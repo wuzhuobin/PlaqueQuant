@@ -1,0 +1,2 @@
+#Add module to the project
+add_subdirectory(Module)

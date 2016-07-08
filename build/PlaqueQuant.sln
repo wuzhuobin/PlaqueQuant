@@ -1,0 +1,65 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ALL_BUILD", "ALL_BUILD.vcxproj", "{A7AE0FA9-494D-3007-A72D-65FFC64C90C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB} = {DCE90FC2-445B-3D75-87D1-32D6B3903FFB}
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD} = {1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D} = {2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Module", "codes\Module\Module.vcxproj", "{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D} = {2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlaqueQuant", "PlaqueQuant.vcxproj", "{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D} = {2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZERO_CHECK", "ZERO_CHECK.vcxproj", "{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+		MinSizeRel|x64 = MinSizeRel|x64
+		RelWithDebInfo|x64 = RelWithDebInfo|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7AE0FA9-494D-3007-A72D-65FFC64C90C7}.Debug|x64.ActiveCfg = Debug|x64
+		{A7AE0FA9-494D-3007-A72D-65FFC64C90C7}.Release|x64.ActiveCfg = Release|x64
+		{A7AE0FA9-494D-3007-A72D-65FFC64C90C7}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{A7AE0FA9-494D-3007-A72D-65FFC64C90C7}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.Debug|x64.ActiveCfg = Debug|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.Debug|x64.Build.0 = Debug|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.Release|x64.ActiveCfg = Release|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.Release|x64.Build.0 = Release|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{DCE90FC2-445B-3D75-87D1-32D6B3903FFB}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.Debug|x64.ActiveCfg = Debug|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.Debug|x64.Build.0 = Debug|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.Release|x64.ActiveCfg = Release|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.Release|x64.Build.0 = Release|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{1BBBD4AF-6AF4-301C-88D7-C39EE0A5FDCD}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.Debug|x64.ActiveCfg = Debug|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.Debug|x64.Build.0 = Debug|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.Release|x64.ActiveCfg = Release|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.Release|x64.Build.0 = Release|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{2B4AD3C2-FB18-3CCD-BB3B-D2AC260D562D}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
