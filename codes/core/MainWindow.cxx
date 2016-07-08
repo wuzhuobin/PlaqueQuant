@@ -130,7 +130,7 @@ MainWindow::MainWindow()
 	//Segmentation
 	SegmentationOverlay = NULL;
 	*overlayColor = NULL;
-	
+
 }
 
 MainWindow* MainWindow::GetMainWindow()
@@ -185,21 +185,24 @@ void MainWindow::initializeModule()
 void MainWindow::initializeViewers()
 {
     
-	for(int i=0; i<3; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		m_2DimageViewer[i]	= MyImageViewer::New();
-		m_interactor[i]		= vtkRenderWindowInteractor::New();
-		m_style[i]			= MyVtkInteractorStyleImage::New();
-		m_2DimageViewer[i]->SetInputData(m_vtkT1);
-		double* range = m_vtkT1->GetScalarRange();
-		m_2DimageViewer[i]->SetColorWindow(range[1] - range[0]);
-		m_2DimageViewer[i]->SetColorLevel((range[1] + range[0]) * 0.5);
-		double defaultWindowLevel[2] = { range[1] - range[0] ,(range[1] + range[0]) * 0.5 };
-		m_2DimageViewer[i]->SetDefaultWindowLevel(defaultWindowLevel);
+		//m_interactor[i]		= vtkRenderWindowInteractor::New();
+		//m_style[i]			= MyVtkInteractorStyleImage::New();
+		//m_2DimageViewer[i] = MyImageViewer::New();
+		m_2DimageViewer[i] = controller.getViewers(i);
+
+		//m_2DimageViewer[i]->SetInputData(m_vtkT1);
+		//double* range = m_vtkT1->GetScalarRange();
+		//m_2DimageViewer[i]->SetColorWindow(range[1] - range[0]);
+		//m_2DimageViewer[i]->SetColorLevel((range[1] + range[0]) * 0.5);
+		//double defaultWindowLevel[2] = { range[1] - range[0] ,(range[1] + range[0]) * 0.5 };
+		//m_2DimageViewer[i]->SetDefaultWindowLevel(defaultWindowLevel);
 
 
-		
+	//	
 	}
+	
 	this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 	//this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
 	//this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
@@ -211,27 +214,24 @@ void MainWindow::initializeViewers()
 	this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 	//this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
 	//this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
+	controller.initialize(m_vtkT1);
 
 
 	for (int i = 0 ; i < 3 ; i++)
 	{
-		m_2DimageViewer[i]->SetSliceOrientation(i);
-		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
-		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-		
-		//Update style
-		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-		m_style[i]->SetMode(MyVtkInteractorStyleImage::NavaigationMode);
+		//m_2DimageViewer[i]->SetSliceOrientation(i);
+		//m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
+		//m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
+		//m_interactor[i]->SetInteractorStyle(m_style[i]);
+		////
+		//////Update style
+		//m_style[i]->SetImageViewer(m_2DimageViewer[i]);
+		//m_style[i]->SetMode(MyVtkInteractorStyleImage::NavaigationMode);
 		//m_style[i]->SetAutoAdjustCameraClippingRange(true);
 		//m_style[i]->SetSliceSpinBox(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox);
 		//m_style[i]->SetWindowLevelSpinBox(ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL);
 		//m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
 		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
-
-
-
-
-		m_interactor[i]->SetInteractorStyle(m_style[i]);
 
 		m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
 		m_2DimageViewer[i]->Render();

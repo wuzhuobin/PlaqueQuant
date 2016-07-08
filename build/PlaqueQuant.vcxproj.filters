@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\main.cxx">
@@ -46,6 +46,9 @@
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyPlaneWidget.cxx">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_MainWindow.cpp">
       <Filter>generated</Filter>
     </ClCompile>
@@ -82,7 +85,6 @@
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\qrc_Project.cpp">
       <Filter>generated</Filter>
     </ClCompile>
-    <ClCompile Include="MultiplanarViewController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.h">
@@ -130,13 +132,15 @@
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\include\Define.h">
       <Filter>head</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.h">
+      <Filter>head</Filter>
+    </ClInclude>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\ui_MainWindow.h">
       <Filter>generated</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\ui_InfoDialog.h">
       <Filter>generated</Filter>
     </ClInclude>
-    <ClInclude Include="MultiplanarViewController.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.ui">

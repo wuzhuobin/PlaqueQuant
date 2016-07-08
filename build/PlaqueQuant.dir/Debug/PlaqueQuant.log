@@ -1,4 +1,5 @@
-﻿  moc_MainWindow.cpp
+﻿  Generating codes/core/moc_MainWindow.cpp
+  moc_MainWindow.cpp
 D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
   D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkTransform.hxx(529): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<const double*,T*>(_InIt,_InIt,_OutIt)”的引用
@@ -35,89 +36,107 @@ D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): w
           ]
   c:\users\jieji\desktop\blood_vessel_v_2.0\blood_vessel\codes\core\ImageRegistration.h(38): note: 参见对正在编译的类 模板 实例化“itk::VersorRigid3DTransform<double>”的引用
   MainWindow.cxx
-D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.hxx(441): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<const float*,float*>(_InIt,_InIt,_OutIt)”的引用
-          with
-          [
-              _OutIt=float *,
-              _InIt=const float *
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.hxx(353): note: 编译类 模板 成员函数“void itk::ImageFileReader<ImageType,itk::DefaultConvertPixelTraits<float>>::GenerateData(void)”时
-  C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(413): note: 参见对正在编译的类 模板 实例化“itk::ImageFileReader<ImageType,itk::DefaultConvertPixelTraits<float>>”的引用
-  MyVtkInteractorStyleImage.cxx
-D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkTransform.hxx(529): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<const double*,T*>(_InIt,_InIt,_OutIt)”的引用
-          with
-          [
-              _OutIt=double *,
-              T=double,
-              _InIt=const double *
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkTransform.hxx(524): note: 编译类 模板 成员函数“void itk::Transform<TParametersValueType,3,3>::CopyInParameters(const double *const ,const double *const )”时
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkMatrixOffsetTransformBase.h(76): note: 参见对正在编译的类 模板 实例化“itk::Transform<TParametersValueType,3,3>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkRigid3DTransform.h(59): note: 参见对正在编译的类 模板 实例化“itk::MatrixOffsetTransformBase<TParametersValueType,3,3>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkVersorTransform.h(48): note: 参见对正在编译的类 模板 实例化“itk::Rigid3DTransform<TParametersValueType>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkVersorRigid3DTransform.h(48): note: 参见对正在编译的类 模板 实例化“itk::VersorTransform<TParametersValueType>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  c:\users\jieji\desktop\blood_vessel_v_2.0\blood_vessel\codes\core\ImageRegistration.h(38): note: 参见对正在编译的类 模板 实例化“itk::VersorRigid3DTransform<double>”的引用
-  main.cxx
-D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkTransform.hxx(529): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<const double*,T*>(_InIt,_InIt,_OutIt)”的引用
-          with
-          [
-              _OutIt=double *,
-              T=double,
-              _InIt=const double *
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkTransform.hxx(524): note: 编译类 模板 成员函数“void itk::Transform<TParametersValueType,3,3>::CopyInParameters(const double *const ,const double *const )”时
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkMatrixOffsetTransformBase.h(76): note: 参见对正在编译的类 模板 实例化“itk::Transform<TParametersValueType,3,3>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkRigid3DTransform.h(59): note: 参见对正在编译的类 模板 实例化“itk::MatrixOffsetTransformBase<TParametersValueType,3,3>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkVersorTransform.h(48): note: 参见对正在编译的类 模板 实例化“itk::Rigid3DTransform<TParametersValueType>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkVersorRigid3DTransform.h(48): note: 参见对正在编译的类 模板 实例化“itk::VersorTransform<TParametersValueType>”的引用
-          with
-          [
-              TParametersValueType=double
-          ]
-  c:\users\jieji\desktop\blood_vessel_v_2.0\blood_vessel\codes\core\ImageRegistration.h(38): note: 参见对正在编译的类 模板 实例化“itk::VersorRigid3DTransform<double>”的引用
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(99): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(158): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(159): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(159): error C2227: “->Delete”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(194): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(207): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(207): error C2227: “->GetRenderWindow”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(211): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(211): error C2227: “->GetRenderWindow”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(215): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(215): error C2227: “->GetRenderWindow”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(236): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(236): error C2227: “->InitializeHeader”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(237): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(237): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(238): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(238): error C2227: “->GetRenderer”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(238): error C2227: “->ResetCamera”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(239): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(239): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(241): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(241): error C2227: “->GetSliceMax”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(242): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(242): error C2227: “->GetSliceMin”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(276): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(276): error C2227: “->SetInputDataLayer”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(284): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(284): error C2227: “->SetInputDataLayer”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(620): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(620): error C2227: “->GetInput”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(620): error C2227: “->GetDimensions”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(621): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(621): error C2227: “->GetInput”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(621): error C2227: “->GetDimensions”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(622): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(622): error C2227: “->GetInput”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(622): error C2227: “->GetDimensions”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(623): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(623): error C2227: “->GetSlice”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(624): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(624): error C2227: “->GetSlice”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(625): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(625): error C2227: “->GetSlice”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(626): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(626): error C2227: “->GetColorWindow”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(627): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(627): error C2227: “->GetColorLevel”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(644): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(644): error C2227: “->GetInput”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(645): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(646): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(646): error C2227: “->GetBound”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(826): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(828): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(828): error C2227: “->ResizeOrientationText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(829): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(829): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(858): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(860): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(860): error C2227: “->ResizeOrientationText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(861): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(861): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(892): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(894): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(894): error C2227: “->ResizeOrientationText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(895): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(895): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(969): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(971): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(971): error C2227: “->ResizeOrientationText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(972): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(972): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(980): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(982): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(982): error C2227: “->ResizeOrientationText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(983): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(983): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1001): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1001): error C2227: “->SetRulerEnabled”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1027): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1027): error C2227: “->GetBound”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1054): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1054): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1064): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1064): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1074): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1074): error C2227: “->SetBound”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1131): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1131): error C2227: “->InitializeIntensityText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1132): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1132): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1140): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1140): error C2227: “->InitializeIntensityText”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1141): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1141): error C2227: “->Render”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1170): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1170): error C2227: “->SetSlice”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1174): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1174): error C2227: “->SetSlice”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1178): error C2065: “m_2DimageViewer”: 未声明的标识符
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1178): error C2227: “->SetSlice”的左边必须指向类/结构/联合/泛型类型
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.cxx(1178): fatal error C1003: 错误计数超过 100；正在停止编译
+  MyImageViewer.cxx
   正在生成代码...
-c:\users\jieji\desktop\blood_vessel_v_2.0\blood_vessel\codes\core\mainwindow.cxx(1822): warning C4715: “MainWindow::GetOverlay”: 不是所有的控件路径都返回值
-  PlaqueQuant.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\Debug\PlaqueQuant.exe
-  PlaqueQuant.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/Debug/PlaqueQuant.pdb (Full PDB)

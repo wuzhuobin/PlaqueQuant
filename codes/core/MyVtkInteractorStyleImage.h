@@ -3,7 +3,6 @@
 
 #include "Define.h"
 #include "MyImageViewer.h"
-#include "MainWindow.h"
 
 //#include <QSpinBox>
 //#include <QDoubleSpinBox>
@@ -48,9 +47,7 @@
 //#include <vtkWidgetEventTranslator.h>
 //#include <vtkImageCanvasSource2D.h>
 
-#include "MultiplanarViewController.h"
 
-class MainWindow;
 class ModuleWidget;
 using namespace std;
 // Define own interaction style
@@ -85,7 +82,6 @@ public:
 //	void SetPolygonModeEnabled(bool b);
 	void SetMode(int m);
 	void SetMode(Mode m);
-	//void setController(MultiplanarViewController* controller);
 
 //	void SetSliceRange(int min, int max);
 //	void SetCurrentSlice(int slice);
@@ -103,7 +99,6 @@ protected:
 	~MyVtkInteractorStyleImage();
 
 	vtkImageViewer2* imageViewer;
-	//MultiplanarViewController* controller;
 	//    int no_of_points;
 	//    int max_point;
 	int slice;

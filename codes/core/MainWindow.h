@@ -54,11 +54,11 @@
 #include "SurfaceCreator.h"
 #include "VesselSegmentation.h"
 #include "ExtractCenterline.h"
-
+#include "MultiplanarViewController.h"
 
 class Ui_MainWindow;
 class ModuleWidget;
-class MyVtkInteractorStyleImage;
+
 class MainWindow: public QMainWindow
 {
 	Q_OBJECT
@@ -78,12 +78,15 @@ public:
 	Overlay* GetOverlay();
 	~MainWindow();
 	
+	MultiplanarViewController controller;
+	
 	enum
   {
     SLICE_ORIENTATION_YZ = 0,
     SLICE_ORIENTATION_XZ = 1,
     SLICE_ORIENTATION_XY = 2
   };
+
 
 public slots:
 	//GUI

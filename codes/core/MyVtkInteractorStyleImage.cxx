@@ -131,10 +131,6 @@ void MyVtkInteractorStyleImage::SetMode(Mode m)
 	mode = m;
 }
 
-//void MyVtkInteractorStyleImage::setController(MultiplanarViewController * controller)
-//{
-//	this->controller = controller;
-//}
 
 MyVtkInteractorStyleImage::MyVtkInteractorStyleImage()
 	:vtkInteractorStyleImage()
@@ -145,7 +141,6 @@ MyVtkInteractorStyleImage::MyVtkInteractorStyleImage()
 	mode = WindowLevelMode;
 	rclickDrag = false;
 	lclickDrag = false;
-	//controller = NULL;
 	imageViewer = NULL;
 }
 
@@ -230,7 +225,6 @@ void MyVtkInteractorStyleImage::OnMouseWheelBackward()
 
 void MyVtkInteractorStyleImage::OnLeftButtonUp()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	lclickDrag = false;
 	//if (m_mode == 3)
 	//{
