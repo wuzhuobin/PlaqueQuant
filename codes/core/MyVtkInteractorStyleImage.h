@@ -80,8 +80,6 @@ public:
 	virtual void OnKeyPress();
 	int getOrientation();
 
-	// Interaction mode entry points used internally.
-	virtual void EndWindowLevel();
 
 	//void SetOrientation(MyImageViewer* imageViewer);
 //	void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
@@ -100,6 +98,7 @@ public:
 	void SetMode(int m);
 	void SetMode(Mode m);
 	void setViewerSlice();
+	double* getIndex();
 
 //	void SetSliceRange(int min, int max);
 //	void SetCurrentSlice(int slice);
@@ -116,6 +115,8 @@ public:
 // are overridden in subclasses to perform the correct motion. Since
 // they might be called from OnTimer, they do not have mouse coord parameters
 // (use interactor's GetEventPosition and GetLastEventPosition)
+	virtual void WindowLevel();
+
 protected:
 	MyVtkInteractorStyleImage();
 	~MyVtkInteractorStyleImage();

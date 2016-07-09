@@ -141,7 +141,87 @@ void MyVtkInteractorStyleImage::setViewerSlice()
 	imageViewer->SetSlice(slice);
 }
 
+double * MyVtkInteractorStyleImage::getIndex()
+{
+	return index;
+}
 
+
+
+void MyVtkInteractorStyleImage::WindowLevel()
+{
+	vtkRenderWindowInteractor *rwi = this->Interactor;
+
+	this->WindowLevelCurrentPosition[0] = rwi->GetEventPosition()[0];
+	this->WindowLevelCurrentPosition[1] = rwi->GetEventPosition()[1];
+
+	if (this->HandleObservers &&
+		this->HasObserver(vtkCommand::WindowLevelEvent))
+	{
+		this->InvokeEvent(vtkCommand::WindowLevelEvent, this);
+	}
+	else if (this->CurrentImageProperty)
+	{
+		int *size = this->CurrentRenderer->GetSize();
+
+		double window = this->WindowLevelInitial[0];
+		double level = this->WindowLevelInitial[1];
+
+		// Compute normalized delta
+
+		double dx = (this->WindowLevelCurrentPosition[0] -
+			this->WindowLevelStartPosition[0]) * 4.0 / size[0];
+		double dy = (this->WindowLevelStartPosition[1] -
+			this->WindowLevelCurrentPosition[1]) * 4.0 / size[1];
+
+		// Scale by current values
+
+		if (fabs(window) > 0.01)
+		{
+			dx = dx * window;
+		}
+		else
+		{
+			dx = dx * (window < 0 ? -0.01 : 0.01);
+		}
+		if (fabs(level) > 0.01)
+		{
+			dy = dy * level;
+		}
+		else
+		{
+			dy = dy * (level < 0 ? -0.01 : 0.01);
+		}
+
+		// Abs so that direction does not flip
+
+		if (window < 0.0)
+		{
+			dx = -1 * dx;
+		}
+		if (level < 0.0)
+		{
+			dy = -1 * dy;
+		}
+
+		// Compute new window level
+
+		double newWindow = dx + window;
+		double newLevel = level - dy;
+
+		if (newWindow < 0.01)
+		{
+			newWindow = 0.01;
+		}
+		imageViewer->SetColorWindow(newWindow);
+		imageViewer->SetColorLevel(newLevel);
+		imageViewer->Render();
+	}
+	if (this->HandleObservers && this->HasObserver(MyVtkCommand::WindowLevelEvent2))
+	{
+		this->InvokeEvent(MyVtkCommand::WindowLevelEvent2, this);
+	}
+}
 
 MyVtkInteractorStyleImage::MyVtkInteractorStyleImage()
 	:vtkInteractorStyleImage()
@@ -534,6 +614,7 @@ int MyVtkInteractorStyleImage::getOrientation()
 {
 	return this->orientation;
 }
+
 //void MyVtkInteractorStyleImage::CalculateIndex()
 void MyVtkInteractorStyleImage::CalculateIndex(double* index)
 {
@@ -555,11 +636,17 @@ void MyVtkInteractorStyleImage::CalculateIndex(double* index)
         for (int i =0;i<3;i++)
         {
             index[i] = (picked[i]-origin[i])/spacing[i];
-        }
-		cout << index[0] << " " << index[1] << " " << index[2] << endl;
+			if (i == orientation) {
+				index[i] = imageViewer->GetSlice();
+			}
+		}
+		cout << "index:" <<index[0] << " " << index[1] << " " << index[2] << endl;
 		//mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
     }
-    
+	if (this->HandleObservers && this->HasObserver(MyVtkCommand::NavigationEvent))
+	{
+		this->InvokeEvent(MyVtkCommand::NavigationEvent, this);
+	}
 	
 }
 //

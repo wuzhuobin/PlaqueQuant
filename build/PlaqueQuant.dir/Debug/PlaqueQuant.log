@@ -1,5 +1,5 @@
-﻿  MultiplanarViewController.cpp
-C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\MyVtkCommand.h(12): warning C4091: “static ”: 没有声明变量时忽略“MyVtkCommand::EventIds”的左侧
+﻿  MyVtkInteractorStyleImage.cxx
+C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\MyVtkCommand.h(14): warning C4091: “static ”: 没有声明变量时忽略“MyVtkCommand::EventIds”的左侧
 D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
   D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(72): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<TElement*,TElement*>(_InIt,_InIt,_OutIt)”的引用
