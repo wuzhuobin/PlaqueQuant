@@ -32,13 +32,30 @@ void MultiplanarViewController::setSlices(int * slices)
 
 void MultiplanarViewController::setColorWindow(double colorWindow)
 {
-	for (int i = 0; i < 3; ++i) {
+	this->colorWindow = colorWindow;
+	for (int i = 0; i < NUMOFVIEWERS; ++i) {
+		cout << viewers[i]->GetColorLevel() << " " << viewers[i]->GetColorWindow() << endl;
 
+		viewers[i]->SetColorWindow(colorWindow);
 	}
 }
 
-void MultiplanarViewController::setColorLevel(double colorWindow)
+void MultiplanarViewController::setColorLevel(double colorLevel)
 {
+	this->colorLevel = colorLevel;
+	for (int i = 0; i < NUMOFVIEWERS; ++i) {
+		cout << viewers[i]->GetColorLevel() << " " << viewers[i]->GetColorWindow() << endl;
+
+		viewers[i]->SetColorLevel (colorLevel);
+	}
+}
+
+void MultiplanarViewController::render()
+{
+	for (int i = 0; i < NUMOFVIEWERS; ++i) {
+		cout << viewers[i]->GetColorLevel() << " " << viewers[i]->GetColorWindow() << endl;
+		viewers[i]->Render();
+	}
 }
 
 MyImageViewer* MultiplanarViewController::getViewers(int i)
@@ -54,12 +71,17 @@ void MultiplanarViewController::initialize(vtkImageData * in)
 {
 	vtkSmartPointer<MultiplanarViewControllerCallback> callback =
 		vtkSmartPointer<MultiplanarViewControllerCallback>::New();
+	callback->controller = this;
 	double* range = in->GetScalarRange();
+	setColorLevel((range[1] + range[0]) * 0.5);
+	setColorWindow(range[1] - range[0]);
 	for (int i = 0; i < NUMOFVIEWERS; ++i) {
 
 		viewers[i]->SetInputData(in);
-		viewers[i]->SetColorWindow(range[1] - range[0]);
-		viewers[i]->SetColorLevel((range[1] + range[0]) * 0.5);
+
+		//viewers[i]->SetColorWindow(range[1] - range[0]);
+		//viewers[i]->SetColorLevel((range[1] + range[0]) * 0.5);
+
 		double defaultWindowLevel[2] = { range[1] - range[0], (range[1] + range[0]) * 0.5 };
 		viewers[i]->SetDefaultWindowLevel(defaultWindowLevel);
 
@@ -74,13 +96,13 @@ void MultiplanarViewController::initialize(vtkImageData * in)
 
 		slices[i] = viewers[i]->GetSlice();
 
-		style[i]->AddObserver(MyVtkCommand::ResetWindowLevelEvent, callback);
+		style[i]->AddObserver(MyVtkCommand::WindowLevelEvent2, callback);
 		style[i]->AddObserver(MyVtkCommand::SliceChangeEvent, callback);
 
 
 	}
-	colorLevel = viewers[0]->GetColorLevel();
-	colorWindow = viewers[0]->GetColorWindow();
+	//colorLevel = viewers[0]->GetColorLevel();
+	//colorWindow = viewers[0]->GetColorWindow();
 
 }
 
@@ -111,6 +133,10 @@ MultiplanarViewControllerCallback* MultiplanarViewControllerCallback::New() {
 
 void MultiplanarViewControllerCallback::Execute(vtkObject* caller,
 	unsigned long event, void* callData) {
+
+	MyVtkInteractorStyleImage* style = static_cast<MyVtkInteractorStyleImage*>(caller);
+	int orientation = style->getOrientation();
+	cout << "orientatino:" << orientation << endl;
 	if (controller->viewers.size() == 0) {
 		return;
 	}
@@ -120,7 +146,13 @@ void MultiplanarViewControllerCallback::Execute(vtkObject* caller,
 		cout << "slice change" << endl;
 		break;
 
-	case MyVtkCommand::StartWindowLevelEvent:
+	//case MyVtkCommand::WindowLevelEvent:
+	//	cout << " window level1 " << endl;
+	//	break;
+	case MyVtkCommand::WindowLevelEvent2:
+		controller->setColorLevel(style->GetWindowLevelCurrentPosition()[1]);
+		controller->setColorWindow(style->GetWindowLevelCurrentPosition()[0]);
+		controller->render();
 		cout << " window level " << endl;
 		break;
 	default:

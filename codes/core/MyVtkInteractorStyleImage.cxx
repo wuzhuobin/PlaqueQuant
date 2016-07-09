@@ -133,9 +133,15 @@ void MyVtkInteractorStyleImage::SetMode(Mode m)
 
 void MyVtkInteractorStyleImage::setViewerSlice()
 {
+	if (this->HandleObservers && this->HasObserver(MyVtkCommand::SliceChangeEvent)) {
+
+		InvokeEvent(MyVtkCommand::SliceChangeEvent, this);
+
+	}
 	imageViewer->SetSlice(slice);
-	InvokeEvent(MyVtkCommand::SliceChangeEvent, this);
 }
+
+
 
 MyVtkInteractorStyleImage::MyVtkInteractorStyleImage()
 	:vtkInteractorStyleImage()
@@ -231,6 +237,24 @@ void MyVtkInteractorStyleImage::OnMouseWheelBackward()
 void MyVtkInteractorStyleImage::OnLeftButtonUp()
 {
 	lclickDrag = false;
+
+	switch (mode)
+	{
+	case MyVtkInteractorStyleImage::OtherMode:
+		break;
+	case MyVtkInteractorStyleImage::NavaigationMode:
+		break;
+	case MyVtkInteractorStyleImage::WindowLevelMode:
+		vtkInteractorStyleImage::OnLeftButtonUp();
+		break;
+	case MyVtkInteractorStyleImage::PaintBrushMode:
+		break;
+	case MyVtkInteractorStyleImage::PolygonMode:
+		break;
+	default:
+		vtkInteractorStyleImage::OnLeftButtonDown();
+		break;
+	}
 	//if (m_mode == 3)
 	//{
 	//	if (!isDraw)
@@ -505,6 +529,10 @@ void MyVtkInteractorStyleImage::OnKeyPress()
 
 	// Forward events
 	vtkInteractorStyleImage::OnKeyPress();
+}
+int MyVtkInteractorStyleImage::getOrientation()
+{
+	return this->orientation;
 }
 //void MyVtkInteractorStyleImage::CalculateIndex()
 void MyVtkInteractorStyleImage::CalculateIndex(double* index)

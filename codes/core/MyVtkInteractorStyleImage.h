@@ -69,7 +69,21 @@ public:
 	enum Mode { OtherMode = 0, NavaigationMode = 1, WindowLevelMode = 2, PaintBrushMode = 3, PolygonMode = 4 };
 
 	void SetImageViewer(vtkImageViewer2* imageViewer);
-    //void SetOrientation(MyImageViewer* imageViewer);
+	virtual void OnMouseWheelForward();
+	virtual void OnMouseWheelBackward();
+	virtual void OnLeftButtonDown();
+	virtual void OnLeftButtonUp();
+	virtual void OnMouseMove();
+	void MoveSliceForward();
+	void MoveSliceBackward();
+	void CalculateIndex(double* index);
+	virtual void OnKeyPress();
+	int getOrientation();
+
+	// Interaction mode entry points used internally.
+	virtual void EndWindowLevel();
+
+	//void SetOrientation(MyImageViewer* imageViewer);
 //	void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
 //	void SetWindowLevelSpinBox(QDoubleSpinBox* w,QDoubleSpinBox* l);
 //	// Paint Brush
@@ -98,6 +112,10 @@ public:
 //	void RemoveContourWidgetAll();
 //
 
+// These methods for the different interactions in different modes
+// are overridden in subclasses to perform the correct motion. Since
+// they might be called from OnTimer, they do not have mouse coord parameters
+// (use interactor's GetEventPosition and GetLastEventPosition)
 protected:
 	MyVtkInteractorStyleImage();
 	~MyVtkInteractorStyleImage();
@@ -137,23 +155,16 @@ protected:
 	//	int color_r, color_g, color_b;
 	//	int m_opacity;
 //protected:
-	virtual void OnMouseWheelForward();
-	virtual void OnMouseWheelBackward();
-	virtual void OnLeftButtonDown();
-	virtual void OnLeftButtonUp();	
-	virtual void OnMouseMove();
+
 //	virtual void OnChar();
-	virtual void OnKeyPress();
 //    virtual void OnRightButtonUp();
 //    virtual void OnRightButtonDown();
 //    virtual void OnMiddleButtonUp();
 //    virtual void OnMiddleButtonDown();
 //    
-	void MoveSliceForward();
-	void MoveSliceBackward();
+
 //    void Synchronize();
 	//void CalculateIndex();
-	void CalculateIndex(double* index);
 
 //	void WindowLevel();
 //

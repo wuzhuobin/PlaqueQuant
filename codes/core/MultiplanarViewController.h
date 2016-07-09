@@ -26,7 +26,8 @@ public:
 
 	void setSlices(int* slices);
 	void setColorWindow(double colorWindow);
-	void setColorLevel(double colorWindow);
+	void setColorLevel(double colorLevel);
+	void render();
 
 	MyImageViewer* getViewers(int i);
 	void initialize(vtkImageData* in);
@@ -47,7 +48,6 @@ class MultiplanarViewControllerCallback : public MyVtkCommand
 public:
 	static MultiplanarViewControllerCallback* New();
 	virtual void Execute(vtkObject* caller, unsigned long event, void* callData);
-private:
 	MultiplanarViewController* controller;
 };
 
