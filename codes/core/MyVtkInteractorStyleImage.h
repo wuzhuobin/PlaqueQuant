@@ -60,15 +60,13 @@ public:
 	static MyVtkInteractorStyleImage* New();
 	vtkTypeMacro(MyVtkInteractorStyleImage, vtkInteractorStyleImage);
 
-
-//private:
-//	bool isDraw;
-//
 public:
 	// Model
 	enum Mode { OtherMode = 0, NavaigationMode = 1, WindowLevelMode = 2, PaintBrushMode = 3, PolygonMode = 4 };
 
-	void SetImageViewer(vtkImageViewer2* imageViewer);
+	// Description:
+	// Event bindings controlling the effects of pressing mouse buttons
+	// or moving the mouse.
 	virtual void OnMouseWheelForward();
 	virtual void OnMouseWheelBackward();
 	virtual void OnLeftButtonDown();
@@ -76,9 +74,14 @@ public:
 	virtual void OnMouseMove();
 	void MoveSliceForward();
 	void MoveSliceBackward();
+
+	/**
+	 *
+	 */
 	void CalculateIndex(double* index);
 	virtual void OnKeyPress();
 	int getOrientation();
+	void SetImageViewer(vtkImageViewer2* imageViewer);
 
 
 	//void SetOrientation(MyImageViewer* imageViewer);
