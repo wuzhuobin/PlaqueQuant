@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QFuture>
+#include <qdebug.h>
 
 #include "vtkCamera.h"
 #include "vtkImageMapToWindowLevelColors.h"
@@ -41,207 +42,68 @@
 
 
 //Own Class
-#include "Define.h"
+//#include "Define.h"
 #include "RegistrationWizard.h"
-#include "MyVtkInteractorStyleImage.h"
+//#include "MyVtkInteractorStyleImage.h"
 #include "MyImageViewer.h"
-#include "MyProgressDialog.h"
+//#include "MyProgressDialog.h"
 #include "ModuleWidget.h"
 #include "InfoDialog.h"
-#include "ImageRegistration.h"
-#include "MyPlaneWidget.h"
-#include "Overlay.h"
-#include "SurfaceCreator.h"
-#include "VesselSegmentation.h"
-#include "ExtractCenterline.h"
+//#include "ImageRegistration.h"
+//#include "MyPlaneWidget.h"
+//#include "Overlay.h"
+//#include "SurfaceCreator.h"
+//#include "VesselSegmentation.h"
+//#include "ExtractCenterline.h"
 #include "MultiplanarViewController.h"
+#include "ui_MainWindow.h"
 
-class Ui_MainWindow;
-class ModuleWidget;
 
 class MainWindow: public QMainWindow
 {
 	Q_OBJECT
 public:
-	explicit MainWindow(); 	
-
-	static MainWindow* GetMainWindow();
-    MyImageViewer* GetMyImageViewer(int);
-    MyVtkInteractorStyleImage* GetMyVtkInteractorStyleImage(int);
-	QString GetFileName(int);
-
-	int GetVisibleImageNo();
-	void RenderAllViewer();
-	void Set3DRulerEnabled(bool b);
-	void SetImageLayerNo(int);
-	int GetImageLayerNo();
-	Overlay* GetOverlay();
+	static const int maxRecentImage = 10;
+	MainWindow(QMainWindow* parent = 0);
 	~MainWindow();
-	
-	MultiplanarViewController controller;
-	
-	enum
-  {
-    SLICE_ORIENTATION_YZ = 0,
-    SLICE_ORIENTATION_XZ = 1,
-    SLICE_ORIENTATION_XY = 2
-  };
 
-
-public slots:
-	//GUI
-	virtual void resizeEvent(QResizeEvent * event);
-	virtual void dragEnterEvent(QDragEnterEvent *ev);
-	virtual void dropEvent( QDropEvent *ev );
-	
-	//Mouse Interaction/ Update of Spin Box 
-	virtual void slotChangeSlice();
-	virtual void slotChangeSlice(int, int, int);
-	virtual void slotChangeWindowLevel();
-	virtual void slotChangeWindowLevelUL();
-    virtual void slotChangeWindowLevelUR();
-    virtual void slotChangeWindowLevelLL();
-    virtual void slotChangeWindowLevelLR();
-
-	/*
-    virtual void slotResetWindowLevel();
-		*/
-
-  
-	//Action
-	virtual void slotExit();
-	virtual void slotOpenImage(QString dir);
-	virtual void slotOpenImage();
-	virtual void slotOpenRecentImage();
-	virtual void slotAbout();
-	virtual void slotHelp();
-	virtual void slot3DUpdate();
-	virtual void slotNavigationMode();
-	virtual void slotWindowLevelMode();
-	virtual void slotBrushMode();
-	virtual void slotContourMode();
-    virtual void slotimage1();
-	virtual void slotimage2();
-	virtual void slotimage3();
-	virtual void slotimage4();
-	virtual void slotFourViews();
-	virtual void slotMultiPlanarView();
-
-
-
-	//Overlay
-    
-	virtual void slotAddExternalOverlay();
-	//virtual void slotRemoveOverlay();
-	virtual void slotOverlayVisibilty(bool b);
-	virtual void slotOverlayVisibilty(bool b, int);
-    virtual void slotOverlayOpacity(double);
-  
-	//Centerline
-	virtual void slotCenterline();
-    //Segmentation
-	virtual void slotSegmentationView();
-	virtual void slotChangeBaseImageUL();
-	virtual void slotChangeBaseImageUR();
-	virtual void slotChangeBaseImageLL();
-	virtual void ChangeOrientation(int);
-	virtual void slotChangeImageSeq(int image_no, int window_no);
-	virtual void slotSelectImageSeq(QAction*);
-	//Intensity
-	virtual void slotChangeIntensity();
-
-	//Widget
-	virtual void slotRuler(bool b);
-	virtual void slotSetROIWidgetEnabled(bool b);
-	virtual void slotSelectROI();
-
-	//Widget running 
-	virtual void slotShowProgressDialog(int value, QString text);
-
-	//Visualization
-	bool loadImage(int, QStringList*list);
-	bool visualizeImage();
-
-private:
-	//UI
-	Ui_MainWindow* ui;
-	void setActionsEnable(bool b);
-    
-	//2D/3D view
-	MyImageViewer*				m_2DimageViewer[3];
-	MyImageViewer*				m_3DimageViewer;
-	vtkRenderWindowInteractor*  m_3Dinteractor;
-	vtkRenderWindowInteractor*  m_interactor[3];
-	MyVtkInteractorStyleImage*	m_style[3];
-	vtkRenderer*				m_renderer[4]; // m_renderer[4] is for 3D
-
-    //ROI
-	MyPlaneWidget*			m_planeWidget[3];
-	MyPlaneWidgetCallback*	m_planeWidgetCallback[3];
-	double	m_currentBound[6];
-	bool	m_settingROI;
-
-    //File Name
-    QStringList* FileNameList1;
-    QStringList* FileNameList2;
-    QStringList* FileNameList3;
-    QStringList* FileNameList4;
-    QStringList* FileNameList5;
-    
-	//3D ruler
-	vtkDistanceWidget* DistanceWidget3D;
-	//Recent File
-	int m_maxRecentImage;
-	QList<QAction*> recentFileActionList;
-	void createRecentImageActions();
+	/**
+	* save recent folder to register
+	* i have no idea the following 3
+	*/
 	void adjustForCurrentFile(const QString& filePath);
 	void updateRecentActionList();
-
-	//Initialization
-	void initializeViewers();
-	void initializeModule();
-	void initializeOverlay();
+	void createRecentImageActions();
+public:
+	public slots:
+	void slotAbout();
+	void slotHelp();
+	void slotOpenImage(QString dir);
+	void slotOpenImage();
+	void slotOpenRecentImage();
+	void slotVisualizeImage(int i);
 
 	
-	//Data
-	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
-	ImageType::Pointer	m_itkT1;
-	ImageType::Pointer	m_itkT2;
-	ImageType::Pointer	m_itkT1C;
-	ImageType::Pointer	m_itk2DDIR;
-	ImageType::Pointer	m_itkMPRAGE;
-	vtkImageData*		m_vtkT1;
-	vtkImageData*		m_vtkT2;
-	vtkImageData*		m_vtkT1C;
-    vtkImageData*		m_vtk2DDIR;
-	vtkImageData*		m_vtkMPRAGE;
-	//vtkPolyData*		m_vtkOutputPolyData;
+private:
+	//UI
+	Ui::MainWindow ui;
+	ModuleWidget moduleWidget;
+	Dialog dialog;
 
-    //Orientation
-	int m_orientation;
-    
-	//Dock Widget
-	ModuleWidget* m_moduleWidget;
+	//Initialization
+	//void initializeViewers();
+	void initializeModule();
+	//void initializeOverlay();
 
-	//Overlay
-	Overlay* SegmentationOverlay;
-	int* overlayColor[3];
-	int m_layer_no;		//Main Image
-	//vtkActor* actorOverlay;
-	//Progress Dialog
-	//MyProgressDialog* m_progressDialog;
+	// controller 3 2d viewer
+	MultiplanarViewController controller;
 
-	//Navigation
-	double m_focalPoint[3];
-    
-    int m_visible_image_no;
-
-	//Information
-	Dialog* m_InfoDialog;
-
-	//Segmentation mode
-	bool segmentation;
-
+	//File Name
+	QStringList fileNameList[5];
+	// number of images from waizard
+	int visibleImageNum;
+	// for using recent folders
+	QList<QAction*> recentFileActionList;
 
 };
  

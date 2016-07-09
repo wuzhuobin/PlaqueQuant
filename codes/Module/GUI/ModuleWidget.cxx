@@ -84,28 +84,28 @@ QComboBox* ModuleWidget::GetBrushShapeComBox()
 }
 void ModuleWidget::slotSegmentationView()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotSegmentationView();
+	//MainWindow* mainWnd = MainWindow::GetMainWindow();
+	//mainWnd->slotSegmentationView();
 }
 
 void ModuleWidget::slotChangeLayerNo()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	int layer = ui->labelComboBox->currentIndex() + 1;
-	mainwnd->SetImageLayerNo(layer);
+	//MainWindow* mainwnd = MainWindow::GetMainWindow();
+	//int layer = ui->labelComboBox->currentIndex() + 1;
+	//mainwnd->SetImageLayerNo(layer);
 
 }
 
 void ModuleWidget::slotChangeOpacity()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotOverlayOpacity(ui->opacitySpinBox->value()/100.0);
+	//MainWindow* mainWnd = MainWindow::GetMainWindow();
+	//mainWnd->slotOverlayOpacity(ui->opacitySpinBox->value()/100.0);
 
 }
 void ModuleWidget::slotSelectROI()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotSelectROI();
+	//MainWindow* mainWnd = MainWindow::GetMainWindow();
+	//mainWnd->slotSelectROI();
 }
 
 

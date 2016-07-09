@@ -1,5 +1,4 @@
-﻿  MyVtkInteractorStyleImage.cxx
-C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\MyVtkCommand.h(14): warning C4091: “static ”: 没有声明变量时忽略“MyVtkCommand::EventIds”的左侧
+﻿  moc_MainWindow.cpp
 D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
   D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(72): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<TElement*,TElement*>(_InIt,_InIt,_OutIt)”的引用
@@ -13,5 +12,60 @@ D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): w
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(56): note: 参见对正在编译的函数 模板 实例化“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”的引用
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(50): note: 编译类 模板 成员函数“void itk::Image<PixelType,3>::Allocate(bool)”时
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.h(74): note: 参见对正在编译的类 模板 实例化“itk::Image<PixelType,3>”的引用
+  MainWindow.cxx
+D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(72): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<TElement*,TElement*>(_InIt,_InIt,_OutIt)”的引用
+          with
+          [
+              _OutIt=float *,
+              TElement=float,
+              _InIt=float *
+          ]
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(60): note: 编译类 模板 成员函数“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”时
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(56): note: 参见对正在编译的函数 模板 实例化“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”的引用
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(50): note: 编译类 模板 成员函数“void itk::Image<PixelType,3>::Allocate(bool)”时
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.h(74): note: 参见对正在编译的类 模板 实例化“itk::Image<PixelType,3>”的引用
+  MultiplanarViewController.cpp
+D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.hxx(441): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<const float*,float*>(_InIt,_InIt,_OutIt)”的引用
+          with
+          [
+              _OutIt=float *,
+              _InIt=const float *
+          ]
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.hxx(353): note: 编译类 模板 成员函数“void itk::ImageFileReader<ImageType,itk::DefaultConvertPixelTraits<float>>::GenerateData(void)”时
+  C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.cpp(75): note: 参见对正在编译的类 模板 实例化“itk::ImageFileReader<ImageType,itk::DefaultConvertPixelTraits<float>>”的引用
+  MyVtkInteractorStyleImage.cxx
+D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(72): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<TElement*,TElement*>(_InIt,_InIt,_OutIt)”的引用
+          with
+          [
+              _OutIt=float *,
+              TElement=float,
+              _InIt=float *
+          ]
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(60): note: 编译类 模板 成员函数“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”时
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(56): note: 参见对正在编译的函数 模板 实例化“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”的引用
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(50): note: 编译类 模板 成员函数“void itk::Image<PixelType,3>::Allocate(bool)”时
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.h(74): note: 参见对正在编译的类 模板 实例化“itk::Image<PixelType,3>”的引用
+  main.cxx
+D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(72): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<TElement*,TElement*>(_InIt,_InIt,_OutIt)”的引用
+          with
+          [
+              _OutIt=float *,
+              TElement=float,
+              _InIt=float *
+          ]
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImportImageContainer.hxx(60): note: 编译类 模板 成员函数“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”时
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(56): note: 参见对正在编译的函数 模板 实例化“void itk::ImportImageContainer<unsigned long,float>::Reserve(unsigned long,const bool)”的引用
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\common\include\itkImage.hxx(50): note: 编译类 模板 成员函数“void itk::Image<PixelType,3>::Allocate(bool)”时
+  d:\itk_4.8.2\insighttoolkit-4.8.2\modules\io\imagebase\include\itkImageFileReader.h(74): note: 参见对正在编译的类 模板 实例化“itk::Image<PixelType,3>”的引用
+  正在生成代码...
+c:\users\jieji\desktop\blood_vessel_v_2.0\blood_vessel\codes\core\multiplanarviewcontroller.cpp(104): warning C4715: “MultiplanarViewController::loadImage”: 不是所有的控件路径都返回值
   PlaqueQuant.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\Debug\PlaqueQuant.exe
   PlaqueQuant.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/Debug/PlaqueQuant.pdb (Full PDB)

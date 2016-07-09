@@ -5,7 +5,7 @@ class MyVtkCommand :
 	public vtkCommand
 {
 public:
-	static enum EventIds {
+	enum EventIds {
 		SliceChangeEvent = 1001,
 		EndWindowLevelEvent2 = 1002,
 		WindowLevelEvent2 = 1003,

@@ -17,7 +17,7 @@ int main( int argc, char** argv )
   {
 	  QString folder = argv[1];
 	  folder.replace("\\","/");
-	  mainWnd.slotOpenImage(folder);
+	  //mainWnd.slotOpenImage(folder);
   }
 
   return app.exec();

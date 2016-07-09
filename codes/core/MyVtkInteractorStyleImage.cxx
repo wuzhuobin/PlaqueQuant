@@ -141,6 +141,11 @@ void MyVtkInteractorStyleImage::setViewerSlice()
 	imageViewer->SetSlice(slice);
 }
 
+void MyVtkInteractorStyleImage::setSlice(int slice)
+{
+	this->slice = slice;
+}
+
 double * MyVtkInteractorStyleImage::getIndex()
 {
 	return index;

@@ -101,6 +101,7 @@ public:
 	void SetMode(int m);
 	void SetMode(Mode m);
 	void setViewerSlice();
+	void setSlice(int slice);
 	double* getIndex();
 
 //	void SetSliceRange(int min, int max);

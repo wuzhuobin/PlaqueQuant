@@ -28,6 +28,7 @@ void MultiplanarViewController::setSlices(int * slices)
 	for (int i = 0; i < 3; ++i) {
 		this->slices[i] = slices[i];
 		viewers[i]->SetSlice(slices[i]);
+		style[i]->setSlice(slices[i]);
 		cout << "slices:" << slices[i];
 	}
 	cout << endl;
@@ -64,6 +65,42 @@ MyImageViewer* MultiplanarViewController::getViewers(int i)
 	}
 	else
 		return NULL;
+}
+
+int MultiplanarViewController::loadImage(list<string> list)
+{
+	//Load Nifti Data
+	if (list.size() == 1 && (list.cbegin()->find(".nii") != string::npos))
+	{
+		NiftiReaderType::Pointer reader = NiftiReaderType::New();
+		reader->SetFileName(*list.cbegin());
+		reader->Update();
+
+		//re-orient
+		OrienterType::Pointer orienter = OrienterType::New();
+		orienter->UseImageDirectionOn();
+		orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+		orienter->SetInput(reader->GetOutput());
+		orienter->Update();
+
+		ConnectorType::Pointer connector = ConnectorType::New();
+		ConnectorType::Pointer connectorAfter = ConnectorType::New();
+		connector->SetInput(orienter->GetOutput());
+		try
+		{
+			connector->Update();
+		}
+		catch (itk::ExceptionObject &err)
+		{
+			std::cerr << err << std::endl;
+			return 1;
+		}
+
+		//Get Data
+		vtkSmartPointer<vtkImageData> img = vtkSmartPointer<vtkImageData>::New();
+		img->DeepCopy(connector->GetOutput());
+		imgs.push_back(img);
+	}
 }
 
 void MultiplanarViewController::initialize(vtkImageData * in)
@@ -103,13 +140,21 @@ void MultiplanarViewController::initialize(vtkImageData * in)
 		style[i]->AddObserver(MyVtkCommand::ResetWindowLevelEvent, callback);
 		style[i]->AddObserver(MyVtkCommand::NavigationEvent, callback);
 
-
+		viewers[i]->Render();
+		viewers[i]->GetRenderer()->ResetCamera();
+		viewers[i]->Render();
+		interactor[i]->Initialize();
 
 
 	}
 	//colorLevel = viewers[0]->GetColorLevel();
 	//colorWindow = viewers[0]->GetColorWindow();
 
+}
+
+vtkImageData * MultiplanarViewController::getImage(int i)
+{
+	return imgs[i];
 }
 
 //void CallbackFunction(vtkObject * caller, long unsigned int eventId, void * clientData, void * callData)
