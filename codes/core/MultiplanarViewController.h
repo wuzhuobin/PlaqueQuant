@@ -2,31 +2,18 @@
 
 #include "MyImageViewer.h"
 #include "MyVtkInteractorStyleImage.h"
+#include "MyVtkCommand.h"
 
 #include <vtkSmartPointer.h>
 #include <vtkSetGet.h>
 #include <vtkImageData.h>
-#include <vtkCommand.h>
-#include <vtkCallbackCommand.h>
 #include <vtkRenderWindowInteractor.h>
 
 #include <vector>
 
 using namespace std;
 
-void CallbackFunction(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
-
-
-class MultiplanarViewControllerCallback : public vtkCallbackCommand
-{
-public:
-
-	static enum _enum_name { 
-		SliceChangeEvent = 1001, 
-		ColorWindowEvent = 1002,
-		ColorLevelEvent = 1003
-	};
-};
+//void CallbackFunction(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
 
 class MultiplanarViewController
 {
@@ -52,7 +39,16 @@ protected:
 	vector<vtkSmartPointer<vtkRenderWindowInteractor>> interactor;
 	vector<vtkSmartPointer<MyVtkInteractorStyleImage>> style;
 
+	friend class MultiplanarViewControllerCallback;
 };
 
+class MultiplanarViewControllerCallback : public MyVtkCommand
+{
+public:
+	static MultiplanarViewControllerCallback* New();
+	virtual void Execute(vtkObject* caller, unsigned long event, void* callData);
+private:
+	MultiplanarViewController* controller;
+};
 
 

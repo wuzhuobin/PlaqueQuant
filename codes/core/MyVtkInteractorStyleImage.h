@@ -3,6 +3,7 @@
 
 #include "Define.h"
 #include "MyImageViewer.h"
+#include "MyVtkCommand.h"
 
 //#include <QSpinBox>
 //#include <QDoubleSpinBox>
@@ -28,6 +29,8 @@
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkAbstractPicker.h>
+
+
 //#include <vtkRenderer.h>
 //#include <vtkRenderWindow.h>
 //#include <vtkOrientedGlyphContourRepresentation.h>
@@ -82,6 +85,7 @@ public:
 //	void SetPolygonModeEnabled(bool b);
 	void SetMode(int m);
 	void SetMode(Mode m);
+	void setViewerSlice();
 
 //	void SetSliceRange(int min, int max);
 //	void SetCurrentSlice(int slice);

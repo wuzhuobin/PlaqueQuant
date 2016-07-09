@@ -131,6 +131,11 @@ void MyVtkInteractorStyleImage::SetMode(Mode m)
 	mode = m;
 }
 
+void MyVtkInteractorStyleImage::setViewerSlice()
+{
+	imageViewer->SetSlice(slice);
+	InvokeEvent(MyVtkCommand::SliceChangeEvent, this);
+}
 
 MyVtkInteractorStyleImage::MyVtkInteractorStyleImage()
 	:vtkInteractorStyleImage()
@@ -154,7 +159,7 @@ void MyVtkInteractorStyleImage::MoveSliceForward()
 	if(slice < maxSlice) 
 	{
 		slice += 1;
-		imageViewer->SetSlice(slice);
+		setViewerSlice();
 		cout << " slice " << slice << endl;
 		cout << " maxslice " << maxSlice << endl;
 		cout << " minslice " << minSlice << endl;
@@ -180,7 +185,7 @@ void MyVtkInteractorStyleImage::MoveSliceBackward()
 	if(slice > minSlice) 
 	{
 		slice -= 1;
-		imageViewer->SetSlice(slice);
+		setViewerSlice();
 		cout << " slice " << slice << endl;
 		cout << " maxslice " << maxSlice << endl;
 		cout << " minslice " << minSlice << endl;
