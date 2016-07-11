@@ -49,6 +49,9 @@
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyVtkCommand.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_MainWindow.cpp">
       <Filter>generated</Filter>
     </ClCompile>
@@ -85,7 +88,7 @@
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\qrc_Project.cpp">
       <Filter>generated</Filter>
     </ClCompile>
-    <ClCompile Include="MyVtkCommand.cpp" />
+    <ClCompile Include="MultiWidgetsController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.h">
@@ -136,13 +139,16 @@
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.h">
       <Filter>head</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyVtkCommand.h">
+      <Filter>head</Filter>
+    </ClInclude>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\ui_MainWindow.h">
       <Filter>generated</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\ui_InfoDialog.h">
       <Filter>generated</Filter>
     </ClInclude>
-    <ClInclude Include="MyVtkCommand.h" />
+    <ClInclude Include="MultiWidgetsController.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.ui">

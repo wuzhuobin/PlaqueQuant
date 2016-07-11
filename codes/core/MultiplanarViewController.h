@@ -10,7 +10,6 @@
 #include <vtkImageData.h>
 #include <vtkRenderWindowInteractor.h>
 
-#include <vector>
 #include <list>
 #include <string>
 
@@ -31,21 +30,36 @@ public:
 	void setColorWindow(double colorWindow);
 	void setColorLevel(double colorLevel);
 	void render();
+	void setMode(MyVtkInteractorStyleImage::Mode mode);
+	void setMode(int mode);
+	void setIntensityText(int* index);
 
 	MyImageViewer* getViewers(int i);
 	int loadImage(list<string> in);
+	void setImageName(string name);
+	void initialize();
+	/**
+	 * @deprecated
+	 */
 	void initialize(vtkImageData* in);
-	vtkImageData* getImage(int i);
+	vtkImageData* getImage();
 
 
 protected:
 	int slices[NUMOFVIEWERS];
 	double colorWindow;
 	double colorLevel;
-	vector<vtkSmartPointer<MyImageViewer>> viewers;
-	vector<vtkSmartPointer<vtkRenderWindowInteractor>> interactor;
-	vector<vtkSmartPointer<MyVtkInteractorStyleImage>> style;
-	vector<vtkSmartPointer<vtkImageData>> imgs;
+	vtkSmartPointer<MyImageViewer> viewers[NUMOFVIEWERS];
+	vtkSmartPointer<vtkRenderWindowInteractor> interactor[NUMOFVIEWERS];
+	vtkSmartPointer<MyVtkInteractorStyleImage> style[NUMOFVIEWERS];
+	vtkSmartPointer<vtkImageData> img;
+	string imgName;
+
+	//Cursor
+	//vector<vtkSmartPointer<vtkCursor3D>> Cursor3D;
+	//vector<vtkSmartPointer<vtkPolyDataMapper>> Cursormapper;
+	//vector<vtkSmartPointer<vtkActor>> CursorActor;
+
 
 	friend class MultiplanarViewControllerCallback;
 

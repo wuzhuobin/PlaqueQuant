@@ -146,7 +146,7 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 CMAKE_VERBOSE_MAKEFILE:BOOL=OFF
 
 //The directory containing a CMake configuration file for ITK.
-ITK_DIR:PATH=D:/itk_4.8.2/InsightToolkit-4.8.2_bin
+ITK_DIR:PATH=D:\itk_4.8.2\InsightToolkit-4.8.2_bin
 
 //Path to a library.
 MODULE_LIBRARIES:FILEPATH=C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/lib/Debug/Module.lib

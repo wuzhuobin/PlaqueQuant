@@ -89,24 +89,25 @@
 #include <vtkLeaderActor2D.h>
 #include <vtkAxisActor2D.h>
 #include <vtkProperty2D.h>
+#include <vtkCamera.h>
 
-#include <QString>
-
+#include <string>
 
 class MyImageViewer : public vtkImageViewer2
 {
 public:
   static MyImageViewer *New();
   vtkTypeMacro(MyImageViewer,vtkObject);
-    virtual void InitializeHeader(QString);
-	virtual void InitializeIntensityText(QString);
-  
+    virtual void initializeHeader(std::string file);
+	virtual void InitializeIntensityText(std::string IntText);
+	virtual void InitializeOrientationText();
+
+
    virtual void RemoveInput();
    // Set Input Layer
     virtual void SetInputDataLayer(vtkImageData *in);
     virtual vtkImageData *GetInputLayer();
     virtual void RemoveInputLayer();
-    
 	virtual void AddPolyData(vtkPolyData* polydata,vtkProperty* property);
   
 	// Description:
@@ -157,8 +158,8 @@ public:
   virtual void ResizeOrientationText();
  
   //Ruler
-  virtual void SetRulerEnabled(bool b);
-  virtual void SetProtractorEnabled(bool b);
+  //virtual void SetRulerEnabled(bool b);
+  //virtual void SetProtractorEnabled(bool b);
 
 
   //// Description:
@@ -169,23 +170,22 @@ public:
   //VTK_LEGACY(void SetZSlice(int));
 
 protected:
-  MyImageViewer();
-  ~MyImageViewer();
+	MyImageViewer();
+	~MyImageViewer();
 
   virtual void SetCursorBoundary();
-  virtual void InitializeOrientationText();
     
 
   //Rendering 
-  vtkRenderWindow           *RenderWindow;
-  vtkRenderer               *Renderer;
-  vtkRenderWindowInteractor *Interactor;
-  vtkInteractorStyleImage   *InteractorStyle;
+  //vtkRenderWindow           *RenderWindow;
+  //vtkRenderer               *Renderer;
+  //vtkRenderWindowInteractor *Interactor;
+  //vtkInteractorStyleImage   *InteractorStyle;
 
   //OrientationText
   vtkTextActor*	TextActor[4];
     
-  //Header
+	//Header
     vtkTextActor* HeaderActor;
 
 	// IntensityText
@@ -209,14 +209,12 @@ protected:
   vtkActor*	ClipActor;
 
   //Widget
-  vtkDistanceWidget* DistanceWidget;
+  //vtkDistanceWidget* DistanceWidget;
 
-  vtkAngleWidget*	 AngleWidget;
-   vtkContourWidget*  ContourWidget;
+  //vtkAngleWidget*	 AngleWidget;
+  // vtkContourWidget*  ContourWidget;
   //vtkSmartPointer<vtkOrientedGlyphContourRepresentation> ContourRep;
   //Parameter
-  int SliceOrientation;
-  int FirstRender;
   int Slice;
   vtkPlane* SliceImplicitPlane;
   double DefaultWindowLevel[2];

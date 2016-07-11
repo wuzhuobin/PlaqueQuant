@@ -9,7 +9,7 @@ The output was:
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:07。
+生成启动时间为 2016/7/11 20:19:25。
 节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\3.5.2\CompilerIdC\CompilerIdC.vcxproj”(默认目标)。
 PrepareForBuild:
   正在创建目录“Debug\”。
@@ -35,7 +35,7 @@ FinalizeBuildStatus:
     0 个警告
     0 个错误
 
-已用时间 00:00:00.55
+已用时间 00:00:01.82
 
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -54,7 +54,7 @@ The output was:
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:08。
+生成启动时间为 2016/7/11 20:19:27。
 节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\3.5.2\CompilerIdCXX\CompilerIdCXX.vcxproj”(默认目标)。
 PrepareForBuild:
   正在创建目录“Debug\”。
@@ -80,7 +80,7 @@ FinalizeBuildStatus:
     0 个警告
     0 个错误
 
-已用时间 00:00:00.51
+已用时间 00:00:00.59
 
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -92,157 +92,157 @@ The CXX compiler identification is MSVC, found in "C:/Users/jieji/Desktop/blood_
 Determining if the C compiler works passed with the following output:
 Change Dir: C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_ace3d.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_90e47.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:09。
-节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_ace3d.vcxproj”(默认目标)。
+生成启动时间为 2016/7/11 20:19:28。
+节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_90e47.vcxproj”(默认目标)。
 PrepareForBuild:
-  正在创建目录“cmTC_ace3d.dir\Debug\”。
+  正在创建目录“cmTC_90e47.dir\Debug\”。
   正在创建目录“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\”。
-  正在创建目录“cmTC_ace3d.dir\Debug\cmTC_ace3d.tlog\”。
+  正在创建目录“cmTC_90e47.dir\Debug\cmTC_90e47.tlog\”。
 InitializeBuildStatus:
-  正在创建“cmTC_ace3d.dir\Debug\cmTC_ace3d.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+  正在创建“cmTC_90e47.dir\Debug\cmTC_90e47.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
 ClCompile:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_ace3d.dir\Debug\\" /Fd"cmTC_ace3d.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCCompiler.c
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_90e47.dir\Debug\\" /Fd"cmTC_90e47.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCCompiler.c
   用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.23918 版
   版权所有(C) Microsoft Corporation。保留所有权利。
   
-  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_ace3d.dir\Debug\\" /Fd"cmTC_ace3d.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCCompiler.c
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_90e47.dir\Debug\\" /Fd"cmTC_90e47.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCCompiler.c
   
   testCCompiler.c
 Link:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_ace3d.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_ace3d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_ace3d.lib" /MACHINE:X64  /machine:x64 cmTC_ace3d.dir\Debug\testCCompiler.obj
-  cmTC_ace3d.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_ace3d.exe
-  cmTC_ace3d.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_ace3d.pdb (Full PDB)
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_90e47.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_90e47.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_90e47.lib" /MACHINE:X64  /machine:x64 cmTC_90e47.dir\Debug\testCCompiler.obj
+  cmTC_90e47.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_90e47.exe
+  cmTC_90e47.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_90e47.pdb (Full PDB)
 FinalizeBuildStatus:
-  正在删除文件“cmTC_ace3d.dir\Debug\cmTC_ace3d.tlog\unsuccessfulbuild”。
-  正在对“cmTC_ace3d.dir\Debug\cmTC_ace3d.tlog\cmTC_ace3d.lastbuildstate”执行 Touch 任务。
-已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_ace3d.vcxproj”(默认目标)的操作。
+  正在删除文件“cmTC_90e47.dir\Debug\cmTC_90e47.tlog\unsuccessfulbuild”。
+  正在对“cmTC_90e47.dir\Debug\cmTC_90e47.tlog\cmTC_90e47.lastbuildstate”执行 Touch 任务。
+已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_90e47.vcxproj”(默认目标)的操作。
 
 已成功生成。
     0 个警告
     0 个错误
 
-已用时间 00:00:00.93
+已用时间 00:00:01.03
 
 
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_c6581.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_d9a70.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:10。
-节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_c6581.vcxproj”(默认目标)。
+生成启动时间为 2016/7/11 20:19:29。
+节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_d9a70.vcxproj”(默认目标)。
 PrepareForBuild:
-  正在创建目录“cmTC_c6581.dir\Debug\”。
+  正在创建目录“cmTC_d9a70.dir\Debug\”。
   正在创建目录“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\”。
-  正在创建目录“cmTC_c6581.dir\Debug\cmTC_c6581.tlog\”。
+  正在创建目录“cmTC_d9a70.dir\Debug\cmTC_d9a70.tlog\”。
 InitializeBuildStatus:
-  正在创建“cmTC_c6581.dir\Debug\cmTC_c6581.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+  正在创建“cmTC_d9a70.dir\Debug\cmTC_d9a70.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
 ClCompile:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_c6581.dir\Debug\\" /Fd"cmTC_c6581.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCCompilerABI.c"
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_d9a70.dir\Debug\\" /Fd"cmTC_d9a70.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCCompilerABI.c"
   用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.23918 版
   版权所有(C) Microsoft Corporation。保留所有权利。
   
-  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_c6581.dir\Debug\\" /Fd"cmTC_c6581.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCCompilerABI.c"
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_d9a70.dir\Debug\\" /Fd"cmTC_d9a70.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCCompilerABI.c"
   
   CMakeCCompilerABI.c
 Link:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_c6581.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_c6581.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_c6581.lib" /MACHINE:X64  /machine:x64 cmTC_c6581.dir\Debug\CMakeCCompilerABI.obj
-  cmTC_c6581.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_c6581.exe
-  cmTC_c6581.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_c6581.pdb (Full PDB)
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_d9a70.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_d9a70.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_d9a70.lib" /MACHINE:X64  /machine:x64 cmTC_d9a70.dir\Debug\CMakeCCompilerABI.obj
+  cmTC_d9a70.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_d9a70.exe
+  cmTC_d9a70.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_d9a70.pdb (Full PDB)
 FinalizeBuildStatus:
-  正在删除文件“cmTC_c6581.dir\Debug\cmTC_c6581.tlog\unsuccessfulbuild”。
-  正在对“cmTC_c6581.dir\Debug\cmTC_c6581.tlog\cmTC_c6581.lastbuildstate”执行 Touch 任务。
-已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_c6581.vcxproj”(默认目标)的操作。
+  正在删除文件“cmTC_d9a70.dir\Debug\cmTC_d9a70.tlog\unsuccessfulbuild”。
+  正在对“cmTC_d9a70.dir\Debug\cmTC_d9a70.tlog\cmTC_d9a70.lastbuildstate”执行 Touch 任务。
+已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_d9a70.vcxproj”(默认目标)的操作。
 
 已成功生成。
     0 个警告
     0 个错误
 
-已用时间 00:00:00.67
+已用时间 00:00:00.59
 
 
 Determining if the CXX compiler works passed with the following output:
 Change Dir: C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_f5df5.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_f86bb.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:11。
-节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_f5df5.vcxproj”(默认目标)。
+生成启动时间为 2016/7/11 20:19:30。
+节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_f86bb.vcxproj”(默认目标)。
 PrepareForBuild:
-  正在创建目录“cmTC_f5df5.dir\Debug\”。
+  正在创建目录“cmTC_f86bb.dir\Debug\”。
   正在创建目录“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\”。
-  正在创建目录“cmTC_f5df5.dir\Debug\cmTC_f5df5.tlog\”。
+  正在创建目录“cmTC_f86bb.dir\Debug\cmTC_f86bb.tlog\”。
 InitializeBuildStatus:
-  正在创建“cmTC_f5df5.dir\Debug\cmTC_f5df5.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+  正在创建“cmTC_f86bb.dir\Debug\cmTC_f86bb.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
 ClCompile:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_f5df5.dir\Debug\\" /Fd"cmTC_f5df5.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_f86bb.dir\Debug\\" /Fd"cmTC_f86bb.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
   用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.23918 版
   版权所有(C) Microsoft Corporation。保留所有权利。
   
-  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_f5df5.dir\Debug\\" /Fd"cmTC_f5df5.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_f86bb.dir\Debug\\" /Fd"cmTC_f86bb.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
   
   testCXXCompiler.cxx
 Link:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_f5df5.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f5df5.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f5df5.lib" /MACHINE:X64  /machine:x64 cmTC_f5df5.dir\Debug\testCXXCompiler.obj
-  cmTC_f5df5.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_f5df5.exe
-  cmTC_f5df5.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f5df5.pdb (Full PDB)
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_f86bb.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f86bb.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f86bb.lib" /MACHINE:X64  /machine:x64 cmTC_f86bb.dir\Debug\testCXXCompiler.obj
+  cmTC_f86bb.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_f86bb.exe
+  cmTC_f86bb.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f86bb.pdb (Full PDB)
 FinalizeBuildStatus:
-  正在删除文件“cmTC_f5df5.dir\Debug\cmTC_f5df5.tlog\unsuccessfulbuild”。
-  正在对“cmTC_f5df5.dir\Debug\cmTC_f5df5.tlog\cmTC_f5df5.lastbuildstate”执行 Touch 任务。
-已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_f5df5.vcxproj”(默认目标)的操作。
+  正在删除文件“cmTC_f86bb.dir\Debug\cmTC_f86bb.tlog\unsuccessfulbuild”。
+  正在对“cmTC_f86bb.dir\Debug\cmTC_f86bb.tlog\cmTC_f86bb.lastbuildstate”执行 Touch 任务。
+已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_f86bb.vcxproj”(默认目标)的操作。
 
 已成功生成。
     0 个警告
     0 个错误
 
-已用时间 00:00:00.57
+已用时间 00:00:00.64
 
 
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_8da3d.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_f0b96.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:12。
-节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_8da3d.vcxproj”(默认目标)。
+生成启动时间为 2016/7/11 20:19:31。
+节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_f0b96.vcxproj”(默认目标)。
 PrepareForBuild:
-  正在创建目录“cmTC_8da3d.dir\Debug\”。
+  正在创建目录“cmTC_f0b96.dir\Debug\”。
   正在创建目录“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\”。
-  正在创建目录“cmTC_8da3d.dir\Debug\cmTC_8da3d.tlog\”。
+  正在创建目录“cmTC_f0b96.dir\Debug\cmTC_f0b96.tlog\”。
 InitializeBuildStatus:
-  正在创建“cmTC_8da3d.dir\Debug\cmTC_8da3d.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+  正在创建“cmTC_f0b96.dir\Debug\cmTC_f0b96.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
 ClCompile:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_8da3d.dir\Debug\\" /Fd"cmTC_8da3d.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCXXCompilerABI.cpp"
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_f0b96.dir\Debug\\" /Fd"cmTC_f0b96.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCXXCompilerABI.cpp"
   用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.23918 版
   版权所有(C) Microsoft Corporation。保留所有权利。
   
-  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_8da3d.dir\Debug\\" /Fd"cmTC_8da3d.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCXXCompilerABI.cpp"
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_f0b96.dir\Debug\\" /Fd"cmTC_f0b96.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue "D:\cmake-3.5.2-win32-x86\share\cmake-3.5\Modules\CMakeCXXCompilerABI.cpp"
   
   CMakeCXXCompilerABI.cpp
 Link:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_8da3d.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_8da3d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_8da3d.lib" /MACHINE:X64  /machine:x64 cmTC_8da3d.dir\Debug\CMakeCXXCompilerABI.obj
-  cmTC_8da3d.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_8da3d.exe
-  cmTC_8da3d.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_8da3d.pdb (Full PDB)
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_f0b96.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f0b96.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f0b96.lib" /MACHINE:X64  /machine:x64 cmTC_f0b96.dir\Debug\CMakeCXXCompilerABI.obj
+  cmTC_f0b96.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_f0b96.exe
+  cmTC_f0b96.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_f0b96.pdb (Full PDB)
 FinalizeBuildStatus:
-  正在删除文件“cmTC_8da3d.dir\Debug\cmTC_8da3d.tlog\unsuccessfulbuild”。
-  正在对“cmTC_8da3d.dir\Debug\cmTC_8da3d.tlog\cmTC_8da3d.lastbuildstate”执行 Touch 任务。
-已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_8da3d.vcxproj”(默认目标)的操作。
+  正在删除文件“cmTC_f0b96.dir\Debug\cmTC_f0b96.tlog\unsuccessfulbuild”。
+  正在对“cmTC_f0b96.dir\Debug\cmTC_f0b96.tlog\cmTC_f0b96.lastbuildstate”执行 Touch 任务。
+已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_f0b96.vcxproj”(默认目标)的操作。
 
 已成功生成。
     0 个警告
     0 个错误
 
-已用时间 00:00:00.55
+已用时间 00:00:00.59
 
 
 
@@ -250,40 +250,40 @@ FinalizeBuildStatus:
 Detecting CXX [] compiler features compiled with the following output:
 Change Dir: C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_57e1e.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_45575.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) 生成引擎版本 14.0.25123.0
 版权所有(C) Microsoft Corporation。保留所有权利。
 
-生成启动时间为 2016/7/7 9:56:13。
-节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_57e1e.vcxproj”(默认目标)。
+生成启动时间为 2016/7/11 20:19:32。
+节点 1 上的项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_45575.vcxproj”(默认目标)。
 PrepareForBuild:
-  正在创建目录“cmTC_57e1e.dir\Debug\”。
+  正在创建目录“cmTC_45575.dir\Debug\”。
   正在创建目录“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\”。
-  正在创建目录“cmTC_57e1e.dir\Debug\cmTC_57e1e.tlog\”。
+  正在创建目录“cmTC_45575.dir\Debug\cmTC_45575.tlog\”。
 InitializeBuildStatus:
-  正在创建“cmTC_57e1e.dir\Debug\cmTC_57e1e.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+  正在创建“cmTC_45575.dir\Debug\cmTC_45575.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
 ClCompile:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_57e1e.dir\Debug\\" /Fd"cmTC_57e1e.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\feature_tests.cxx
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_45575.dir\Debug\\" /Fd"cmTC_45575.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\feature_tests.cxx
   用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.00.23918 版
   版权所有(C) Microsoft Corporation。保留所有权利。
   
-  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_57e1e.dir\Debug\\" /Fd"cmTC_57e1e.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\feature_tests.cxx
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_45575.dir\Debug\\" /Fd"cmTC_45575.dir\Debug\vc140.pdb" /Gd /TP /errorReport:queue C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\feature_tests.cxx
   
   feature_tests.cxx
 Link:
-  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_57e1e.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_57e1e.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_57e1e.lib" /MACHINE:X64  /machine:x64 cmTC_57e1e.dir\Debug\feature_tests.obj
-  cmTC_57e1e.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_57e1e.exe
-  cmTC_57e1e.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_57e1e.pdb (Full PDB)
+  D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_45575.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_45575.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_45575.lib" /MACHINE:X64  /machine:x64 cmTC_45575.dir\Debug\feature_tests.obj
+  cmTC_45575.vcxproj -> C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\Debug\cmTC_45575.exe
+  cmTC_45575.vcxproj -> C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/CMakeTmp/Debug/cmTC_45575.pdb (Full PDB)
 FinalizeBuildStatus:
-  正在删除文件“cmTC_57e1e.dir\Debug\cmTC_57e1e.tlog\unsuccessfulbuild”。
-  正在对“cmTC_57e1e.dir\Debug\cmTC_57e1e.tlog\cmTC_57e1e.lastbuildstate”执行 Touch 任务。
-已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_57e1e.vcxproj”(默认目标)的操作。
+  正在删除文件“cmTC_45575.dir\Debug\cmTC_45575.tlog\unsuccessfulbuild”。
+  正在对“cmTC_45575.dir\Debug\cmTC_45575.tlog\cmTC_45575.lastbuildstate”执行 Touch 任务。
+已完成生成项目“C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\CMakeFiles\CMakeTmp\cmTC_45575.vcxproj”(默认目标)的操作。
 
 已成功生成。
     0 个警告
     0 个错误
 
-已用时间 00:00:00.58
+已用时间 00:00:00.59
 
 
     Feature record: CXX_FEATURE:1cxx_alias_templates

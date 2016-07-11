@@ -10,6 +10,7 @@
 //#include <QComboBox>
 //#include <QCheckBox>
 #include <iostream>
+#include <sstream>
 //
 //#include <QTime>
 //#include <QCoreApplication>

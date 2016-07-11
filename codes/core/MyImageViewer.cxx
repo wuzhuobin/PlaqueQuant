@@ -5,13 +5,19 @@ vtkStandardNewMacro(MyImageViewer);
 MyImageViewer::MyImageViewer()
 	:vtkImageViewer2()
 {
-	this->DistanceWidget = vtkDistanceWidget::New();
-	this->AngleWidget = vtkAngleWidget::New();
-	this->ContourWidget = vtkContourWidget::New();
+	//this->DistanceWidget = vtkDistanceWidget::New();
+	//this->AngleWidget = vtkAngleWidget::New();
+	//this->ContourWidget = vtkContourWidget::New();
 	this->ImageActorLayer = vtkImageActor::New();
 	this->WindowLevelLayer = vtkImageMapToWindowLevelColors::New();
 	this->LookUpTableLayer = vtkLookupTable::New();
 	this->SliceImplicitPlane = vtkPlane::New();
+	this->IntTextActor = vtkTextActor::New();
+	this->HeaderActor = vtkTextActor::New();
+	for (int i = 0; i < 4; i++)
+	{
+		TextActor[i] = vtkTextActor::New();
+	}
 
 
 	//Disable the warning
@@ -55,18 +61,18 @@ MyImageViewer::MyImageViewer()
 
 MyImageViewer::~MyImageViewer()
 {
-	if (this->DistanceWidget) {
-		this->DistanceWidget->Delete();
-		this->DistanceWidget = NULL;
-	}
-	if (this->AngleWidget) {
-		this->AngleWidget->Delete();
-		this->AngleWidget = NULL;
-	}
-	if (this->ContourWidget) {
-		this->ContourWidget->Delete();
-		this->ContourWidget = NULL;
-	}
+	//if (this->DistanceWidget) {
+	//	this->DistanceWidget->Delete();
+	//	this->DistanceWidget = NULL;
+	//}
+	//if (this->AngleWidget) {
+	//	this->AngleWidget->Delete();
+	//	this->AngleWidget = NULL;
+	//}
+	//if (this->ContourWidget) {
+	//	this->ContourWidget->Delete();
+	//	this->ContourWidget = NULL;
+	//}
 	if (this->ImageActorLayer) {
 		this->ImageActorLayer->Delete();
 		this->ImageActorLayer = NULL;
@@ -96,6 +102,19 @@ MyImageViewer::~MyImageViewer()
 		CursorActor = NULL;
 	}
 	
+	if (HeaderActor) {
+		HeaderActor->Delete();
+		HeaderActor = NULL;
+	}
+	if(IntTextActor){
+		this->IntTextActor->Delete();
+		IntTextActor = NULL;
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		if(TextActor[i])
+		TextActor[i] = NULL;
+	}
 }
 
 double MyImageViewer::GetColorWindowLayer()
@@ -120,8 +139,8 @@ void MyImageViewer::SetColorLevelLayer(double s)
 
 void MyImageViewer::SetDefaultWindowLevel(double * defaultWindowLevel)
 {
-	DefaultWindowLevel[0] = defaultWindowLevel[0];
-	defaultWindowLevel[1] = defaultWindowLevel[1];
+	this->DefaultWindowLevel[0] = defaultWindowLevel[0];
+	this->DefaultWindowLevel[1] = defaultWindowLevel[1];
 }
 
 
@@ -247,6 +266,49 @@ double* MyImageViewer::GetFocalPoint()
 	return Cursor3D->GetFocalPoint();
 }
 
+//void MyImageViewer::Render(void)
+//{
+//	//switch (this->SliceOrientation)
+//	//{
+//
+//	//	//
+//	//case MyImageViewer::SLICE_ORIENTATION_XY:
+//	//default:
+//	//	GetRenderer()->GetActiveCamera()->Roll(180);
+//	//	GetRenderer()->GetActiveCamera()->Azimuth(180);
+//	//	break;
+//
+//	//case MyImageViewer::SLICE_ORIENTATION_XZ:
+//	//	GetRenderer()->GetActiveCamera()->Azimuth(180);
+//	//	GetRenderer()->GetActiveCamera()->Elevation(180);
+//	//	break;
+//	//}
+//	if (this->FirstRender)
+//	{
+//		this->InitializeOrientationText();
+//		this->InitializeIntensityText("");
+//		//switch (this->SliceOrientation)
+//		//{
+//
+//		//	//
+//		//case MyImageViewer::SLICE_ORIENTATION_XY:
+//		//default:
+//		//	GetRenderer()->GetActiveCamera()->Roll(180);
+//		//	GetRenderer()->GetActiveCamera()->Azimuth(180);
+//		//	break;
+//
+//		//case MyImageViewer::SLICE_ORIENTATION_XZ:
+//		//	GetRenderer()->GetActiveCamera()->Azimuth(180);
+//		//	GetRenderer()->GetActiveCamera()->Elevation(180);
+//		//	break;
+//		//}
+//	}
+//	vtkImageViewer2::Render();
+//
+//
+//
+//}
+
 void MyImageViewer::RemoveInput()
 {
 
@@ -277,17 +339,17 @@ void MyImageViewer::RemoveInput()
 	this->RenderWindow = NULL;
 	}
 	*/
-	if (this->Interactor)
-	{
-		this->Interactor->Delete();
-		this->Interactor = NULL;
-	}
+	//if (this->Interactor)
+	//{
+	//	this->Interactor->Delete();
+	//	this->Interactor = NULL;
+	//}
 
-	if (this->InteractorStyle)
-	{
-		this->InteractorStyle->Delete();
-		this->InteractorStyle = NULL;
-	}
+	//if (this->InteractorStyle)
+	//{
+	//	this->InteractorStyle->Delete();
+	//	this->InteractorStyle = NULL;
+	//}
 
 	//if (this->SliceImplicitPlane)
 	//{
@@ -331,7 +393,7 @@ void MyImageViewer::RemoveInputLayer()
 	this->WindowLevelLayer = vtkImageMapToWindowLevelColors::New();
 
 }
-void MyImageViewer::InitializeHeader(QString File)
+void MyImageViewer::initializeHeader(std::string File)
 {
 	int* size = GetRenderer()->GetSize();
 	double margin = 15;
@@ -339,9 +401,7 @@ void MyImageViewer::InitializeHeader(QString File)
 
 	if (HeaderActor != NULL) {
 		GetRenderer()->RemoveActor2D(HeaderActor);
-		//HeaderActor->Delete();
 	}
-	HeaderActor = vtkTextActor::New();
 	HeaderActor->GetTextProperty()->SetFontSize(15);
 	HeaderActor->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
 	GetRenderer()->AddActor2D(HeaderActor);
@@ -349,24 +409,19 @@ void MyImageViewer::InitializeHeader(QString File)
 	HeaderActor->SetDisplayPosition(coord[0], coord[1]);
 
 
-	QByteArray Fileba = File.toLatin1();
-	const char *Filestr = Fileba.data();
-
-
 	if (GetInput() != NULL)
-		HeaderActor->SetInput(Filestr);
+		HeaderActor->SetInput(File.c_str());
 	else
 		cout << "Error in setting text, file not found" << endl;
 }
 
-void MyImageViewer::InitializeIntensityText(QString IntText)
+void MyImageViewer::InitializeIntensityText(std::string IntText)
 {
 	int* size = GetRenderer()->GetSize();
 	//double margin = 15;
 	int coord[2] = { 5,5 };
 
 	if (this->FirstRender) {
-		IntTextActor = vtkTextActor::New();
 		IntTextActor->GetTextProperty()->SetFontSize(15);
 		IntTextActor->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
 		GetRenderer()->AddActor2D(IntTextActor);
@@ -374,12 +429,9 @@ void MyImageViewer::InitializeIntensityText(QString IntText)
 		return;
 	}
 
-	QByteArray IntTextba = IntText.toLatin1();
-	const char *IntTextstr = IntTextba.data();
-
 
 	if (GetInput() != NULL)
-		IntTextActor->SetInput(IntTextstr);
+		IntTextActor->SetInput(IntText.c_str());
 	else
 		cout << "Error in setting text, file not found" << endl;
 }
@@ -394,19 +446,16 @@ void MyImageViewer::InitializeOrientationText()
 	int left[2] = { 5			,size[1] / 2 };
 	int right[2] = { size[0] - (int)margin	,size[1] / 2 };
 
-	for (int i = 0; i<4; i++)
-	{
-		TextActor[i] = vtkTextActor::New();
-		TextActor[i]->GetTextProperty()->SetFontSize(15);
-		TextActor[i]->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
-		GetRenderer()->AddActor2D(TextActor[i]);
-	}
-
 	TextActor[0]->SetDisplayPosition(up[0], up[1]);
 	TextActor[1]->SetDisplayPosition(down[0], down[1]);
 	TextActor[2]->SetDisplayPosition(left[0], left[1]);
 	TextActor[3]->SetDisplayPosition(right[0], right[1]);
-
+	for (int i = 0; i<4; i++)
+	{
+		TextActor[i]->GetTextProperty()->SetFontSize(15);
+		TextActor[i]->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
+		GetRenderer()->AddActor2D(TextActor[i]);
+	}
 	switch (SliceOrientation)
 	{
 	case 0:
@@ -422,8 +471,8 @@ void MyImageViewer::InitializeOrientationText()
 		TextActor[3]->SetInput("L");
 		break;
 	case 2:
-		TextActor[0]->SetInput("A");
-		TextActor[1]->SetInput("P");
+		TextActor[0]->SetInput("P");
+		TextActor[1]->SetInput("A");
 		TextActor[2]->SetInput("R");
 		TextActor[3]->SetInput("L");
 		break;
@@ -448,66 +497,66 @@ void MyImageViewer::ResizeOrientationText()
 	HeaderActor->SetDisplayPosition(coord[0], coord[1]);
 }
 
-void MyImageViewer::SetRulerEnabled(bool b)
-{
-	if (b)
-	{
-		if (DistanceWidget)
-			DistanceWidget->Delete();
-
-		DistanceWidget = vtkDistanceWidget::New();
-		DistanceWidget->SetInteractor(GetRenderWindow()->GetInteractor());
-		DistanceWidget->SetPriority(GetRenderWindow()->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
-
-		vtkSmartPointer< vtkPointHandleRepresentation2D > rulerHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
-		vtkSmartPointer< vtkDistanceRepresentation2D > distanceRep = vtkSmartPointer< vtkDistanceRepresentation2D >::New();
-		distanceRep->SetHandleRepresentation(rulerHandleRep);
-		DistanceWidget->SetRepresentation(distanceRep);
-		distanceRep->InstantiateHandleRepresentation();
-		distanceRep->SetLabelFormat("%-#11.2f mm");
-		distanceRep->GetAxis()->GetProperty()->SetColor(0, 1, 0);
-
-		DistanceWidget->CreateDefaultRepresentation();
-		DistanceWidget->On();
-	}
-	else
-	{
-		DistanceWidget->Off();
-
-	}
-
-	GetRenderWindow()->Render();
-}
-
-
-
-void MyImageViewer::SetProtractorEnabled(bool b)
-{
-	if (b)
-	{
-		if (AngleWidget)
-			AngleWidget->Delete();
-		AngleWidget = vtkAngleWidget::New();
-		AngleWidget->SetInteractor(GetRenderWindow()->GetInteractor());
-		AngleWidget->SetPriority(GetRenderWindow()->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
-		vtkSmartPointer< vtkPointHandleRepresentation2D > angleHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
-		vtkSmartPointer< vtkAngleRepresentation2D > angleRep = vtkSmartPointer< vtkAngleRepresentation2D >::New();
-		angleRep->SetHandleRepresentation(angleHandleRep);
-		AngleWidget->SetRepresentation(angleRep);
-		angleRep->InstantiateHandleRepresentation();
-		angleRep->SetLabelFormat("%-#11.2f mm");
-		angleRep->GetRay1()->GetProperty()->SetColor(0, 1, 0);
-		angleRep->GetRay2()->GetProperty()->SetColor(0, 1, 0);
-
-		AngleWidget->CreateDefaultRepresentation();
-		AngleWidget->On();
-	}
-	else
-	{
-		AngleWidget->Off();
-
-	}
-
-	GetRenderWindow()->Render();
-}
+//void MyImageViewer::SetRulerEnabled(bool b)
+//{
+//	if (b)
+//	{
+//		if (DistanceWidget)
+//			DistanceWidget->Delete();
+//
+//		DistanceWidget = vtkDistanceWidget::New();
+//		DistanceWidget->SetInteractor(GetRenderWindow()->GetInteractor());
+//		DistanceWidget->SetPriority(GetRenderWindow()->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
+//
+//		vtkSmartPointer< vtkPointHandleRepresentation2D > rulerHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
+//		vtkSmartPointer< vtkDistanceRepresentation2D > distanceRep = vtkSmartPointer< vtkDistanceRepresentation2D >::New();
+//		distanceRep->SetHandleRepresentation(rulerHandleRep);
+//		DistanceWidget->SetRepresentation(distanceRep);
+//		distanceRep->InstantiateHandleRepresentation();
+//		distanceRep->SetLabelFormat("%-#11.2f mm");
+//		distanceRep->GetAxis()->GetProperty()->SetColor(0, 1, 0);
+//
+//		DistanceWidget->CreateDefaultRepresentation();
+//		DistanceWidget->On();
+//	}
+//	else
+//	{
+//		DistanceWidget->Off();
+//
+//	}
+//
+//	GetRenderWindow()->Render();
+//}
+//
+//
+//
+//void MyImageViewer::SetProtractorEnabled(bool b)
+//{
+//	if (b)
+//	{
+//		if (AngleWidget)
+//			AngleWidget->Delete();
+//		AngleWidget = vtkAngleWidget::New();
+//		AngleWidget->SetInteractor(GetRenderWindow()->GetInteractor());
+//		AngleWidget->SetPriority(GetRenderWindow()->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
+//		vtkSmartPointer< vtkPointHandleRepresentation2D > angleHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
+//		vtkSmartPointer< vtkAngleRepresentation2D > angleRep = vtkSmartPointer< vtkAngleRepresentation2D >::New();
+//		angleRep->SetHandleRepresentation(angleHandleRep);
+//		AngleWidget->SetRepresentation(angleRep);
+//		angleRep->InstantiateHandleRepresentation();
+//		angleRep->SetLabelFormat("%-#11.2f mm");
+//		angleRep->GetRay1()->GetProperty()->SetColor(0, 1, 0);
+//		angleRep->GetRay2()->GetProperty()->SetColor(0, 1, 0);
+//
+//		AngleWidget->CreateDefaultRepresentation();
+//		AngleWidget->On();
+//	}
+//	else
+//	{
+//		AngleWidget->Off();
+//
+//	}
+//
+//	GetRenderWindow()->Render();
+//}
 

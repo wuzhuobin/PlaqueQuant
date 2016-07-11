@@ -1283,7 +1283,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MyVtkCommand.cpp" />
+    <ClCompile Include="MultiWidgetsController.cpp" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\InfoDialog.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyProgressDialog.h" />
@@ -1300,6 +1300,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyPlaneWidget.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\include\Define.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.h" />
+    <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyVtkCommand.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\ui_MainWindow.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\ui_InfoDialog.h" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\main.cxx" />
@@ -1318,6 +1319,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyVtkInteractorStyleImage.cxx" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyPlaneWidget.cxx" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MultiplanarViewController.cpp" />
+    <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyVtkCommand.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_MainWindow.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_InfoDialog.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_MyProgressDialog.cpp" />
@@ -1330,7 +1332,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_ExtractCenterline.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_VesselSegmentation.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\qrc_Project.cpp" />
-    <ClInclude Include="MyVtkCommand.h" />
+    <ClInclude Include="MultiWidgetsController.h" />
     <ResourceCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\resources\Project.rc" />
   </ItemGroup>
   <ItemGroup>

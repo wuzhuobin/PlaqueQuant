@@ -648,6 +648,7 @@ void MyVtkInteractorStyleImage::CalculateIndex(double* index)
 		cout << "index:" <<index[0] << " " << index[1] << " " << index[2] << endl;
 		//mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
     }
+
 	if (this->HandleObservers && this->HasObserver(MyVtkCommand::NavigationEvent))
 	{
 		this->InvokeEvent(MyVtkCommand::NavigationEvent, this);

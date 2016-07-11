@@ -13,6 +13,8 @@
 #include <QMimeData>
 #include <QFuture>
 #include <qdebug.h>
+#include <qactiongroup.h>
+#include <qsignalmapper.h>
 
 #include "vtkCamera.h"
 #include "vtkImageMapToWindowLevelColors.h"
@@ -56,6 +58,7 @@
 //#include "VesselSegmentation.h"
 //#include "ExtractCenterline.h"
 #include "MultiplanarViewController.h"
+#include "MultiWidgetsController.h"
 #include "ui_MainWindow.h"
 
 
@@ -82,6 +85,11 @@ public:
 	void slotOpenImage();
 	void slotOpenRecentImage();
 	void slotVisualizeImage(int i);
+	void slotNavigationMode();
+	void slotWindowLevelMode();
+	void slotOtherMode();
+	void slotImage(int i);
+	void resizeEvent(QResizeEvent * event);
 
 	
 private:
@@ -89,6 +97,14 @@ private:
 	Ui::MainWindow ui;
 	ModuleWidget moduleWidget;
 	Dialog dialog;
+	// for using recent folders
+	QList<QAction*> recentFileActionList;
+	// for group of actionNavigation, actoinWindowLevel, actionRuler,
+	// actionROI, actoinContour, actoinBrush
+	QActionGroup group1;
+	// for group of actionImage1, actionImage2, actionImage3, actionImage4,
+	// actionFourViews
+	QActionGroup group2;
 
 	//Initialization
 	//void initializeViewers();
@@ -96,14 +112,16 @@ private:
 	//void initializeOverlay();
 
 	// controller 3 2d viewer
-	MultiplanarViewController controller;
+	MultiplanarViewController controller[5];
+
+	// widgets controller 
+	MultiWidgetsController wController[5];
 
 	//File Name
 	QStringList fileNameList[5];
 	// number of images from waizard
 	int visibleImageNum;
-	// for using recent folders
-	QList<QAction*> recentFileActionList;
+
 
 };
  

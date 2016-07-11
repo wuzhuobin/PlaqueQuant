@@ -183,7 +183,7 @@ public:
         actionNavigation = new QAction(MainWindow);
         actionNavigation->setObjectName(QStringLiteral("actionNavigation"));
         actionNavigation->setCheckable(true);
-        actionNavigation->setChecked(true);
+        actionNavigation->setChecked(false);
         QIcon icon5;
         icon5.addFile(QStringLiteral(":/icons/Navigation.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionNavigation->setIcon(icon5);
@@ -314,8 +314,8 @@ public:
         image3frame->setFrameShadow(QFrame::Raised);
         horizontalLayout_4 = new QHBoxLayout(image3frame);
         horizontalLayout_4->setSpacing(1);
-        horizontalLayout_4->setContentsMargins(1, 1, 1, 1);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        horizontalLayout_4->setContentsMargins(1, 1, 1, 1);
         image3View = new QVTKWidget(image3frame);
         image3View->setObjectName(QStringLiteral("image3View"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -375,8 +375,8 @@ public:
         image4frame->setFrameShadow(QFrame::Raised);
         horizontalLayout_6 = new QHBoxLayout(image4frame);
         horizontalLayout_6->setSpacing(1);
-        horizontalLayout_6->setContentsMargins(1, 1, 1, 1);
         horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setContentsMargins(1, 1, 1, 1);
         image4View = new QVTKWidget(image4frame);
         image4View->setObjectName(QStringLiteral("image4View"));
         sizePolicy.setHeightForWidth(image4View->sizePolicy().hasHeightForWidth());
@@ -570,8 +570,8 @@ public:
         image1frame->setFrameShadow(QFrame::Raised);
         horizontalLayout = new QHBoxLayout(image1frame);
         horizontalLayout->setSpacing(1);
-        horizontalLayout->setContentsMargins(1, 1, 1, 1);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(1, 1, 1, 1);
         image1View = new QVTKWidget(image1frame);
         image1View->setObjectName(QStringLiteral("image1View"));
         sizePolicy.setHeightForWidth(image1View->sizePolicy().hasHeightForWidth());
@@ -640,8 +640,8 @@ public:
         image2frame->setFrameShadow(QFrame::Raised);
         horizontalLayout_5 = new QHBoxLayout(image2frame);
         horizontalLayout_5->setSpacing(1);
-        horizontalLayout_5->setContentsMargins(1, 1, 1, 1);
         horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(1, 1, 1, 1);
         image2View = new QVTKWidget(image2frame);
         image2View->setObjectName(QStringLiteral("image2View"));
         sizePolicy.setHeightForWidth(image2View->sizePolicy().hasHeightForWidth());
@@ -694,7 +694,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1160, 26));
+        menuBar->setGeometry(QRect(0, 0, 1160, 23));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuRecentImage = new QMenu(menuFile);

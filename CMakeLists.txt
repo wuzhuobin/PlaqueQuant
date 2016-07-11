@@ -100,6 +100,7 @@ SET(
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MultiplanarViewController.cpp
+	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkCommand.cpp
 
 )
 
@@ -110,6 +111,7 @@ SET(
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.h
 	  ${CMAKE_SOURCE_DIR}/include/Define.h
 	  	  ${CMAKE_SOURCE_DIR}/codes/core/MultiplanarViewController.h
+	${CMAKE_SOURCE_DIR}/codes/core/MyVtkCommand.h
 )
 
 Set(
