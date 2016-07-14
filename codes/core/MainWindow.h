@@ -84,12 +84,22 @@ public:
 	void slotOpenImage(QString dir);
 	void slotOpenImage();
 	void slotOpenRecentImage();
-	void slotVisualizeImage(int i);
+	void slotVisualize2DImage(int i);
 	void slotNavigationMode();
 	void slotWindowLevelMode();
+	void slotContour(bool);
+	void slotPaintBrush(bool);
 	void slotOtherMode();
 	void slotImage(int i);
 	void resizeEvent(QResizeEvent * event);
+	void slotAllAxialView();
+	void slotMultiPlanarView();
+	void slotPopupULSelectImgBtn();
+	void slotPopupURSelectImgBtn();
+	void slotPopupLLSelectImgBtn();
+	void slotULSelectImageSeq(QAction*);
+	void slotURSelectImageSeq(QAction*);
+	void slotLLSelectImageSeq(QAction*);
 
 	
 private:
@@ -101,15 +111,25 @@ private:
 	QList<QAction*> recentFileActionList;
 	// for group of actionNavigation, actoinWindowLevel, actionRuler,
 	// actionROI, actoinContour, actoinBrush
+	MyVtkInteractorStyleImage::Mode mode;
 	QActionGroup group1;
 	// for group of actionImage1, actionImage2, actionImage3, actionImage4,
 	// actionFourViews
 	QActionGroup group2;
+	// for group of actionAllAxialView, actionMultiplanerView
+	QActionGroup group3;
+
+	// all axial view
+	bool allAxialView = false;
+
+	//SelectImgBtnMenu
+	QMenu ULSelectImgBtnMenu;
+	QMenu URSelectImgBtnMenu;
+	QMenu LLSelectImgBtnMenu;
+	QMenu LRSelectImgBtnMenu;
 
 	//Initialization
-	//void initializeViewers();
 	void initializeModule();
-	//void initializeOverlay();
 
 	// controller 3 2d viewer
 	MultiplanarViewController controller[5];

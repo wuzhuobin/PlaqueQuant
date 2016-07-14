@@ -1,7 +1,9 @@
 #include "MainWindow.h"
 
 MainWindow::MainWindow(QMainWindow* parent) 
-	:QMainWindow(parent), group1(parent), group2(parent)
+	:QMainWindow(parent), group1(parent), group2(parent), ULSelectImgBtnMenu(this), 
+	URSelectImgBtnMenu(this), LLSelectImgBtnMenu(this), LRSelectImgBtnMenu(this),
+	group3(this)
 {
 	ui.setupUi(this);
 
@@ -28,7 +30,9 @@ MainWindow::MainWindow(QMainWindow* parent)
 	connect(ui.actionRuler, SIGNAL(triggered()), this, SLOT(slotOtherMode()));
 	connect(ui.actionROI, SIGNAL(triggered()), this, SLOT(slotOtherMode()));
 	connect(ui.actionContour, SIGNAL(triggered()), this, SLOT(slotOtherMode()));
+	connect(ui.actionContour, SIGNAL(toggled(bool)), this, SLOT(slotContour(bool)));
 	connect(ui.actionBrush, SIGNAL(triggered()), this, SLOT(slotOtherMode()));
+	connect(ui.actionBrush, SIGNAL(toggled(bool)), this, SLOT(slotPaintBrush(bool)));
 
 
 	// action group2
@@ -52,7 +56,6 @@ MainWindow::MainWindow(QMainWindow* parent)
 	connect(ui.actionImage4, SIGNAL(triggered()), imageSignalMapper, SLOT(map()));
 	connect(ui.actionFourViews, SIGNAL(triggered()), imageSignalMapper, SLOT(map()));
 	connect(imageSignalMapper, SIGNAL(mapped(int)), this, SLOT(slotImage(int)));
-	//connect(imageSignalMapper, SIGNAL(mapped(int)), this, SLOT(resizeEvent()));
 
 
 	connect(ui.ULBtn, SIGNAL(clicked()), ui.actionImage1, SLOT(trigger()));
@@ -64,12 +67,28 @@ MainWindow::MainWindow(QMainWindow* parent)
 	connect(ui.URBtn2, SIGNAL(clicked()), ui.actionFourViews, SLOT(trigger()));
 	connect(ui.LLBtn2, SIGNAL(clicked()), ui.actionFourViews, SLOT(trigger()));
 	connect(ui.LRBtn2, SIGNAL(clicked()), ui.actionFourViews, SLOT(trigger()));
+	
+	//action group3
+	group3.addAction(ui.actionAllAxialView);
+	group3.addAction(ui.actionMultiPlanarView);
+	group3.setExclusive(true);
 
+	connect(ui.actionAllAxialView, SIGNAL(triggered()), this, SLOT(slotAllAxialView()));
+	connect(ui.actionMultiPlanarView, SIGNAL(triggered()), this, SLOT(slotMultiPlanarView()));
+
+	//connect selecting image menu
+	connect(ui.ULSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotPopupULSelectImgBtn()));
+	connect(ui.URSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotPopupURSelectImgBtn()));
+	connect(ui.LLSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotPopupLLSelectImgBtn()));
+	connect(&ULSelectImgBtnMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotULSelectImageSeq(QAction*)));
+	connect(&URSelectImgBtnMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotURSelectImageSeq(QAction*)));
+	connect(&LLSelectImgBtnMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotLLSelectImageSeq(QAction*)));
 
 
 	//initialization
 	initializeModule();
-
+	// set 3d viewers
+	ui.image4View->SetRenderWindow(vtkSmartPointer<vtkRenderWindow>::New());
 	// set 2d viewers
 	ui.image1View->SetRenderWindow(controller[0].getViewers(0)->GetRenderWindow());
 	ui.image2View->SetRenderWindow(controller[0].getViewers(1)->GetRenderWindow());
@@ -80,7 +99,7 @@ MainWindow::MainWindow(QMainWindow* parent)
 			controller[i].getViewers(1)->GetRenderWindow(),
 			controller[i].getViewers(2)->GetRenderWindow()
 		};
-		wController[i].setRenderWindows(renderWindow);
+		//wController[i].setupRenderWindows(renderWindow);
 	}
 	//initialize MultiWidgetsController
 
@@ -92,7 +111,6 @@ MainWindow::MainWindow(QMainWindow* parent)
 MainWindow::~MainWindow()
 {
 }
-
 
 void MainWindow::adjustForCurrentFile(const QString & filePath)
 {
@@ -190,16 +208,23 @@ void MainWindow::slotOpenImage(QString dir)
 				it!= fileNameList[i].cend();++it) {
 				list1.push_back(it->toStdString());
 			}
-			controller[i].setImageName(QFileInfo(*fileNameList[i].cbegin()).baseName().toStdString());
+			QString imageName = QFileInfo(*fileNameList[i].cbegin()).baseName();
+			controller[i].setImageName(imageName.toStdString());
 			controller[i].loadImage(list1);
+
+			ULSelectImgBtnMenu.addAction(imageName);
+			URSelectImgBtnMenu.addAction(imageName);
+			LLSelectImgBtnMenu.addAction(imageName);
+			LRSelectImgBtnMenu.addAction(imageName);
 		}
 	}
 
 	adjustForCurrentFile(wizard.getDirectory());
 	// default begin in NavigationMode
+	slotVisualize2DImage(0);
+	slotMultiPlanarView();
 	slotNavigationMode();
-	ui.actionNavigation->setChecked(true);
-	slotVisualizeImage(0);
+	
 }
 
 void MainWindow::slotOpenImage()
@@ -218,35 +243,83 @@ void MainWindow::slotOpenRecentImage()
 	}
 }
 
-void MainWindow::slotVisualizeImage(int i)
+void MainWindow::slotVisualize2DImage(int i)
 {
+	ui.image1View->SetRenderWindow(controller[i].getViewers(0)->GetRenderWindow());
+	ui.image2View->SetRenderWindow(controller[i].getViewers(1)->GetRenderWindow());
+	ui.image3View->SetRenderWindow(controller[i].getViewers(2)->GetRenderWindow());
 	controller[i].initialize();
-	controller[i].setMode(MyVtkInteractorStyleImage::NavaigationMode);
+	//for (int j = 0; j < 5; ++j) {
+	//	if (j != i) {
+	//		controller[j].finalize();
+	//	}
+	//}
+	switch (mode)
+	{
+	case MyVtkInteractorStyleImage::OtherMode:
+		slotOtherMode();
+		break;
+	case MyVtkInteractorStyleImage::NavaigationMode:
+		slotNavigationMode();
+		break;
+	case MyVtkInteractorStyleImage::WindowLevelMode:
+		slotWindowLevelMode();
+		break;
+	default:
+		break;
+	}
+
 }
 
 void MainWindow::slotNavigationMode()
 {
-	controller[0].setMode(MyVtkInteractorStyleImage::NavaigationMode);
+	ui.actionNavigation->setChecked(true);
+	mode = MyVtkInteractorStyleImage::NavaigationMode;
+	for (int i = 0; i < 5; ++i) {
+		if (!fileNameList[i].isEmpty()) {
+			controller[i].setMode(MyVtkInteractorStyleImage::NavaigationMode);
+		}
+	}
 }
 
 void MainWindow::slotWindowLevelMode()
 {
-	controller[0].setMode(MyVtkInteractorStyleImage::WindowLevelMode);
+	ui.actionWindowLevel->setChecked(true);
+	mode = MyVtkInteractorStyleImage::WindowLevelMode;
+	for (int i = 0; i < 5; ++i) {
+		if (!fileNameList[i].isEmpty()) {
+			controller[i].setMode(MyVtkInteractorStyleImage::WindowLevelMode);
+		}
+	}
+}
 
+void MainWindow::slotContour(bool flag)
+{
+	if (flag) {
+		wController[0].contourMotion();
+
+	}
+}
+
+void MainWindow::slotPaintBrush(bool flag)
+{
+	if (flag) {
+		controller[0].setInteractorStyle();
+	}
 }
 
 void MainWindow::slotOtherMode()
 {
-	controller[0].setMode(MyVtkInteractorStyleImage::OtherMode);
-
+	mode = MyVtkInteractorStyleImage::OtherMode;
+	for (int i = 0; i < 5; ++i) {
+		if (!fileNameList[i].isEmpty()) {
+			controller[i].setMode(MyVtkInteractorStyleImage::OtherMode);
+		}
+	}
 }
 
 void MainWindow::slotImage(int i)
 {
-	//ui.image1frame->setHidden(true);
-	//ui.image2frame->setHidden(true);
-	//ui.image3frame->setHidden(true);
-	//ui.image4frame->setHidden(true);
 	switch (i) {
 	case 1:
 		ui.image1frame->setHidden(false);
@@ -279,15 +352,74 @@ void MainWindow::slotImage(int i)
 		ui.image4frame->setHidden(false);
 
 	}
-	controller[0].render();
+
 }
 
 void MainWindow::resizeEvent(QResizeEvent * event) {
 	QMainWindow::resizeEvent(event);
 
-	controller[0].render();
+	for (int i = 0; i < 5; ++i) {
+		controller[i].render();
+	}
 }
 
+void MainWindow::slotAllAxialView()
+{
+}
+
+void MainWindow::slotMultiPlanarView()
+{
+	ui.actionMultiPlanarView->setChecked(true);
+}
+
+void MainWindow::slotPopupULSelectImgBtn()
+{
+	ULSelectImgBtnMenu.popup(ui.ULSelectImgBtn->mapToGlobal(QPoint(0, 0)));
+}
+
+void MainWindow::slotPopupURSelectImgBtn()
+{
+	URSelectImgBtnMenu.popup(ui.URSelectImgBtn->mapToGlobal(QPoint(0, 0)));
+
+}
+
+void MainWindow::slotPopupLLSelectImgBtn()
+{
+	LLSelectImgBtnMenu.popup(ui.LLSelectImgBtn->mapToGlobal(QPoint(0, 0)));
+}
+
+void MainWindow::slotULSelectImageSeq(QAction * action)
+{
+	for (int i = 0; i < 5; ++i) {
+		QString imgName = QString::fromStdString(controller[i].getImageName());
+		if (imgName == action->text()) {
+			slotVisualize2DImage(i);
+			break;
+		}
+	}
+}
+
+void MainWindow::slotURSelectImageSeq(QAction * action)
+{
+	for (int i = 0; i < 5; ++i) {
+		QString imgName = QString::fromStdString(controller[i].getImageName());
+		if (imgName == action->text()) {
+			slotVisualize2DImage(i);
+			break;
+		}
+	}
+}
+
+void MainWindow::slotLLSelectImageSeq(QAction * action)
+{
+	for (int i = 0; i < 5; ++i) {
+		QString imgName = QString::fromStdString(controller[i].getImageName());
+		if (imgName == action->text()) {
+			slotVisualize2DImage(i);
+			break;
+		}
+	}
+}
 
 void MainWindow::initializeModule()
 {

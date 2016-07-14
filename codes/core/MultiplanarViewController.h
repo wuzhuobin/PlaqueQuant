@@ -8,7 +8,9 @@
 #include <vtkSmartPointer.h>
 #include <vtkSetGet.h>
 #include <vtkImageData.h>
+#include <vtkInteractorStyleImage.h>
 #include <vtkRenderWindowInteractor.h>
+#include <InteractorStylePaintBrush.hxx>
 
 #include <list>
 #include <string>
@@ -33,11 +35,15 @@ public:
 	void setMode(MyVtkInteractorStyleImage::Mode mode);
 	void setMode(int mode);
 	void setIntensityText(int* index);
+	void setInteractorStyle();
+
 
 	MyImageViewer* getViewers(int i);
 	int loadImage(list<string> in);
 	void setImageName(string name);
+	string getImageName();
 	void initialize();
+	void finalize();
 	/**
 	 * @deprecated
 	 */
@@ -51,7 +57,7 @@ protected:
 	double colorLevel;
 	vtkSmartPointer<MyImageViewer> viewers[NUMOFVIEWERS];
 	vtkSmartPointer<vtkRenderWindowInteractor> interactor[NUMOFVIEWERS];
-	vtkSmartPointer<MyVtkInteractorStyleImage> style[NUMOFVIEWERS];
+	vtkSmartPointer<vtkInteractorStyleImage> style[NUMOFVIEWERS];
 	vtkSmartPointer<vtkImageData> img;
 	string imgName;
 

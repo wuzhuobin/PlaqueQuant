@@ -15,9 +15,8 @@ int main( int argc, char** argv )
   
   if (argc==2)
   {
-	  QString folder = argv[1];
-	  folder.replace("\\","/");
-	  //mainWnd.slotOpenImage(folder);
+	  QDir dir(argv[1]);
+	  mainWnd.slotOpenImage(dir.absolutePath());
   }
 
   return app.exec();

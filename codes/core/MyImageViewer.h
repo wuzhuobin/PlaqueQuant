@@ -102,85 +102,29 @@ public:
 	virtual void InitializeIntensityText(std::string IntText);
 	virtual void InitializeOrientationText();
 
-
-   virtual void RemoveInput();
-   // Set Input Layer
-    virtual void SetInputDataLayer(vtkImageData *in);
-    virtual vtkImageData *GetInputLayer();
-    virtual void RemoveInputLayer();
-	virtual void AddPolyData(vtkPolyData* polydata,vtkProperty* property);
-  
-	// Description:
-	// Set/get the slice orientation
-	//BTX
-	//ETX
-	virtual void SetSliceOrientation(int orientation);
-	virtual void SetSliceOrientationToXY()
-	{
-		this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_XY);
-	};
-	virtual void SetSliceOrientationToYZ()
-	{
-		this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_YZ);
-	};
-	virtual void SetSliceOrientationToXZ()
-	{
-		this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_XZ);
-	};
-  
-  // Description:
-  // Set window and level for mapping pixels to colors.
-    
-  virtual double* GetDefaultWindowLevel();
-
-  virtual double  GetColorWindowLayer();
-  virtual double  GetColorLevelLayer();
-  virtual void	  SetColorWindowLayer(double s);
-  virtual void	  SetColorLevelLayer(double s);
-  virtual void SetDefaultWindowLevel(double* defaultWindowLevel);
-
-
-  virtual void SetBound(double* b);
-  virtual double* GetBound();
-  virtual double* GetFocalPoint();
+	//virtual void SetSliceOrientationToXY()
+	//{
+	//	this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_XY);
+	//};
+	//virtual void SetSliceOrientationToYZ()
+	//{
+	//	this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_YZ);
+	//};
+	//virtual void SetSliceOrientationToXZ()
+	//{
+	//	this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_XZ);
+	//};
   
   // Description:
   // Get the internal render window, renderer, image actor, and
   // image map instances.
-  vtkGetObjectMacro(ImageActorLayer, vtkImageActor);
-  vtkGetObjectMacro(WindowLevelLayer, vtkImageMapToWindowLevelColors);
-  vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
-
-  //Cursor
-  virtual void SetFocalPoint(double x, double y, double z);
 
   //Orientation Text
   virtual void ResizeOrientationText();
- 
-  //Ruler
-  //virtual void SetRulerEnabled(bool b);
-  //virtual void SetProtractorEnabled(bool b);
-
-
-  //// Description:
-  //// @deprecated Replaced by MyImageViewer::GetSliceMin() as of VTK 5.0.
-  //VTK_LEGACY(int  GetWholeZMin());
-  //VTK_LEGACY(int  GetWholeZMax());
-  //VTK_LEGACY(int  GetZSlice());
-  //VTK_LEGACY(void SetZSlice(int));
 
 protected:
 	MyImageViewer();
 	~MyImageViewer();
-
-  virtual void SetCursorBoundary();
-    
-
-  //Rendering 
-  //vtkRenderWindow           *RenderWindow;
-  //vtkRenderer               *Renderer;
-  //vtkRenderWindowInteractor *Interactor;
-  //vtkInteractorStyleImage   *InteractorStyle;
 
   //OrientationText
   vtkTextActor*	TextActor[4];
@@ -191,34 +135,6 @@ protected:
 	// IntensityText
 	vtkTextActor* IntTextActor;
 
-  //Cursor
-  vtkCursor3D*		 Cursor3D;
-  vtkPolyDataMapper* Cursormapper;	
-  vtkActor*			 CursorActor;
-
-  //BackGround
-  vtkImageMapToWindowLevelColors* WindowLevel;
-  double Bound[6];
-
-  //Label
-   vtkImageMapToWindowLevelColors* WindowLevelLayer;
-  vtkImageActor* ImageActorLayer;
-   vtkLookupTable* LookUpTableLayer;
-  
-  //Clip polyData
-  vtkActor*	ClipActor;
-
-  //Widget
-  //vtkDistanceWidget* DistanceWidget;
-
-  //vtkAngleWidget*	 AngleWidget;
-  // vtkContourWidget*  ContourWidget;
-  //vtkSmartPointer<vtkOrientedGlyphContourRepresentation> ContourRep;
-  //Parameter
-  int Slice;
-  vtkPlane* SliceImplicitPlane;
-  double DefaultWindowLevel[2];
-    
 
 private:
   MyImageViewer(const MyImageViewer&);  // Not implemented.

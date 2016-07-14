@@ -1283,7 +1283,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="InteractorStylePaintBrush.cxx" />
     <ClCompile Include="MultiWidgetsController.cpp" />
+    <ClCompile Include="vtkCircleBorderRepresentation.cxx" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\InfoDialog.h" />
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MyProgressDialog.h" />
@@ -1332,7 +1334,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_ExtractCenterline.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\codes\core\moc_VesselSegmentation.cpp" />
     <ClCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\build\qrc_Project.cpp" />
+    <ClInclude Include="InteractorStylePaintBrush.hxx" />
     <ClInclude Include="MultiWidgetsController.h" />
+    <ClInclude Include="vtkCircleBorderRepresentation.h" />
     <ResourceCompile Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\resources\Project.rc" />
   </ItemGroup>
   <ItemGroup>

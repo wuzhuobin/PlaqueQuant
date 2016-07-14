@@ -89,6 +89,8 @@
       <Filter>generated</Filter>
     </ClCompile>
     <ClCompile Include="MultiWidgetsController.cpp" />
+    <ClCompile Include="InteractorStylePaintBrush.cxx" />
+    <ClCompile Include="vtkCircleBorderRepresentation.cxx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.h">
@@ -149,6 +151,8 @@
       <Filter>generated</Filter>
     </ClInclude>
     <ClInclude Include="MultiWidgetsController.h" />
+    <ClInclude Include="InteractorStylePaintBrush.hxx" />
+    <ClInclude Include="vtkCircleBorderRepresentation.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\jieji\Desktop\blood_vessel_v_2.0\blood_vessel\codes\core\MainWindow.ui">
