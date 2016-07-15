@@ -77,6 +77,7 @@ protected:
 
 	double origin[3];
 	double spacing[3];
+	int extent[6];
 };
 
 #endif // MYVTKINTERACTORYSTYLEIMAGE_H

@@ -15,6 +15,7 @@ void MyVtkInteractorStyleImage::SetImageViewer(vtkImageViewer2* imageViewer)
 	orientation = imageViewer->GetSliceOrientation();
 	imageViewer->GetInput()->GetSpacing(spacing);
 	imageViewer->GetInput()->GetOrigin(origin);
+	imageViewer->GetInput()->GetExtent(extent);
 }
 
 void MyVtkInteractorStyleImage::SetMode(int m) 
@@ -296,9 +297,7 @@ void MyVtkInteractorStyleImage::CalculateIndex(double* index)
         for (int i =0;i<3;i++)
         {
             index[i] = (picked[i]-origin[i])/spacing[i];
-			if (i == orientation) {
-				index[i] = imageViewer->GetSlice();
-			}
+
 		}
 		cout << "index:" <<index[0] << " " << index[1] << " " << index[2] << endl;
     }

@@ -56,7 +56,6 @@
 
 #include <vtkObject.h>
 #include <vtkVersion.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkInformation.h>
 #include <vtkImageViewer2.h>
 #include <vtkAlgorithmOutput.h>
@@ -74,18 +73,12 @@
 #include <vtkProperty.h>
 #include <vtkPlane.h>
 #include <vtkDataSet.h>
-#include <vtkLookupTable.h>
 #include <vtkTextActor.h>
-#include <vtkDistanceWidget.h>
-#include <vtkAngleWidget.h>
-#include <vtkContourWidget.h>
 #include <vtkObjectFactory.h>
 #include <vtkImageActor.h>
 #include <vtkPointHandleRepresentation2D.h>
 #include <vtkTextProperty.h>
 #include <vtkImageProperty.h>
-#include <vtkDistanceRepresentation2D.h>
-#include <vtkAngleRepresentation2D.h>
 #include <vtkLeaderActor2D.h>
 #include <vtkAxisActor2D.h>
 #include <vtkProperty2D.h>
