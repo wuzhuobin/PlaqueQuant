@@ -83,6 +83,7 @@
 #include <vtkAxisActor2D.h>
 #include <vtkProperty2D.h>
 #include <vtkCamera.h>
+#include <vtkLookupTable.h>
 
 #include <string>
 
@@ -118,9 +119,13 @@ public:
 protected:
 	MyImageViewer();
 	~MyImageViewer();
+ 
+	//Label
+	vtkLookupTable* lookUpTableLayer;
 
-  //OrientationText
-  vtkTextActor*	TextActor[4];
+
+	//OrientationText
+	vtkTextActor* TextActor[4];
     
 	//Header
     vtkTextActor* HeaderActor;

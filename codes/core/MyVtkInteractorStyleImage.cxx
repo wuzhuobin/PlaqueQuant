@@ -205,7 +205,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonUp()
 		vtkInteractorStyleImage::OnLeftButtonUp();
 		break;
 	default:
-		vtkInteractorStyleImage::OnLeftButtonDown();
+		vtkInteractorStyleImage::OnLeftButtonUp();
 		break;
 	}
 

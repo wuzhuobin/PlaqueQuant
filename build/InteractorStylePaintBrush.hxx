@@ -10,6 +10,7 @@
 #include "vtkProperty2D.h"
 #include "vtkBorderRepresentation.h"
 #include <vtkRendererCollection.h>
+#include <vtkProperty.h>
 
 #include "MyVtkInteractorStyleImage.h"
 #include "vtkCircleBorderRepresentation.h"
@@ -29,6 +30,13 @@ public:
 	void SetDrawColor(int* rgb);
 	void SetDrawOpacity(int opacity);
 
+	void OnLeftButtonDown();
+	void OnMouseMove();
+
+	void draw();
+	void drawCircle(int x0, int y0, int x1, int y1, int brushSize);
+	void drawLine3D(int x0, int y0, int x1, int y1);
+
 protected:
 	InteractorStylePaintBrush();
 	~InteractorStylePaintBrush();
@@ -42,11 +50,9 @@ private:
 	vtkSmartPointer<vtkImageActor> brushActor;
 	vtkSmartPointer<vtkRenderer> brushRender;
 
-	int draw_index_old[3];
+	int brushSize = 10;
 	int red, green, blue, opacity;
 	bool isDraw;
-
-	double brushSize = 10;
 
 };
 

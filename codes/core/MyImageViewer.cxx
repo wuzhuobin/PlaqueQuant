@@ -12,9 +12,13 @@ MyImageViewer::MyImageViewer()
 		TextActor[i] = vtkTextActor::New();
 	}
 
+	//this->lookUpTableLayer = vtkLookupTable::New();
 
 	//Disable the warning
 	this->WindowLevel->SetGlobalWarningDisplay(false);
+
+	this->ImageActor->GetProperty()->SetInterpolationTypeToNearest();
+
 }
 
 MyImageViewer::~MyImageViewer()

@@ -97,6 +97,7 @@ void MultiplanarViewController::setInteractorStyle()
 		vtkSmartPointer<InteractorStylePaintBrush> styleNew =
 			vtkSmartPointer<InteractorStylePaintBrush>::New();
 		styleNew->SetImageViewer(viewers[i]);
+		viewers[i]->SetupInteractor(interactor[i]);
 		interactor[i]->SetInteractorStyle(styleNew);
 		styleNew->SetPaintBrushModeEnabled(true);
 	}
@@ -255,14 +256,16 @@ void MultiplanarViewController::initialize(vtkImageData * in)
 			style2->AddObserver(MyVtkCommand::NavigationEvent, callback);
 		}
 		interactor[i]->SetInteractorStyle(style[i]);
+		interactor[i]->Initialize();
+		viewers[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+		viewers[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
 		//interactor[i]->SetInteractorStyle(vtkInteractorStyleImage::New());
 
-		slices[i] = viewers[i]->GetSlice();
+		//slices[i] = viewers[i]->GetSlice();
 
-		viewers[i]->Render();
-		viewers[i]->GetRenderer()->ResetCamera();
-		viewers[i]->Render();
-		interactor[i]->Initialize();
+		//viewers[i]->Render();
+		//viewers[i]->GetRenderer()->ResetCamera();
+		//viewers[i]->Render();
 
 
 	}
