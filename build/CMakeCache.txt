@@ -73,7 +73,7 @@ CMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=/INCREMENTAL:NO
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 
 //Install path prefix, prepended onto install directories.
-CMAKE_INSTALL_PREFIX:PATH=C:/Program Files/PlaqueQuant
+CMAKE_INSTALL_PREFIX:PATH=C:/Program Files/Project
 
 //Path to a program.
 CMAKE_LINKER:FILEPATH=D:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/x86_amd64/link.exe
@@ -94,7 +94,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=/INCREMENTAL:NO
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=PlaqueQuant
+CMAKE_PROJECT_NAME:STATIC=Project
 
 //RC compiler
 CMAKE_RC_COMPILER:FILEPATH=rc
@@ -146,19 +146,16 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 CMAKE_VERBOSE_MAKEFILE:BOOL=OFF
 
 //The directory containing a CMake configuration file for ITK.
-ITK_DIR:PATH=D:\itk_4.8.2\InsightToolkit-4.8.2_bin
-
-//Path to a library.
-MODULE_LIBRARIES:FILEPATH=C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/lib/Debug/Module.lib
+ITK_DIR:PATH=D:/itk_4.8.2/InsightToolkit-4.8.2_bin
 
 //Dependencies for the target
 Module_LIB_DEPENDS:STATIC=general;vtkvmtkCommon;general;vtkvmtkComputationalGeometry;general;vtkvmtkContrib;general;vtkvmtkDifferentialGeometry;general;vtkvmtkIO;general;vtkvmtkITK;general;vtkvmtkMisc;general;vtkvmtkSegmentation;general;nl;general;tet;general;itkdouble-conversion;general;itksys;general;itkvnl_algo;general;itkvnl;general;itkv3p_netlib;general;ITKCommon;general;itkNetlibSlatec;general;ITKStatistics;general;ITKIOImageBase;general;ITKMesh;general;itkzlib;general;ITKMetaIO;general;ITKSpatialObjects;general;ITKPath;general;ITKLabelMap;general;ITKQuadEdgeMesh;general;ITKOptimizers;general;ITKPolynomials;general;ITKBiasCorrection;general;ITKBioCell;general;ITKDICOMParser;general;ITKEXPAT;general;ITKIOXML;general;ITKIOSpatialObjects;general;ITKFEM;general;gdcmDICT;general;gdcmMSFF;general;ITKznz;general;ITKniftiio;general;ITKgiftiio;general;itkhdf5_cpp;general;itkhdf5;general;ITKIOBMP;general;ITKIOBioRad;general;ITKIOCSV;general;ITKIOGDCM;general;ITKIOIPL;general;ITKIOGE;general;ITKIOGIPL;general;ITKIOHDF5;general;itkjpeg;general;ITKIOJPEG;general;itktiff;general;ITKIOTIFF;general;ITKIOLSM;general;ITKIOMRC;general;ITKIOMesh;general;ITKIOMeta;general;ITKIONIFTI;general;ITKNrrdIO;general;ITKIONRRD;general;itkpng;general;ITKIOPNG;general;ITKIOSiemens;general;ITKIOStimulate;general;ITKIOTransformBase;general;ITKIOTransformHDF5;general;ITKIOTransformInsightLegacy;general;ITKIOTransformMatlab;general;ITKIOVTK;general;ITKKLMRegionGrowing;general;ITKOptimizersv4;general;itkopenjpeg;general;ITKVTK;general;ITKWatersheds;general;ITKReview;general;ITKVideoCore;general;ITKVideoIO;general;ITKVtkGlue;general;vtkalglib;general;vtkChartsCore;general;vtkCommonColor;general;vtkCommonDataModel;general;vtkCommonMath;general;vtkCommonCore;general;vtksys;general;vtkCommonMisc;general;vtkCommonSystem;general;vtkCommonTransforms;general;vtkInfovisCore;general;vtkFiltersExtraction;general;vtkCommonExecutionModel;general;vtkFiltersCore;general;vtkFiltersGeneral;general;vtkCommonComputationalGeometry;general;vtkFiltersStatistics;general;vtkImagingFourier;general;vtkImagingCore;general;vtkRenderingContext2D;general;vtkRenderingCore;general;vtkFiltersGeometry;general;vtkFiltersSources;general;vtkRenderingFreeType;general;vtkfreetype;general;vtkzlib;general;vtkftgl;general;vtkDICOMParser;general;vtkDomainsChemistry;general;vtkIOXML;general;vtkIOGeometry;general;vtkIOCore;general;vtkIOXMLParser;general;vtkexpat;general;vtkexoIIc;general;vtkNetCDF;general;vtkNetCDF_cxx;general;vtkhdf5_hl;general;vtkhdf5;general;vtkFiltersAMR;general;vtkParallelCore;general;vtkIOLegacy;general;vtkFiltersFlowPaths;general;vtkFiltersGeneric;general;vtkFiltersHybrid;general;vtkImagingSources;general;vtkFiltersHyperTree;general;vtkFiltersImaging;general;vtkImagingGeneral;general;vtkFiltersModeling;general;vtkFiltersParallel;general;vtkFiltersParallelImaging;general;vtkFiltersProgrammable;general;vtkFiltersPython;general;D:/Python27/libs/python27.lib;general;vtkWrappingPythonCore;general;vtkWrappingTools;general;vtkFiltersSelection;general;vtkFiltersSMP;general;vtkFiltersTexture;general;vtkFiltersVerdict;general;verdict;general;vtkGeovisCore;general;vtkInfovisLayout;general;vtkImagingHybrid;general;vtkIOImage;general;vtkmetaio;general;vtkjpeg;general;vtkpng;general;vtktiff;general;vtkInteractionStyle;general;vtkInteractionWidgets;general;vtkRenderingAnnotation;general;vtkImagingColor;general;vtkRenderingVolume;general;vtkViewsCore;general;vtkproj4;general;vtkgl2ps;general;vtkGUISupportQt;general;vtkRenderingOpenGL;general;vtkGUISupportQtOpenGL;general;vtkGUISupportQtSQL;general;vtkIOSQL;general;vtksqlite;general;vtkImagingMath;general;vtkImagingMorphological;general;vtkImagingStatistics;general;vtkImagingStencil;general;vtkInteractionImage;general;vtkIOAMR;general;vtkIOEnSight;general;vtkIOExodus;general;vtkIOExport;general;vtkRenderingGL2PS;general;vtkRenderingContextOpenGL;general;vtkRenderingLabel;general;vtkIOImport;general;vtkIOInfovis;general;vtklibxml2;general;vtkIOLSDyna;general;vtkIOMINC;general;vtkIOMovie;general;vtkoggtheora;general;vtkIONetCDF;general;vtkIOParallel;general;vtkjsoncpp;general;vtkIOParallelXML;general;vtkIOPLY;general;vtkIOVideo;general;vtkRenderingImage;general;vtkRenderingLIC;general;vtkRenderingLOD;general;vtkRenderingQt;general;vtkRenderingVolumeOpenGL;general;vtkViewsContext2D;general;vtkViewsInfovis;general;vtkViewsQt;general;Qt5::Widgets;general;Qt5::PrintSupport;
 
 //Value Computed by CMake
-PlaqueQuant_BINARY_DIR:STATIC=C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build
+Project_BINARY_DIR:STATIC=C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build
 
 //Value Computed by CMake
-PlaqueQuant_SOURCE_DIR:STATIC=C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel
+Project_SOURCE_DIR:STATIC=C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel
 
 //The directory containing a CMake configuration file for Qt5Core.
 Qt5Core_DIR:PATH=D:/Qt/Qt5.6.0_64/5.6/msvc2015_64/lib/cmake/Qt5Core
@@ -168,9 +165,6 @@ Qt5Gui_DIR:PATH=D:/Qt/Qt5.6.0_64/5.6/msvc2015_64/lib/cmake/Qt5Gui
 
 //The directory containing a CMake configuration file for Qt5PrintSupport.
 Qt5PrintSupport_DIR:PATH=D:/Qt/Qt5.6.0_64/5.6/msvc2015_64/lib/cmake/Qt5PrintSupport
-
-//The directory containing a CMake configuration file for Qt5.
-Qt5_DIR:PATH=D:/Qt/Qt5.6.0_64/5.6/msvc2015_64/lib/cmake/Qt5
 
 //The directory containing a CMake configuration file for VMTK.
 VMTK_DIR:PATH=D:/vmtk_v1.3/vmtk_bin/VMTK-Build
