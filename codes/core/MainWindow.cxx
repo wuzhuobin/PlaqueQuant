@@ -1542,6 +1542,10 @@ void MainWindow::slotMultiPlanarView()
 	ui->actionAllAxialView->setChecked(false);
 	ui->actionMultiPlanarView->setChecked(true);
 	segmentation = false;
+	this->ui->image1View->SetRenderWindow(NULL);
+	this->ui->image2View->SetRenderWindow(NULL);
+	this->ui->image3View->SetRenderWindow(NULL);
+
 	for (int i = 0; i < 3; ++i) {
 		if (m_2DimageViewer[i] != NULL) {
 			m_2DimageViewer[i]->Delete();
@@ -1551,10 +1555,14 @@ void MainWindow::slotMultiPlanarView()
 
 	this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 	this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
+	this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
 	this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
 	this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
+	this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
 	this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 	this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
+	this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
+
 
 	for (int i = 0; i<3; i++)
 	{
@@ -1566,11 +1574,10 @@ void MainWindow::slotMultiPlanarView()
 		m_2DimageViewer[i]->Render();
 
 		//Update style
-		m_style[i]->SetOrientation(m_2DimageViewer[i]);
-		m_style[i]->SetWindowLevelSpinBox(ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL);
 		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
 		m_style[i]->SetAutoAdjustCameraClippingRange(true);
 		m_style[i]->SetSliceSpinBox(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox);
+		m_style[i]->SetWindowLevelSpinBox(ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL);
 		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
 		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
@@ -1599,37 +1606,32 @@ void MainWindow::slotSegmentationView()
 		m_2DimageViewer[i] = NULL;
 	}
 
-	m_2DimageViewer[0] = MyImageViewer::New();
-	m_2DimageViewer[0]->SetRenderWindow(this->ui->image1View->GetRenderWindow());
-	this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
-	this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
-	// disable useless viewers
-	if (m_visible_image_no > 1) {
+	if (m_vtkT1) {
+		m_2DimageViewer[0] = MyImageViewer::New();
+		m_2DimageViewer[0]->SetRenderWindow(this->ui->image1View->GetRenderWindow());
+		this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
+		this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
+		m_2DimageViewer[0]->SetInputData(m_vtkT1);
+	}
+	if (m_vtkT2) {
 		m_2DimageViewer[1] = MyImageViewer::New();
 		m_2DimageViewer[1]->SetRenderWindow(this->ui->image2View->GetRenderWindow());
 		this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
 		this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
+		m_2DimageViewer[1]->SetInputData(m_vtkT2);
 	}
-	if (m_visible_image_no > 2) {
+	if (m_vtkT1C) {
 		m_2DimageViewer[2] = MyImageViewer::New();
 		m_2DimageViewer[2]->SetRenderWindow(this->ui->image3View->GetRenderWindow());
 		this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
 		this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
-	}
-
-	if (m_vtkT1)
-		m_2DimageViewer[0]->SetInputData(m_vtkT1);
-	if (m_vtkT2)
-		m_2DimageViewer[1]->SetInputData(m_vtkT2);
-	if (m_vtkT1C)
 		m_2DimageViewer[2]->SetInputData(m_vtkT1C);
+	}
 	
 	for (int i = 0; i<m_visible_image_no; i++)
 	{
 
 		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);
-		//int max = m_2DimageViewer[i]->GetSliceMax();
-		//m_2DimageViewer[i]->SetSlice(max/2);
 		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(i));
@@ -1704,10 +1706,14 @@ void MainWindow::ChangeOrientation(int orientation){
 
 void MainWindow::slotOverlayVisibilty(bool b, int orientation)
 {
+	for (int i = 0; i < 3; ++i) {
+		if (m_2DimageViewer[i] != NULL && m_2DimageViewer[i]->GetSliceOrientation() == orientation) {
+			m_2DimageViewer[i]->GetImageActorLayer()->SetVisibility(b);
+			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+			m_2DimageViewer[i]->Render();
+		}
+	}
 
-	m_2DimageViewer[orientation]->GetImageActorLayer()->SetVisibility(b);
-	m_2DimageViewer[orientation]->GetRenderer()->ResetCameraClippingRange();
-    m_2DimageViewer[orientation]->Render();
 }
 
 void MainWindow::slotOverlayVisibilty(bool b)

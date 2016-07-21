@@ -1,4 +1,118 @@
 ﻿  Checking Build System
   CMake does not need to re-run because C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/generate.stamp is up-to-date.
   CMake does not need to re-run because C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/codes/CMakeFiles/generate.stamp is up-to-date.
-  CMake does not need to re-run because C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/codes/Module/CMakeFiles/generate.stamp is up-to-date.
+  CMake is re-running because C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/codes/Module/CMakeFiles/generate.stamp is out-of-date.
+    the file 'C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/codes/Module/CMakeLists.txt'
+    is newer than 'C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/codes/Module/CMakeFiles/generate.stamp.depend'
+    result='-1'
+  -- Configuring done
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  CMake Warning (dev) in codes/Module/CMakeLists.txt:
+    Policy CMP0020 is not set: Automatically link Qt executables to qtmain
+    target on Windows.  Run "cmake --help-policy CMP0020" for policy details.
+    Use the cmake_policy command to set the policy and suppress this warning.
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  -- Generating done
+  -- Build files have been written to: C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build
