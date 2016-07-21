@@ -54,85 +54,247 @@
 #ifndef __MyImageViewer_h
 #define __MyImageViewer_h
 
-#include <vtkObject.h>
+#include "vtkObject.h"
 #include <vtkVersion.h>
-#include <vtkInformation.h>
-#include <vtkImageViewer2.h>
-#include <vtkAlgorithmOutput.h>
-#include <vtkImageActor.h>
-#include <vtkImageData.h>
-#include <vtkImageMapToWindowLevelColors.h>
-#include <vtkInteractorStyleImage.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkCursor3D.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkProperty.h>
-#include <vtkPlane.h>
-#include <vtkDataSet.h>
-#include <vtkTextActor.h>
-#include <vtkObjectFactory.h>
-#include <vtkImageActor.h>
-#include <vtkPointHandleRepresentation2D.h>
-#include <vtkTextProperty.h>
-#include <vtkImageProperty.h>
-#include <vtkLeaderActor2D.h>
-#include <vtkAxisActor2D.h>
-#include <vtkProperty2D.h>
-#include <vtkCamera.h>
-#include <vtkLookupTable.h>
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
+#include <QString>
+class vtkAlgorithmOutput;
+class vtkImageActor;
+class vtkImageData;
+class vtkImageMapToWindowLevelColors;
+class vtkInteractorStyleImage;
+class vtkRenderWindow;
+class vtkRenderer;
+class vtkRenderWindowInteractor;
+class vtkCursor3D;
+class vtkPolyData;
+class vtkPolyDataMapper;
+class vtkActor;
+class vtkProperty;
+class vtkPlane;
+class vtkDataSet;
+class vtkLookupTable;
+class vtkTextActor;
+class vtkDistanceWidget;
+class vtkAngleWidget;
+class vtkContourWidget;
 
-#include <string>
-
-class MyImageViewer : public vtkImageViewer2
+class MyImageViewer : public vtkObject
 {
 public:
   static MyImageViewer *New();
   vtkTypeMacro(MyImageViewer,vtkObject);
-    virtual void initializeHeader(std::string file);
-	virtual void InitializeIntensityText(std::string IntText);
-	virtual void InitializeOrientationText();
+  void PrintSelf(ostream& os, vtkIndent indent);
+    virtual void InitializeHeader(QString);
+	virtual void InitializeIntensityText(QString);
+  // Description:
+  // Get the name of rendering window.
+  virtual const char *GetWindowName();
 
-	//virtual void SetSliceOrientationToXY()
-	//{
-	//	this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_XY);
-	//};
-	//virtual void SetSliceOrientationToYZ()
-	//{
-	//	this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_YZ);
-	//};
-	//virtual void SetSliceOrientationToXZ()
-	//{
-	//	this->SetSliceOrientation(vtkImageViewer2::SLICE_ORIENTATION_XZ);
-	//};
+  // Description:
+  // Render the resulting image.
+  virtual void Render(void);
+  
+  // Description:
+  // Set/Get the input image to the viewer.
+  virtual void SetInputData(vtkImageData *in);
+  virtual vtkImageData *GetInput();
+  virtual vtkAlgorithm * GetInputAlgorithm();		//vtk6
+  virtual vtkInformation* GetInputInformation();	//vtk6
+  virtual void SetInputConnection(vtkAlgorithmOutput* input);
+   virtual void RemoveInput();
+   // Set Input Layer
+    virtual void SetInputDataLayer(vtkImageData *in);
+    virtual vtkImageData *GetInputLayer();
+    virtual void RemoveInputLayer();
+    
+  virtual void AddPolyData(vtkPolyData* polydata,vtkProperty* property);
+  
+  // Description:
+  // Set/get the slice orientation
+  //BTX
+  enum
+  {
+    SLICE_ORIENTATION_YZ = 0,
+    SLICE_ORIENTATION_XZ = 1,
+    SLICE_ORIENTATION_XY = 2
+  };
+  //ETX
+  vtkGetMacro(SliceOrientation, int);
+  virtual void SetSliceOrientation(int orientation);
+    //virtual void SetSliceOrientation2(int orientation);
+    //virtual void SetSliceOrientation3(int orientation);
+    //virtual void SetSliceOrientation4(int orientation);
+  virtual void SetSliceOrientationToXY() { this->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_XY); };
+  virtual void SetSliceOrientationToYZ() { this->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_YZ); };
+  virtual void SetSliceOrientationToXZ() { this->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_XZ); };
+
+  // Description:
+  // Set/Get the current slice to display (depending on the orientation
+  // this can be in X, Y or Z).
+  vtkGetMacro(Slice, int);
+  virtual void SetSlice(int s);
+
+  // Description:
+  // Update the display extent manually so that the proper slice for the
+  // given orientation is displayed. It will also try to set a
+  // reasonable camera clipping range.
+  // This method is called automatically when the Input is changed, but
+  // most of the time the input of this class is likely to remain the same,
+  // i.e. connected to the output of a filter, or an image reader. When the
+  // input of this filter or reader itself is changed, an error message might
+  // be displayed since the current display extent is probably outside
+  // the new whole extent. Calling this method will ensure that the display
+  // extent is reset properly.
+  virtual void UpdateDisplayExtent();
+  // Description:
+  // Return the minimum and maximum slice values (depending on the orientation
+  // this can be in X, Y or Z).
+  virtual int  GetSliceMin();
+  virtual int  GetSliceMax();
+  //virtual void GetSliceRange(int range[2]) { this->GetSliceRange(range[0], range[1]); }
+  //virtual void GetSliceRange(int &min, int &max);
+  virtual int* GetSliceRange();
+
+  
+  // Description:
+  // Set window and level for mapping pixels to colors.
+    
+  virtual double  GetColorWindow();
+  virtual double  GetColorLevel();
+  virtual double* GetDefaultWindowLevel();
+  virtual void	  SetColorWindow(double s);
+  virtual void	  SetColorLevel(double s);
+
+  virtual double  GetColorWindowLayer();
+  virtual double  GetColorLevelLayer();
+  virtual void	  SetColorWindowLayer(double s);
+  virtual void	  SetColorLevelLayer(double s);
+
+
+  virtual void SetBound(double* b);
+  virtual double* GetBound();
+  virtual double* GetFocalPoint();
+
+  // Description:
+  // These are here when using a Tk window.
+  virtual void SetDisplayId(void *a);
+  virtual void SetWindowId(void *a);
+  virtual void SetParentId(void *a);
+  
+  // Description:
+  // Set/Get the position in screen coordinates of the rendering window.
+  virtual int* GetPosition();
+  virtual void SetPosition(int a,int b);
+  virtual void SetPosition(int a[2]) { this->SetPosition(a[0],a[1]); }
+  
+  // Description:
+  // Set/Get the size of the window in screen coordinates in pixels.
+  virtual int* GetSize();
+  virtual void SetSize(int a, int b);
+  virtual void SetSize(int a[2]) { this->SetSize(a[0],a[1]); }
   
   // Description:
   // Get the internal render window, renderer, image actor, and
   // image map instances.
+  vtkGetObjectMacro(RenderWindow,	vtkRenderWindow);
+  vtkGetObjectMacro(Renderer,		vtkRenderer);
+  vtkGetObjectMacro(ImageActor,	vtkImageActor);
+  vtkGetObjectMacro(ImageActorLayer,	vtkImageActor);
+  
+  vtkGetObjectMacro(WindowLevel,	vtkImageMapToWindowLevelColors);
+  vtkGetObjectMacro(WindowLevelLayer,	vtkImageMapToWindowLevelColors);
+ 
+  vtkGetObjectMacro(InteractorStyle,vtkInteractorStyleImage);
+  vtkGetObjectMacro(SliceImplicitPlane,vtkPlane);
+
+  //Cursor
+  virtual void SetFocalPoint(double x, double y, double z);
 
   //Orientation Text
   virtual void ResizeOrientationText();
+ 
+  virtual void SetRenderWindow(vtkRenderWindow *arg);
+  virtual void SetRenderer(vtkRenderer *arg);
+  virtual void SetupInteractor(vtkRenderWindowInteractor*);
+
+  //Ruler
+  virtual void SetRulerEnabled(bool b);
+  virtual void SetProtractorEnabled(bool b);
+
+  // Description:  
+  // Create a window in memory instead of on the screen. This may not
+  // be supported for every type of window and on some windows you may
+  // need to invoke this prior to the first render.
+  virtual void SetOffScreenRendering(int);
+  virtual int GetOffScreenRendering();
+  vtkBooleanMacro(OffScreenRendering,int);
+
+  // Description:
+  // @deprecated Replaced by MyImageViewer::GetSliceMin() as of VTK 5.0.
+  VTK_LEGACY(int  GetWholeZMin());
+  VTK_LEGACY(int  GetWholeZMax());
+  VTK_LEGACY(int  GetZSlice());
+  VTK_LEGACY(void SetZSlice(int));
 
 protected:
-	MyImageViewer();
-	~MyImageViewer();
- 
-	//Label
-	vtkLookupTable* lookUpTableLayer;
+  MyImageViewer();
+  ~MyImageViewer();
 
-
-	//OrientationText
-	vtkTextActor* TextActor[4];
+  virtual void InstallPipeline();
+  virtual void UnInstallPipeline();
+  virtual void SetCursorBoundary();
+  virtual void UpdateOrientation();
+  virtual void InitializeOrientationText();
     
-	//Header
+
+  //Rendering 
+  vtkRenderWindow           *RenderWindow;
+  vtkRenderer               *Renderer;
+  vtkRenderWindowInteractor *Interactor;
+  vtkInteractorStyleImage   *InteractorStyle;
+
+  //OrientationText
+  vtkTextActor*	TextActor[4];
+    
+  //Header
     vtkTextActor* HeaderActor;
 
 	// IntensityText
 	vtkTextActor* IntTextActor;
 
+  //Cursor
+  vtkCursor3D*		 Cursor3D;
+  vtkPolyDataMapper* Cursormapper;	
+  vtkActor*			 CursorActor;
+
+  //BackGround
+  vtkImageMapToWindowLevelColors* WindowLevel;
+  vtkImageActor* ImageActor;
+  double Bound[6];
+
+  //Label
+   vtkImageMapToWindowLevelColors* WindowLevelLayer;
+  vtkImageActor* ImageActorLayer;
+   vtkLookupTable* LookUpTableLayer;
+  
+  //Clip polyData
+  vtkActor*	ClipActor;
+
+  //Widget
+  vtkDistanceWidget* DistanceWidget;
+
+  vtkAngleWidget*	 AngleWidget;
+   vtkContourWidget*  ContourWidget;
+  //vtkSmartPointer<vtkOrientedGlyphContourRepresentation> ContourRep;
+  //Parameter
+  int SliceOrientation;
+  int FirstRender;
+  int Slice;
+  vtkPlane* SliceImplicitPlane;
+  double DefaultWindowLevel[2];
+    
 
 private:
   MyImageViewer(const MyImageViewer&);  // Not implemented.

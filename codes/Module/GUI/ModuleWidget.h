@@ -12,6 +12,7 @@
 #include <QComboBox>
 #include "MyThread.h"
 #include "Define.h"
+#include "MainWindow.h"
 #include "ReportGenerator.h"
 #include <QDebug>
 #include <QDesktopServices>
@@ -21,7 +22,7 @@
 namespace Ui {
 class ModuleWidget;
 }
-//class MainWindow;
+class MainWindow;
 class ModuleWidget: public QWidget
 {
     Q_OBJECT

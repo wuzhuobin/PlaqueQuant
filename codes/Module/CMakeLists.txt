@@ -6,9 +6,6 @@ SET(
 
 #ITK
 find_package(ITK REQUIRED)
-if (NOT ITK_FOUND)
-	message(FATAL_ERROR "error: ITK is not found")
-endif()
 include(${ITK_USE_FILE})
 
 #VTK
@@ -18,14 +15,11 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
-#QT
 if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
   # Instruct CMake to run moc automatically when needed.
   # set(CMAKE_AUTOMOC ON)
-  find_package(Qt5 COMPONENTS Widgets REQUIRED)
-  find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
-  include_directories(${Qt5Widgets_INCLUDE_DIRS})
-  include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
+  find_package(Qt5PrintSupport REQUIRED)
+  find_package(Qt5Widgets REQUIRED QUIET)
   # add_definitions(-DQT5_IS_LOADED)
 else()
   find_package(Qt4 REQUIRED)

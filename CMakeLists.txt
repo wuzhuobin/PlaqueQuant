@@ -1,11 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
  
-project( PlaqueQuant )
+PROJECT(Project)
 
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
+
+SET(
+  CMAKE_PREFIX_PATH
+  "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
+  )
 
 #ITK
 find_package(ITK REQUIRED)
@@ -21,21 +26,6 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
-#QT
-if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
-  # Instruct CMake to run moc automatically when needed.
-  # set(CMAKE_AUTOMOC ON)
-  find_package(Qt5 COMPONENTS Widgets REQUIRED)
-  find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
-  include_directories(${Qt5Widgets_INCLUDE_DIRS})
-  include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
-  # add_definitions(-DQT5_IS_LOADED)
-else()
-  find_package(Qt4 REQUIRED)
-  include(${QT_USE_FILE})
-endif()
-
-
 #VMTK
 find_package(VMTK REQUIRED)
 if (NOT VMTK_FOUND)
@@ -43,11 +33,21 @@ if (NOT VMTK_FOUND)
 endif()
 include(${VMTK_USE_FILE})
 
+#QT
+if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
+  # Instruct CMake to run moc automatically when needed.
+  # set(CMAKE_AUTOMOC ON)
+  find_package(Qt5PrintSupport REQUIRED)
+  find_package(Qt5Widgets REQUIRED QUIET)
+  # add_definitions(-DQT5_IS_LOADED)
+else()
+  find_package(Qt4 REQUIRED)
+  include(${QT_USE_FILE})
+endif()
+
 Add_subdirectory(codes)
 
-include_directories(
-	${CMAKE_BINARY_DIR}
-	${CMAKE_SOURCE_DIR}
+include_directories(	
 	${CMAKE_SOURCE_DIR}/build
 	${CMAKE_SOURCE_DIR}/include
 	${CMAKE_SOURCE_DIR}/codes/core
@@ -74,7 +74,7 @@ SET(
 )
 
 SET(
-	QT_HEAD
+	QT_INC
 	  ${CMAKE_SOURCE_DIR}/codes/core/MainWindow.h
 	  ${CMAKE_SOURCE_DIR}/codes/core/InfoDialog.h
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyProgressDialog.h
@@ -95,93 +95,71 @@ SET(
 )
 
 SET(
-	SRC
+	CORE_SRC
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyImageViewer.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.cxx
-	  ${CMAKE_SOURCE_DIR}/codes/core/MultiplanarViewController.cpp
-	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkCommand.cpp
 
 )
 
 SET(
-	HEAD
+	CORE_INC
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyImageViewer.h
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.h
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.h
 	  ${CMAKE_SOURCE_DIR}/include/Define.h
-	  	  ${CMAKE_SOURCE_DIR}/codes/core/MultiplanarViewController.h
-	${CMAKE_SOURCE_DIR}/codes/core/MyVtkCommand.h
 )
 
 Set(
-	 QT_QRC 
+	 QT_RSRS 
 	  ${CMAKE_SOURCE_DIR}/resources/Project.qrc
 )
 
 Set(
-	RESOURCE
+	RC_FILE
 	${CMAKE_SOURCE_DIR}/resources/Project.rc
 )
 #Generate moc and ui file
 
 
-QT5_WRAP_UI(QT_UI_HEAD ${QT_UI})
-QT5_WRAP_CPP(QT_MOC ${QT_HEAD})
-QT5_ADD_RESOURCES(QT_RESOURCES ${QT_QRC})
+QT5_WRAP_UI(UISrcs ${QT_UI})
+QT5_WRAP_CPP(MOCSrcs ${QT_INC})
+QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
 
 add_executable(
-	PlaqueQuant
+	Project
 	MACOSX_BUNDLE 
-	${QT_HEAD}
+	${QT_WRAP} 
+	${UISrcs} 
+	${MOCSrcs}
 	${QT_SRC}
-	${QT_UI}
-	${QT_QRC}
-	${HEAD}
-	${SRC}
-	${QT_UI_HEAD}
-	${QT_MOC}
-	${QT_RESOURCES}
-	${RESOURCE}
+	${QT_INC}
+	${CORE_INC}
+	${CORE_SRC}
+	${RCC_RSRS}
+	${RC_FILE}
 )
 
 #Link all libraries
-find_library(MODULE_LIBRARIES 
-	NAMES 	Module.lib
-	PATHS 	${CMAKE_SOURCE_DIR}/lib/Debug
-			${CMAKE_SOURCE_DIR}/lib/Release
-)
+link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 
 target_link_libraries(
-	PlaqueQuant
-	${Qt5Widgets_LIBRARIES}
-	${Qt5PrintSupport_LIBRARIES}
+	Project
+	Qt5::Widgets 
+	Qt5::PrintSupport
 	${VTK_LIBRARIES} 
 	${VMTK_LIBRARIES} 
 	${ITK_LIBRARIES} 
-	${MODULE_LIBRARIES}
+	Module
 )
 
 #Grouping in MSVC
-source_group("generated"
-	FILES 	${QT_UI_HEAD}
-			${QT_MOC}
-			${QT_RESOURCES}
-)
-
-source_group("form"
-	FILES	${QT_UI}
-)
-source_group("head"
-	FILES	${QT_HEAD}
-			${HEAD}
-			
-)
-source_group("source"
-	FILES	${QT_SRC}
-			${SRC}
-			${RESOURCE}
-		
-)
- 
+SOURCE_GROUP("_Generated" 	FILES ${UISrcs})
+SOURCE_GROUP("_Generated" 	FILES ${RCC_RSRS})
+SOURCE_GROUP("_Moc Files" 	REGULAR_EXPRESSION moc_.*cpp)
+SOURCE_GROUP("UI FILES" 	FILES ${QT_UI})
+SOURCE_GROUP("Header Files" FILES ${QT_INC})
+SOURCE_GROUP("Header Files" FILES ${CORE_INC})
+SOURCE_GROUP("Source Files" FILES ${QT_SRC})
+SOURCE_GROUP("Source Files" FILES ${CORE_SRC})
