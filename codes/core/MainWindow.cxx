@@ -1708,7 +1708,7 @@ void MainWindow::slotOverlayVisibilty(bool b, int orientation)
 {
 	for (int i = 0; i < 3; ++i) {
 		if (m_2DimageViewer[i] != NULL && m_2DimageViewer[i]->GetSliceOrientation() == orientation) {
-			m_2DimageViewer[i]->GetImageActorLayer()->SetVisibility(b);
+			m_2DimageViewer[i]->GetdrawActor()->SetVisibility(b);
 			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
 			m_2DimageViewer[i]->Render();
 		}
@@ -1721,7 +1721,7 @@ void MainWindow::slotOverlayVisibilty(bool b)
 	for (int i = 0; i<3; i++)
 	{
 		if (m_2DimageViewer[i] != NULL) {
-			m_2DimageViewer[i]->GetImageActorLayer()->SetVisibility(b);
+			m_2DimageViewer[i]->GetdrawActor()->SetVisibility(b);
 			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
 			m_2DimageViewer[i]->Render();
 		}
@@ -1736,7 +1736,7 @@ void MainWindow::slotOverlayOpacity(double op)
     {
 		if (m_style[i] != NULL)
 			m_style[i]->SetDrawOpacity(op*255);
-        m_2DimageViewer[i]->GetImageActorLayer()->SetOpacity(op);
+        m_2DimageViewer[i]->GetdrawActor()->SetOpacity(op);
         m_2DimageViewer[i]->Render();
     }
 }

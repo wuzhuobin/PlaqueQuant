@@ -46,8 +46,11 @@
 #include <vtkWidgetEventTranslator.h>
 #include <vtkImageCanvasSource2D.h>
 
+#include "MyImageViewer.h"
+class MyImageViewer;
 class MainWindow;
 class ModuleWidget;
+
 // Define own interaction style
 class MyVtkInteractorStyleImage : public vtkInteractorStyleImage
 {
