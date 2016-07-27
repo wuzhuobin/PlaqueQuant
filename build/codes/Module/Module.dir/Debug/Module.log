@@ -1,5 +1,4 @@
-﻿  Generating GUI/moc_ModuleWidget.cpp
-  moc_ModuleWidget.cpp
+﻿  moc_ModuleWidget.cpp
 D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
   D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility(2322): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
   d:\itk_4.8.2\insighttoolkit-4.8.2\modules\core\transform\include\itkTransform.hxx(529): note: 参见对正在编译的函数 模板 实例化“_OutIt std::copy<const double*,T*>(_InIt,_InIt,_OutIt)”的引用

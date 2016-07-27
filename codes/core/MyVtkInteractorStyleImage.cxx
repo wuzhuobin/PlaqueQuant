@@ -472,19 +472,25 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 
-	//Overlay Image
-	//if (!mainWnd->GetVtkOverlay())
-	//{
-
-	//	}
-	// Boarder Widget
 	if (m_borderWidget != NULL)
 	{
 		m_retangleRep->Delete();
 		m_borderWidget->Delete();
 		m_borderWidget = NULL;
 	}
+	if (m_brush != NULL)
+	{
+		m_imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
+		//Renderer2->RemoveActor(BrushActor);
+		//Renderer2->Delete();
+		//Renderer2 = NULL;
 
+		m_brush->Delete();
+		m_brush = NULL;
+		BrushActor->Delete();
+		BrushActor = NULL;
+
+	}
 	if (b)
 	{
 		m_retangleRep = vtkBorderRepresentation::New();
@@ -503,18 +509,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 	//mainWnd->GetViewers(m_orientation)->GetAnnotationRenderer()->ResetCameraClippingRange();
 	this->GetInteractor()->Render();
 
-	if (m_brush)
-	{
-		Renderer2->RemoveActor(BrushActor);
-		Renderer2->Delete();
-		Renderer2 = NULL;
 
-		m_brush->Delete();
-		m_brush = NULL;
-		BrushActor->Delete();
-		BrushActor = NULL;
-		
-	}
 
 	m_brush = vtkImageCanvasSource2D::New();
 	m_brush->SetScalarTypeToUnsignedChar();
@@ -546,6 +541,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 	BrushActor = vtkImageActor::New();
 	BrushActor->SetInputData(m_brush->GetOutput());
 	BrushActor->GetProperty()->SetInterpolationTypeToNearest();
+	BrushActor->SetOpacity(1);
 	// Set the image actor
 
 	switch (this->m_orientation)
@@ -563,14 +559,8 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 			extent[0], extent[1], extent[2], extent[3], 0, 0);
 		break;
 	}
-	Renderer2 = vtkRenderer::New();
-	Renderer2->SetLayer(1);
-	Renderer2->SetActiveCamera(m_imageViewer->GetRenderer()->GetActiveCamera());
-	m_imageViewer->GetRenderer()->SetLayer(0);
-	m_imageViewer->GetRenderWindow()->SetNumberOfLayers(2);
-	m_imageViewer->GetRenderWindow()->AddRenderer(Renderer2);
 
-	Renderer2->AddActor(BrushActor);
+	m_imageViewer->GetannotationRenderer()->AddActor(BrushActor);
 	m_imageViewer->GetRenderWindow()->Render();
 
 }
@@ -1046,19 +1036,12 @@ void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
 		RenderWindow = m_imageViewer->GetRenderWindow();
 		//this->Synchronize();
 
-		Renderer2 = vtkRenderer::New();
-		Renderer2->SetLayer(1);
-		Renderer2->SetActiveCamera(Renderer->GetActiveCamera());
-		Renderer->SetLayer(0);
-		RenderWindow->SetNumberOfLayers(2);
-		RenderWindow->AddRenderer(Renderer2);
-
 		contourWidget = vtkContourWidget::New();
 		contourWidget->SetInteractor(RenderWindow->GetInteractor());
-		contourWidget->SetCurrentRenderer(Renderer2);
+		contourWidget->SetCurrentRenderer(m_imageViewer->GetannotationRenderer());
 
 		contourRep = vtkOrientedGlyphContourRepresentation::New();
-		contourRep->SetRenderer(Renderer2);
+		contourRep->SetRenderer(m_imageViewer->GetannotationRenderer());
 		contourRep->GetLinesProperty()->SetColor(255, 255, 0);
 
 		vtkPolyData* cursorpolyData = contourRep->GetActiveCursorShape();
@@ -1227,19 +1210,13 @@ void MyVtkInteractorStyleImage::DrawSynchronize(vtkPolyData* polydata)
         contourWidgetA->Delete();
         contourWidgetA = NULL;
     }
-    Renderer2 = vtkRenderer::New();
-    Renderer2->SetLayer(1);
-    Renderer2->SetActiveCamera(Renderer->GetActiveCamera());
-    Renderer->SetLayer(0);
-    RenderWindow->SetNumberOfLayers(2);
-    RenderWindow->AddRenderer(Renderer2);
     
     contourWidgetA = vtkContourWidget::New();
     contourWidgetA->SetInteractor(RenderWindow->GetInteractor());
-    contourWidgetA->SetCurrentRenderer(Renderer2);
+    contourWidgetA->SetCurrentRenderer(m_imageViewer->GetannotationRenderer());
     
     contourRepA = vtkOrientedGlyphContourRepresentation::New();
-    contourRepA->SetRenderer(Renderer2);
+    contourRepA->SetRenderer(m_imageViewer->GetannotationRenderer());
     contourRepA->GetLinesProperty()->SetColor(255,255,255);
     contourRepA->GetProperty()->SetOpacity(0);
     contourWidgetA->CreateDefaultRepresentation();

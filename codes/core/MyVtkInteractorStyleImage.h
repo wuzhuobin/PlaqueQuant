@@ -152,7 +152,7 @@ protected:
 private:
     // Drawing points and lines tool
     vtkRenderer* Renderer;
-    vtkRenderer* Renderer2;
+    //vtkRenderer* Renderer2;
     vtkRenderWindow* RenderWindow;
     vtkOrientedGlyphContourRepresentation* contourRep;
     vtkOrientedGlyphContourRepresentation* contourRepA;
