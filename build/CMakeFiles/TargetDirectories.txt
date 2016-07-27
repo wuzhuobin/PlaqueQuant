@@ -1,4 +1,0 @@
-C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/Project.dir
-C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/jieji/Desktop/blood_vessel_v_2.0/blood_vessel/build/codes/Module/CMakeFiles/Module.dir
