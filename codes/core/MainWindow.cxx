@@ -1539,20 +1539,20 @@ void MainWindow::slotChangeBaseImageLL()
 void MainWindow::slotMultiPlanarView()
 {
 	segmentation = false;
-	//this->ui->image1View->SetRenderWindow(NULL);
-	//this->ui->image2View->SetRenderWindow(NULL);
-	//this->ui->image3View->SetRenderWindow(NULL);
+	this->ui->image1View->SetRenderWindow(NULL);
+	this->ui->image2View->SetRenderWindow(NULL);
+	this->ui->image3View->SetRenderWindow(NULL);
 
-	//for (int i = 0; i < 3; ++i) {
-	//	if (m_2DimageViewer[i] != NULL) {
-	//		m_2DimageViewer[i]->Delete();
-	//	}
-	//		m_2DimageViewer[i] = MyImageViewer::New();
-	//}
+	for (int i = 0; i < 3; ++i) {
+		if (m_2DimageViewer[i] != NULL) {
+			m_2DimageViewer[i]->Delete();
+		}
+		m_2DimageViewer[i] = MyImageViewer::New();
+	}
 
-	//this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
-	//this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
-	//this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
+	this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
+	this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
+	this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 
 
 	for (int i = 0; i<3; i++)
@@ -1589,28 +1589,33 @@ void MainWindow::slotSegmentationView()
 	this->ui->image2View->SetRenderWindow(NULL);
 	this->ui->image3View->SetRenderWindow(NULL);
 
-	//for (int i = 0; i < 3; ++i) {
-	//	m_2DimageViewer[i]->Delete();
-	//	m_2DimageViewer[i] = NULL;
-	//}
+	for (int i = 0; i < 3; ++i) {
+		if (m_2DimageViewer[i] != NULL) {
+			m_2DimageViewer[i]->Delete();
+		}
+		m_2DimageViewer[i] = MyImageViewer::New();
+	}
+
+	this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
+	this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
+	this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 
 	if (m_vtkT1) {
 		//m_2DimageViewer[0] = MyImageViewer::New();
-		ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 		//this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
 		//this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
 		m_2DimageViewer[0]->SetInputData(m_vtkT1);
 	}
 	if (m_vtkT2) {
 		//m_2DimageViewer[1] = MyImageViewer::New();
-		ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
+		//ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
 		//this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
 		//this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
 		m_2DimageViewer[1]->SetInputData(m_vtkT2);
 	}
 	if (m_vtkT1C) {
 		//m_2DimageViewer[2] = MyImageViewer::New();
-		ui->image2View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
+		//ui->image2View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 		//this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
 		//this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
 		m_2DimageViewer[2]->SetInputData(m_vtkT1C);
