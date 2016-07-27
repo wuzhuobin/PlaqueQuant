@@ -80,13 +80,11 @@ MyImageViewer::MyImageViewer()
 	annotationRenderer->SetActiveCamera(Renderer->GetActiveCamera());
 	annotationRenderer->SetLayer(1);
 
-	this->ImageActor->SetOpacity(1.0);
 	//for (int i = 0; i < 4; ++i) {
 	//	Renderer->AddActor2D(TextActor[i]);
 	//}
 	//Renderer->AddActor(IntTextActor);
 	//Renderer->AddActor(HeaderActor);
-	this->drawActor->SetOpacity(1);
 	this->drawActor->SetVisibility(false);
 
 	RenderWindow->SetNumberOfLayers(2);

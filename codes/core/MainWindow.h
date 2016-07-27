@@ -13,10 +13,10 @@
 #include <QMimeData>
 #include <QFuture>
 #include <QMenu>
+#include <QActionGroup>
 
 #include "vtkCamera.h"
 #include "vtkImageMapToWindowLevelColors.h"
-#include "vtkSmartPointer.h"
 #include "vtkMarchingCubes.h"
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkWindowedSincPolyDataFilter.h"
@@ -39,7 +39,7 @@
 #include "vtkDistanceWidget.h"
 #include "vtkPointHandleRepresentation3D.h"
 #include <vtkLookupTable.h>
-
+#include <vtkSmartPointer.h>
 
 //Own Class
 #include "Define.h"
@@ -142,7 +142,7 @@ public slots:
 	virtual void slotChangeBaseImageUL();
 	virtual void slotChangeBaseImageUR();
 	virtual void slotChangeBaseImageLL();
-	virtual void ChangeOrientation(int);
+	//virtual void ChangeOrientation(int);
 	virtual void slotChangeImageSeq(int image_no, int window_no);
 	virtual void slotSelectImageSeq(QAction*);
 	//Intensity
@@ -173,11 +173,10 @@ private:
     
 	//2D/3D view
 	MyImageViewer*				m_2DimageViewer[3];
-	MyImageViewer*				m_3DimageViewer;
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
 	MyVtkInteractorStyleImage*	m_style[3];
-	vtkRenderer*				m_renderer[4]; // m_renderer[4] is for 3D
+	//vtkRenderer*				m_renderer[4]; // m_renderer[4] is for 3D
 
     //ROI
 	MyPlaneWidget*			m_planeWidget[3];
@@ -186,11 +185,11 @@ private:
 	bool	m_settingROI;
 
     //File Name
-    QStringList* FileNameList1;
-    QStringList* FileNameList2;
-    QStringList* FileNameList3;
-    QStringList* FileNameList4;
-    QStringList* FileNameList5;
+    QStringList FileNameList1;
+    QStringList FileNameList2;
+    QStringList FileNameList3;
+    QStringList FileNameList4;
+    QStringList FileNameList5;
     
 	//3D ruler
 	vtkDistanceWidget* DistanceWidget3D;

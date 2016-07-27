@@ -44,14 +44,6 @@ void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 	m_imageViewer->GetInput()->GetOrigin(origin);
 }
 
-void MyVtkInteractorStyleImage::SetOrientation(MyImageViewer* imageViewer)
-{
-    m_minSlice	  = imageViewer->GetSliceMin();
-    m_maxSlice	  = imageViewer->GetSliceMax();
-    m_slice		  = imageViewer->GetSlice();
-    m_orientation = imageViewer->GetSliceOrientation();
-}
-
 void MyVtkInteractorStyleImage::SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z)
 {
 	m_sliceSplinBox[0] = x;
@@ -401,14 +393,14 @@ void MyVtkInteractorStyleImage::OnMouseMove()
 void MyVtkInteractorStyleImage::OnChar()
 {
 	vtkRenderWindowInteractor *rwi = this->Interactor;
-	switch (rwi->GetKeyCode()) 
+	switch (rwi->GetKeyCode())
 	{
 	case 'r':
 	case 'R':
-            if (m_imageViewer->GetInput() != NULL){
-                m_wlDoubleSpinBox[0]->setValue(m_imageViewer->GetDefaultWindowLevel()[0]);
-                m_wlDoubleSpinBox[1]->setValue(m_imageViewer->GetDefaultWindowLevel()[1]);
-            }
+		if (m_imageViewer->GetInput() != NULL) {
+			m_wlDoubleSpinBox[0]->setValue(m_imageViewer->GetDefaultWindowLevel()[0]);
+			m_wlDoubleSpinBox[1]->setValue(m_imageViewer->GetDefaultWindowLevel()[1]);
+		}
 		break;
 	}
 }
@@ -478,19 +470,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 		m_borderWidget->Delete();
 		m_borderWidget = NULL;
 	}
-	if (m_brush != NULL)
-	{
-		m_imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
-		//Renderer2->RemoveActor(BrushActor);
-		//Renderer2->Delete();
-		//Renderer2 = NULL;
 
-		m_brush->Delete();
-		m_brush = NULL;
-		BrushActor->Delete();
-		BrushActor = NULL;
-
-	}
 	if (b)
 	{
 		m_retangleRep = vtkBorderRepresentation::New();
@@ -506,10 +486,18 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 		m_borderWidget->Off();
 	}
 
-	//mainWnd->GetViewers(m_orientation)->GetAnnotationRenderer()->ResetCameraClippingRange();
 	this->GetInteractor()->Render();
 
+	if (m_brush)
+	{
+		m_imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
 
+		m_brush->Delete();
+		m_brush = NULL;
+		BrushActor->Delete();
+		BrushActor = NULL;
+		
+	}
 
 	m_brush = vtkImageCanvasSource2D::New();
 	m_brush->SetScalarTypeToUnsignedChar();
@@ -541,7 +529,6 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 	BrushActor = vtkImageActor::New();
 	BrushActor->SetInputData(m_brush->GetOutput());
 	BrushActor->GetProperty()->SetInterpolationTypeToNearest();
-	BrushActor->SetOpacity(1);
 	// Set the image actor
 
 	switch (this->m_orientation)
@@ -559,7 +546,6 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 			extent[0], extent[1], extent[2], extent[3], 0, 0);
 		break;
 	}
-
 	m_imageViewer->GetannotationRenderer()->AddActor(BrushActor);
 	m_imageViewer->GetRenderWindow()->Render();
 
@@ -567,7 +553,6 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 	
 void MyVtkInteractorStyleImage::Draw(bool b)
 {
-
 	if (b)
 		m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
 	else
@@ -662,9 +647,6 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 		draw_index_old[i] = draw_index[i];
 	}
 
-	//m_brush->Update();
-	//m_brush->GetOutput()->SetOrigin(origin);
-	//m_brush->GetOutput()->SetSpacing(spacing);
 
 }
 
@@ -1032,12 +1014,12 @@ void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
 		contourRep = NULL;
 	}
 	if (b) {
-		Renderer = m_imageViewer->GetRenderer();
-		RenderWindow = m_imageViewer->GetRenderWindow();
+		
 		//this->Synchronize();
 
+
 		contourWidget = vtkContourWidget::New();
-		contourWidget->SetInteractor(RenderWindow->GetInteractor());
+		contourWidget->SetInteractor(m_imageViewer->GetRenderWindow()->GetInteractor());
 		contourWidget->SetCurrentRenderer(m_imageViewer->GetannotationRenderer());
 
 		contourRep = vtkOrientedGlyphContourRepresentation::New();
@@ -1064,11 +1046,10 @@ void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
 		cursorpolyData->DeepCopy(transformFilter->GetOutput());
 		contourWidget->SetRepresentation(contourRep);
 		contourWidget->FollowCursorOn();
-		//contourWidget->CreateDefaultRepresentation();
 		contourWidget->On();
 		contourWidget->EnabledOn();
 
-		RenderWindow->Render();
+		m_imageViewer->GetRenderWindow()->Render();
 	}		
 }
 
@@ -1204,15 +1185,14 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 
 void MyVtkInteractorStyleImage::DrawSynchronize(vtkPolyData* polydata)
 {
-    Renderer=m_imageViewer->GetRenderer();
-    RenderWindow=m_imageViewer->GetRenderWindow();
     if (contourWidgetA){
         contourWidgetA->Delete();
         contourWidgetA = NULL;
     }
+	m_imageViewer->GetRenderer()->SetLayer(0);
     
     contourWidgetA = vtkContourWidget::New();
-    contourWidgetA->SetInteractor(RenderWindow->GetInteractor());
+    contourWidgetA->SetInteractor(m_imageViewer->GetRenderWindow()->GetInteractor());
     contourWidgetA->SetCurrentRenderer(m_imageViewer->GetannotationRenderer());
     
     contourRepA = vtkOrientedGlyphContourRepresentation::New();
@@ -1224,7 +1204,7 @@ void MyVtkInteractorStyleImage::DrawSynchronize(vtkPolyData* polydata)
     contourWidgetA->Initialize(polydata);
     contourWidgetA->SetRepresentation(contourRepA);
     contourWidgetA->On();
-    RenderWindow->Render();
+	m_imageViewer->GetRenderWindow()->Render();
     
 }
 

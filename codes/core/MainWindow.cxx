@@ -15,10 +15,23 @@ MainWindow::MainWindow()
 	connect(ui->actionExit,						SIGNAL(triggered()), this, SLOT(slotExit()));
 	connect(ui->actionAbout,					SIGNAL(triggered()), this, SLOT(slotAbout()));
 	connect(ui->actionHelp,						SIGNAL(triggered()), this, SLOT(slotHelp()));
-	connect(ui->actionNavigation,				SIGNAL(triggered()), this, SLOT(slotNavigationMode()));
-	connect(ui->actionWindowLevel,				SIGNAL(triggered()), this, SLOT(slotWindowLevelMode()));
-	connect(ui->actionContour,					SIGNAL(triggered()), this, SLOT(slotContourMode()));
-	connect(ui->actionBrush,					SIGNAL(triggered()), this, SLOT(slotBrushMode()));
+	
+	//widgets
+	QActionGroup* widgetGroup = new QActionGroup(this);
+	widgetGroup->addAction(ui->actionNavigation);
+	widgetGroup->addAction(ui->actionWindowLevel);
+	widgetGroup->addAction(ui->actionContour);
+	widgetGroup->addAction(ui->actionBrush);
+	widgetGroup->addAction(ui->actionRuler);
+	widgetGroup->addAction(ui->actionROI);
+	widgetGroup->setExclusive(true);
+	connect(ui->actionNavigation, SIGNAL(triggered()), this, SLOT(slotNavigationMode()));
+	connect(ui->actionWindowLevel, SIGNAL(triggered()), this, SLOT(slotWindowLevelMode()));
+	connect(ui->actionContour, SIGNAL(triggered()), this, SLOT(slotContourMode()));
+	connect(ui->actionBrush, SIGNAL(triggered()), this, SLOT(slotBrushMode()));
+	connect(ui->actionRuler, SIGNAL(triggered(bool)), this, SLOT(slotRuler(bool)));
+	connect(ui->actionROI, SIGNAL(triggered(bool)), this, SLOT(slotSetROIWidgetEnabled(bool)));
+
 
 	//Viewer
     connect(ui->actionImage1,					SIGNAL(triggered()), this, SLOT(slotimage1()));
@@ -39,13 +52,16 @@ MainWindow::MainWindow()
 	connect(ui->URSelectImgBtn,					SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUR()));
 	connect(ui->LLSelectImgBtn,					SIGNAL(clicked()), this, SLOT(slotChangeBaseImageLL()));
 
+	QActionGroup* viewgroup = new QActionGroup(this);
+	viewgroup->addAction(ui->actionMultiPlanarView);
+	viewgroup->addAction(ui->actionAllAxialView);
+	viewgroup->setExclusive(true);
 	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), this, SLOT(slotMultiPlanarView()));
 	connect(ui->actionAllAxialView, SIGNAL(triggered()), this, SLOT(slotSegmentationView()));
+
 	connect(ui->actionCenterlineAlgorithm, SIGNAL(triggered()), this, SLOT(slotCenterline()));
 
 	//Tools
-	connect(ui->actionRuler, SIGNAL(triggered(bool)), this, SLOT(slotRuler(bool)));
-	connect(ui->actionROI, SIGNAL(triggered(bool)), this, SLOT(slotSetROIWidgetEnabled(bool)));
 	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), this, SLOT(slotAddExternalOverlay()));
 
 	//3D view
@@ -77,16 +93,11 @@ MainWindow::MainWindow()
 	m_visible_image_no = 0;
 
 	//renderer
-	for (int i=0; i<4; i++)
-	{
-		m_renderer[i]		= vtkRenderer::New();
-		m_renderer[i]->GetActiveCamera()->SetParallelProjection(true);
-	}
     
-    ui->image1View->GetRenderWindow()->AddRenderer(m_renderer[0]);
-	ui->image2View->GetRenderWindow()->AddRenderer(m_renderer[1]);
-	ui->image3View->GetRenderWindow()->AddRenderer(m_renderer[2]);
-	ui->image4View->GetRenderWindow()->AddRenderer(m_renderer[3]);
+	ui->image1View->GetRenderWindow()->AddRenderer(vtkSmartPointer<vtkRenderer>::New());
+	ui->image2View->GetRenderWindow()->AddRenderer(vtkSmartPointer<vtkRenderer>::New());
+	ui->image3View->GetRenderWindow()->AddRenderer(vtkSmartPointer<vtkRenderer>::New());
+	ui->image4View->GetRenderWindow()->AddRenderer(vtkSmartPointer<vtkRenderer>::New());
 	
 	//Initialize
 	initializeModule();
@@ -106,15 +117,9 @@ MainWindow::MainWindow()
 		m_focalPoint[i] = NULL;
 	}
 	DistanceWidget3D = NULL;
-	m_3DimageViewer = NULL;
 	m_3Dinteractor = NULL;
 	m_settingROI = false;
 	ImageAlignment(NULL) = NULL;
-	FileNameList1 = NULL;
-	FileNameList2 = NULL;
-	FileNameList3 = NULL;
-	FileNameList4 = NULL;
-	FileNameList5 = NULL;
 	m_itkT1 = NULL;
 	m_itkT2 = NULL;
 	m_itkT1C = NULL;
@@ -148,10 +153,6 @@ MainWindow* MainWindow::GetMainWindow()
 
 MainWindow::~MainWindow()
 {
-	for (int i=0;i<4;i++)
-	{
-		m_renderer[i]->Delete();
-	}
 
 	for (int i=0;i<3;i++)
 	{
@@ -164,10 +165,6 @@ MainWindow::~MainWindow()
 		if (m_style[i])
 			m_style[i]->Delete();
 	}
-
-	if (m_3DimageViewer)
-		m_3DimageViewer->Delete();
-
 	if (m_3Dinteractor)
 		m_3Dinteractor->Delete();
 
@@ -191,32 +188,25 @@ void MainWindow::initializeViewers()
 		m_interactor[i]		= vtkRenderWindowInteractor::New();
 		m_style[i]			= MyVtkInteractorStyleImage::New();
 
-		m_interactor[i]->SetInteractorStyle(m_style[i]);
 	}
 
-    m_2DimageViewer[0]->SetRenderWindow(this->ui->image1View->GetRenderWindow());
-	this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
-	this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
+	ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 
-	m_2DimageViewer[1]->SetRenderWindow(this->ui->image2View->GetRenderWindow());
-	this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
-	this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
+	ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
 
-	m_2DimageViewer[2]->SetRenderWindow(this->ui->image3View->GetRenderWindow());
-	this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
-	this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
+	ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 
 
 	for (int i = 0 ; i < 3 ; i++)
 	{
 	    m_2DimageViewer[i]->SetInputData(m_vtkT1);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
-		int max = m_2DimageViewer[i]->GetSliceMax();
-		m_2DimageViewer[i]->SetSlice(max/2);
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
+		//m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+		//m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
-		m_2DimageViewer[i]->Render();
+		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
+
 
 		//Update style
 		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
@@ -226,7 +216,8 @@ void MainWindow::initializeViewers()
 		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
 		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
-		m_interactor[i]->Initialize();
+		m_interactor[i]->SetInteractorStyle(m_style[i]);
+//  m_interactor[i]->Initialize();
 		
 	}
 	this->initializeOverlay();
@@ -321,18 +312,26 @@ void MainWindow::slotOpenImage(QString dir)
 
 	//Update Recent Image
     m_visible_image_no=wizard.getTotalFileNo();
-
-    FileNameList1=wizard.getFileNames1();
-    FileNameList2=wizard.getFileNames2();
-    FileNameList3=wizard.getFileNames3();
-    FileNameList4=wizard.getFileNames4();
-	FileNameList5=wizard.getFileNames5();
-    if (FileNameList1!=NULL) loadImage(1,FileNameList1);
-    if (FileNameList2!=NULL) loadImage(2,FileNameList2);
-    if (FileNameList3!=NULL) loadImage(3,FileNameList3);
-    if (FileNameList4!=NULL) loadImage(4,FileNameList4);
-	if (FileNameList5!=NULL) loadImage(5,FileNameList5);
-	
+	if (wizard.getFileNames1() != NULL) {
+		FileNameList1 = *wizard.getFileNames1();
+		loadImage(1, &FileNameList1);
+	}
+	if (wizard.getFileNames2() != NULL) {
+		FileNameList2 = *wizard.getFileNames2();
+		loadImage(2, &FileNameList2);
+	}
+	if (wizard.getFileNames3() != NULL) {
+		FileNameList3 = *wizard.getFileNames3();
+		loadImage(3, &FileNameList3);
+	}
+	if (wizard.getFileNames4() != NULL) {
+		FileNameList4 = *wizard.getFileNames4();
+		loadImage(4, &FileNameList4);
+	}
+	if (wizard.getFileNames5() != NULL) {
+		FileNameList5 = *wizard.getFileNames5();
+		loadImage(5, &FileNameList5);
+	}
 	adjustForCurrentFile(wizard.getDirectory());
 	visualizeImage();
 
@@ -1066,7 +1065,7 @@ void MainWindow::slot3DUpdate()
 
 	if (SegmentationOverlay == NULL)
 		return;
-	m_renderer[3]->RemoveAllViewProps();
+	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
 	
 	//Layer 1
 	SurfaceCreator* SegmentationOverlayCreator = new SurfaceCreator();
@@ -1081,9 +1080,9 @@ void MainWindow::slot3DUpdate()
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
 	Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
 	Actor->SetMapper(mapper);
-	m_renderer[3]->AddActor(Actor);
-	m_renderer[3]->ResetCameraClippingRange();
-	m_renderer[3]->ResetCamera();
+	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
+	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui->image4View->GetRenderWindow()->Render();
 }
 
@@ -1355,7 +1354,7 @@ QString MainWindow::GetFileName(int i)
     switch(i) {
         case 0:
         {
-            QString Path1 =FileNameList1->at(0);
+            QString Path1 =FileNameList1.at(0);
             if (Path1 != NULL)
             {
                 start = Path1.lastIndexOf("/");
@@ -1369,7 +1368,7 @@ QString MainWindow::GetFileName(int i)
         }
         case 1:
         {
-             QString Path2 =FileNameList2->at(0);
+             QString Path2 =FileNameList2.at(0);
             if (Path2 != NULL)
             {
                 start = Path2.lastIndexOf("/");
@@ -1383,7 +1382,7 @@ QString MainWindow::GetFileName(int i)
         }
         case 2:
         {
-            QString Path3 =FileNameList3->at(0);
+            QString Path3 =FileNameList3.at(0);
             if (Path3 != NULL)
             {
                 start = Path3.lastIndexOf("/");
@@ -1397,7 +1396,7 @@ QString MainWindow::GetFileName(int i)
         }
         case 3:
         {
-            QString Path4 =FileNameList4->at(0);
+            QString Path4 =FileNameList4.at(0);
             if (Path4 != NULL)
             {
                 start = Path4.lastIndexOf("/");
@@ -1539,40 +1538,30 @@ void MainWindow::slotChangeBaseImageLL()
 
 void MainWindow::slotMultiPlanarView()
 {
-	ui->actionAllAxialView->setChecked(false);
-	ui->actionMultiPlanarView->setChecked(true);
 	segmentation = false;
-	this->ui->image1View->SetRenderWindow(NULL);
-	this->ui->image2View->SetRenderWindow(NULL);
-	this->ui->image3View->SetRenderWindow(NULL);
+	//this->ui->image1View->SetRenderWindow(NULL);
+	//this->ui->image2View->SetRenderWindow(NULL);
+	//this->ui->image3View->SetRenderWindow(NULL);
 
-	for (int i = 0; i < 3; ++i) {
-		if (m_2DimageViewer[i] != NULL) {
-			m_2DimageViewer[i]->Delete();
-		}
-			m_2DimageViewer[i] = MyImageViewer::New();
-	}
+	//for (int i = 0; i < 3; ++i) {
+	//	if (m_2DimageViewer[i] != NULL) {
+	//		m_2DimageViewer[i]->Delete();
+	//	}
+	//		m_2DimageViewer[i] = MyImageViewer::New();
+	//}
 
-	this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
-	this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
-	this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
-	this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
-	this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
-	this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
-	this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
-	this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
-	this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
+	//this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
+	//this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
+	//this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 
 
 	for (int i = 0; i<3; i++)
 	{
 		m_2DimageViewer[i]->SetInputData(m_vtkT1);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
 		m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
-		m_2DimageViewer[i]->Render();
 
+		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 		//Update style
 		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
 		m_style[i]->SetAutoAdjustCameraClippingRange(true);
@@ -1581,7 +1570,8 @@ void MainWindow::slotMultiPlanarView()
 		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
 		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
-		m_interactor[i]->Initialize();
+		m_interactor[i]->SetInteractorStyle(m_style[i]);
+//  m_interactor[i]->Initialize();
 	}
 
 	this->slotChangeSlice();
@@ -1591,8 +1581,6 @@ void MainWindow::slotMultiPlanarView()
 
 void MainWindow::slotSegmentationView()
 {
-	ui->actionAllAxialView->setChecked(true);
-	ui->actionMultiPlanarView->setChecked(false);
 	m_orientation = SLICE_ORIENTATION_XY;
 	segmentation = true;
 	bool image[5] = {false};
@@ -1601,30 +1589,30 @@ void MainWindow::slotSegmentationView()
 	this->ui->image2View->SetRenderWindow(NULL);
 	this->ui->image3View->SetRenderWindow(NULL);
 
-	for (int i = 0; i < 3; ++i) {
-		m_2DimageViewer[i]->Delete();
-		m_2DimageViewer[i] = NULL;
-	}
+	//for (int i = 0; i < 3; ++i) {
+	//	m_2DimageViewer[i]->Delete();
+	//	m_2DimageViewer[i] = NULL;
+	//}
 
 	if (m_vtkT1) {
-		m_2DimageViewer[0] = MyImageViewer::New();
-		m_2DimageViewer[0]->SetRenderWindow(this->ui->image1View->GetRenderWindow());
-		this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
-		this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
+		//m_2DimageViewer[0] = MyImageViewer::New();
+		ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
+		//this->ui->image1View->GetRenderWindow()->SetInteractor(m_interactor[0]);
+		//this->ui->image1View->GetRenderWindow()->GetInteractor()->Initialize();
 		m_2DimageViewer[0]->SetInputData(m_vtkT1);
 	}
 	if (m_vtkT2) {
-		m_2DimageViewer[1] = MyImageViewer::New();
-		m_2DimageViewer[1]->SetRenderWindow(this->ui->image2View->GetRenderWindow());
-		this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
-		this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
+		//m_2DimageViewer[1] = MyImageViewer::New();
+		ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
+		//this->ui->image2View->GetRenderWindow()->SetInteractor(m_interactor[1]);
+		//this->ui->image2View->GetRenderWindow()->GetInteractor()->Initialize();
 		m_2DimageViewer[1]->SetInputData(m_vtkT2);
 	}
 	if (m_vtkT1C) {
-		m_2DimageViewer[2] = MyImageViewer::New();
-		m_2DimageViewer[2]->SetRenderWindow(this->ui->image3View->GetRenderWindow());
-		this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
-		this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
+		//m_2DimageViewer[2] = MyImageViewer::New();
+		ui->image2View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
+		//this->ui->image3View->GetRenderWindow()->SetInteractor(m_interactor[2]);
+		//this->ui->image3View->GetRenderWindow()->GetInteractor()->Initialize();
 		m_2DimageViewer[2]->SetInputData(m_vtkT1C);
 	}
 	
@@ -1632,13 +1620,12 @@ void MainWindow::slotSegmentationView()
 	{
 
 		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+		//m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+		//m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(i));
 		m_2DimageViewer[i]->Render();
 
 		//Update style
-		m_style[i]->SetOrientation(m_2DimageViewer[i]);
 		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
 		m_style[i]->SetAutoAdjustCameraClippingRange(true);
 		m_style[i]->SetSliceSpinBox(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox);
@@ -1656,7 +1643,7 @@ void MainWindow::slotSegmentationView()
 			break;
         
 		}
-		m_interactor[i]->Initialize();
+//  m_interactor[i]->Initialize();
 	}
 	
 	this->slotChangeSlice();
@@ -1675,33 +1662,33 @@ void MainWindow::slotAddExternalOverlay()
 
 }
 
-void MainWindow::ChangeOrientation(int orientation){
-    
-     m_orientation=orientation;
-
-	for (int i=0; i<m_visible_image_no; i++)
-	{
-		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);
-		/*
-        if (m_orientation == 0)
-            m_2DimageViewer[i]->SetSlice(ui->xSpinBox->value());
-        else if (m_orientation == 1)
-            m_2DimageViewer[i]->SetSlice(ui->ySpinBox->value());
-        else if (m_orientation == 2)
-            m_2DimageViewer[i]->SetSlice(ui->zSpinBox->value());
-        */
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
-        
-		m_2DimageViewer[i]->Render();
-
-		//Update style
-		m_style[i]->SetOrientation(m_2DimageViewer[i]);
-		m_style[i]->SetAutoAdjustCameraClippingRange(true);
-	}
-
-    
-}
+//void MainWindow::ChangeOrientation(int orientation){
+//    
+//     m_orientation=orientation;
+//
+//	for (int i=0; i<m_visible_image_no; i++)
+//	{
+//		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);
+//		/*
+//        if (m_orientation == 0)
+//            m_2DimageViewer[i]->SetSlice(ui->xSpinBox->value());
+//        else if (m_orientation == 1)
+//            m_2DimageViewer[i]->SetSlice(ui->ySpinBox->value());
+//        else if (m_orientation == 2)
+//            m_2DimageViewer[i]->SetSlice(ui->zSpinBox->value());
+//        */
+//		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+//		m_2DimageViewer[i]->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+//        
+//		m_2DimageViewer[i]->Render();
+//
+//		//Update style
+//		m_style[i]->SetOrientation(m_2DimageViewer[i]);
+//		m_style[i]->SetAutoAdjustCameraClippingRange(true);
+//	}
+//
+//    
+//}
 
 
 void MainWindow::slotOverlayVisibilty(bool b, int orientation)
@@ -1748,19 +1735,19 @@ void MainWindow::RenderAllViewer()
 	//QCoreApplication::processEvents();
 	if (segmentation)
 	{
-	for (int i = 0 ; i < m_visible_image_no ; i++)
-	{
-		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		m_2DimageViewer[i]->Render();
-	}
+		for (int i = 0; i < m_visible_image_no; i++)
+		{
+			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+			m_2DimageViewer[i]->Render();
+		}
 	}
 	else
 	{
-		for (int i = 0 ; i < 3 ; i++)
-	{
-		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		m_2DimageViewer[i]->Render();
-	}
+		for (int i = 0; i < 3; i++)
+		{
+			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+			m_2DimageViewer[i]->Render();
+		}
 	}
 }
 

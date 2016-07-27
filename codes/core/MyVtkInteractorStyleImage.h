@@ -96,7 +96,6 @@ private:
 
 public:
 	void SetImageViewer(MyImageViewer* imageViewer);
-    void SetOrientation(MyImageViewer* imageViewer);
 	void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
 	void SetWindowLevelSpinBox(QDoubleSpinBox* w,QDoubleSpinBox* l);
 	// Paint Brush
@@ -151,9 +150,6 @@ protected:
 
 private:
     // Drawing points and lines tool
-    vtkRenderer* Renderer;
-    //vtkRenderer* Renderer2;
-    vtkRenderWindow* RenderWindow;
     vtkOrientedGlyphContourRepresentation* contourRep;
     vtkOrientedGlyphContourRepresentation* contourRepA;
     vtkContourWidget* contourWidget;
