@@ -59,7 +59,7 @@ public:
 	vtkTypeMacro(MyVtkInteractorStyleImage, vtkInteractorStyleImage);
 
 protected:
-	MyImageViewer* m_imageViewer;
+	MyImageViewer* imageViewer;
     int no_of_points;
     int max_point;
 	int m_slice;

@@ -5,13 +5,13 @@
 
 vtkStandardNewMacro(MyVtkInteractorStyleImage);
 
-void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer) 
+void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 {
 	//Contour Widget
-    contourWidget = NULL;
-    contourWidgetA = NULL;
-    contourRep = NULL;
-    contourRepA = NULL;
+	contourWidget = NULL;
+	contourWidgetA = NULL;
+	contourRep = NULL;
+	contourRepA = NULL;
 	//Paint Brush
 	m_drawValueComboBox = NULL;
 	m_drawBrushShapeComboBox = NULL;
@@ -28,20 +28,20 @@ void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 	color_b = 0;
 	m_opacity = 255;
 	//Image Viewer
-	m_imageViewer = imageViewer;
-	m_minSlice	  = imageViewer->GetSliceMin();
-	m_maxSlice	  = imageViewer->GetSliceMax();
-	m_slice		  = imageViewer->GetSlice();
+	this->imageViewer = imageViewer;
+	m_minSlice = imageViewer->GetSliceMin();
+	m_maxSlice = imageViewer->GetSliceMax();
+	m_slice = imageViewer->GetSlice();
 	m_orientation = imageViewer->GetSliceOrientation();
 	//Default setting
-    m_mode = NavaigationMode;
-    m_functioning = false;
-    rclick_mode = false;
-    mclick_mode = false;
-    
-	m_imageViewer->GetInput()->GetExtent(extent);
-	m_imageViewer->GetInput()->GetSpacing(spacing);
-	m_imageViewer->GetInput()->GetOrigin(origin);
+	m_mode = NavaigationMode;
+	m_functioning = false;
+	rclick_mode = false;
+	mclick_mode = false;
+
+	imageViewer->GetInput()->GetExtent(extent);
+	imageViewer->GetInput()->GetSpacing(spacing);
+	imageViewer->GetInput()->GetOrigin(origin);
 }
 
 void MyVtkInteractorStyleImage::SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z)
@@ -52,7 +52,7 @@ void MyVtkInteractorStyleImage::SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinB
 }
 
 
-void MyVtkInteractorStyleImage::SetWindowLevelSpinBox(QDoubleSpinBox* w,QDoubleSpinBox* l)
+void MyVtkInteractorStyleImage::SetWindowLevelSpinBox(QDoubleSpinBox* w, QDoubleSpinBox* l)
 {
 	m_wlDoubleSpinBox[0] = w;
 	m_wlDoubleSpinBox[1] = l;
@@ -93,7 +93,7 @@ void MyVtkInteractorStyleImage::SetDrawOpacity(int opacity)
 {
 	m_opacity = opacity;
 }
-void MyVtkInteractorStyleImage::SetMode(int m) 
+void MyVtkInteractorStyleImage::SetMode(int m)
 {
 	if (m == 1)
 		m_mode = NavaigationMode;
@@ -112,14 +112,16 @@ void MyVtkInteractorStyleImage::SetMode(int m)
 	{
 		m_mode = PolygonMode;
 		SetPolygonModeEnabled(true);
+		SetPaintBrushModeEnabled(true);
+
 	}
 
 }
 
-void MyVtkInteractorStyleImage::MoveSliceForward() 
+void MyVtkInteractorStyleImage::MoveSliceForward()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	if(m_slice < m_maxSlice) 
+	if (m_slice < m_maxSlice)
 	{
 		m_slice += 1;
 		switch (m_orientation)
@@ -138,10 +140,10 @@ void MyVtkInteractorStyleImage::MoveSliceForward()
 	}
 }
 
-void MyVtkInteractorStyleImage::MoveSliceBackward() 
+void MyVtkInteractorStyleImage::MoveSliceBackward()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	if(m_slice > m_minSlice) 
+	if (m_slice > m_minSlice)
 	{
 		m_slice -= 1;
 		switch (m_orientation)
@@ -160,10 +162,10 @@ void MyVtkInteractorStyleImage::MoveSliceBackward()
 	}
 }
 
-void MyVtkInteractorStyleImage::OnMouseWheelForward() 
+void MyVtkInteractorStyleImage::OnMouseWheelForward()
 {
 	//std::cout << "Scrolled mouse wheel forward." << std::endl;
-	if(m_slice < m_maxSlice) {
+	if (m_slice < m_maxSlice) {
 		MoveSliceForward();
 	}
 	// don't forward events, otherwise the image will be zoomed 
@@ -172,10 +174,10 @@ void MyVtkInteractorStyleImage::OnMouseWheelForward()
 }
 
 
-void MyVtkInteractorStyleImage::OnMouseWheelBackward() 
+void MyVtkInteractorStyleImage::OnMouseWheelBackward()
 {
 	//std::cout << "Scrolled mouse wheel backward." << std::endl;
-	if(m_slice > m_minSlice) {
+	if (m_slice > m_minSlice) {
 		MoveSliceBackward();
 	}
 	// don't forward events, otherwise the image will be zoomed 
@@ -199,7 +201,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonUp()
 			this->Render();
 			isDraw = true;
 		}
-		
+
 	}
 
 }
@@ -209,26 +211,26 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 	m_functioning = true;
 	isDraw = false;
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	if(m_mode == 1)
+	if (m_mode == 1)
 		CalculateIndex();
 
-	if(m_mode == 2)
+	if (m_mode == 2)
 	{
 		int x = this->GetInteractor()->GetEventPosition()[0];
 		int y = this->GetInteractor()->GetEventPosition()[1];
 
 		this->WindowLevelStartPosition[0] = x;
-		this->WindowLevelStartPosition[1] = y;  		
-		
+		this->WindowLevelStartPosition[1] = y;
+
 		this->FindPokedRenderer(x, y);
 	}
 	if (m_mode == 3)
-    {
+	{
 		this->GetInteractor()->GetPicker()->Pick(
 			this->GetInteractor()->GetEventPosition()[0],
 			this->GetInteractor()->GetEventPosition()[1],
 			0,  // always zero.
-			m_imageViewer->GetRenderer());
+			imageViewer->GetRenderer());
 
 		double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -236,7 +238,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 		if (picked[0] == 0.0&&picked[1] == 0.0)
 			return;
 		double index[3];
-		if (m_imageViewer->GetInput() != NULL) {
+		if (imageViewer->GetInput() != NULL) {
 			picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
 			for (int i = 0; i<3; i++)
 			{
@@ -258,10 +260,10 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 		mainWnd->slotOverlayVisibilty(false, m_orientation);
 		Draw(true);
 		this->Render();
-    }
-	
-	
-	
+	}
+
+
+
 }
 
 void MyVtkInteractorStyleImage::OnRightButtonUp()
@@ -296,7 +298,7 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 			this->GetInteractor()->GetEventPosition()[0],
 			this->GetInteractor()->GetEventPosition()[1],
 			0,  // always zero.
-			m_imageViewer->GetRenderer());
+			imageViewer->GetRenderer());
 
 		double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -304,7 +306,7 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 		if (picked[0] == 0.0&&picked[1] == 0.0)
 			return;
 		double index[3];
-		if (m_imageViewer->GetInput() != NULL) {
+		if (imageViewer->GetInput() != NULL) {
 			picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
 			for (int i = 0; i<3; i++)
 			{
@@ -334,29 +336,29 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 			FillPolygon();
 		}
 	}
-    vtkInteractorStyleTrackballCamera::OnRightButtonDown();
+	vtkInteractorStyleTrackballCamera::OnRightButtonDown();
 
-    
+
 }
 
 void MyVtkInteractorStyleImage::OnMiddleButtonUp()
 {
-    mclick_mode=false;
-    // Forward events
-    vtkInteractorStyleTrackballCamera::OnMiddleButtonUp();
+	mclick_mode = false;
+	// Forward events
+	vtkInteractorStyleTrackballCamera::OnMiddleButtonUp();
 }
 
 void MyVtkInteractorStyleImage::OnMiddleButtonDown()
 {
-    mclick_mode=true;
-    vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
+	mclick_mode = true;
+	vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
 }
 void MyVtkInteractorStyleImage::OnMouseMove()
 {
 
-	if (m_mode==1 && m_functioning == true)
+	if (m_mode == 1 && m_functioning == true)
 		CalculateIndex();
-	else if (m_mode==2 && m_functioning == true)
+	else if (m_mode == 2 && m_functioning == true)
 		WindowLevel();
 	else if (m_mode == 3 && m_functioning == true)
 	{
@@ -381,13 +383,13 @@ void MyVtkInteractorStyleImage::OnMouseMove()
 		vtkInteractorStyleImage::OnMouseMove();
 	}
 	/*
-    if ( rclick_mode == true || mclick_mode == true){
-        Synchronize();
-    }
+	if ( rclick_mode == true || mclick_mode == true){
+	Synchronize();
+	}
 	*/
 }
 
-	
+
 
 
 void MyVtkInteractorStyleImage::OnChar()
@@ -397,24 +399,24 @@ void MyVtkInteractorStyleImage::OnChar()
 	{
 	case 'r':
 	case 'R':
-		if (m_imageViewer->GetInput() != NULL) {
-			m_wlDoubleSpinBox[0]->setValue(m_imageViewer->GetDefaultWindowLevel()[0]);
-			m_wlDoubleSpinBox[1]->setValue(m_imageViewer->GetDefaultWindowLevel()[1]);
+		if (imageViewer->GetInput() != NULL) {
+			m_wlDoubleSpinBox[0]->setValue(imageViewer->GetDefaultWindowLevel()[0]);
+			m_wlDoubleSpinBox[1]->setValue(imageViewer->GetDefaultWindowLevel()[1]);
 		}
 		break;
 	}
 }
 
-void MyVtkInteractorStyleImage::OnKeyPress() 
+void MyVtkInteractorStyleImage::OnKeyPress()
 {
 	// Get the keypress
 	vtkRenderWindowInteractor *rwi = this->Interactor;
 	std::string key = rwi->GetKeySym();
 
 	// Handle an arrow key
-	if(key == "Up")
+	if (key == "Up")
 		MoveSliceForward();
-	else if(key == "Down")
+	else if (key == "Down")
 		MoveSliceBackward();
 
 	// Forward events
@@ -425,38 +427,38 @@ void MyVtkInteractorStyleImage::CalculateIndex()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	//Pick
-	this->GetInteractor()->GetPicker()->Pick(	
-		this->GetInteractor()->GetEventPosition()[0], 
-		this->GetInteractor()->GetEventPosition()[1], 
+	this->GetInteractor()->GetPicker()->Pick(
+		this->GetInteractor()->GetEventPosition()[0],
+		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		m_imageViewer->GetRenderer());
+		imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
 	//Check if valid pick
-	if(picked[0]==0.0&&picked[1]==0.0)	
+	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
-            double index[3];
-    if (m_imageViewer->GetInput() != NULL){
-	picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
-        for (int i =0;i<3;i++)
-        {
-            index[i] = (picked[i]-origin[i])/spacing[i];
-        }
+	double index[3];
+	if (imageViewer->GetInput() != NULL) {
+		picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
+		for (int i = 0; i<3; i++)
+		{
+			index[i] = (picked[i] - origin[i]) / spacing[i];
+		}
 		mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
-    }
-    
-	
+	}
+
+
 }
 
-void MyVtkInteractorStyleImage::RemoveContourWidgetAll(){
-    MainWindow* mainwnd = MainWindow::GetMainWindow();
- 
-    for (int i = 0 ; i < mainwnd->GetVisibleImageNo() ; i++){
-        mainwnd->GetMyVtkInteractorStyleImage(i)->RemoveContourWidget();
-        mainwnd->GetMyImageViewer(i)->GetRenderWindow()->Render();
-    }
-    
+void MyVtkInteractorStyleImage::RemoveContourWidgetAll() {
+	MainWindow* mainwnd = MainWindow::GetMainWindow();
+
+	for (int i = 0; i < mainwnd->GetVisibleImageNo(); i++) {
+		mainwnd->GetMyVtkInteractorStyleImage(i)->RemoveContourWidget();
+		mainwnd->GetMyImageViewer(i)->GetRenderWindow()->Render();
+	}
+
 
 }
 
@@ -476,7 +478,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());
-		m_borderWidget->SetCurrentRenderer(m_imageViewer->GetRenderer());
+		m_borderWidget->SetCurrentRenderer(imageViewer->GetRenderer());
 		m_borderWidget->SetRepresentation(m_retangleRep);
 		m_borderWidget->SetManagesCursor(true);
 		m_borderWidget->GetBorderRepresentation()->SetMoving(false);
@@ -490,13 +492,13 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 
 	if (m_brush)
 	{
-		m_imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
+		imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
 
 		m_brush->Delete();
 		m_brush = NULL;
 		BrushActor->Delete();
 		BrushActor = NULL;
-		
+
 	}
 
 	m_brush = vtkImageCanvasSource2D::New();
@@ -546,11 +548,11 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 			extent[0], extent[1], extent[2], extent[3], 0, 0);
 		break;
 	}
-	m_imageViewer->GetannotationRenderer()->AddActor(BrushActor);
-	m_imageViewer->GetRenderWindow()->Render();
+	imageViewer->GetannotationRenderer()->AddActor(BrushActor);
+	imageViewer->GetRenderWindow()->Render();
 
 }
-	
+
 void MyVtkInteractorStyleImage::Draw(bool b)
 {
 	if (b)
@@ -563,7 +565,7 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 		this->GetInteractor()->GetEventPosition()[0],
 		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		m_imageViewer->GetRenderer());
+		imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -571,7 +573,7 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
 	double index[3];
-	if (m_imageViewer->GetInput() != NULL) {
+	if (imageViewer->GetInput() != NULL) {
 		picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
 		for (int i = 0; i<3; i++)
 		{
@@ -782,7 +784,7 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 		this->GetInteractor()->GetEventPosition()[0],
 		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		m_imageViewer->GetRenderer());
+		imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -790,7 +792,7 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
 	double index[3];
-	if (m_imageViewer->GetInput() != NULL) {
+	if (imageViewer->GetInput() != NULL) {
 		picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
 		for (int i = 0; i<3; i++)
 		{
@@ -809,26 +811,26 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 	double display_origin[3];
 	double display_size[3];
 
-	m_imageViewer->GetRenderer()->SetWorldPoint(0, 0, 0, 1);
-	m_imageViewer->GetRenderer()->WorldToDisplay();
-	m_imageViewer->GetRenderer()->GetDisplayPoint(display_origin);
+	imageViewer->GetRenderer()->SetWorldPoint(0, 0, 0, 1);
+	imageViewer->GetRenderer()->WorldToDisplay();
+	imageViewer->GetRenderer()->GetDisplayPoint(display_origin);
 	//cout << "World->Display vtkRenderer 00: " << "(" << x << "," << y << ")" << " --> " << "(" << result2[0] << "," << result2[1] << ")\n";
 
-	m_imageViewer->GetRenderer()->SetWorldPoint(size*spacing[0], size*spacing[1], size*spacing[2], 1);
-	m_imageViewer->GetRenderer()->WorldToDisplay();
-	m_imageViewer->GetRenderer()->GetDisplayPoint(display_size);
+	imageViewer->GetRenderer()->SetWorldPoint(size*spacing[0], size*spacing[1], size*spacing[2], 1);
+	imageViewer->GetRenderer()->WorldToDisplay();
+	imageViewer->GetRenderer()->GetDisplayPoint(display_size);
 	//cout << "World->Display vtkRenderer: "	<< "(" << x << "," << y << ")" << " --> " << "(" << result[0] << "," << result[1] << ")\n";
 
 	double X3 = display_size[0] - display_origin[0];
 	double Y3 = display_size[1] - display_origin[1];
 
-	m_imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X1, Y1);
-	m_imageViewer->GetRenderer()->NormalizedDisplayToViewport(X1, Y1);
-	m_imageViewer->GetRenderer()->ViewportToNormalizedViewport(X1, Y1);
+	imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X1, Y1);
+	imageViewer->GetRenderer()->NormalizedDisplayToViewport(X1, Y1);
+	imageViewer->GetRenderer()->ViewportToNormalizedViewport(X1, Y1);
 
-	m_imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X3, Y3);
-	m_imageViewer->GetRenderer()->NormalizedDisplayToViewport(X3, Y3);
-	m_imageViewer->GetRenderer()->ViewportToNormalizedViewport(X3, Y3);
+	imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X3, Y3);
+	imageViewer->GetRenderer()->NormalizedDisplayToViewport(X3, Y3);
+	imageViewer->GetRenderer()->ViewportToNormalizedViewport(X3, Y3);
 
 	//if (m_drawBrushShapeComboBox->currentText() == "Square") //Square
 	//{
@@ -848,27 +850,19 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 	m_borderWidget->Modified();
 	m_borderWidget->On();
 
-	//double rsize[2];
-	//m_borderWidget->GetBorderRepresentation()->GetSize(rsize);
-	//qDebug() << "Size: " << size;
-	//qDebug() << "rSize: " << rsize[0] << ", " << rsize[1];
-	//qDebug() << "Event: " << x << y;
-	//qDebug() << "Pos3:" << X3 << Y3;
-	//qDebug() << "rPos: " << QString::number(m_borderWidget->GetBorderRepresentation()->GetPosition()[0]) << QString::number(m_borderWidget->GetBorderRepresentation()->GetPosition()[1]);
-	//qDebug() << "rPos2: " << QString::number(m_borderWidget->GetBorderRepresentation()->GetPosition2()[0]) << QString::number(m_borderWidget->GetBorderRepresentation()->GetPosition2()[1]);
 
 }
 
 void MyVtkInteractorStyleImage::ReadfromImageData()
 {
-	
+
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	int label = mainWnd->GetImageLayerNo();
 	//Clear Layer
 	m_brush->SetDrawColor(0, 0, 0, 0);
 	this->FillBox3D();
 	//m_brush->Update();
-	
+
 
 	int pos[3];
 	switch (m_orientation)
@@ -949,7 +943,7 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 				pos[0] = m_sliceSplinBox[m_orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
-				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(0,y,z));
+				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(0, y, z));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
 					pixelval = label;
 				else
@@ -966,7 +960,7 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 				pos[0] = x;
 				pos[1] = m_sliceSplinBox[m_orientation]->value();
 				pos[2] = z;
-				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x,0,z));
+				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, 0, z));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
 					pixelval = label;
 				else
@@ -983,19 +977,19 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = m_sliceSplinBox[m_orientation]->value();
-				uchar * val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x,y,0));
+				uchar * val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, y, 0));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
 					pixelval = label;
 				else
 					pixelval = 0;
 				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
-				
+
 			}
 		}
 		break;
 	}
 	mainWnd->GetOverlay()->GetOutput()->Modified();
-	
+
 }
 
 void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
@@ -1014,16 +1008,16 @@ void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
 		contourRep = NULL;
 	}
 	if (b) {
-		
+
 		//this->Synchronize();
 
 
 		contourWidget = vtkContourWidget::New();
-		contourWidget->SetInteractor(m_imageViewer->GetRenderWindow()->GetInteractor());
-		contourWidget->SetCurrentRenderer(m_imageViewer->GetannotationRenderer());
+		contourWidget->SetInteractor(imageViewer->GetRenderWindow()->GetInteractor());
+		contourWidget->SetCurrentRenderer(imageViewer->GetannotationRenderer());
 
 		contourRep = vtkOrientedGlyphContourRepresentation::New();
-		contourRep->SetRenderer(m_imageViewer->GetannotationRenderer());
+		contourRep->SetRenderer(imageViewer->GetannotationRenderer());
 		contourRep->GetLinesProperty()->SetColor(255, 255, 0);
 
 		vtkPolyData* cursorpolyData = contourRep->GetActiveCursorShape();
@@ -1049,180 +1043,178 @@ void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
 		contourWidget->On();
 		contourWidget->EnabledOn();
 
-		m_imageViewer->GetRenderWindow()->Render();
-	}		
+		imageViewer->GetRenderWindow()->Render();
+	}
 }
 
 
 
 bool MyVtkInteractorStyleImage::FillPolygon()
-    {
-        //Check if region is selected by the user
-        if (contourRep == NULL)
-            return false;
-		MainWindow* mainWnd = MainWindow::GetMainWindow();
-		// enable brush to fill the contour
-		mainWnd->slotOverlayVisibilty(false, m_orientation);
-		SetPaintBrushModeEnabled(true);
-		m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
+{
+	//Check if region is selected by the user
+	if (contourRep == NULL)
+		return false;
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	// enable brush to fill the contour
+	m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
 
-        vtkPolyData* polydata=vtkPolyData::New();
-        polydata=contourRep->GetContourRepresentationAsPolyData();
-        pointsInsideContour=vtkPoints::New();
-        vtkPolygon* polygon = vtkPolygon::New();
-        int numOfPoints = polydata->GetNumberOfPoints();
-        cout << numOfPoints << endl;
-        // Get the coordinates of the contour data points
-        double origin[3];
-        double spacing[3];
-        m_imageViewer->GetInput()->GetOrigin(origin);
-        m_imageViewer->GetInput()->GetSpacing(spacing);
-        
-        for(vtkIdType i = 0; i < numOfPoints; i++)
-        {
-            double p[3];
-            double s[3];
-            polydata->GetPoint(i,p);
-            //std::cout << "Point " << i << " : (" << p[0] << " " << p[1] << " " << p[2] << ")" << std::endl;
-            //Take one image data 1 to be reference
-            s[0]=(p[0]-origin[0])/spacing[0];
-            s[1]=(p[1]-origin[1])/spacing[1];
-            s[2]=(p[2]-origin[2])/spacing[2];
-            //cout << s[0] << " " << s[1] << " " << s[2] << endl;
-            //Test whether the points are inside the polygon or not
-            if (m_orientation == 0)
-            polygon->GetPoints()->InsertNextPoint(0.0,s[1], s[2]);
-            else if (m_orientation == 1)
-            polygon->GetPoints()->InsertNextPoint(s[0],0.0, s[2]);
-            else if (m_orientation == 2)
-            polygon->GetPoints()->InsertNextPoint(s[0],s[1], 0.0);
-        }
-        
-        double n[3];
-        polygon->ComputeNormal(polygon->GetPoints()->GetNumberOfPoints(),
-                               static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), n);
-        double bounds[6];
-        int bounds_int[6];
-        
-        polygon->GetPoints()->GetBounds(bounds);
-        
-        bounds_int[0] = ceil(bounds[0]);
-        bounds_int[1] = floor(bounds[1]);
-        bounds_int[2] = ceil(bounds[2]);
-        bounds_int[3] = floor(bounds[3]);
-        bounds_int[4] = ceil(bounds[4]);
-        bounds_int[5] = floor(bounds[5]);
+	vtkPolyData* polydata = vtkPolyData::New();
+	polydata = contourRep->GetContourRepresentationAsPolyData();
+	pointsInsideContour = vtkPoints::New();
+	vtkPolygon* polygon = vtkPolygon::New();
+	int numOfPoints = polydata->GetNumberOfPoints();
+	cout << numOfPoints << endl;
+	// Get the coordinates of the contour data points
+	double origin[3];
+	double spacing[3];
+	imageViewer->GetInput()->GetOrigin(origin);
+	imageViewer->GetInput()->GetSpacing(spacing);
 
-        cout << "Bounds: " << bounds_int[0] << " " << bounds_int[1] << " " << bounds_int[2] << " " << bounds_int[3] << " " << bounds_int[4] << " " << bounds_int[5] << endl;
-        
-        if (m_orientation == 0)
-        {
-            for ( int y = bounds_int[2] ; y < bounds_int[3] ; y++){
-                for ( int z = bounds_int[4] ; z < bounds_int[5] ; z++){
-                    double p[3];
-                    p[0] = 0.0;
-                    p[1] = (double)y;
-                    p[2] = (double)z;
-					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
-						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
-						// fill the contour
-						pointsInsideContour->InsertNextPoint(p);
-						DrawLine3D(y, z, y, z);
-					}
-                        
-                }
-            }
-        }
-        else if (m_orientation == 1)
-        {
-        for ( int x = bounds_int[0] ; x < bounds_int[1] ; x++){
-            for ( int z = bounds_int[4] ; z < bounds_int[5] ; z++){
-                double p[3];
-                p[0] = (double)x;
-                p[1] = 0.0;
-                p[2] = (double)z;
-                if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
-                                            static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+	for (vtkIdType i = 0; i < numOfPoints; i++)
+	{
+		double p[3];
+		double s[3];
+		polydata->GetPoint(i, p);
+		//std::cout << "Point " << i << " : (" << p[0] << " " << p[1] << " " << p[2] << ")" << std::endl;
+		//Take one image data 1 to be reference
+		s[0] = (p[0] - origin[0]) / spacing[0];
+		s[1] = (p[1] - origin[1]) / spacing[1];
+		s[2] = (p[2] - origin[2]) / spacing[2];
+		//cout << s[0] << " " << s[1] << " " << s[2] << endl;
+		//Test whether the points are inside the polygon or not
+		if (m_orientation == 0)
+			polygon->GetPoints()->InsertNextPoint(0.0, s[1], s[2]);
+		else if (m_orientation == 1)
+			polygon->GetPoints()->InsertNextPoint(s[0], 0.0, s[2]);
+		else if (m_orientation == 2)
+			polygon->GetPoints()->InsertNextPoint(s[0], s[1], 0.0);
+	}
+
+	double n[3];
+	polygon->ComputeNormal(polygon->GetPoints()->GetNumberOfPoints(),
+		static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), n);
+	double bounds[6];
+	int bounds_int[6];
+
+	polygon->GetPoints()->GetBounds(bounds);
+
+	bounds_int[0] = ceil(bounds[0]);
+	bounds_int[1] = floor(bounds[1]);
+	bounds_int[2] = ceil(bounds[2]);
+	bounds_int[3] = floor(bounds[3]);
+	bounds_int[4] = ceil(bounds[4]);
+	bounds_int[5] = floor(bounds[5]);
+
+	cout << "Bounds: " << bounds_int[0] << " " << bounds_int[1] << " " << bounds_int[2] << " " << bounds_int[3] << " " << bounds_int[4] << " " << bounds_int[5] << endl;
+
+	if (m_orientation == 0)
+	{
+		for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
+			for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
+				double p[3];
+				p[0] = 0.0;
+				p[1] = (double)y;
+				p[2] = (double)z;
+				if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+					static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+					// fill the contour
+					pointsInsideContour->InsertNextPoint(p);
+					DrawLine3D(y, z, y, z);
+				}
+
+			}
+		}
+	}
+	else if (m_orientation == 1)
+	{
+		for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
+			for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
+				double p[3];
+				p[0] = (double)x;
+				p[1] = 0.0;
+				p[2] = (double)z;
+				if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+					static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 					// fill the contour
 					pointsInsideContour->InsertNextPoint(p);
 					DrawLine3D(x, z, x, z);
 				}
-            }
-        }
-        }
-        else if (m_orientation == 2)
-        {
-            for ( int x = bounds_int[0] ; x < bounds_int[1] ; x++){
-                for ( int y = bounds_int[2] ; y < bounds_int[3] ; y++){
-                    double p[3];
-                    p[0] = (double)x;
-                    p[1] = (double)y;
-                    p[2] = 0.0;
-					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
-						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
-						// fill the contour
-						pointsInsideContour->InsertNextPoint(p);
-						DrawLine3D(x, y, x, y);
-					}
+			}
+		}
+	}
+	else if (m_orientation == 2)
+	{
+		for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
+			for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
+				double p[3];
+				p[0] = (double)x;
+				p[1] = (double)y;
+				p[2] = 0.0;
+				if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+					static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+					// fill the contour
+					pointsInsideContour->InsertNextPoint(p);
+					DrawLine3D(x, y, x, y);
+				}
 
-                }
-            }
-        }
-		this->Write2ImageData();
-		mainWnd->slotOverlayVisibilty(true, m_orientation);
-		m_brush->SetDrawColor(0, 0, 0, 0);
-		this->FillBox3D();
-		this->Render();
+			}
+		}
+	}
+	this->Write2ImageData();
+	mainWnd->slotOverlayVisibilty(true, m_orientation);
+	m_brush->SetDrawColor(0, 0, 0, 0);
+	this->FillBox3D();
+	this->Render();
 
-        if (pointsInsideContour->GetNumberOfPoints() == 0)
-        {
-            return false;
-        }
-        else
-            return true;
+	if (pointsInsideContour->GetNumberOfPoints() == 0)
+	{
+		return false;
+	}
+	else
+		return true;
 }
 
 
 void MyVtkInteractorStyleImage::DrawSynchronize(vtkPolyData* polydata)
 {
-    if (contourWidgetA){
-        contourWidgetA->Delete();
-        contourWidgetA = NULL;
-    }
-	m_imageViewer->GetRenderer()->SetLayer(0);
-    
-    contourWidgetA = vtkContourWidget::New();
-    contourWidgetA->SetInteractor(m_imageViewer->GetRenderWindow()->GetInteractor());
-    contourWidgetA->SetCurrentRenderer(m_imageViewer->GetannotationRenderer());
-    
-    contourRepA = vtkOrientedGlyphContourRepresentation::New();
-    contourRepA->SetRenderer(m_imageViewer->GetannotationRenderer());
-    contourRepA->GetLinesProperty()->SetColor(255,255,255);
-    contourRepA->GetProperty()->SetOpacity(0);
-    contourWidgetA->CreateDefaultRepresentation();
-    contourWidgetA->SetRepresentation(contourRepA);
-    contourWidgetA->Initialize(polydata);
-    contourWidgetA->SetRepresentation(contourRepA);
-    contourWidgetA->On();
-	m_imageViewer->GetRenderWindow()->Render();
-    
+	if (contourWidgetA) {
+		contourWidgetA->Delete();
+		contourWidgetA = NULL;
+	}
+	imageViewer->GetRenderer()->SetLayer(0);
+
+	contourWidgetA = vtkContourWidget::New();
+	contourWidgetA->SetInteractor(imageViewer->GetRenderWindow()->GetInteractor());
+	contourWidgetA->SetCurrentRenderer(imageViewer->GetannotationRenderer());
+
+	contourRepA = vtkOrientedGlyphContourRepresentation::New();
+	contourRepA->SetRenderer(imageViewer->GetannotationRenderer());
+	contourRepA->GetLinesProperty()->SetColor(255, 255, 255);
+	contourRepA->GetProperty()->SetOpacity(0);
+	contourWidgetA->CreateDefaultRepresentation();
+	contourWidgetA->SetRepresentation(contourRepA);
+	contourWidgetA->Initialize(polydata);
+	contourWidgetA->SetRepresentation(contourRepA);
+	contourWidgetA->On();
+	imageViewer->GetRenderWindow()->Render();
+
 }
 
 
-void MyVtkInteractorStyleImage::RemoveContourWidget(){
-    if (contourWidget)
-    {
+void MyVtkInteractorStyleImage::RemoveContourWidget() {
+	if (contourWidget)
+	{
 		cout << "remove" << endl;
 		contourWidget->SetInteractor(NULL);
 		contourWidget->Off();
 		contourWidget->SetRepresentation(NULL);
 		contourWidget->EnabledOff();
-        contourWidget->Delete();
+		contourWidget->Delete();
 		contourWidget = NULL;
 	}
-    if (contourWidgetA)
-    {
-        contourWidgetA->Delete();
+	if (contourWidgetA)
+	{
+		contourWidgetA->Delete();
 		contourWidgetA = NULL;
 	}
 	if (contourRep) {
@@ -1234,8 +1226,8 @@ void MyVtkInteractorStyleImage::RemoveContourWidget(){
 		contourRepA = NULL;
 
 	}
-    pointsInsideContour = NULL;
-    
+	pointsInsideContour = NULL;
+
 }
 
 
@@ -1246,12 +1238,12 @@ void MyVtkInteractorStyleImage::WindowLevel()
 
 	int *size = this->GetCurrentRenderer()->GetSize();
 
-    double window=0.0, level=0.0;
-    if (m_imageViewer->GetInput() != NULL){
-        window = m_imageViewer->GetDefaultWindowLevel()[0];
-        level = m_imageViewer->GetDefaultWindowLevel()[1];
-    }
-    
+	double window = 0.0, level = 0.0;
+	if (imageViewer->GetInput() != NULL) {
+		window = imageViewer->GetDefaultWindowLevel()[0];
+		level = imageViewer->GetDefaultWindowLevel()[1];
+	}
+
 	// Compute normalized delta
 
 	double dx = (this->WindowLevelCurrentPosition[0] -
@@ -1261,30 +1253,30 @@ void MyVtkInteractorStyleImage::WindowLevel()
 
 	// Scale by current values
 
-	if ( fabs( window ) > 0.01 )
+	if (fabs(window) > 0.01)
 	{
 		dx = dx * window;
 	}
 	else
 	{
-		dx = dx * ( window < 0 ? -0.01 : 0.01 );
+		dx = dx * (window < 0 ? -0.01 : 0.01);
 	}
-	if ( fabs( level ) > 0.01 )
+	if (fabs(level) > 0.01)
 	{
 		dy = dy * level;
 	}
 	else
 	{
-		dy = dy * ( level < 0 ? -0.01 : 0.01 );
+		dy = dy * (level < 0 ? -0.01 : 0.01);
 	}
 
 	// Abs so that direction does not flip
 
-	if ( window < 0.0 )
+	if (window < 0.0)
 	{
 		dx = -1 * dx;
 	}
-	if ( level < 0.0 )
+	if (level < 0.0)
 	{
 		dy = -1 * dy;
 	}
@@ -1294,7 +1286,7 @@ void MyVtkInteractorStyleImage::WindowLevel()
 	double newWindow = dx + window;
 	double newLevel = level - dy;
 
-	if ( newWindow < 0.01 )
+	if (newWindow < 0.01)
 	{
 		newWindow = 0.01;
 	}
@@ -1303,61 +1295,61 @@ void MyVtkInteractorStyleImage::WindowLevel()
 	m_wlDoubleSpinBox[1]->setValue(newLevel);
 }
 
- 
- 
-void MyVtkInteractorStyleImage::SetSliceRange( int min, int max )
+
+
+void MyVtkInteractorStyleImage::SetSliceRange(int min, int max)
 {
 	m_minSlice = min;
 	m_maxSlice = max;
 }
 
-void MyVtkInteractorStyleImage::SetCurrentSlice( int slice )
+void MyVtkInteractorStyleImage::SetCurrentSlice(int slice)
 {
 	m_slice = slice;
 }
 
 void MyVtkInteractorStyleImage::Synchronize()
 {
-    
-    MainWindow* mainwnd = MainWindow::GetMainWindow();
-    vtkCamera* camera = m_imageViewer->GetRenderer()->GetActiveCamera();
-    for (int i=0;i<mainwnd->GetVisibleImageNo();i++)
-    {
-        mainwnd->GetMyImageViewer(i)->GetRenderer()->SetActiveCamera(camera);
-        mainwnd->GetMyImageViewer(i)->Render();
-    }
+
+	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	vtkCamera* camera = imageViewer->GetRenderer()->GetActiveCamera();
+	for (int i = 0; i<mainwnd->GetVisibleImageNo(); i++)
+	{
+		mainwnd->GetMyImageViewer(i)->GetRenderer()->SetActiveCamera(camera);
+		mainwnd->GetMyImageViewer(i)->Render();
+	}
 }
 
 vtkPoints* MyVtkInteractorStyleImage::GetPointsInsideContour()
 {
-    if (pointsInsideContour != NULL)
-        return pointsInsideContour;
-    else
-        return NULL;
+	if (pointsInsideContour != NULL)
+		return pointsInsideContour;
+	else
+		return NULL;
 }
 
 vtkOrientedGlyphContourRepresentation* MyVtkInteractorStyleImage::GetContourRep()
 {
-    if (contourRep != NULL)
-        return contourRep;
-    else
-        return NULL;
+	if (contourRep != NULL)
+		return contourRep;
+	else
+		return NULL;
 }
 
 void MyVtkInteractorStyleImage::SetContourVisibility(bool b)
 {
 	if (b)
 	{
-    if (contourWidget)
-        contourWidget->SetEnabled(1);
-    if (contourWidgetA)
-        contourWidgetA->SetEnabled(1);
+		if (contourWidget)
+			contourWidget->SetEnabled(1);
+		if (contourWidgetA)
+			contourWidgetA->SetEnabled(1);
 	}
 	else
 	{
-    if (contourWidget)
-        contourWidget->SetEnabled(0);
-    if (contourWidgetA)
-        contourWidgetA->SetEnabled(0);
+		if (contourWidget)
+			contourWidget->SetEnabled(0);
+		if (contourWidgetA)
+			contourWidgetA->SetEnabled(0);
 	}
 }

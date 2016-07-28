@@ -14,6 +14,7 @@
 #include <QFuture>
 #include <QMenu>
 #include <QActionGroup>
+#include <QSignalMapper>
 
 #include "vtkCamera.h"
 #include "vtkImageMapToWindowLevelColors.h"
@@ -118,11 +119,7 @@ public slots:
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
 	virtual void slotContourMode();
-    virtual void slotimage1();
-	virtual void slotimage2();
-	virtual void slotimage3();
-	virtual void slotimage4();
-	virtual void slotFourViews();
+	virtual void slotImage(int image);
 	virtual void slotMultiPlanarView();
 
 
@@ -142,7 +139,6 @@ public slots:
 	virtual void slotChangeBaseImageUL();
 	virtual void slotChangeBaseImageUR();
 	virtual void slotChangeBaseImageLL();
-	//virtual void ChangeOrientation(int);
 	virtual void slotChangeImageSeq(int image_no, int window_no);
 	virtual void slotSelectImageSeq(QAction*);
 	//Intensity
@@ -203,7 +199,7 @@ private:
 	//Initialization
 	void initializeViewers();
 	void initializeModule();
-	void initializeOverlay();
+	void addOverlay2ImageViewer();
 
 	
 	//Data
@@ -237,13 +233,13 @@ private:
 	//Navigation
 	double m_focalPoint[3];
     
-    int m_visible_image_no;
+    int visibleImageNum;
 
 	//Information
 	Dialog* m_InfoDialog;
 
-	//Segmentation mode
-	bool segmentation;
+	//Segmentation view flag
+	bool segmentationView;
 
 
 };
