@@ -59,6 +59,7 @@ MainWindow::MainWindow()
 	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), this, SLOT(slotMultiPlanarView()));
 	connect(ui->actionAllAxialView, SIGNAL(triggered()), this, SLOT(slotSegmentationView()));
 
+	// CenterLineAlgorithm
 	connect(ui->actionCenterlineAlgorithm, SIGNAL(triggered()), this, SLOT(slotCenterline()));
 
 	//Tools
@@ -71,7 +72,6 @@ MainWindow::MainWindow()
 	segmentation = false;
 
 	//UI Setting
-	ui->actionSagittal->setChecked(true);
 	ui->ULBtn2->setHidden(true);
 	ui->URBtn2->setHidden(true);
 	ui->LLBtn2->setHidden(true);
@@ -174,7 +174,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::initializeModule()
 {
-	m_moduleWidget = new ModuleWidget();
+	m_moduleWidget = new ModuleWidget(this);
 	ui->dockWidget->setWidget(m_moduleWidget);
 }
 
@@ -1595,7 +1595,6 @@ void MainWindow::slotSegmentationView()
 		}
 		m_2DimageViewer[i] = MyImageViewer::New();
 	}
-
 	this->ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 	this->ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
 	this->ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
@@ -1621,7 +1620,7 @@ void MainWindow::slotSegmentationView()
 		m_2DimageViewer[2]->SetInputData(m_vtkT1C);
 	}
 	
-	for (int i = 0; i<m_visible_image_no; i++)
+	for (int i = 0; i<(3<m_visible_image_no?3:m_visible_image_no); i++)
 	{
 
 		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);

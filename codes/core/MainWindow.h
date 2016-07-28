@@ -172,7 +172,7 @@ private:
 
     
 	//2D/3D view
-	MyImageViewer*				m_2DimageViewer[3];
+	MyImageViewer*				m_2DimageViewer[5];
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
 	MyVtkInteractorStyleImage*	m_style[3];
