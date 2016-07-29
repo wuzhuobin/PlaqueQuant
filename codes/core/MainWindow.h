@@ -93,7 +93,6 @@ public slots:
 	virtual void dragEnterEvent(QDragEnterEvent *ev);
 	virtual void dropEvent( QDropEvent *ev );
 	
-	//Mouse Interaction/ Update of Spin Box 
 	virtual void slotChangeSlice();
 	virtual void slotChangeSlice(int, int, int);
 	virtual void slotChangeWindowLevel();
@@ -102,11 +101,6 @@ public slots:
     virtual void slotChangeWindowLevelLL();
     virtual void slotChangeWindowLevelLR();
 
-	/*
-    virtual void slotResetWindowLevel();
-		*/
-
-  
 	//Action
 	virtual void slotExit();
 	virtual void slotOpenImage(QString dir);
@@ -172,7 +166,6 @@ private:
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
 	MyVtkInteractorStyleImage*	m_style[3];
-	//vtkRenderer*				m_renderer[4]; // m_renderer[4] is for 3D
 
     //ROI
 	MyPlaneWidget*			m_planeWidget[3];
@@ -222,14 +215,6 @@ private:
 	//Dock Widget
 	ModuleWidget* m_moduleWidget;
 
-	//Overlay
-	Overlay* SegmentationOverlay;
-	int* overlayColor[3];
-	int m_layer_no;		//Main Image
-	//vtkActor* actorOverlay;
-	//Progress Dialog
-	//MyProgressDialog* m_progressDialog;
-
 	//Navigation
 	double m_focalPoint[3];
     
@@ -241,6 +226,19 @@ private:
 	//Segmentation view flag
 	bool segmentationView;
 
+
+	//Overlay
+	Overlay* SegmentationOverlay;
+	int m_layer_no;		//Main Image
+
+	const int* overlayColor[6];
+
+	const int lumen[3] = { 255, 0, 0 };
+	const int vesselWall[3] = { 0, 0, 255 };
+	const int calcification[3] = { 0,255,0 };
+	const int hemorrhage[3] = { 255, 255, 0 };
+	const int lrnc[3] = { 0, 255, 255 };
+	const int lm[3] = { 255, 0, 255 };
 
 };
  

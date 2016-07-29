@@ -45,13 +45,16 @@ MyImageViewer::MyImageViewer()
 	//this->WindowLevel->SetGlobalWarningDisplay(false);
 	//this->imageMapToWindowLevelColors->SetGlobalWarningDisplay(false);
 	//set label Look Up Table
-	this->LookUpTable->SetNumberOfTableValues(4);
-	this->LookUpTable->SetTableRange(0.0, 3);
+	this->LookUpTable->SetNumberOfTableValues(7);
+	this->LookUpTable->SetTableRange(0.0, 6);
 	//this->LookUpTable->SetValueRange(-1, 1);
 	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
 	this->LookUpTable->SetTableValue(1, 1, 0, 0, 1);
 	this->LookUpTable->SetTableValue(2, 0, 0, 1, 1);
 	this->LookUpTable->SetTableValue(3, 0, 1, 0, 1);
+	this->LookUpTable->SetTableValue(4, 1, 1, 0, 1);
+	this->LookUpTable->SetTableValue(5, 0, 1, 1, 1);
+	this->LookUpTable->SetTableValue(6, 1, 0, 1, 1);
 	this->LookUpTable->Build();
 	this->drawActor->GetProperty()->SetLookupTable(LookUpTable);
 
@@ -413,6 +416,11 @@ void MyImageViewer::SetCursorBoundary()
 	Cursor3D->SetTranslationMode(false);
 	Cursor3D->SetModelBounds(Bound);
 	Cursor3D->Update();
+}
+
+vtkLookupTable* MyImageViewer::getLookupTable()
+{
+	return LookUpTable;
 }
 
 void MyImageViewer::SetFocalPoint(double x, double y, double z)

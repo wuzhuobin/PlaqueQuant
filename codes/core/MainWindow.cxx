@@ -156,8 +156,13 @@ MainWindow::MainWindow()
 
 	//Segmentation
 	SegmentationOverlay = NULL;
-	*overlayColor = NULL;
 	
+	overlayColor[0] = lumen;
+	overlayColor[1] = vesselWall;
+	overlayColor[2] = calcification;
+	overlayColor[3] = hemorrhage;
+	overlayColor[4] = lrnc;
+	overlayColor[5] = lm;
 }
 
 MainWindow* MainWindow::GetMainWindow()
@@ -234,22 +239,6 @@ void MainWindow::initializeViewers()
 void MainWindow::addOverlay2ImageViewer()
 {
 	if (SegmentationOverlay == NULL) {
-		for (int i = 0; i < 3; i++)
-		{
-			overlayColor[i] = new int[3];
-		}
-		//Red
-		overlayColor[0][0] = 255;
-		overlayColor[0][1] = 0;
-		overlayColor[0][2] = 0;
-		//Blue
-		overlayColor[1][0] = 0;
-		overlayColor[1][1] = 0;
-		overlayColor[1][2] = 255;
-		//Green
-		overlayColor[2][0] = 0;
-		overlayColor[2][1] = 255;
-		overlayColor[2][2] = 0;
 
 		//Overlay
 		SegmentationOverlay = new Overlay;
@@ -1395,7 +1384,7 @@ void MainWindow::slotMultiPlanarView()
 	}
 
 	this->slotChangeSlice();
-	this->addOverlay2ImageViewer();
+	//this->addOverlay2ImageViewer();
 
 
 }
@@ -1459,7 +1448,7 @@ void MainWindow::slotSegmentationView()
 	}
 	
 	this->slotChangeSlice();
-	this->addOverlay2ImageViewer();
+	//this->addOverlay2ImageViewer();
 
 }
 
@@ -1497,13 +1486,11 @@ void MainWindow::slotOverlayVisibilty(bool b)
 			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
 			m_2DimageViewer[i]->Render();
 		}
-		
 	}
 }
 
 void MainWindow::slotOverlayOpacity(double op)
 {
-
     for (int i=0;i<3;i++)
     {
 		if (m_style[i] != NULL)

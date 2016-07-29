@@ -65,7 +65,7 @@ protected:
 	int m_slice;
 	int m_minSlice;
 	int m_maxSlice;
-	int m_orientation;
+	int orientation;
 	enum Mode{NavaigationMode = 1, WindowLevelMode = 2, PaintBrushMode = 3, PolygonMode = 4} m_mode;
 	QSpinBox* m_sliceSplinBox[3];
 	QDoubleSpinBox* m_wlDoubleSpinBox[2];
@@ -105,7 +105,7 @@ public:
 	void SetDrawIsotropicCheckBox(QCheckBox* checkBox);
 	void SetPaintBrushModeEnabled(bool b);
 	void SetDrawColor(int r, int g, int b);
-	void SetDrawColor(int*);
+	void SetDrawColor(const int* rgb);
 	void SetDrawOpacity(int opacity);
 	// Contour Widget
 	void SetPolygonModeEnabled(bool b);

@@ -156,6 +156,7 @@ public:
 	vtkGetObjectMacro(imageMapToWindowLevelColors, vtkImageMapToWindowLevelColors);
 	vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
 	vtkGetObjectMacro(annotationRenderer, vtkRenderer);
+	virtual vtkLookupTable* getLookupTable();
 
 	//Cursor
 	virtual void SetFocalPoint(double x, double y, double z);

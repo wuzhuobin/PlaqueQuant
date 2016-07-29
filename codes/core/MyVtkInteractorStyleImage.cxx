@@ -32,7 +32,7 @@ void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 	m_minSlice = imageViewer->GetSliceMin();
 	m_maxSlice = imageViewer->GetSliceMax();
 	m_slice = imageViewer->GetSlice();
-	m_orientation = imageViewer->GetSliceOrientation();
+	orientation = imageViewer->GetSliceOrientation();
 	//Default setting
 	m_mode = NavaigationMode;
 	m_functioning = false;
@@ -77,7 +77,7 @@ void MyVtkInteractorStyleImage::SetDrawIsotropicCheckBox(QCheckBox* checkBox)
 {
 	m_drawIsotropicCheckBox = checkBox;
 }
-void MyVtkInteractorStyleImage::SetDrawColor(int* rgb)
+void MyVtkInteractorStyleImage::SetDrawColor(const int* rgb)
 {
 	SetDrawColor(rgb[0], rgb[1], rgb[2]);
 }
@@ -122,7 +122,7 @@ void MyVtkInteractorStyleImage::MoveSliceForward()
 	if (m_slice < m_maxSlice)
 	{
 		m_slice += 1;
-		switch (m_orientation)
+		switch (orientation)
 		{
 		case 0:
 			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
@@ -144,7 +144,7 @@ void MyVtkInteractorStyleImage::MoveSliceBackward()
 	if (m_slice > m_minSlice)
 	{
 		m_slice -= 1;
-		switch (m_orientation)
+		switch (orientation)
 		{
 		case 0:
 			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
@@ -192,7 +192,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonUp()
 		if (!isDraw)
 		{
 			this->Write2ImageData();
-			mainWnd->slotOverlayVisibilty(true, m_orientation);
+			mainWnd->slotOverlayVisibilty(true, orientation);
 			//Clear Layer
 			m_brush->SetDrawColor(0, 0, 0, 0);
 			this->FillBox3D();
@@ -237,7 +237,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 			return;
 		double index[3];
 		if (imageViewer->GetInput() != NULL) {
-			picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
+			picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
 			for (int i = 0; i<3; i++)
 			{
 				index[i] = (picked[i] - origin[i]) / spacing[i];
@@ -255,7 +255,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 			this->ReadfromImageData();
 			this->Render();
 		}
-		mainWnd->slotOverlayVisibilty(false, m_orientation);
+		mainWnd->slotOverlayVisibilty(false, orientation);
 		Draw(true);
 		this->Render();
 	}
@@ -274,7 +274,7 @@ void MyVtkInteractorStyleImage::OnRightButtonUp()
 		if (!isDraw)
 		{
 			this->Write2ImageData();
-			mainWnd->slotOverlayVisibilty(true, m_orientation);
+			mainWnd->slotOverlayVisibilty(true, orientation);
 			//Clear Layer
 			m_brush->SetDrawColor(0, 0, 0, 0);
 			this->FillBox3D();
@@ -305,7 +305,7 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 			return;
 		double index[3];
 		if (imageViewer->GetInput() != NULL) {
-			picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
+			picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
 			for (int i = 0; i<3; i++)
 			{
 				index[i] = (picked[i] - origin[i]) / spacing[i];
@@ -323,7 +323,7 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 			this->ReadfromImageData();
 			this->Render();
 		}
-		mainWnd->slotOverlayVisibilty(false, m_orientation);
+		mainWnd->slotOverlayVisibilty(false, orientation);
 		this->Draw(false);
 		this->Render();
 	}
@@ -438,7 +438,7 @@ void MyVtkInteractorStyleImage::CalculateIndex()
 		return;
 	double index[3];
 	if (imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
+		picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
 		for (int i = 0; i<3; i++)
 		{
 			index[i] = (picked[i] - origin[i]) / spacing[i];
@@ -470,13 +470,22 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 		m_borderWidget->Delete();
 		m_borderWidget = NULL;
 	}
+	if (m_brush != NULL)
+	{
+		imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
 
+		m_brush->Delete();
+		m_brush = NULL;
+		BrushActor->Delete();
+		BrushActor = NULL;
+
+	}
 	if (b)
 	{
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());
-		m_borderWidget->SetCurrentRenderer(imageViewer->GetRenderer());
+		m_borderWidget->SetCurrentRenderer(imageViewer->GetannotationRenderer());
 		m_borderWidget->SetRepresentation(m_retangleRep);
 		m_borderWidget->SetManagesCursor(true);
 		m_borderWidget->GetBorderRepresentation()->SetMoving(false);
@@ -488,21 +497,12 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 
 	this->GetInteractor()->Render();
 
-	if (m_brush)
-	{
-		imageViewer->GetannotationRenderer()->RemoveActor(BrushActor);
 
-		m_brush->Delete();
-		m_brush = NULL;
-		BrushActor->Delete();
-		BrushActor = NULL;
-
-	}
 
 	m_brush = vtkImageCanvasSource2D::New();
 	m_brush->SetScalarTypeToUnsignedChar();
 	m_brush->SetNumberOfScalarComponents(4);
-	switch (m_orientation)
+	switch (orientation)
 	{
 	case 0:
 	{
@@ -529,9 +529,11 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 	BrushActor = vtkImageActor::New();
 	BrushActor->SetInputData(m_brush->GetOutput());
 	BrushActor->GetProperty()->SetInterpolationTypeToNearest();
+	BrushActor->Update();
+
 	// Set the image actor
 
-	switch (this->m_orientation)
+	switch (this->orientation)
 	{
 	case 0:
 		this->BrushActor->SetDisplayExtent(
@@ -572,7 +574,7 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 		return;
 	double index[3];
 	if (imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
+		picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
 		for (int i = 0; i<3; i++)
 		{
 			index[i] = (picked[i] - origin[i]) / spacing[i];
@@ -585,7 +587,7 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 	draw_index[2] = (int)(index[2] + 0.5);
 
 	int x2Dindex, y2Dindex;
-	switch (m_orientation)
+	switch (orientation)
 	{
 	case 0:
 		x2Dindex = 1;
@@ -653,7 +655,7 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 void MyVtkInteractorStyleImage::FillBox3D()
 {
 
-	switch (m_orientation)
+	switch (orientation)
 	{
 	case 0:
 		for (int y = extent[2]; y < extent[3]; y++)
@@ -677,7 +679,7 @@ void MyVtkInteractorStyleImage::FillBox3D()
 void MyVtkInteractorStyleImage::DrawLine3D(int x0, int y0, int x1, int y1)
 {
 	int index[6];
-	switch (m_orientation)
+	switch (orientation)
 	{
 	case 0:
 		if (x0 < extent[2] || x0 > extent[3] || y0 < extent[4] || y0 > extent[5] || x1 < extent[2] || x1 > extent[3] || y1 < extent[4] || y1 > extent[5])
@@ -791,7 +793,7 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 		return;
 	double index[3];
 	if (imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = origin[m_orientation] + m_slice * spacing[m_orientation];
+		picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
 		for (int i = 0; i<3; i++)
 		{
 			index[i] = (picked[i] - origin[i]) / spacing[i];
@@ -861,24 +863,28 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 	this->FillBox3D();
 	//m_brush->Update();
 
+	m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
 
 	int pos[3];
-	switch (m_orientation)
+	switch (orientation)
 	{
 	case 0:
 		for (int y = extent[2]; y < extent[3]; y++)
 		{
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
-				pos[0] = m_sliceSplinBox[m_orientation]->value();
+				pos[0] = m_sliceSplinBox[orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
 				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
-				if ((int)val[0] == label)
-				{
-					this->SetDrawColor(255, 0, 0);
+				if (*val > 0) {
 					m_brush->DrawSegment3D(0, y, z, 0, y, z);
 				}
+				//if ((int)val[0] == label)
+				//{
+				//	this->SetDrawColor(255, 0, 0);
+				//	m_brush->DrawSegment3D(0, y, z, 0, y, z);
+				//}
 			}
 		}
 		break;
@@ -888,10 +894,10 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
 				pos[0] = x;
-				pos[1] = m_sliceSplinBox[m_orientation]->value();
+				pos[1] = m_sliceSplinBox[orientation]->value();
 				pos[2] = z;
 				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
-				if (val[0] > 0)
+				if (*val > 0)
 					m_brush->DrawSegment3D(x, 0, z, x, 0, z);
 			}
 		}
@@ -903,9 +909,9 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 			{
 				pos[0] = x;
 				pos[1] = y;
-				pos[2] = m_sliceSplinBox[m_orientation]->value();
+				pos[2] = m_sliceSplinBox[orientation]->value();
 				double * val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
-				if (val[0] > 0)
+				if (*val > 0)
 					m_brush->DrawPoint(x, y);
 			}
 		}
@@ -930,7 +936,7 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 	int label = mainWnd->GetImageLayerNo();
 	int pos[3];
 	double pixelval;
-	switch (m_orientation)
+	switch (orientation)
 	{
 	case 0:
 		;
@@ -938,12 +944,25 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 		{
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
-				pos[0] = m_sliceSplinBox[m_orientation]->value();
+				pos[0] = m_sliceSplinBox[orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
 				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(0, y, z));
-				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-					pixelval = label;
+				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0){
+					// Check if color of the lookup table matches the color drawn on canvas
+					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					{
+						double rgba[4];
+						uchar rgbaUCHAR[4];
+						imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+						imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+
+						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
+							pixelval = i;
+							break;
+						}
+					}
+				}
 				else
 					pixelval = 0;
 				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
@@ -956,11 +975,22 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
 				pos[0] = x;
-				pos[1] = m_sliceSplinBox[m_orientation]->value();
+				pos[1] = m_sliceSplinBox[orientation]->value();
 				pos[2] = z;
 				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, 0, z));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-					pixelval = label;
+					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					{
+						double rgba[4];
+						uchar rgbaUCHAR[4];
+						imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+						imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+
+						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
+							pixelval = i;
+							break;
+						}
+					}
 				else
 					pixelval = 0;
 				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
@@ -974,10 +1004,21 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 			{
 				pos[0] = x;
 				pos[1] = y;
-				pos[2] = m_sliceSplinBox[m_orientation]->value();
+				pos[2] = m_sliceSplinBox[orientation]->value();
 				uchar * val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, y, 0));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-					pixelval = label;
+					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					{
+						double rgba[4];
+						uchar rgbaUCHAR[4];
+						imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+						imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+
+						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
+							pixelval = i;
+							break;
+						}
+					}
 				else
 					pixelval = 0;
 				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
@@ -1020,11 +1061,11 @@ void MyVtkInteractorStyleImage::SetPolygonModeEnabled(bool b)
 
 		vtkPolyData* cursorpolyData = contourRep->GetActiveCursorShape();
 		vtkSmartPointer<vtkTransform> translation = vtkSmartPointer<vtkTransform>::New();
-		if (m_orientation == 0) {
+		if (orientation == 0) {
 			translation->RotateX(90);
 			translation->RotateZ(90);
 		}
-		else if (m_orientation == 1) {
+		else if (orientation == 1) {
 			translation->RotateX(90);
 			translation->RotateY(90);
 		}
@@ -1080,11 +1121,11 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 		s[2] = (p[2] - origin[2]) / spacing[2];
 		//cout << s[0] << " " << s[1] << " " << s[2] << endl;
 		//Test whether the points are inside the polygon or not
-		if (m_orientation == 0)
+		if (orientation == 0)
 			polygon->GetPoints()->InsertNextPoint(0.0, s[1], s[2]);
-		else if (m_orientation == 1)
+		else if (orientation == 1)
 			polygon->GetPoints()->InsertNextPoint(s[0], 0.0, s[2]);
-		else if (m_orientation == 2)
+		else if (orientation == 2)
 			polygon->GetPoints()->InsertNextPoint(s[0], s[1], 0.0);
 	}
 
@@ -1105,7 +1146,7 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 
 	cout << "Bounds: " << bounds_int[0] << " " << bounds_int[1] << " " << bounds_int[2] << " " << bounds_int[3] << " " << bounds_int[4] << " " << bounds_int[5] << endl;
 
-	if (m_orientation == 0)
+	if (orientation == 0)
 	{
 		for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
 			for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
@@ -1123,7 +1164,7 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 			}
 		}
 	}
-	else if (m_orientation == 1)
+	else if (orientation == 1)
 	{
 		for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
 			for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
@@ -1140,7 +1181,7 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 			}
 		}
 	}
-	else if (m_orientation == 2)
+	else if (orientation == 2)
 	{
 		for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
 			for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
@@ -1159,7 +1200,7 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 		}
 	}
 	this->Write2ImageData();
-	mainWnd->slotOverlayVisibilty(true, m_orientation);
+	mainWnd->slotOverlayVisibilty(true, orientation);
 	m_brush->SetDrawColor(0, 0, 0, 0);
 	this->FillBox3D();
 	this->Render();
@@ -1179,7 +1220,6 @@ void MyVtkInteractorStyleImage::DrawSynchronize(vtkPolyData* polydata)
 		contourWidgetA->Delete();
 		contourWidgetA = NULL;
 	}
-	imageViewer->GetRenderer()->SetLayer(0);
 
 	contourWidgetA = vtkContourWidget::New();
 	contourWidgetA->SetInteractor(imageViewer->GetRenderWindow()->GetInteractor());
