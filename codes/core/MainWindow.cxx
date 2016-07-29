@@ -1404,7 +1404,6 @@ void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;
 	segmentationView = true;
-	bool image[5] = {false};
 
 	this->ui->image1View->SetRenderWindow(NULL);
 	this->ui->image2View->SetRenderWindow(NULL);

@@ -79,9 +79,7 @@ void MyVtkInteractorStyleImage::SetDrawIsotropicCheckBox(QCheckBox* checkBox)
 }
 void MyVtkInteractorStyleImage::SetDrawColor(int* rgb)
 {
-	color_r = rgb[0];
-	color_g = rgb[1];
-	color_b = rgb[2];
+	SetDrawColor(rgb[0], rgb[1], rgb[2]);
 }
 void MyVtkInteractorStyleImage::SetDrawColor(int r, int g, int b)
 {
