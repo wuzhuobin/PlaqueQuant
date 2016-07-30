@@ -1242,7 +1242,6 @@ void MyVtkInteractorStyleImage::DrawSynchronize(vtkPolyData* polydata)
 void MyVtkInteractorStyleImage::RemoveContourWidget() {
 	if (contourWidget)
 	{
-		cout << "remove" << endl;
 		contourWidget->SetInteractor(NULL);
 		contourWidget->Off();
 		contourWidget->SetRepresentation(NULL);

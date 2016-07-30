@@ -208,9 +208,6 @@ void MainWindow::initializeModule()
 
 void MainWindow::initializeViewers()
 {
-    
-
-
 
 	for (int i = 0 ; i < 3 ; i++)
 	{

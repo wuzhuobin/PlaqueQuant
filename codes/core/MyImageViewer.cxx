@@ -78,7 +78,6 @@ MyImageViewer::MyImageViewer()
 
 	//annotationRenderer
 	annotationRenderer = vtkRenderer::New();
-	annotationRenderer->AddActor(CursorActor);
 	annotationRenderer->SetGlobalWarningDisplay(false);
 	annotationRenderer->SetActiveCamera(Renderer->GetActiveCamera());
 	annotationRenderer->SetLayer(1);
@@ -117,7 +116,6 @@ MyImageViewer::~MyImageViewer()
 	if (CursorActor != NULL) {
 		CursorActor->Delete();
 	}
-
 
 	if (this->imageMapToWindowLevelColors) {
 		this->imageMapToWindowLevelColors->Delete();
@@ -219,10 +217,10 @@ void MyImageViewer::InstallPipeline()
 	{
 		this->Renderer->AddViewProp(this->drawActor);
 	}
-	if (this->Renderer && this->CursorActor)
-	{
-		this->Renderer->AddViewProp(this->CursorActor);
-	}
+	//if (this->Renderer && this->CursorActor)
+	//{
+	//	this->Renderer->AddViewProp(this->CursorActor);
+	//}
 
 	if (this->drawActor && this->imageMapToWindowLevelColors)
 	{
@@ -341,8 +339,8 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 	double* range = in->GetScalarRange();
 	this->SetColorWindow(range[1] - range[0]);
 	this->SetColorLevel((range[1] + range[0]) / 2.0);
-	DefaultWindowLevel[0] = range[1] - range[0];
-	DefaultWindowLevel[1] = (range[1] + range[0]) / 2.0;
+	DefaultWindowLevel[0] = this->GetColorWindow();
+	DefaultWindowLevel[1] = this->GetColorLevel();
 
 	//Cursor
 	this->SetCursorBoundary();
@@ -355,9 +353,8 @@ void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 	this->UpdateDisplayExtent();
 	this->drawActor->SetInputData(this->imageMapToWindowLevelColors->GetOutput());
 
-	double* range = in->GetScalarRange();
-	this->SetColorWindowLayer(range[1] - range[0]);
-	this->SetColorLevelLayer((range[1] + range[0]) / 2.0);
+	this->SetColorWindowLayer(6);
+	this->SetColorLevelLayer(3);
 }
 //----------------------------------------------------------------------------
 vtkImageData* MyImageViewer::GetInputLayer()
