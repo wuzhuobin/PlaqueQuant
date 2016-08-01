@@ -787,7 +787,7 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 		imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
-
+	qDebug() << picked[0] << '\t' << picked[1] << 't' << picked[2];
 	//Check if valid pick
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;

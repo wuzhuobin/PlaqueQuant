@@ -1378,7 +1378,7 @@ void MainWindow::slotMultiPlanarView()
 	}
 
 	this->slotChangeSlice();
-	//this->addOverlay2ImageViewer();
+	this->addOverlay2ImageViewer();
 
 
 }
@@ -1394,7 +1394,8 @@ void MainWindow::slotSegmentationView()
 
 	for (int i = 0; i < 3; ++i) {
 		if (m_2DimageViewer[i] != NULL) {
-			m_2DimageViewer[i]->Delete();
+			m_2DimageViewer[i]->Delete(); 
+			qDebug() << "delete";
 		}
 		m_2DimageViewer[i] = MyImageViewer::New();
 	}
@@ -1442,7 +1443,7 @@ void MainWindow::slotSegmentationView()
 	}
 	
 	this->slotChangeSlice();
-	//this->addOverlay2ImageViewer();
+	this->addOverlay2ImageViewer();
 
 }
 
