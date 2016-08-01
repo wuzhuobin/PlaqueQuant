@@ -104,9 +104,7 @@ MainWindow::MainWindow()
 
 	//Initial Visible image number
 	visibleImageNum = 0;
-
     
-	
 	//Initialize
 	initializeModule();
 	setActionsEnable(false);

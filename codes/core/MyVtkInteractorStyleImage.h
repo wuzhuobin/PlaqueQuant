@@ -90,7 +90,7 @@ protected:
 	int extent[6];
 	int draw_index_old[3];
 	int color_r, color_g, color_b;
-	int m_opacity;
+	int opacity;
 private:
 	bool isDraw;
 

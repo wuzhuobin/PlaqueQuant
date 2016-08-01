@@ -125,11 +125,6 @@ public:
 
 	virtual double* GetDefaultWindowLevel();
 
-	virtual double GetColorWindowLayer();
-	virtual double GetColorLevelLayer();
-	virtual void SetColorWindowLayer(double s);
-	virtual void SetColorLevelLayer(double s);
-
 	virtual void InstallPipeline();
 
 	void virtual UnInstallPipeline();

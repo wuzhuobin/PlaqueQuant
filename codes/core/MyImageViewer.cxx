@@ -36,18 +36,18 @@ MyImageViewer::MyImageViewer()
 	}
 
 
-	this->drawActor = vtkImageActor::New();
 	this->imageMapToWindowLevelColors = vtkImageMapToWindowLevelColors::New();
-	this->LookUpTable = vtkLookupTable::New();
 	this->SliceImplicitPlane = vtkPlane::New();
+	this->SliceImplicitPlane->SetOrigin(0, 0, 0);
+	this->SliceImplicitPlane->SetNormal(0, 0, 1);
 
 	//Disable the warning
 	//this->WindowLevel->SetGlobalWarningDisplay(false);
 	//this->imageMapToWindowLevelColors->SetGlobalWarningDisplay(false);
 	//set label Look Up Table
+	this->LookUpTable = vtkLookupTable::New();
 	this->LookUpTable->SetNumberOfTableValues(7);
 	this->LookUpTable->SetTableRange(0.0, 6);
-	//this->LookUpTable->SetValueRange(-1, 1);
 	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
 	this->LookUpTable->SetTableValue(1, 1, 0, 0, 1);
 	this->LookUpTable->SetTableValue(2, 0, 0, 1, 1);
@@ -56,10 +56,10 @@ MyImageViewer::MyImageViewer()
 	this->LookUpTable->SetTableValue(5, 0, 1, 1, 1);
 	this->LookUpTable->SetTableValue(6, 1, 0, 1, 1);
 	this->LookUpTable->Build();
-	this->drawActor->GetProperty()->SetLookupTable(LookUpTable);
 
-	this->SliceImplicitPlane->SetOrigin(0, 0, 0);
-	this->SliceImplicitPlane->SetNormal(0, 0, 1);
+	this->drawActor = vtkImageActor::New();
+	this->drawActor->GetProperty()->SetLookupTable(LookUpTable);
+	this->drawActor->SetVisibility(false);
 
 	//Cursor
 	Cursor3D = vtkCursor3D::New();
@@ -82,16 +82,7 @@ MyImageViewer::MyImageViewer()
 	annotationRenderer->SetActiveCamera(Renderer->GetActiveCamera());
 	annotationRenderer->SetLayer(1);
 
-	//for (int i = 0; i < 4; ++i) {
-	//	Renderer->AddActor2D(TextActor[i]);
-	//}
-	//Renderer->AddActor(IntTextActor);
-	//Renderer->AddActor(HeaderActor);
-	this->drawActor->SetVisibility(false);
-
 	RenderWindow->SetNumberOfLayers(2);
-	RenderWindow->AddRenderer(annotationRenderer);
-
 }
 
 //----------------------------------------------------------------------------
@@ -99,13 +90,35 @@ MyImageViewer::~MyImageViewer()
 {
 	// TextActor
 	if (IntTextActor != NULL)
-		this->IntTextActor = vtkTextActor::New();
+		this->IntTextActor->Delete();
 	if (HeaderActor != NULL)
-		this->HeaderActor = vtkTextActor::New();
+		this->HeaderActor->Delete();
 	for (int i = 0; i < 4; i++)
 	{
 		if (TextActor[i] != NULL)
-			TextActor[i] = vtkTextActor::New();
+			TextActor[i]->Delete();
+	}
+	//Widget
+	if (this->DistanceWidget != NULL)
+		this->DistanceWidget->Delete();
+	if (this->AngleWidget != NULL)
+		this->AngleWidget->Delete();
+	if (this->ContourWidget != NULL)
+		this->ContourWidget->Delete();
+
+	if (this->imageMapToWindowLevelColors) {
+		this->imageMapToWindowLevelColors->Delete();
+	}
+	if (this->SliceImplicitPlane) {
+		this->SliceImplicitPlane->Delete();
+	}
+	//lookupTable
+	if (this->LookUpTable != NULL) {
+		this->LookUpTable->Delete();
+	}
+
+	if (this->drawActor) {
+		this->drawActor->Delete();
 	}
 	if (Cursor3D != NULL) {
 		Cursor3D->Delete();
@@ -117,15 +130,6 @@ MyImageViewer::~MyImageViewer()
 		CursorActor->Delete();
 	}
 
-	if (this->imageMapToWindowLevelColors) {
-		this->imageMapToWindowLevelColors->Delete();
-	}
-	if (this->drawActor) {
-		this->drawActor->Delete();
-	}
-	if (this->SliceImplicitPlane) {
-		this->SliceImplicitPlane->Delete();
-	}
 	if (this->annotationRenderer != NULL) {
 		this->annotationRenderer->Delete();
 	}
@@ -185,29 +189,6 @@ void MyImageViewer::UpdateDisplayExtent()
 	}
 
 }
-//----------------------------------------------------------------------------
-double MyImageViewer::GetColorWindowLayer()
-{
-	return this->imageMapToWindowLevelColors->GetWindow();
-}
-
-//----------------------------------------------------------------------------
-double MyImageViewer::GetColorLevelLayer()
-{
-	return this->imageMapToWindowLevelColors->GetLevel();
-}
-
-//----------------------------------------------------------------------------
-void MyImageViewer::SetColorWindowLayer(double s)
-{
-	this->imageMapToWindowLevelColors->SetWindow(s);
-}
-
-//----------------------------------------------------------------------------
-void MyImageViewer::SetColorLevelLayer(double s)
-{
-	this->imageMapToWindowLevelColors->SetLevel(s);
-}
 
 //----------------------------------------------------------------------------
 void MyImageViewer::InstallPipeline()
@@ -217,39 +198,37 @@ void MyImageViewer::InstallPipeline()
 	{
 		this->annotationRenderer->AddViewProp(this->drawActor);
 	}
-	if (this->annotationRenderer && this->CursorActor)
+	if (this->Renderer && this->CursorActor)
 	{
-		this->annotationRenderer->AddViewProp(this->CursorActor);
+		this->Renderer->AddActor(this->CursorActor);
 	}
 
 	if (this->drawActor && this->imageMapToWindowLevelColors)
 	{
 		this->drawActor->GetMapper()->SetInputConnection(this->imageMapToWindowLevelColors->GetOutputPort());
 	}
-
+	if (this->RenderWindow && this->annotationRenderer) {
+		this->RenderWindow->AddRenderer(this->annotationRenderer); 
+	}
 }
 
 //----------------------------------------------------------------------------
 void MyImageViewer::UnInstallPipeline()
 {
 	Superclass::UnInstallPipeline();
+	if (this->annotationRenderer) {
+		this->annotationRenderer->RemoveActor(drawActor);
+	}
+	if (this->Renderer && this->CursorActor)
+	{
+		this->Renderer->RemoveActor(this->CursorActor);
+	}
 	if (this->drawActor)
 	{
 		this->drawActor->GetMapper()->SetInputConnection(NULL);
 	}
-	if (this->Renderer && this->drawActor)
-	{
-		this->Renderer->RemoveViewProp(this->drawActor);
-	}
-
-	if (this->Renderer && this->CursorActor)
-	{
-		this->Renderer->RemoveViewProp(this->CursorActor);
-	}
-	if (this->Interactor)
-	{
-		this->Interactor->SetInteractorStyle(NULL);
-		this->Interactor->SetRenderWindow(NULL);
+	if (RenderWindow) {
+		this->RenderWindow->RemoveRenderer(this->annotationRenderer);
 	}
 }
 
@@ -301,7 +280,6 @@ void MyImageViewer::Render()
 			case MyImageViewer::SLICE_ORIENTATION_YZ:
 				xs = w_ext[3] - w_ext[2] + 1;
 				ys = w_ext[5] - w_ext[4] + 1;
-				//this->Renderer->GetActiveCamera()->Azimuth(180);
 				break;
 			}
 
@@ -338,7 +316,7 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 	//Color Map
 	double* range = in->GetScalarRange();
 	this->SetColorWindow(range[1] - range[0]);
-	this->SetColorLevel((range[1] + range[0]) / 2.0);
+	this->SetColorLevel((range[1] + range[0])*0.5);
 	DefaultWindowLevel[0] = this->GetColorWindow();
 	DefaultWindowLevel[1] = this->GetColorLevel();
 
@@ -352,9 +330,10 @@ void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 	this->imageMapToWindowLevelColors->SetInputData(in);
 	this->UpdateDisplayExtent();
 	this->drawActor->SetInputData(this->imageMapToWindowLevelColors->GetOutput());
+	double* range = LookUpTable->GetRange();
+	imageMapToWindowLevelColors->SetWindow(range[1] - range[0]);
+	imageMapToWindowLevelColors->SetLevel((range[1] + range[0])*0.5);
 
-	this->SetColorWindowLayer(6);
-	this->SetColorLevelLayer(3);
 }
 //----------------------------------------------------------------------------
 vtkImageData* MyImageViewer::GetInputLayer()
@@ -603,10 +582,12 @@ void MyImageViewer::InitializeOrientationText()
 
 	for (int i = 0; i<4; i++)
 	{
-		TextActor[i] = vtkTextActor::New();
-		TextActor[i]->GetTextProperty()->SetFontSize(15);
-		TextActor[i]->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
-		Renderer->AddActor2D(TextActor[i]);
+		if (TextActor[i] != NULL) {
+			TextActor[i]->GetTextProperty()->SetFontSize(15);
+			TextActor[i]->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
+			Renderer->AddActor2D(TextActor[i]);
+		}
+		
 	}
 
 	TextActor[0]->SetDisplayPosition(up[0], up[1]);

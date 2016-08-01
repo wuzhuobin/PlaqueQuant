@@ -1,6 +1,7 @@
 #include "MyVtkInteractorStyleImage.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
+#include <qdebug.h>
 
 
 vtkStandardNewMacro(MyVtkInteractorStyleImage);
@@ -26,7 +27,7 @@ void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 	color_r = 255;
 	color_g = 0;
 	color_b = 0;
-	m_opacity = 255;
+	opacity = 255;
 	//Image Viewer
 	this->imageViewer = imageViewer;
 	m_minSlice = imageViewer->GetSliceMin();
@@ -89,7 +90,7 @@ void MyVtkInteractorStyleImage::SetDrawColor(int r, int g, int b)
 }
 void MyVtkInteractorStyleImage::SetDrawOpacity(int opacity)
 {
-	m_opacity = opacity;
+	this->opacity = opacity;
 }
 void MyVtkInteractorStyleImage::SetMode(int m)
 {
@@ -548,7 +549,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 			extent[0], extent[1], extent[2], extent[3], 0, 0);
 		break;
 	}
-	imageViewer->GetannotationRenderer()->AddViewProp(BrushActor);
+	imageViewer->GetannotationRenderer()->AddActor(BrushActor);
 	imageViewer->GetRenderWindow()->Render();
 
 }
@@ -556,7 +557,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 void MyVtkInteractorStyleImage::Draw(bool b)
 {
 	if (b)
-		m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
+		m_brush->SetDrawColor(color_r, color_g, color_b, opacity);
 	else
 		m_brush->SetDrawColor(0, 0, 0, 0);
 
@@ -568,7 +569,6 @@ void MyVtkInteractorStyleImage::Draw(bool b)
 		imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
-
 	//Check if valid pick
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
@@ -857,13 +857,9 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 {
 
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	int label = mainWnd->GetImageLayerNo();
 	//Clear Layer
 	m_brush->SetDrawColor(0, 0, 0, 0);
 	this->FillBox3D();
-	//m_brush->Update();
-
-	m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
 
 	int pos[3];
 	switch (orientation)
@@ -878,13 +874,18 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 				pos[2] = z;
 				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
 				if (*val > 0) {
-					m_brush->DrawSegment3D(0, y, z, 0, y, z);
+					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+						if (*val == i) {
+							double rgba[4];
+							uchar rgbaUCHAR[4];
+							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
+							m_brush->DrawSegment3D(0, y, z, 0, y, z);
+							break;
+						}
+					}
 				}
-				//if ((int)val[0] == label)
-				//{
-				//	this->SetDrawColor(255, 0, 0);
-				//	m_brush->DrawSegment3D(0, y, z, 0, y, z);
-				//}
 			}
 		}
 		break;
@@ -897,8 +898,19 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 				pos[1] = m_sliceSplinBox[orientation]->value();
 				pos[2] = z;
 				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
-				if (*val > 0)
-					m_brush->DrawSegment3D(x, 0, z, x, 0, z);
+				if (*val > 0) {
+					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+						if (*val == i) {
+							double rgba[4];
+							uchar rgbaUCHAR[4];
+							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
+							m_brush->DrawSegment3D(x, 0, z, x, 0, z);
+							break;
+						}
+					}
+				}
 			}
 		}
 		break;
@@ -911,8 +923,19 @@ void MyVtkInteractorStyleImage::ReadfromImageData()
 				pos[1] = y;
 				pos[2] = m_sliceSplinBox[orientation]->value();
 				double * val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
-				if (*val > 0)
-					m_brush->DrawPoint(x, y);
+				if (*val > 0) {
+					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+						if (*val == i) {
+							double rgba[4];
+							uchar rgbaUCHAR[4];
+							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
+							m_brush->DrawPoint(x, y);
+							break;
+						}
+					}
+				}
 			}
 		}
 		break;
@@ -933,7 +956,6 @@ void MyVtkInteractorStyleImage::Write2ImageData()
 {
 	//Update Layer
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	int label = mainWnd->GetImageLayerNo();
 	int pos[3];
 	double pixelval;
 	switch (orientation)
@@ -1095,7 +1117,7 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 		return false;
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	// enable brush to fill the contour
-	m_brush->SetDrawColor(color_r, color_g, color_b, m_opacity);
+	m_brush->SetDrawColor(color_r, color_g, color_b, opacity);
 
 	vtkPolyData* polydata = vtkPolyData::New();
 	polydata = contourRep->GetContourRepresentationAsPolyData();
