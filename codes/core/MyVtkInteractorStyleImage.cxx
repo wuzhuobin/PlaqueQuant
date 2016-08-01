@@ -36,10 +36,11 @@ void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 	orientation = imageViewer->GetSliceOrientation();
 	//Default setting
 	m_mode = NavaigationMode;
-	m_functioning = false;
-	rclick_mode = false;
-	mclick_mode = false;
+	leftClicked = false;
+	rightClicked = false;
+	middleClicked = false;
 
+	//the property which paintbrush needed
 	imageViewer->GetInput()->GetExtent(extent);
 	imageViewer->GetInput()->GetSpacing(spacing);
 	imageViewer->GetInput()->GetOrigin(origin);
@@ -112,7 +113,6 @@ void MyVtkInteractorStyleImage::SetMode(int m)
 		m_mode = PolygonMode;
 		SetPolygonModeEnabled(true);
 		SetPaintBrushModeEnabled(true);
-
 	}
 
 }
@@ -187,7 +187,7 @@ void MyVtkInteractorStyleImage::OnMouseWheelBackward()
 void MyVtkInteractorStyleImage::OnLeftButtonUp()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	m_functioning = false;
+	leftClicked = false;
 	if (m_mode == 3)
 	{
 		if (!isDraw)
@@ -207,7 +207,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonUp()
 
 void MyVtkInteractorStyleImage::OnLeftButtonDown()
 {
-	m_functioning = true;
+	leftClicked = true;
 	isDraw = false;
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (m_mode == 1)
@@ -247,9 +247,9 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 		draw_index_old[0] = (int)(index[0] + 0.5);
 		draw_index_old[1] = (int)(index[1] + 0.5);
 		draw_index_old[2] = (int)(index[2] + 0.5);
-		if (rclick_mode == true)
+		if (rightClicked == true)
 		{
-			rclick_mode = false;
+			rightClicked = false;
 		}
 		else
 		{
@@ -268,7 +268,7 @@ void MyVtkInteractorStyleImage::OnLeftButtonDown()
 void MyVtkInteractorStyleImage::OnRightButtonUp()
 {
 	vtkInteractorStyleTrackballCamera::OnRightButtonUp();
-	rclick_mode = false;
+	rightClicked = false;
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (m_mode == 3)
 	{
@@ -290,7 +290,7 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	isDraw = false;
-	rclick_mode = true;
+	rightClicked = true;
 	if (m_mode == 3)
 	{
 		this->GetInteractor()->GetPicker()->Pick(
@@ -315,9 +315,9 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 		draw_index_old[0] = (int)(index[0] + 0.5);
 		draw_index_old[1] = (int)(index[1] + 0.5);
 		draw_index_old[2] = (int)(index[2] + 0.5);
-		if (m_functioning == true)
+		if (leftClicked == true)
 		{
-			m_functioning = false;
+			leftClicked = false;
 		}
 		else
 		{
@@ -342,30 +342,30 @@ void MyVtkInteractorStyleImage::OnRightButtonDown()
 
 void MyVtkInteractorStyleImage::OnMiddleButtonUp()
 {
-	mclick_mode = false;
+	middleClicked = false;
 	// Forward events
 	vtkInteractorStyleTrackballCamera::OnMiddleButtonUp();
 }
 
 void MyVtkInteractorStyleImage::OnMiddleButtonDown()
 {
-	mclick_mode = true;
+	middleClicked = true;
 	vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
 }
 void MyVtkInteractorStyleImage::OnMouseMove()
 {
 
-	if (m_mode == 1 && m_functioning == true)
+	if (m_mode == 1 && leftClicked == true)
 		CalculateIndex();
-	else if (m_mode == 2 && m_functioning == true)
+	else if (m_mode == 2 && leftClicked == true)
 		WindowLevel();
-	else if (m_mode == 3 && m_functioning == true)
+	else if (m_mode == 3 && leftClicked == true)
 	{
 		Draw(true);
 		this->UpdateBorderWidgetPosition();
 		this->Render();
 	}
-	else if (m_mode == 3 && rclick_mode == true)
+	else if (m_mode == 3 && rightClicked == true)
 	{
 		Draw(false);
 		this->UpdateBorderWidgetPosition();
@@ -382,7 +382,7 @@ void MyVtkInteractorStyleImage::OnMouseMove()
 		vtkInteractorStyleImage::OnMouseMove();
 	}
 	/*
-	if ( rclick_mode == true || mclick_mode == true){
+	if ( rightClicked == true || middleClicked == true){
 	Synchronize();
 	}
 	*/
@@ -486,7 +486,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());
-		m_borderWidget->SetCurrentRenderer(imageViewer->GetannotationRenderer());
+		m_borderWidget->SetCurrentRenderer(imageViewer->GetRenderer());
 		m_borderWidget->SetRepresentation(m_retangleRep);
 		m_borderWidget->SetManagesCursor(true);
 		m_borderWidget->GetBorderRepresentation()->SetMoving(false);
@@ -787,7 +787,6 @@ void MyVtkInteractorStyleImage::UpdateBorderWidgetPosition()
 		imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
-	qDebug() << picked[0] << '\t' << picked[1] << 't' << picked[2];
 	//Check if valid pick
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;

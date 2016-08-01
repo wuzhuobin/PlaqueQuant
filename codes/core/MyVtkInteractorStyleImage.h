@@ -70,9 +70,9 @@ protected:
 	QSpinBox* m_sliceSplinBox[3];
 	QDoubleSpinBox* m_wlDoubleSpinBox[2];
 	double* m_wlDouble[2];
-	bool m_functioning;
-    bool rclick_mode;
-    bool mclick_mode;
+	bool leftClicked;
+    bool rightClicked;
+    bool middleClicked;
 
 
 	//PaintBrush

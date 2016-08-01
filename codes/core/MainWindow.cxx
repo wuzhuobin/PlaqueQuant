@@ -1386,7 +1386,7 @@ void MainWindow::slotMultiPlanarView()
 void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;
-	segmentationView = true;
+	//segmentationView = true;
 
 	this->ui.image1View->SetRenderWindow(NULL);
 	this->ui.image2View->SetRenderWindow(NULL);
@@ -1395,9 +1395,8 @@ void MainWindow::slotSegmentationView()
 	for (int i = 0; i < 3; ++i) {
 		if (m_2DimageViewer[i] != NULL) {
 			m_2DimageViewer[i]->Delete(); 
-			qDebug() << "delete";
+			m_2DimageViewer[i] = MyImageViewer::New();
 		}
-		m_2DimageViewer[i] = MyImageViewer::New();
 	}
 	this->ui.image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 	this->ui.image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
@@ -1417,9 +1416,9 @@ void MainWindow::slotSegmentationView()
 	{
 		if (i >= visibleImageNum)
 			break;
+
 		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(i));
-		m_2DimageViewer[i]->Render();
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 		//Update style
 		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
@@ -1427,7 +1426,6 @@ void MainWindow::slotSegmentationView()
 		m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
 		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
 		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
-		m_interactor[i]->SetInteractorStyle(m_style[i]);
 		switch(i){
 		case 0:
 			m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL,ui.levelDoubleSpinBoxUL);
@@ -1440,6 +1438,8 @@ void MainWindow::slotSegmentationView()
 			break;
         
 		}
+		m_interactor[i]->SetInteractorStyle(m_style[i]);
+
 	}
 	
 	this->slotChangeSlice();
