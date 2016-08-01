@@ -29,11 +29,14 @@ endif()
 #link other libraries
 link_directories(${PROJECT_SOURCE_DIR}/lib)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/codes/core)
-include_directories(${PROJECT_SOURCE_DIR}/build/codes/Module)
-include_directories(${PROJECT_SOURCE_DIR}/codes/Module/GUI)
-include_directories(${PROJECT_SOURCE_DIR}/codes/Module/Pipeline)
+include_directories(
+	${PROJECT_BINARY_DIR}
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/codes/core
+	${PROJECT_SOURCE_DIR}/build/codes/Module
+	${PROJECT_SOURCE_DIR}/codes/Module/GUI
+	${PROJECT_SOURCE_DIR}/codes/Module/Pipeline
+	)
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 

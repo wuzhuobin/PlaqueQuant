@@ -16,6 +16,8 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 
+#include "ui_MainWindow.h"
+
 #include "vtkCamera.h"
 #include "vtkImageMapToWindowLevelColors.h"
 #include "vtkMarchingCubes.h"
@@ -58,7 +60,6 @@
 #include "ExtractCenterline.h"
 
 
-class Ui_MainWindow;
 class ModuleWidget;
 class MyVtkInteractorStyleImage;
 class MainWindow: public QMainWindow
@@ -152,7 +153,7 @@ public slots:
 
 private:
 	//UI
-	Ui_MainWindow* ui;
+	Ui_MainWindow ui;
 	void setActionsEnable(bool b);
 
 	//menu for changing images

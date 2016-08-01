@@ -217,10 +217,10 @@ void MyImageViewer::InstallPipeline()
 	{
 		this->Renderer->AddViewProp(this->drawActor);
 	}
-	//if (this->Renderer && this->CursorActor)
-	//{
-	//	this->Renderer->AddViewProp(this->CursorActor);
-	//}
+	if (this->Renderer && this->CursorActor)
+	{
+		this->Renderer->AddViewProp(this->CursorActor);
+	}
 
 	if (this->drawActor && this->imageMapToWindowLevelColors)
 	{

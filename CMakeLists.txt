@@ -48,6 +48,7 @@ endif()
 Add_subdirectory(codes)
 
 include_directories(	
+	${CMAKE_BINARY_DIR}
 	${CMAKE_SOURCE_DIR}/build
 	${CMAKE_SOURCE_DIR}/include
 	${CMAKE_SOURCE_DIR}/codes/core
