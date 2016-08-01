@@ -213,13 +213,13 @@ void MyImageViewer::SetColorLevelLayer(double s)
 void MyImageViewer::InstallPipeline()
 {
 	Superclass::InstallPipeline();
-	if (this->Renderer && this->drawActor)
+	if (this->annotationRenderer && this->drawActor)
 	{
-		this->Renderer->AddViewProp(this->drawActor);
+		this->annotationRenderer->AddViewProp(this->drawActor);
 	}
-	if (this->Renderer && this->CursorActor)
+	if (this->annotationRenderer && this->CursorActor)
 	{
-		this->Renderer->AddViewProp(this->CursorActor);
+		this->annotationRenderer->AddViewProp(this->CursorActor);
 	}
 
 	if (this->drawActor && this->imageMapToWindowLevelColors)
@@ -474,46 +474,6 @@ double* MyImageViewer::GetDefaultWindowLevel()
 double* MyImageViewer::GetFocalPoint()
 {
 	return Cursor3D->GetFocalPoint();
-}
-
-void MyImageViewer::AddActor(vtkActor* actor, bool renderAfterward)
-{
-	Renderer->AddActor(actor);
-
-	if (renderAfterward)
-		RenderWindow->Render();
-}
-
-void MyImageViewer::RemoveActor(vtkActor* actor, bool renderAfterward)
-{
-	Renderer->RemoveActor(actor);
-
-	if (renderAfterward)
-		RenderWindow->Render();
-}
-
-void MyImageViewer::AddAnnotationActor(vtkProp* prop, bool renderAfterward)
-{
-	//3D view use dataRenderer to add actor to present problem of Z-buffer
-	if (SliceOrientation< 3)
-		annotationRenderer->AddActor(prop);
-	else
-		Renderer->AddActor(prop);
-
-	if (renderAfterward)
-		RenderWindow->Render();
-}
-
-void MyImageViewer::RemoveAnnotationActor(vtkProp* prop, bool renderAfterward)
-{
-	//3D view use dataRenderer to add actor to present problem of Z-buffer
-	if (SliceOrientation < 3)
-		annotationRenderer->RemoveActor(prop);
-	else
-		Renderer->RemoveActor(prop);
-
-	if (renderAfterward)
-		RenderWindow->Render();
 }
 
 void MyImageViewer::RemoveInput()

@@ -548,7 +548,7 @@ void MyVtkInteractorStyleImage::SetPaintBrushModeEnabled(bool b)
 			extent[0], extent[1], extent[2], extent[3], 0, 0);
 		break;
 	}
-	imageViewer->GetannotationRenderer()->AddActor(BrushActor);
+	imageViewer->GetannotationRenderer()->AddViewProp(BrushActor);
 	imageViewer->GetRenderWindow()->Render();
 
 }

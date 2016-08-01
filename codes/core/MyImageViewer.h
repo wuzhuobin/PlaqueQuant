@@ -143,12 +143,6 @@ public:
 	virtual double* GetBound();
 	virtual double* GetFocalPoint();
 
-	void AddActor(vtkActor* actor, bool renderAfterward = false);
-	void RemoveActor(vtkActor* actor, bool renderAfterward = false);
-
-	void AddAnnotationActor(vtkProp* prop, bool renderAfterward = false);
-	void RemoveAnnotationActor(vtkProp* prop, bool renderAfterward = false);
-
 	// Description:
 	// Get the internal render window, renderer, image actor, and
 	// image map instances.
