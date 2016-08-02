@@ -49,13 +49,38 @@ Add_subdirectory(codes)
 
 include_directories(	
 	${CMAKE_BINARY_DIR}
-	${CMAKE_SOURCE_DIR}/build
 	${CMAKE_SOURCE_DIR}/include
 	${CMAKE_SOURCE_DIR}/codes/core
-	${CMAKE_SOURCE_DIR}/codes/Module/Pipeline
+	${CMAKE_SOURCE_DIR}/build/codes/Module
 	${CMAKE_SOURCE_DIR}/codes/Module/GUI
+	${CMAKE_SOURCE_DIR}/codes/Module/Pipeline
+	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles
 
 )
+
+file(
+	GLOB 
+	ABSTRACT_INTERACTORS_SRC 
+	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles/Abstract*.cxx
+	)
+file(
+	GLOB 
+	ABSTRACT_INTERACTORS_H 
+	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles/Abstract*.h
+	)
+file(
+	GLOB 
+	INTERACTORS_SRC  
+	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles/InteractorStyle*.cxx 
+	PARENT_SCOPE
+	)
+file(
+	GLOB 
+	INTERACTORS_INC  
+	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles/InteractorStyle*.h 
+	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles/StyleSwitchMacro.h 
+	PARENT_SCOPE
+	)
 
 SET(
 	QT_SRC
@@ -100,7 +125,8 @@ SET(
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyImageViewer.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.cxx
-
+	${ABSTRACT_INTERACTORS_SRC}
+	${INTERACTORS_SRC}
 )
 
 SET(
@@ -109,7 +135,9 @@ SET(
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.h
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.h
 	  ${CMAKE_SOURCE_DIR}/include/Define.h
-)
+	${ABSTRACT_INTERACTORS_H}
+	${INTERACTORS_INC}
+	  )
 
 Set(
 	 QT_RSRS 

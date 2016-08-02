@@ -116,7 +116,6 @@ public:
     vtkPoints* GetPointsInsideContour();
     vtkOrientedGlyphContourRepresentation* GetContourRep();
     bool FillPolygon();
-    void DrawSynchronize(vtkPolyData*);
 	void SetContourVisibility(bool b);
 	void RemoveContourWidgetAll();
     
@@ -151,9 +150,7 @@ protected:
 private:
     // Drawing points and lines tool
     vtkOrientedGlyphContourRepresentation* contourRep;
-    vtkOrientedGlyphContourRepresentation* contourRepA;
     vtkContourWidget* contourWidget;
-    vtkContourWidget* contourWidgetA;
     vtkPoints* pointsInsideContour;
     
 };

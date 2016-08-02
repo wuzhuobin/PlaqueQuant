@@ -36,6 +36,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/build/codes/Module
 	${PROJECT_SOURCE_DIR}/codes/Module/GUI
 	${PROJECT_SOURCE_DIR}/codes/Module/Pipeline
+	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
 	)
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)

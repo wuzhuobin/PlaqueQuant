@@ -25,7 +25,6 @@ MyImageViewer::MyImageViewer()
 	// Widget 
 	this->DistanceWidget = vtkDistanceWidget::New();
 	this->AngleWidget = vtkAngleWidget::New();
-	this->ContourWidget = vtkContourWidget::New();
 
 	// TextActor 
 	this->IntTextActor = vtkTextActor::New();
@@ -103,8 +102,6 @@ MyImageViewer::~MyImageViewer()
 		this->DistanceWidget->Delete();
 	if (this->AngleWidget != NULL)
 		this->AngleWidget->Delete();
-	if (this->ContourWidget != NULL)
-		this->ContourWidget->Delete();
 
 	if (this->imageMapToWindowLevelColors) {
 		this->imageMapToWindowLevelColors->Delete();

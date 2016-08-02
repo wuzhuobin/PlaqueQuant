@@ -192,7 +192,6 @@ protected:
 	vtkDistanceWidget* DistanceWidget;
 
 	vtkAngleWidget*	 AngleWidget;
-	vtkContourWidget*  ContourWidget;
 	//Parameter
 	vtkPlane* SliceImplicitPlane;
 	double DefaultWindowLevel[2];
