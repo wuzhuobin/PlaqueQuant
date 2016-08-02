@@ -58,6 +58,7 @@
 #include "SurfaceCreator.h"
 #include "VesselSegmentation.h"
 #include "ExtractCenterline.h"
+#include "InteractorStyleSwitch.h"
 
 
 class ModuleWidget;
