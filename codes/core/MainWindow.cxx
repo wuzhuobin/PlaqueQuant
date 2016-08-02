@@ -1386,7 +1386,7 @@ void MainWindow::slotMultiPlanarView()
 void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;
-	//segmentationView = true;
+	segmentationView = true;
 
 	this->ui.image1View->SetRenderWindow(NULL);
 	this->ui.image2View->SetRenderWindow(NULL);
@@ -1502,7 +1502,7 @@ void MainWindow::RenderAllViewer()
 	//QCoreApplication::processEvents();
 	for (int i = 0; i < 3; ++i)
 	{
-		if (segmentationView && visibleImageNum >= i)
+		if (segmentationView && i >= visibleImageNum)
 			break;
 		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
 		m_2DimageViewer[i]->Render();
