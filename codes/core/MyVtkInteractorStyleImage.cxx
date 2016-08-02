@@ -11,7 +11,6 @@ void MyVtkInteractorStyleImage::SetImageViewer(MyImageViewer* imageViewer)
 	//Contour Widget
 	contourWidget = NULL;
 	contourRep = NULL;
-	contourRepA = NULL;
 	//Paint Brush
 	m_drawValueComboBox = NULL;
 	m_drawBrushShapeComboBox = NULL;
