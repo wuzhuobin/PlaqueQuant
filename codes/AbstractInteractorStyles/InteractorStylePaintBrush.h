@@ -38,7 +38,6 @@ Copyright (C) 2016
 
 // Our codes
 
-class MainWindow;
 
 class InteractorStylePaintBrush : public AbstractInteractorStyleImage
 {
@@ -94,7 +93,6 @@ private:
 	bool PAINT_BRUSH_MODE_ENABLED;
 
 	//PaintBrush
-	QComboBox*	m_drawValueComboBox;
 	QComboBox*  m_drawBrushShapeComboBox;
 	QSpinBox*	m_drawBrushSizeSpinBox;
 	QCheckBox*	m_drawVolumetricCheckBox;

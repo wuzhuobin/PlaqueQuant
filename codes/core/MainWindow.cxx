@@ -1,6 +1,9 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include <QActionGroup>
+#include <QUrl>
+
 
 
 MainWindow::MainWindow() 
@@ -180,19 +183,92 @@ MainWindow::~MainWindow()
 
 	for (int i=0;i<3;i++)
 	{
-		if (m_2DimageViewer[i])
+		if (m_2DimageViewer[i]) {
 			m_2DimageViewer[i]->Delete();
+			m_2DimageViewer[i] = NULL;
+		}
 
-		if(m_interactor[i])
+		if (m_interactor[i]) {
 			m_interactor[i]->Delete();
+			m_interactor[i] = NULL;
+		}
 
-		if (m_style[i])
+		if (m_style[i]) {
 			m_style[i]->Delete();
+			m_style[i] = NULL;
+		}
 	}
-	if (m_3Dinteractor)
+	if (m_3Dinteractor) {
 		m_3Dinteractor->Delete();
+		m_3Dinteractor = NULL;
+	}
 
-	delete m_moduleWidget;
+	for (int i = 0; i < 3; ++i) {
+		if (m_planeWidget != NULL) {
+			m_planeWidget[i]->Delete();
+			m_planeWidget[i] = NULL;
+		}
+		if (m_planeWidgetCallback != NULL) {
+			m_planeWidgetCallback[i]->Delete();
+			m_planeWidgetCallback[i] = NULL;
+		}
+	}
+	if (DistanceWidget3D != NULL) {
+		DistanceWidget3D->Delete();
+		DistanceWidget3D = NULL;
+	}
+	/*if (m_itkT1 != NULL) {
+		m_itkT1->Delete();
+		m_itkT1 = NULL;
+	}
+	if (m_itkT2 != NULL) {
+		m_itkT2->Delete();
+		m_itkT2 = NULL;
+	}
+	if (m_itkT1C != NULL) {
+		m_itkT1C->Delete();
+		m_itkT1C = NULL;
+	}
+	if (m_itk2DDIR != NULL) {
+		m_itk2DDIR->Delete();
+		m_itk2DDIR = NULL;
+	}
+	if (m_itkMPRAGE != NULL) {
+		m_itkMPRAGE->Delete();
+		m_itkMPRAGE = NULL;
+	}*/
+	if (m_vtkT1 != NULL) {
+		m_vtkT1->Delete();
+		m_vtkT1 = NULL;
+	}
+	if (m_vtkT2 != NULL) {
+		m_vtkT2->Delete();
+		m_vtkT2 = NULL;
+	}
+	if (m_vtkT1C != NULL) {
+		m_vtkT1C->Delete();
+		m_vtkT1C = NULL;
+	}
+	if (m_vtk2DDIR != NULL) {
+		m_vtk2DDIR->Delete();
+		m_vtk2DDIR = NULL;
+	}
+	if (m_vtkMPRAGE != NULL) {
+		m_vtkMPRAGE->Delete();
+		m_vtkMPRAGE = NULL;
+	}
+	if (m_moduleWidget != NULL) {
+		delete m_moduleWidget;
+		m_moduleWidget = NULL;
+	}
+	if (m_InfoDialog != NULL) {
+		delete m_InfoDialog;
+		m_InfoDialog = NULL;
+	}
+	if (SegmentationOverlay != NULL) {
+		delete SegmentationOverlay;
+	}
+
 
 }
 
@@ -901,7 +977,7 @@ void MainWindow::slot3DUpdate()
 	mapper->SetInputData(SegmentationOverlayCreator->GetOutput());
 	mapper->SetScalarRange(0, 1);
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
-	Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
 	Actor->SetMapper(mapper);
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();

@@ -17,6 +17,10 @@
 //Copyright (C) 2016
 //*/
 //
+//#include <QTime>
+//#include <vtkContourWidget.h>
+//#include <vtkRenderWindowInteractor.h>
+//#include <vtkOrientedGlyphContourRepresentation.h>
 //#include <vtkInteractorStyleImage.h>
 //#include <vtkPolygon.h>
 //#include <vtkCallbackCommand.h>
@@ -188,6 +192,23 @@
 //	}
 //}
 //
+//void InteractorStylePolygonDraw::SetDrawColor(int r, int g, int b)
+//{
+//	color_r = r;
+//	color_g = g;
+//	color_b = b;
+//}
+//
+//void InteractorStylePolygonDraw::SetDrawColor(const int * rgb)
+//{
+//	this->SetDrawColor(rgb[0], rgb[1], rgb[2]);
+//}
+//
+//void InteractorStylePolygonDraw::SetDrawOpacity(int opacity)
+//{
+//	this->opacity = opacity;
+//}
+//
 //void InteractorStylePolygonDraw::DisplayPolygon(vtkObject* caller, long unsigned vtkNotUsed(eventId), void* vtkNotUsed(clientData))
 //{
 //	MainWindow* mainwnd = MainWindow::GetMainWindow();
@@ -199,14 +220,13 @@
 //{
 //	//Get Main window
 //	MainWindow* mainWnd = MainWindow::GetMainWindow();
+//
+//
 //	if (m_contourRep == NULL) return;
 //	if (m_contourWidget == NULL) return;
-//	//if (labelImage == NULL) {
-//	//	this->SetPolygonModeEnabled(false);
-//	//	return;
-//	//}
+//
 //	//Get most updated current value
-//	mainWnd->GetCursorPosition(m_currentPos);
+//	//mainWnd->GetCursorPosition(m_currentPos);
 //
 //	m_contourWidget->CloseLoop();
 //
@@ -219,24 +239,25 @@
 //	vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
 //	int numOfPoints = polydata->GetNumberOfPoints();
 //
+//	// Get the coordinates of the contour data points
+//
 //	double lastPoint[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
-//	for (int i = 0; i < numOfPoints; i++)
+//	for (vtkIdType i = 0; i < numOfPoints; i++)
 //	{
-//		double imageCooridinate[3];
-//		double worldCoordiante[3];
-//		polydata->GetPoint(i, imageCooridinate);
-//		worldCoordiante[0] = (imageCooridinate[0] - origin[0]) / spacing[0];
-//		worldCoordiante[1] = (imageCooridinate[1] - origin[1]) / spacing[1];
-//		worldCoordiante[2] = (imageCooridinate[2] - origin[2]) / spacing[2];
+//		double p[3];
+//		polydata->GetPoint(i, p);
+//
+//		// Project point to slice plane
+//		labelImage->GetReslicer()->ProjectWorldPointToReslicePlane(p, p, this->m_orientation);
 //
 //
 //		// if the points is too close to the previous point, skip it to avoid error in PointInPolygon algorithm
-//		double d = vtkMath::Distance2BetweenPoints(lastPoint, imageCooridinate);
+//		double d = vtkMath::Distance2BetweenPoints(lastPoint, p);
 //		if (d < 1E-5)
 //			continue;
-//		
-//		polygon->GetPoints()->InsertNextPoint(imageCooridinate);
-//		memcpy(lastPoint, imageCooridinate, sizeof(double) * 3);
+//
+//		polygon->GetPoints()->InsertNextPoint(p);
+//		memcpy(lastPoint, p, sizeof(double) * 3);
 //	}
 //
 //	//Test whether the points are inside the polygon or not
@@ -246,15 +267,15 @@
 //	double polygon_bounds[6];
 //
 //	int curIndex[3];
-//	labelImage->GetReslicer()->GetITKIndexFromVTKImageActorPoint(m_currentPos, curIndex, orientation);
+//	labelImage->GetReslicer()->GetITKIndexFromVTKImageActorPoint(m_currentPos, curIndex, m_orientation);
 //
 //	polygon->GetPoints()->GetBounds(polygon_bounds);
 //
 //	int bound_extent[6];
 //	labelImage->GetImageData()->GetExtent(bound_extent);
 //
-//	bound_extent[orientation * 2] = 0;
-//	bound_extent[orientation * 2 + 1] = 1;
+//	bound_extent[m_orientation * 2] = 0;
+//	bound_extent[m_orientation * 2 + 1] = 1;
 //
 //	for (int i = bound_extent[0]; i < bound_extent[1]; i++)
 //	{
@@ -269,7 +290,7 @@
 //
 //				// obtain world coordinate projected on to the reslice plane
 //				double vtkPoint[3];
-//				labelImage->GetReslicer()->GetVTKPointFromITKIndex(vtkIndex, vtkPoint, this->orientation);
+//				labelImage->GetReslicer()->GetVTKPointFromITKIndex(vtkIndex, vtkPoint, this->m_orientation);
 //
 //				// project point to polygon's plane
 //				vtkPlane::GeneralizedProjectPoint(vtkPoint, polygon->GetPoints()->GetPoint(0), n, vtkPoint);
@@ -279,13 +300,13 @@
 //				if ((polygon->PointInPolygon(vtkPoint, polygon->GetPoints()->GetNumberOfPoints(), static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), polygon_bounds, n)) == 0) {
 //					continue;
 //				}
-//				
+//
 //				//cout << i << " " << j << " " << k << "\n";
 //				ImageType::IndexType itkIndex;
 //				itkIndex[0] = i;
 //				itkIndex[1] = j;
 //				itkIndex[2] = k;
-//				itkIndex[orientation] = curIndex[orientation];
+//				itkIndex[m_orientation] = curIndex[m_orientation];
 //
 //				labelImage->GetItkImage()->SetPixel(itkIndex, brushProperty.labelID);
 //			}
@@ -307,3 +328,4 @@
 //	mainWnd->RenderAllViewer();
 //
 //}
+//

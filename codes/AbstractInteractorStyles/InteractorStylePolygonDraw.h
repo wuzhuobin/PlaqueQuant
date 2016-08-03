@@ -35,6 +35,12 @@
 //
 //	void SetPolygonModeEnabled(bool b);
 //
+//	void SetDrawColor(int r, int g, int b);
+//	void SetDrawColor(const int* rgb);
+//	void SetDrawOpacity(int opacity);
+//
+//	void SetDrawIsotropicCheckBox(QCheckBox* checkBox);
+//
 //protected:
 //	InteractorStylePolygonDraw();
 //	~InteractorStylePolygonDraw();
@@ -57,8 +63,12 @@
 //	bool DOUBLE_CLICKED_FLAG;
 //	bool CONTOUR_IS_ON_FLAG;
 //
-//	//int color_r, color_g, color_b;
-//	//int opacity;
+//	int color_r, color_g, color_b;
+//	int opacity;
+//
+//	//PaintBrush
+//	QComboBox*	m_drawValueComboBox;
+//
 //
 //	vtkContourWidget* m_contourWidget;
 //	vtkOrientedGlyphContourRepresentation* m_contourRep;

@@ -81,7 +81,7 @@ public:
 	Overlay* GetOverlay();
 	~MainWindow();
 	
-	enum
+	enum SLICE_ORIENTATION
   {
     SLICE_ORIENTATION_YZ = 0,
     SLICE_ORIENTATION_XZ = 1,
@@ -163,7 +163,7 @@ private:
 
     
 	//2D/3D view
-	MyImageViewer*				m_2DimageViewer[5];
+	MyImageViewer*				m_2DimageViewer[3];
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
 	InteractorStyleSwitch*		m_style[3];
