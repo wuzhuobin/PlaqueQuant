@@ -18,7 +18,7 @@ void SetInteractorStyleTo##style () { \
 		if (this->CurrentStyle) { \
 			this->CurrentStyle->SetInteractor(0); \
 	} \
-		this->CurrentStyle = this->##style;\
+		this->CurrentStyle =(vtkInteractorStyle*) this->##style;\
 	} \
 	if (this->CurrentStyle) { \
 		this->CurrentStyle->SetInteractor(this->Interactor);\

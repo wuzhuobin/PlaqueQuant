@@ -17,6 +17,9 @@
 //Copyright (C) 2016
 //*/
 //
+//#pragma once
+//
+//
 //#include <QTime>
 //#include <vtkContourWidget.h>
 //#include <vtkRenderWindowInteractor.h>
@@ -53,6 +56,9 @@
 //
 //	bool DOUBLE_CLICKED_FLAG;
 //	bool CONTOUR_IS_ON_FLAG;
+//
+//	//int color_r, color_g, color_b;
+//	//int opacity;
 //
 //	vtkContourWidget* m_contourWidget;
 //	vtkOrientedGlyphContourRepresentation* m_contourRep;

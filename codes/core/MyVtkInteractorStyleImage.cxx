@@ -452,7 +452,7 @@ void MyVtkInteractorStyleImage::RemoveContourWidgetAll() {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
 	for (int i = 0; i < mainwnd->GetVisibleImageNo(); i++) {
-		mainwnd->GetMyVtkInteractorStyleImage(i)->RemoveContourWidget();
+		//mainwnd->GetMyVtkInteractorStyleImage(i)->RemoveContourWidget();
 		mainwnd->GetMyImageViewer(i)->GetRenderWindow()->Render();
 	}
 
@@ -1116,7 +1116,7 @@ bool MyVtkInteractorStyleImage::FillPolygon()
 	// enable brush to fill the contour
 	m_brush->SetDrawColor(color_r, color_g, color_b, opacity);
 
-	vtkPolyData* polydata = vtkPolyData::New();
+	vtkPolyData* polydata;
 	polydata = contourRep->GetContourRepresentationAsPolyData();
 	pointsInsideContour = vtkPoints::New();
 	vtkPolygon* polygon = vtkPolygon::New();

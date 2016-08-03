@@ -25,9 +25,10 @@ Copyright (C) 2016
 #include <vtkObjectFactory.h>
 #include <vtkPropPicker.h>
 
+#include "AbstractInteractorStyle.h"
 #include "MyImageViewer.h"
 
-class AbstractInteractorStyleImage : public vtkInteractorStyleImage
+class AbstractInteractorStyleImage : public vtkInteractorStyleImage, public AbstractInteractorStyle
 {
 public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
@@ -38,6 +39,8 @@ public:
 	virtual void SetOrientation(int orientation);
 	virtual int GetOrientation();
 	virtual vtkActor* PickActor(int x, int y);
+	void SetCurrentSlice(int slice);
+
 
 protected:
 	AbstractInteractorStyleImage();

@@ -172,16 +172,17 @@ add_executable(
 #Link all libraries
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
-
+qt5_use_modules(Project Core Gui Widgets PrintSupport)
 target_link_libraries(
 	Project
-	Qt5::Widgets 
-	Qt5::PrintSupport
+#	Qt5::Widgets 
+#	Qt5::PrintSupport
 	${VTK_LIBRARIES} 
 	${VMTK_LIBRARIES} 
 	${ITK_LIBRARIES} 
 	Module
 )
+
 
 #Grouping in MSVC
 SOURCE_GROUP("_Generated" 	FILES ${UISrcs})

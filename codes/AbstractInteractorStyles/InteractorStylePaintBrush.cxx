@@ -18,6 +18,7 @@ Copyright (C) 2016
 */
 
 #include "InteractorStylePaintBrush.h"
+#include "MainWindow.h"
 vtkStandardNewMacro(InteractorStylePaintBrush);
 
 #define SEGMENTATION_CIRCLE 1
@@ -272,7 +273,9 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 
 	if (m_brush != NULL)
 	{
-		this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
+		if (this->imageViewer != NULL) {
+			this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
+		}
 
 		m_brush->Delete();
 		m_brush = NULL;

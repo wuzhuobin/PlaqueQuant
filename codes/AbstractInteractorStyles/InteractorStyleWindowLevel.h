@@ -22,7 +22,7 @@ Copyright (C) 2016
 #define INTERACTOR_STYLE_WINDOW_LEVEL_H
 #include <vtkInteractorStyleImage.h>
 #include "AbstractInteractorStyleImage.h"
-#include "MainWindow.h"
+
 
 class InteractorStyleWindowLevel : public AbstractInteractorStyleImage
 {

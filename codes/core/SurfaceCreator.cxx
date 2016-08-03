@@ -68,6 +68,7 @@ bool SurfaceCreator::Update()
 		m_surface = vtkDiscreteMarchingCubes::New();
 		m_surface->SetNumberOfContours(numValue);
 		m_surface->GenerateValues(numValue, range[0], range[1]);
+		m_surface->SetComputeScalars(1);
 		
 	}
 	else

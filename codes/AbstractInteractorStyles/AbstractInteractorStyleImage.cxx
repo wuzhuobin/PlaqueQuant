@@ -75,6 +75,11 @@ vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
 	}
 }
 
+void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
+{
+	this->m_slice = slice;
+}
+
 void AbstractInteractorStyleImage::OnMouseWheelForward()
 {
 	this->MoveSliceForward();

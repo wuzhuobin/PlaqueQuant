@@ -23,9 +23,10 @@ Copyright (C) 2016
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderWindowInteractor.h>
 #include "AbstractInteractorStyleImage.h"
-#include "MainWindow.h"
+
 
 //Extra
+#include "Define.h"
 #include <QComboBox>
 #include <QSpinBox>
 #include <QCheckBox>
@@ -33,6 +34,7 @@ Copyright (C) 2016
 #include "vtkBorderWidget.h"
 #include "vtkProperty2D.h"
 #include "vtkBorderRepresentation.h"
+#include "vtkTransformPolyDataFilter.h"
 
 // Our codes
 
@@ -76,7 +78,7 @@ private:
 
 	bool CheckValidPick(double*);
 
-	ImageType::Pointer m_overlay;
+	//ImageType::Pointer m_overlay;
 	vtkImageData* m_imageData;
 	vtkImageActor* m_imageActor;
 

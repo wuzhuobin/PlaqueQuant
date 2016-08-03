@@ -115,7 +115,7 @@ MainWindow::MainWindow()
 	{
 		m_2DimageViewer[i] = MyImageViewer::New();
 		m_interactor[i] = vtkRenderWindowInteractor::New();
-		m_style[i] = MyVtkInteractorStyleImage::New();
+		m_style[i] = InteractorStyleSwitch::New();
 	}
 
 	ui.image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
@@ -205,6 +205,7 @@ void MainWindow::initializeModule()
 
 void MainWindow::initializeViewers()
 {
+	segmentationView = false;
 
 	for (int i = 0 ; i < 3 ; i++)
 	{
@@ -216,12 +217,17 @@ void MainWindow::initializeViewers()
 
 
 		//Update style
-		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-		m_style[i]->SetAutoAdjustCameraClippingRange(true);
-		m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
-		m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL,ui.levelDoubleSpinBoxUL);
-		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
-		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
+		m_style[i]->SetViewers(m_2DimageViewer[i]);
+		m_style[i]->initializeQWidget(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox, 
+			ui.windowDoubleSpinBoxUL, ui.levelDoubleSpinBoxUL,
+			m_moduleWidget->GetBrushSizeSpinBox(), 
+			m_moduleWidget->GetBrushShapeComBox(),
+			NULL, NULL);
+		//m_style[i]->SetAutoAdjustCameraClippingRange(true);
+		//m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
+		//m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL,ui.levelDoubleSpinBoxUL);
+		//m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
+		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
 //  m_interactor[i]->Initialize();
@@ -605,6 +611,7 @@ bool MainWindow::visualizeImage()
 	
 	//Update Cursor
 	this->slotChangeSlice();
+	this->slotNavigationMode();
     
 	//ROI
 	for (int i=0;i<3;i++)
@@ -689,7 +696,7 @@ void MainWindow::slotNavigationMode()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
-		m_style[i]->SetMode(1);
+		m_style[i]->SetInteractorStyleToNavigation();
 	}
 }
 
@@ -700,7 +707,7 @@ void MainWindow::slotWindowLevelMode()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
-		m_style[i]->SetMode(2);
+		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
 }	
 
@@ -710,7 +717,7 @@ void MainWindow::slotBrushMode()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
-		m_style[i]->SetMode(3);
+		m_style[i]->SetInteractorStyleToPaintBrush();
 	}
 	//Update ui
 	m_moduleWidget->SetPage(2);
@@ -722,7 +729,7 @@ void MainWindow::slotContourMode()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
-		m_style[i]->SetMode(4);
+		//m_style[i]->SetMode(4);
 	}
 	m_moduleWidget->SetPage(1);
 }
@@ -1229,7 +1236,7 @@ MyImageViewer* MainWindow::GetMyImageViewer(int i){
     else
         return NULL;
 }
-MyVtkInteractorStyleImage* MainWindow::GetMyVtkInteractorStyleImage(int i){
+InteractorStyleSwitch* MainWindow::GetMyVtkInteractorStyleImage(int i){
     if(m_style[i])
         return m_style[i];
     else
@@ -1366,12 +1373,17 @@ void MainWindow::slotMultiPlanarView()
 
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 		//Update style
-		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-		m_style[i]->SetAutoAdjustCameraClippingRange(true);
-		m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
-		m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL, ui.levelDoubleSpinBoxUL);
-		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
-		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
+		m_style[i]->SetViewers(m_2DimageViewer[i]);
+		m_style[i]->initializeQWidget(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox,
+			ui.windowDoubleSpinBoxUL, ui.levelDoubleSpinBoxUL,
+			m_moduleWidget->GetBrushSizeSpinBox(),
+			m_moduleWidget->GetBrushShapeComBox(),
+			NULL, NULL);
+		//m_style[i]->SetAutoAdjustCameraClippingRange(true);
+		//m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
+		//m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL, ui.levelDoubleSpinBoxUL);
+		//m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
+		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
 //  m_interactor[i]->Initialize();
@@ -1421,12 +1433,35 @@ void MainWindow::slotSegmentationView()
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(i));
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 		//Update style
-		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-		m_style[i]->SetAutoAdjustCameraClippingRange(true);
-		m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
-		m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
-		m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
-		switch(i){
+		m_style[i]->SetViewers(m_2DimageViewer[i]);
+		switch (i) {
+		case 0:
+				m_style[i]->initializeQWidget(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox,
+					ui.windowDoubleSpinBoxUL, ui.levelDoubleSpinBoxUL,
+					m_moduleWidget->GetBrushSizeSpinBox(),
+					m_moduleWidget->GetBrushShapeComBox(),
+					NULL, NULL);
+				break;
+		case 1:
+			m_style[i]->initializeQWidget(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox,
+				ui.windowDoubleSpinBoxUR, ui.levelDoubleSpinBoxUR,
+				m_moduleWidget->GetBrushSizeSpinBox(),
+				m_moduleWidget->GetBrushShapeComBox(),
+				NULL, NULL);
+			break;
+		case 2:
+			m_style[i]->initializeQWidget(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox,
+				ui.windowDoubleSpinBoxLL, ui.levelDoubleSpinBoxLL,
+				m_moduleWidget->GetBrushSizeSpinBox(),
+				m_moduleWidget->GetBrushShapeComBox(),
+				NULL, NULL);
+			break;
+		}
+		//m_style[i]->SetAutoAdjustCameraClippingRange(true);
+		//m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
+		//m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
+		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
+		/*switch(i){
 		case 0:
 			m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL,ui.levelDoubleSpinBoxUL);
 			break;
@@ -1437,7 +1472,7 @@ void MainWindow::slotSegmentationView()
 			m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxLL,ui.levelDoubleSpinBoxLL);
 			break;
         
-		}
+		}*/
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
 
 	}
@@ -1489,7 +1524,7 @@ void MainWindow::slotOverlayOpacity(double op)
     for (int i=0;i<3;i++)
     {
 		if (m_style[i] != NULL)
-			m_style[i]->SetDrawOpacity(op*255);
+			m_style[i]->GetPaintBrush()->SetDrawOpacity(op * 255);
         m_2DimageViewer[i]->GetdrawActor()->SetOpacity(op);
         m_2DimageViewer[i]->Render();
     }
@@ -1514,7 +1549,7 @@ void MainWindow::SetImageLayerNo(int layer)
 	for (int i = 0; i < 3; i++)
 	{
 		if (m_style[i] != NULL)
-		m_style[i]->SetDrawColor(overlayColor[m_layer_no-1]);
+		m_style[i]->GetPaintBrush()->SetDrawColor(overlayColor[m_layer_no-1]);
 	}
 }
 

@@ -15,7 +15,9 @@ Copyright (C) 2016
 
 
 #include <vtkImageInterpolator.h>
+#include <vtkInteractorStyle.h>
 #include "InteractorStyleSwitch.h"
+#include "MainWindow.h"
 #include "ui_MainWindow.h"
 
 vtkStandardNewMacro(InteractorStyleSwitch);
@@ -128,6 +130,15 @@ void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * slic
 	this->PaintBrush->SetDrawVolumetricCheckBox(drawVolumetric);
 	this->PaintBrush->SetDrawIsotropicCheckBox(drawIsotropic);
 }
+
+void InteractorStyleSwitch::SetCurrentSlice(int slice)
+{
+	this->Navigation->SetCurrentSlice(slice);
+	this->WindowLevel->SetCurrentSlice(slice);
+	this->PaintBrush->SetCurrentSlice(slice);
+	//this->po
+}
+
 
 void InteractorStyleSwitch::SetInteractor(vtkRenderWindowInteractor *iren)
 {

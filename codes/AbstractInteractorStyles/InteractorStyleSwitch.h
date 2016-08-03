@@ -17,27 +17,24 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_SWITCH_H
 #define INTERACTOR_STYLE_SWITCH_H
 
+#include <vtkSetGet.h>
 #include <vtkObjectFactory.h>
 #include <vtkInteractorStyle.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkInteractorStyleSwitchBase.h>
+#include "AbstractInteractorStyle.h"
 #include "InteractorStyleNavigation.h"
 #include "InteractorStyleWindowLevel.h"
 #include "InteractorStylePolygonDraw.h"
 #include "InteractorStylePaintBrush.h"
 #include "StyleSwitchMacro.h"
 
-class InteractorStyleNavigation;
-class InteractorStyleWindowLevel;
-class InteractorStylePaintBrush;
-
-class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
+class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase, public AbstractInteractorStyle
 {
 public:
 	vtkTypeMacro(InteractorStyleSwitch, vtkInteractorStyleSwitchBase);
 	static InteractorStyleSwitch* New();
-
 	vtkGetMacro(WindowLevel, InteractorStyleWindowLevel*);
 	vtkGetMacro(Navigation, InteractorStyleNavigation*);
 	//vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
@@ -68,6 +65,7 @@ public:
 		QComboBox* drawShape,
 		QCheckBox* drawVolumetric,
 		QCheckBox* drawIsotropic);
+	virtual void SetCurrentSlice(int slice);
 
 protected:
 	InteractorStyleSwitch();
@@ -76,7 +74,7 @@ protected:
 	void InternalUpdate();
 	void SetAutoAdjustCameraClippingRange(int value);
 
-
+private:
 	InteractorStyleNavigation*	Navigation;
 	InteractorStyleWindowLevel* WindowLevel;
 	//InteractorStylePolygonDraw* PolygonDraw;

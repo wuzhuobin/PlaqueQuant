@@ -19,6 +19,7 @@ Copyright (C) 2016
 */
 
 #include "InteractorStyleWindowLevel.h"
+#include "MainWindow.h"
 #include "ui_MainWindow.h"
 
 vtkStandardNewMacro(InteractorStyleWindowLevel);

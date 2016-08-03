@@ -46,9 +46,9 @@
 
 //Own Class
 #include "Define.h"
-#include "RegistrationWizard.h"
-#include "MyVtkInteractorStyleImage.h"
 #include "MyImageViewer.h"
+#include "InteractorStyleSwitch.h"
+#include "RegistrationWizard.h"
 #include "MyProgressDialog.h"
 #include "ModuleWidget.h"
 #include "InfoDialog.h"
@@ -58,7 +58,6 @@
 #include "SurfaceCreator.h"
 #include "VesselSegmentation.h"
 #include "ExtractCenterline.h"
-#include "InteractorStyleSwitch.h"
 
 
 class ModuleWidget;
@@ -71,7 +70,7 @@ public:
 
 	static MainWindow* GetMainWindow();
     MyImageViewer* GetMyImageViewer(int);
-    MyVtkInteractorStyleImage* GetMyVtkInteractorStyleImage(int);
+    InteractorStyleSwitch* GetMyVtkInteractorStyleImage(int);
 	QString GetFileName(int);
 
 	int GetVisibleImageNo();
@@ -167,7 +166,7 @@ private:
 	MyImageViewer*				m_2DimageViewer[5];
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
-	MyVtkInteractorStyleImage*	m_style[3];
+	InteractorStyleSwitch*		m_style[3];
 
     //ROI
 	MyPlaneWidget*			m_planeWidget[3];

@@ -18,6 +18,7 @@ Copyright (C) 2016
 */
 
 #include "InteractorStyleNavigation.h"
+#include "MainWindow.h"
 
 vtkStandardNewMacro(InteractorStyleNavigation);
 
@@ -37,8 +38,9 @@ void InteractorStyleNavigation::OnMouseMove()
 	else if (m_leftFunctioning) {
 		this->CalculateIndex();
 	}
-
-	AbstractInteractorStyleImage::OnMouseMove();
+	else {
+		AbstractInteractorStyleImage::OnMouseMove();
+	}
 }
 
 
@@ -80,6 +82,7 @@ void InteractorStyleNavigation::CalculateIndex()
 		for (int i = 0; i < 3; i++)
 		{
 			index[i] = (picked[i] - origin[i]) / spacing[i];
+			qDebug() << index[i];
 		}
 		mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
 	}

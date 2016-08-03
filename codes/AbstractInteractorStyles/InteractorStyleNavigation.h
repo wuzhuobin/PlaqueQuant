@@ -23,7 +23,7 @@ Copyright (C) 2016
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderWindowInteractor.h>
 #include "AbstractInteractorStyleImage.h"
-#include "MainWindow.h"
+
 
 class InteractorStyleNavigation : public AbstractInteractorStyleImage
 {
