@@ -909,10 +909,11 @@ void MainWindow::slotRuler(bool b)
 
 	for (int i=0;i<3;i++)
 	{
-		m_2DimageViewer[i]->SetRulerEnabled(b);
+		//m_2DimageViewer[i]->SetRulerEnabled(b);
+		m_style[i]->SetInteractorStyleToInteractorStyleTesting();
 	}
 
-	this->Set3DRulerEnabled(b);
+	//this->Set3DRulerEnabled(b);
 }
 
 void MainWindow::slotSetROIWidgetEnabled( bool b )

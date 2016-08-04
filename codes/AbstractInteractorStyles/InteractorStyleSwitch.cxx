@@ -24,6 +24,7 @@ vtkStandardNewMacro(InteractorStyleSwitch);
 
 InteractorStyleSwitch::InteractorStyleSwitch()
 {
+	InteractorStyleTesting = vtkInteractorStyleImage::New();
 	WindowLevel = InteractorStyleWindowLevel::New();
 	Navigation = InteractorStyleNavigation::New();
 	PolygonDraw = InteractorStylePolygonDraw::New();
@@ -44,6 +45,10 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 
 	PaintBrush->Delete();
 	PaintBrush = 0;
+
+	InteractorStyleTesting->Delete();
+	InteractorStyleTesting = 0;
+
 }
 
 void InteractorStyleSwitch::InternalUpdate()
@@ -77,6 +82,7 @@ void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
 	}
 
 	this->AutoAdjustCameraClippingRange = value;
+	this->InteractorStyleTesting->SetAutoAdjustCameraClippingRange(value);
 	this->Navigation->SetAutoAdjustCameraClippingRange(value);
 	this->WindowLevel->SetAutoAdjustCameraClippingRange(value);
 	this->PolygonDraw->SetAutoAdjustCameraClippingRange(value);
@@ -87,6 +93,7 @@ void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
 void InteractorStyleSwitch::SetDefaultRenderer(vtkRenderer* renderer)
 {
 	this->vtkInteractorStyle::SetDefaultRenderer(renderer);
+	this->InteractorStyleTesting->SetDefaultRenderer(renderer);
 	this->Navigation->SetDefaultRenderer(renderer);
 	this->WindowLevel->SetDefaultRenderer(renderer);
 	this->PolygonDraw->SetDefaultRenderer(renderer);
@@ -96,6 +103,7 @@ void InteractorStyleSwitch::SetDefaultRenderer(vtkRenderer* renderer)
 void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
 {
 	this->vtkInteractorStyle::SetCurrentRenderer(renderer);
+	this->InteractorStyleTesting->SetCurrentRenderer(renderer);
 	this->Navigation->SetCurrentRenderer(renderer);
 	this->WindowLevel->SetCurrentRenderer(renderer);
 	this->PolygonDraw->SetCurrentRenderer(renderer);
@@ -134,7 +142,7 @@ void InteractorStyleSwitch::SetCurrentSlice(int slice)
 	this->Navigation->SetCurrentSlice(slice);
 	this->WindowLevel->SetCurrentSlice(slice);
 	this->PaintBrush->SetCurrentSlice(slice);
-	//this->po
+	this->PolygonDraw->SetCurrentSlice(slice);
 }
 
 

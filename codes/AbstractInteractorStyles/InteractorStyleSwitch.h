@@ -23,18 +23,20 @@ Copyright (C) 2016
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkInteractorStyleSwitchBase.h>
-#include "AbstractInteractorStyle.h"
+
 #include "InteractorStyleNavigation.h"
 #include "InteractorStyleWindowLevel.h"
 #include "InteractorStylePolygonDraw.h"
 #include "InteractorStylePaintBrush.h"
 #include "StyleSwitchMacro.h"
 
-class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase, public AbstractInteractorStyle
+class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
 {
 public:
 	vtkTypeMacro(InteractorStyleSwitch, vtkInteractorStyleSwitchBase);
 	static InteractorStyleSwitch* New();
+
+	vtkGetMacro(InteractorStyleTesting, vtkInteractorStyleImage*);
 	vtkGetMacro(WindowLevel, InteractorStyleWindowLevel*);
 	vtkGetMacro(Navigation, InteractorStyleNavigation*);
 	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
@@ -42,11 +44,13 @@ public:
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
+	SetInteractorStyleMacro(InteractorStyleTesting);
 	SetInteractorStyleMacro(Navigation);
 	SetInteractorStyleMacro(WindowLevel);
 	SetInteractorStyleMacro(PolygonDraw);
 	SetInteractorStyleMacro(PaintBrush);
 
+	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
 	CurrentStyleMacro(WindowLevel);
 	CurrentStyleMacro(PolygonDraw);
@@ -75,6 +79,8 @@ protected:
 	void SetAutoAdjustCameraClippingRange(int value);
 
 private:
+	
+	vtkInteractorStyleImage* InteractorStyleTesting;
 	InteractorStyleNavigation*	Navigation;
 	InteractorStyleWindowLevel* WindowLevel;
 	InteractorStylePolygonDraw* PolygonDraw;

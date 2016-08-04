@@ -111,6 +111,7 @@ void AbstractInteractorStyleImage::OnRightButtonDown()
 {
 	m_rightFunctioning = true;
 	vtkInteractorStyleImage::OnRightButtonDown();
+	qDebug() << this->CurrentRenderer;
 
 }
 

@@ -27,7 +27,7 @@ Copyright (C) 2016
 #include "AbstractInteractorStyle.h"
 #include "MyImageViewer.h"
 
-class AbstractInteractorStyleImage : public vtkInteractorStyleImage, public AbstractInteractorStyle
+class AbstractInteractorStyleImage : public vtkInteractorStyleImage
 {
 public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
