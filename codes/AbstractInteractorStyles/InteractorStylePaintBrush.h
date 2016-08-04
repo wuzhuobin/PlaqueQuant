@@ -20,21 +20,18 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_PAINTBRUSH_H
 #define INTERACTOR_STYLE_PAINTBRUSH_H
 
-#include <vtkInteractorStyleImage.h>
-#include <vtkRenderWindowInteractor.h>
 #include "AbstractInteractorStyleImage.h"
 
 
 //Extra
-#include "Define.h"
 #include <QComboBox>
 #include <QSpinBox>
 #include <QCheckBox>
-#include "vtkImageCanvasSource2D.h"
-#include "vtkBorderWidget.h"
-#include "vtkProperty2D.h"
-#include "vtkBorderRepresentation.h"
-#include "vtkTransformPolyDataFilter.h"
+
+#include <vtkRenderWindowInteractor.h>
+#include <vtkImageCanvasSource2D.h>
+#include <vtkBorderWidget.h>
+#include <vtkBorderRepresentation.h>
 
 // Our codes
 

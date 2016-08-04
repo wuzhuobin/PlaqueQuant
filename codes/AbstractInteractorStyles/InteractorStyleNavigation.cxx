@@ -20,6 +20,11 @@ Copyright (C) 2016
 #include "InteractorStyleNavigation.h"
 #include "MainWindow.h"
 
+#include <vtkRenderWindowInteractor.h>
+#include <vtkCamera.h>
+#include <vtkAbstractPicker.h>
+
+
 vtkStandardNewMacro(InteractorStyleNavigation);
 
 InteractorStyleNavigation::InteractorStyleNavigation()
@@ -82,7 +87,6 @@ void InteractorStyleNavigation::CalculateIndex()
 		for (int i = 0; i < 3; i++)
 		{
 			index[i] = (picked[i] - origin[i]) / spacing[i];
-			qDebug() << index[i];
 		}
 		mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
 	}

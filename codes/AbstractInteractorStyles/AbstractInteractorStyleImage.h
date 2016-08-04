@@ -23,7 +23,6 @@ Copyright (C) 2016
 /// VTK
 #include <vtkInteractorStyleImage.h>
 #include <vtkObjectFactory.h>
-#include <vtkPropPicker.h>
 
 #include "AbstractInteractorStyle.h"
 #include "MyImageViewer.h"

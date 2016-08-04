@@ -18,6 +18,9 @@ Copyright (C) 2016
 #include "AbstractInteractorStyleImage.h"
 #include "MainWindow.h"
 
+#include <vtkPropPicker.h>
+
+
 vtkStandardNewMacro(AbstractInteractorStyleImage);
 
 AbstractInteractorStyleImage::AbstractInteractorStyleImage() : vtkInteractorStyleImage()

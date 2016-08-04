@@ -19,6 +19,13 @@ Copyright (C) 2016
 
 #include "InteractorStylePaintBrush.h"
 #include "MainWindow.h"
+
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkImageProperty.h>
+#include <vtkProperty2D.h>
+#include <vtkAbstractPicker.h>
+
+
 vtkStandardNewMacro(InteractorStylePaintBrush);
 
 #define SEGMENTATION_CIRCLE 1

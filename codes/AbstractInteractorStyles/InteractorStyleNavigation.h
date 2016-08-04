@@ -20,8 +20,6 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_NAVIGATION_H
 #define INTERACTOR_STYLE_NAVIGATION_H
 
-#include <vtkInteractorStyleImage.h>
-#include <vtkRenderWindowInteractor.h>
 #include "AbstractInteractorStyleImage.h"
 
 

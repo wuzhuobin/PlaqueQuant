@@ -14,6 +14,22 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "MyImageViewer.h"
 
+#include <vtkVersion.h>
+#include <vtkInformation.h>
+#include <vtkCamera.h>
+#include <vtkImageProperty.h>
+#include <vtkProperty.h>
+#include <vtkRenderWindow.h>
+#include <vtkCachedStreamingDemandDrivenPipeline.h>
+#include <vtkImageMapper3D.h>
+#include <vtkTextProperty.h>
+#include <vtkPointHandleRepresentation2D.h>
+#include <vtkDistanceRepresentation2D.h>
+#include <vtkAngleRepresentation2D.h>
+#include <vtkAxisActor2D.h>
+#include <vtkProperty2D.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkLeaderActor2D.h>
 
 vtkStandardNewMacro(MyImageViewer);
 

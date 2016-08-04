@@ -5,63 +5,23 @@
 #include <QDragEnterEvent> 
 #include <QDropEvent>
 #include <QAction>
-#include <QUrl>
-#include <QSettings>
-#include <QFileInfo>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QMimeData>
-#include <QFuture>
 #include <QMenu>
-#include <QActionGroup>
-#include <QSignalMapper>
 
 #include "ui_MainWindow.h"
 
-#include "vtkCamera.h"
-#include "vtkImageMapToWindowLevelColors.h"
-#include "vtkMarchingCubes.h"
-#include "vtkSmoothPolyDataFilter.h"
-#include "vtkWindowedSincPolyDataFilter.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-#include "vtkImageAccumulate.h"
-#include "vtkImageDataGeometryFilter.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
-#include "vtkTextMapper.h"
-#include "vtkImageProperty.h"
-#include "vtkImageActor.h"
-#include "vtkImageData.h"
-#include "vtkPolyData.h"
-#include <vtkCellData.h>
-#include <vtkSphereSource.h>
-#include <vtkVersion.h>
-#include <vtkDistanceRepresentation3D.h>
-#include <vtkDistanceRepresentation2D.h>
-#include "vtkDistanceWidget.h"
-#include "vtkPointHandleRepresentation3D.h"
-#include <vtkLookupTable.h>
-#include <vtkSmartPointer.h>
+#include <vtkActor.h>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
 
 //Own Class
 #include "Define.h"
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
-#include "RegistrationWizard.h"
-#include "MyProgressDialog.h"
-#include "ModuleWidget.h"
 #include "InfoDialog.h"
-#include "ImageRegistration.h"
 #include "MyPlaneWidget.h"
 #include "Overlay.h"
-#include "SurfaceCreator.h"
-#include "VesselSegmentation.h"
-#include "ExtractCenterline.h"
-
 
 class ModuleWidget;
-class MyVtkInteractorStyleImage;
 class MainWindow: public QMainWindow
 {
 	Q_OBJECT

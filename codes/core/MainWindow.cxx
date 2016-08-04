@@ -1,10 +1,36 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "RegistrationWizard.h"
+#include "MyProgressDialog.h"
+#include "ImageRegistration.h"
+#include "SurfaceCreator.h"
+#include "VesselSegmentation.h"
+#include "ExtractCenterline.h"
+#include "ModuleWidget.h"
+
+
 #include <QActionGroup>
 #include <QUrl>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
+#include <QFuture>
+#include <QMimeData>
+#include <QSignalMapper>
 
-
+#include <vtkPolyDataMapper.h>
+#include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
+#include <vtkImageActor.h>
+#include <vtkDistanceRepresentation3D.h>
+#include <vtkDistanceRepresentation2D.h>
+#include <vtkDistanceWidget.h>
+#include <vtkPointHandleRepresentation3D.h>
+#include <vtkLookupTable.h>
+#include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
 
 MainWindow::MainWindow() 
 {

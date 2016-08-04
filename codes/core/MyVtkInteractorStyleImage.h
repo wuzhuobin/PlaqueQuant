@@ -45,6 +45,7 @@
 #include <vtkWidgetEvent.h>
 #include <vtkWidgetEventTranslator.h>
 #include <vtkImageCanvasSource2D.h>
+#include <vtkObjectFactory.h>
 
 #include "MyImageViewer.h"
 class MyImageViewer;

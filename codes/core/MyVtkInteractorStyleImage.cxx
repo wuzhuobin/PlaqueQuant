@@ -1,6 +1,7 @@
 #include "MyVtkInteractorStyleImage.h"
-#include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
+#include <vtkImageProperty.h>
+#include <vtkImageProperty.h>
 #include <qdebug.h>
 
 
