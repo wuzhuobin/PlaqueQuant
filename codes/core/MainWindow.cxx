@@ -209,11 +209,6 @@ MainWindow::~MainWindow()
 
 	for (int i=0;i<3;i++)
 	{
-		if (m_2DimageViewer[i]) {
-			m_2DimageViewer[i]->Delete();
-			m_2DimageViewer[i] = NULL;
-		}
-
 		if (m_interactor[i]) {
 			m_interactor[i]->Delete();
 			m_interactor[i] = NULL;
@@ -222,6 +217,11 @@ MainWindow::~MainWindow()
 		if (m_style[i]) {
 			m_style[i]->Delete();
 			m_style[i] = NULL;
+		}
+
+		if (m_2DimageViewer[i]) {
+			m_2DimageViewer[i]->Delete();
+			m_2DimageViewer[i] = NULL;
 		}
 	}
 	if (m_3Dinteractor) {
@@ -332,7 +332,6 @@ void MainWindow::initializeViewers()
 		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
-//  m_interactor[i]->Initialize();
 		
 	}
 	this->addOverlay2ImageViewer();
@@ -831,6 +830,7 @@ void MainWindow::slotContourMode()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
+		m_style[i]->SetInteractorStyleToPolygonDraw();
 		//m_style[i]->SetMode(4);
 	}
 	m_moduleWidget->SetPage(1);
@@ -1012,44 +1012,16 @@ void MainWindow::slot3DUpdate()
 }
 
 void MainWindow::slotChangeIntensity()
-{    
-	double* I_xyz = new double[3];
-	if(segmentationView == true)
-	{
-	
-    for (int i = 0 ; i < visibleImageNum ; i++)
-    {
-        switch (i)
-        {
-            case 0:
-                I_xyz[0]= m_vtkT1->GetScalarComponentAsDouble(ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(),0);
-                break;
-            case 1:
-                I_xyz[1]= m_vtkT2->GetScalarComponentAsDouble(ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(),0);
-                break;
-            case 2:
-                I_xyz[2]= m_vtkT1C->GetScalarComponentAsDouble(ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(),0);
-                break;
-            case 3:
-                I_xyz[3]= m_vtk2DDIR->GetScalarComponentAsDouble(ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(),0);
-                break;
-			case 4:
-				I_xyz[4] = m_vtkMPRAGE->GetScalarComponentAsDouble(ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(), 0);
-				break;
-        }
-        
-		m_2DimageViewer[i]->InitializeIntensityText(QString::number(I_xyz[i]));
+{
+	double intensity[3];
+	for (int i = 0; i < 3; ++i) {
+		if (segmentationView && i >= visibleImageNum)
+			break;
+		intensity[i] = m_2DimageViewer[i]->GetInput()->GetScalarComponentAsDouble(
+			ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(), 0
+		);
+		m_2DimageViewer[i]->InitializeIntensityText(QString::number(intensity[i]));
 		m_2DimageViewer[i]->Render();
-    }
-	}
-	else
-	{
-		I_xyz[0] = m_vtkT1->GetScalarComponentAsDouble(ui.xSpinBox->value(), ui.ySpinBox->value(), ui.zSpinBox->value(), 0);
-		for (int i = 0; i < 3; i++)
-		{
-			m_2DimageViewer[i]->InitializeIntensityText(QString::number(I_xyz[0]));
-			m_2DimageViewer[i]->Render();
-		}
 	}
 }
 
@@ -1262,72 +1234,38 @@ QString MainWindow::GetFileName(int i)
 {
     
     QString FileName;
+	QString path;
     int j = 0, start, end;
     
-    switch(i) {
-        case 0:
-        {
-            QString Path1 =FileNameList1.at(0);
-            if (Path1 != NULL)
-            {
-                start = Path1.lastIndexOf("/");
-                end = Path1.length();
-                for ( int k = start+1 ; k< end ; k ++){
-                    FileName[j]=Path1[k];
-                    j++;
-                }
-            }
-            break;
-        }
-        case 1:
-        {
-             QString Path2 =FileNameList2.at(0);
-            if (Path2 != NULL)
-            {
-                start = Path2.lastIndexOf("/");
-                end = Path2.length();
-                for ( int k = start+1 ; k< end ; k ++){
-                    FileName[j]=Path2[k];
-                    j++;
-                }
-            }
-            break;
-        }
-        case 2:
-        {
-            QString Path3 =FileNameList3.at(0);
-            if (Path3 != NULL)
-            {
-                start = Path3.lastIndexOf("/");
-                end = Path3.length();
-                for ( int k = start+1 ; k< end ; k ++){
-                    FileName[j]=Path3[k];
-                    j++;
-                }
-            }
-            break;
-        }
-        case 3:
-        {
-            QString Path4 =FileNameList4.at(0);
-            if (Path4 != NULL)
-            {
-                start = Path4.lastIndexOf("/");
-                end = Path4.length();
-                for ( int k = start+1 ; k< end ; k ++){
-                    FileName[j]=Path4[k];
-                    j++;
-                }
-            }
-            break;
-        }
-        default:
-        {
-            return NULL;
-            break;
-        }
-    }
-	FileName.remove(".nii");
+	switch (i) {
+	case 0:
+		path = FileNameList1.at(0);
+		break;
+	case 1:
+		path = FileNameList2.at(0);
+		break;
+	case 2:
+		path = FileNameList3.at(0);
+		break;
+	case 3:
+		path = FileNameList4.at(0);
+		break;
+	case 4:
+		path = FileNameList5.at(0);
+		break;
+	default:
+		;
+	}
+	if (!path.isEmpty())
+	{
+		start = path.lastIndexOf("/");
+		end = path.length();
+		for (int k = start + 1; k < end; k++) {
+			FileName[j] = path[k];
+			j++;
+		}
+		FileName.remove(".nii");
+	}
     return FileName;
     
 }
@@ -1650,8 +1588,10 @@ void MainWindow::SetImageLayerNo(int layer)
 	m_layer_no = layer;
 	for (int i = 0; i < 3; i++)
 	{
-		if (m_style[i] != NULL)
-		m_style[i]->GetPaintBrush()->SetDrawColor(overlayColor[m_layer_no-1]);
+		if (m_style[i] != NULL) {
+			m_style[i]->GetPaintBrush()->SetDrawColor(overlayColor[m_layer_no-1]);
+			m_style[i]->GetPolygonDraw()->SetLabel(m_layer_no);
+		}
 	}
 }
 

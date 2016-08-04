@@ -37,19 +37,19 @@ public:
 	static InteractorStyleSwitch* New();
 	vtkGetMacro(WindowLevel, InteractorStyleWindowLevel*);
 	vtkGetMacro(Navigation, InteractorStyleNavigation*);
-	//vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
+	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
 	SetInteractorStyleMacro(Navigation);
 	SetInteractorStyleMacro(WindowLevel);
-	//SetInteractorStyleMacro(PolygonDraw);
+	SetInteractorStyleMacro(PolygonDraw);
 	SetInteractorStyleMacro(PaintBrush);
 
 	CurrentStyleMacro(Navigation);
 	CurrentStyleMacro(WindowLevel);
-	//CurrentStyleMacro(PolygonDraw);
+	CurrentStyleMacro(PolygonDraw);
 	CurrentStyleMacro(PaintBrush);
 
 	//bool CurrentStyleIsNavigation();
@@ -77,7 +77,7 @@ protected:
 private:
 	InteractorStyleNavigation*	Navigation;
 	InteractorStyleWindowLevel* WindowLevel;
-	//InteractorStylePolygonDraw* PolygonDraw;
+	InteractorStylePolygonDraw* PolygonDraw;
 	InteractorStylePaintBrush*	PaintBrush;
 	vtkInteractorStyle*			CurrentStyle;
 };

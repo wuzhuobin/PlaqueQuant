@@ -53,7 +53,7 @@ InteractorStylePaintBrush::~InteractorStylePaintBrush()
 	this->SetPaintBrushModeEnabled(false);
 
 	// Clean again if the upper dosen't clean
-	if (m_brushActor != NULL) {
+	if (m_brushActor != NULL && imageViewer != NULL) {
 		this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
 		this->m_brushActor->Delete();
 		this->m_brushActor = NULL;
@@ -280,7 +280,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 
 	if (m_brush != NULL)
 	{
-		if (this->imageViewer != NULL) {
+		if (m_brushActor != NULL && imageViewer != NULL) {
 			this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
 		}
 
@@ -610,7 +610,7 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 	imageViewer->GetRenderer()->GetDisplayPoint(display_origin);
 	//cout << "World->Display vtkRenderer 00: " << "(" << x << "," << y << ")" << " --> " << "(" << result2[0] << "," << result2[1] << ")\n";
 
-	imageViewer->GetRenderer()->SetWorldPoint(size*spacing[0], size*spacing[1], size*spacing[2], 1);
+	imageViewer->GetRenderer()->SetWorldPoint(size, size, size, 1);
 	imageViewer->GetRenderer()->WorldToDisplay();
 	imageViewer->GetRenderer()->GetDisplayPoint(display_size);
 	//cout << "World->Display vtkRenderer: "	<< "(" << x << "," << y << ")" << " --> " << "(" << result[0] << "," << result[1] << ")\n";
@@ -631,6 +631,8 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 	m_borderWidget->SetRepresentation(m_retangleRep);
 	X1 = X1 - X3 / 2.0;
 	Y1 = Y1 - Y3 / 2.0;
+	m_retangleRep->SetPosition(X1, Y1);
+	m_retangleRep->SetPosition2(X3, Y3);
 	//	}
 
 	vtkCoordinate* pos1 = m_borderWidget->GetBorderRepresentation()->GetPositionCoordinate();
@@ -639,7 +641,7 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 	vtkCoordinate* pos2 = m_borderWidget->GetBorderRepresentation()->GetPosition2Coordinate();
 	pos2->SetValue(X3, Y3);
 	m_borderWidget->GetBorderRepresentation()->GetBorderProperty()->SetColor(color);
-	m_borderWidget->GetBorderRepresentation()->GetBorderProperty()->SetLineStipplePattern(0xf0f0);
+	m_borderWidget->GetBorderRepresentation()->GetBorderProperty()->SetLineStipplePattern(0xAAAA);
 	m_borderWidget->GetBorderRepresentation()->Modified();
 	m_borderWidget->Modified();
 	m_borderWidget->On();

@@ -26,7 +26,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 {
 	WindowLevel = InteractorStyleWindowLevel::New();
 	Navigation = InteractorStyleNavigation::New();
-	//PolygonDraw = InteractorStylePolygonDraw::New();
+	PolygonDraw = InteractorStylePolygonDraw::New();
 	PaintBrush = InteractorStylePaintBrush::New();
 	this->CurrentStyle = 0;
 }
@@ -39,8 +39,8 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 	Navigation->Delete();
 	Navigation = 0;
 
-	//PolygonDraw->Delete();
-	//PolygonDraw = 0;
+	PolygonDraw->Delete();
+	PolygonDraw = 0;
 
 	PaintBrush->Delete();
 	PaintBrush = 0;
@@ -50,9 +50,9 @@ void InteractorStyleSwitch::InternalUpdate()
 {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
-	//if (this->CurrentStyle != this->PolygonDraw) {
-	//	this->PolygonDraw->SetPolygonModeEnabled(false);
-	//}
+	if (this->CurrentStyle != this->PolygonDraw) {
+		this->PolygonDraw->SetPolygonModeEnabled(false);
+	}
 
 	//if (this->imageViewer->GetRenderWindow()) {
 	//	this->imageViewer->Render();
@@ -79,8 +79,7 @@ void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
 	this->AutoAdjustCameraClippingRange = value;
 	this->Navigation->SetAutoAdjustCameraClippingRange(value);
 	this->WindowLevel->SetAutoAdjustCameraClippingRange(value);
-	//this->Transform->SetAutoAdjustCameraClippingRange(value);
-	//this->PolygonDraw->SetAutoAdjustCameraClippingRange(value);
+	this->PolygonDraw->SetAutoAdjustCameraClippingRange(value);
 	this->PaintBrush->SetAutoAdjustCameraClippingRange(value);
 	this->Modified();
 }
@@ -90,8 +89,7 @@ void InteractorStyleSwitch::SetDefaultRenderer(vtkRenderer* renderer)
 	this->vtkInteractorStyle::SetDefaultRenderer(renderer);
 	this->Navigation->SetDefaultRenderer(renderer);
 	this->WindowLevel->SetDefaultRenderer(renderer);
-	this->WindowLevel->SetDefaultRenderer(renderer);
-	//this->PolygonDraw->SetDefaultRenderer(renderer);
+	this->PolygonDraw->SetDefaultRenderer(renderer);
 	this->PaintBrush->SetDefaultRenderer(renderer);
 }
 
@@ -100,7 +98,7 @@ void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
 	this->vtkInteractorStyle::SetCurrentRenderer(renderer);
 	this->Navigation->SetCurrentRenderer(renderer);
 	this->WindowLevel->SetCurrentRenderer(renderer);
-	//this->PolygonDraw->SetCurrentRenderer(renderer);
+	this->PolygonDraw->SetCurrentRenderer(renderer);
 	this->PaintBrush->SetCurrentRenderer(renderer);
 }
 
@@ -109,7 +107,7 @@ void InteractorStyleSwitch::SetViewers(MyImageViewer* imageViewer)
 	//this->imageViewer = imageViewer;
 	this->Navigation->SetImageViewer(imageViewer);
 	this->WindowLevel->SetImageViewer(imageViewer);
-	//this->PolygonDraw->SetImageViewer(imageViewer);
+	this->PolygonDraw->SetImageViewer(imageViewer);
 	this->PaintBrush->SetImageViewer(imageViewer);
 }
 
@@ -122,7 +120,7 @@ void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * slic
 {
 	this->Navigation->SetSliceSpinBox(sliceX, sliceY, sliceZ);
 	this->WindowLevel->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-	//this->poly
+	this->PolygonDraw->SetSliceSpinBox(sliceX, sliceY, sliceZ);
 	this->PaintBrush->SetSliceSpinBox(sliceX, sliceY, sliceZ);
 	this->WindowLevel->SetWindowLevelSpinBox(window, level);
 	this->PaintBrush->SetDrawBrushSizeSpinBox(drawBrushSize);
