@@ -81,7 +81,7 @@ void MyPlaneWidget::ReplaceWidget(double bds[6])
 	}
 
 	this->AdjustBounds(bds, bounds, center);
-	
+
 	if (this->GetInput() || this->Prop3D)
 	{
 		if ( this->NormalToYAxis )

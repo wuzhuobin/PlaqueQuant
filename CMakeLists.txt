@@ -123,7 +123,7 @@ SET(
 SET(
 	CORE_SRC
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyImageViewer.cxx
-	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
+	  # ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.cxx
 	${ABSTRACT_INTERACTORS_SRC}
 	${INTERACTORS_SRC}
@@ -132,7 +132,7 @@ SET(
 SET(
 	CORE_INC
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyImageViewer.h
-	  ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.h
+	  # ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.h
 	  ${CMAKE_SOURCE_DIR}/codes/core/MyPlaneWidget.h
 	  ${CMAKE_SOURCE_DIR}/include/Define.h
 	${ABSTRACT_INTERACTORS_H}
