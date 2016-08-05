@@ -158,8 +158,8 @@ MainWindow::MainWindow()
 
 	for (int i=0;i<3;i++)
 	{
-		m_planeWidget[i] = NULL;
-		m_planeWidgetCallback[i] = NULL;
+		m_planeWidgetCallback[i] = MyPlaneWidgetCallback::New();
+		m_planeWidget[i] = MyPlaneWidget::New();
 		m_currentBound[i] = NULL;
 		m_currentBound[i+3] = NULL;
 		m_focalPoint[i] = NULL;
@@ -717,8 +717,7 @@ bool MainWindow::visualizeImage()
 	//ROI
 	for (int i=0;i<3;i++)
 	{		
-		m_planeWidgetCallback[i] = MyPlaneWidgetCallback::New();
-		m_planeWidget[i] = MyPlaneWidget::New();		
+	
 		m_planeWidget[i]->initializeCustomFunction();			
 		m_planeWidget[i]->SetInputData(m_2DimageViewer[i]->GetInput());
 		m_planeWidget[i]->SetImageViewer(m_2DimageViewer[i]);
@@ -921,9 +920,13 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 	ui.actionNavigation->setChecked(false);
 	ui.actionWindowLevel->setChecked(false);
 	ui.actionContour->setChecked(false);
+	for (int i = 0; i < 3; i++)
+	{
+		m_style[i]->SetInteractorStyleToROI();
+	}
 	//ui.actionSegmentation->setChecked(true);
 	this->slotMultiPlanarView();	//Change to multiplanar view if we want to do segmentation
-	if (b)
+	if (false)
 	{
 		m_settingROI = true;
 
@@ -1277,7 +1280,7 @@ MyImageViewer* MainWindow::GetMyImageViewer(int i){
     else
         return NULL;
 }
-InteractorStyleSwitch* MainWindow::GetMyVtkInteractorStyleImage(int i){
+InteractorStyleSwitch* MainWindow::GetInteractorStyleImageSwitch(int i){
     if(m_style[i])
         return m_style[i];
     else

@@ -37,13 +37,13 @@ InteractorStyleNavigation::~InteractorStyleNavigation()
 
 void InteractorStyleNavigation::OnMouseMove()
 {
-	if (m_rightFunctioning) {
-		this->SynchronizedZooming();
-	}
-	else if (m_leftFunctioning) {
+	//if (m_rightFunctioning) {
+	//	this->SynchronizedZooming();
+	//}
+	if (m_leftFunctioning) {
 		this->CalculateIndex();
 	}
-	else {
+	if (m_rightFunctioning) {
 		AbstractInteractorStyleImage::OnMouseMove();
 	}
 }

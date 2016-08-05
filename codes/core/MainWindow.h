@@ -31,7 +31,7 @@ public:
 
 	static MainWindow* GetMainWindow();
     MyImageViewer* GetMyImageViewer(int);
-    InteractorStyleSwitch* GetMyVtkInteractorStyleImage(int);
+    InteractorStyleSwitch* GetInteractorStyleImageSwitch(int);
 	QString GetFileName(int);
 
 	int GetVisibleImageNo();

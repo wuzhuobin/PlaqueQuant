@@ -57,6 +57,7 @@ void AbstractInteractorStyleImage::SetSliceSpinBox(QSpinBox * x, QSpinBox * y, Q
 void AbstractInteractorStyleImage::SetOrientation(int orientation)
 {
 	this->orientation = orientation;
+	this->imageViewer->SetSliceOrientation(orientation);
 }
 
 int AbstractInteractorStyleImage::GetOrientation()
@@ -111,8 +112,6 @@ void AbstractInteractorStyleImage::OnRightButtonDown()
 {
 	m_rightFunctioning = true;
 	vtkInteractorStyleImage::OnRightButtonDown();
-	qDebug() << this->CurrentRenderer;
-
 }
 
 void AbstractInteractorStyleImage::OnRightButtonUp()
