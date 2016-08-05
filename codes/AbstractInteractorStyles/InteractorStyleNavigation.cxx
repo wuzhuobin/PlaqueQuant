@@ -42,10 +42,10 @@ void InteractorStyleNavigation::OnMouseMove()
 	//}
 	if (m_leftFunctioning) {
 		this->CalculateIndex();
+		return;
 	}
-	if (m_rightFunctioning) {
-		AbstractInteractorStyleImage::OnMouseMove();
-	}
+	AbstractInteractorStyleImage::OnMouseMove();
+	SynchronizedZooming();
 }
 
 
@@ -59,11 +59,17 @@ void InteractorStyleNavigation::OnLeftButtonUp()
 
 void InteractorStyleNavigation::SynchronizedZooming()
 {
-
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	MyImageViewer* viewer = NULL;
 	double scale = imageViewer->GetRenderer()->GetActiveCamera()->GetParallelScale();
-
-		imageViewer->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
-		imageViewer->Render();
+	
+	for (int i = 0; i < 3; ++i) {
+		viewer = mainWnd->GetMyImageViewer(i);
+		if (viewer != NULL) {
+			viewer->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
+			viewer->Render();
+		}
+	}
 
 
 }

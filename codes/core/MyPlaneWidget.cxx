@@ -140,7 +140,7 @@ void MyPlaneWidget::ReplaceWidget(double bds[6])
 		this->InitialLength = sqrt(sqr1 + sqr2);
 	}
 
-	//// Set the radius on the sphere handles
+	// Set the radius on the sphere handles
 	this->SizeHandles();
 }
 
@@ -224,7 +224,7 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 
 
 		//Decide if it can be displayed
-		if (focalPoint[i]>=currentBound[i*2]&&focalPoint[i]<=currentBound[i*2+1])
+		if (focalPoint[i] >= currentBound[i * 2] && focalPoint[i] <= currentBound[i * 2 + 1])
 			m_planeWidget[i]->SetVisibility(true);
 		else
 			m_planeWidget[i]->SetVisibility(false);

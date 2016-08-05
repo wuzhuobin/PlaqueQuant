@@ -10,6 +10,9 @@ public:
 	vtkTypeMacro(InteractorStyleROI, InteractorStyleNavigation);
 	static InteractorStyleROI* New();
 	void SetPlaneWidgetEnabled(bool flag);
+	void OnMouseMove() {};
+	void OnLeftButtonDown() {};
+	void OnLeftButtonUp() {};
 
 	MyPlaneWidget* GetPlaneWidget();
 

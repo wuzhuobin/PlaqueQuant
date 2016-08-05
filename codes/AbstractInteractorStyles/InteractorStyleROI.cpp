@@ -12,9 +12,9 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		planeWidget->SetInputData(imageViewer->GetInput());
 		planeWidget->SetImageViewer(imageViewer);
 		planeWidget->SetDefaultBound(imageViewer->GetBound());
-		planeWidget->SetInteractor(this->Interactor);
-		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
-		planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
+		planeWidget->SetInteractor(this->GetInteractor());
+		//planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
+		//planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
 
 		switch (orientation)
 		{
