@@ -1,16 +1,15 @@
 #pragma once
-#include "AbstractInteractorStyleImage.h"
+#include "InteractorStyleNavigation.h"
 
 #include "MyPlaneWidget.h"
 
 class InteractorStyleROI :
-	public AbstractInteractorStyleImage
+	public InteractorStyleNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleROI, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStyleROI, InteractorStyleNavigation);
 	static InteractorStyleROI* New();
-	void SetImageViewer(MyImageViewer * imageViewer);
-	void SetPlaneWidgetEnabled(bool b);
+	void SetPlaneWidgetEnabled(bool flag);
 
 	MyPlaneWidget* GetPlaneWidget();
 

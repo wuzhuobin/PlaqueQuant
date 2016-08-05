@@ -714,23 +714,7 @@ bool MainWindow::visualizeImage()
 	this->slotChangeSlice();
 	this->slotNavigationMode();
     
-	//ROI
-	for (int i=0;i<3;i++)
-	{		
-	
-		m_planeWidget[i]->initializeCustomFunction();			
-		m_planeWidget[i]->SetInputData(m_2DimageViewer[i]->GetInput());
-		m_planeWidget[i]->SetImageViewer(m_2DimageViewer[i]);
-		m_planeWidget[i]->SetDefaultBound(m_2DimageViewer[i]->GetBound());
-		m_planeWidget[i]->SetInteractor(m_interactor[i]);		
-		m_planeWidget[i]->AddObserver(vtkCommand::InteractionEvent,m_planeWidgetCallback[i]);
-		m_planeWidget[i]->AddObserver(vtkCommand::EndInteractionEvent,m_planeWidgetCallback[i]);
-	
-	}
-		m_planeWidgetCallback[0]->SetPlaneWidget(m_planeWidget[0],m_planeWidget[1],m_planeWidget[2]);
-		m_planeWidgetCallback[1]->SetPlaneWidget(m_planeWidget[0],m_planeWidget[1],m_planeWidget[2]);
-		m_planeWidgetCallback[2]->SetPlaneWidget(m_planeWidget[0],m_planeWidget[1],m_planeWidget[2]);
-			
+				
 	return 0;
 }
 
@@ -920,14 +904,34 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 	ui.actionNavigation->setChecked(false);
 	ui.actionWindowLevel->setChecked(false);
 	ui.actionContour->setChecked(false);
+	//this->slotMultiPlanarView();	//Change to multiplanar view if we want to do segmentation
+
 	for (int i = 0; i < 3; i++)
 	{
 		m_style[i]->SetInteractorStyleToROI();
 	}
 	//ui.actionSegmentation->setChecked(true);
-	this->slotMultiPlanarView();	//Change to multiplanar view if we want to do segmentation
+	
+	
 	if (false)
 	{
+		//ROI
+
+		for (int i = 0; i < 3; i++)
+		{
+			m_planeWidget[i]->initializeCustomFunction();
+			m_planeWidget[i]->SetInputData(m_2DimageViewer[i]->GetInput());
+			m_planeWidget[i]->SetImageViewer(m_2DimageViewer[i]);
+			m_planeWidget[i]->SetDefaultBound(m_2DimageViewer[i]->GetBound());
+			m_planeWidget[i]->SetInteractor(m_interactor[i]);
+			m_planeWidget[i]->AddObserver(vtkCommand::InteractionEvent, m_planeWidgetCallback[i]);
+			m_planeWidget[i]->AddObserver(vtkCommand::EndInteractionEvent, m_planeWidgetCallback[i]);
+
+		}
+		m_planeWidgetCallback[0]->SetPlaneWidget(m_planeWidget[0], m_planeWidget[1], m_planeWidget[2]);
+		m_planeWidgetCallback[1]->SetPlaneWidget(m_planeWidget[0], m_planeWidget[1], m_planeWidget[2]);
+		m_planeWidgetCallback[2]->SetPlaneWidget(m_planeWidget[0], m_planeWidget[1], m_planeWidget[2]);
+
 		m_settingROI = true;
 
 		for (int i=0;i<3;i++)
@@ -964,7 +968,8 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 
 			m_planeWidget[i]->SetCurrentBound(m_currentBound);
 			m_planeWidget[i]->PlaceWidget(displayBound);
-			
+			//m_planeWidget[i]->GetImageViewer()->GetInput()->Print(cout);
+
 			m_planeWidget[i]->On();
 			m_2DimageViewer[i]->Render();
 		}

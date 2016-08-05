@@ -70,7 +70,9 @@ void InteractorStyleSwitch::InternalUpdate()
 	if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
 
-	if (this->CurrentStyle != this->ROI)
+	if (this->CurrentStyle == this->ROI)
+		this->ROI->SetPlaneWidgetEnabled(true);
+	else
 		this->ROI->SetPlaneWidgetEnabled(false);
 }
 
@@ -146,6 +148,7 @@ void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * slic
 	this->PaintBrush->SetDrawBrushShapeComBox(drawShape);
 	this->PaintBrush->SetDrawVolumetricCheckBox(drawVolumetric);
 	this->PaintBrush->SetDrawIsotropicCheckBox(drawIsotropic);
+	this->ROI->SetSliceSpinBox(sliceX, sliceY, sliceZ);
 }
 
 void InteractorStyleSwitch::SetCurrentSlice(int slice)

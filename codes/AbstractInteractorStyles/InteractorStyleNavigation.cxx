@@ -64,6 +64,8 @@ void InteractorStyleNavigation::SynchronizedZooming()
 
 		imageViewer->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
 		imageViewer->Render();
+
+
 }
 
 void InteractorStyleNavigation::CalculateIndex()

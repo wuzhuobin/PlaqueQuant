@@ -148,7 +148,6 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 {
 	MyPlaneWidget *planeWidget = 
 		reinterpret_cast<MyPlaneWidget*>(caller);
-
 	double* currentBound = planeWidget->GetCurrentBound();
 	double* defaultBound = planeWidget->GetDefaultBound(); 		
 	double* p1	  = planeWidget->GetPoint1();

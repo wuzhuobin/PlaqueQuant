@@ -3,76 +3,77 @@
 
 vtkStandardNewMacro(InteractorStyleROI);
 
-void InteractorStyleROI::SetImageViewer(MyImageViewer * imageViewer)
-{
-	AbstractInteractorStyleImage::SetImageViewer(imageViewer);
-
-	planeWidget->initializeCustomFunction();
-	planeWidget->SetInputData(imageViewer->GetInput());
-	planeWidget->SetImageViewer(imageViewer);
-	planeWidget->SetDefaultBound(imageViewer->GetBound());
-	planeWidget->SetInteractor(this->Interactor);
-	planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
-	planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
-
-}
-
-void InteractorStyleROI::SetPlaneWidgetEnabled(bool b)
+void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 {
 	MainWindow *mainWnd = MainWindow::GetMainWindow();
 
-	switch (orientation)
-	{
-	case 0:
-		planeWidgetCallback->SetPlaneWidget(
-			planeWidget,
-			mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
-			mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget());
-		planeWidget->SetNormalToXAxis(true);
-		break;
-	case 1:
-		planeWidgetCallback->SetPlaneWidget(
-			mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
-			planeWidget,
-			mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget());
-		planeWidget->SetNormalToYAxis(true);
-		break;
-	case 2:
-		planeWidgetCallback->SetPlaneWidget(
-			mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
-			mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
-			planeWidget);
-		planeWidget->SetNormalToZAxis(true);
-	default:
-		break;
-	}
-	double* bound = imageViewer->GetBound();
-	double displayBound[6];
-	double	m_currentBound[6];
-	double m_focalPoint[3];
+	if (flag) {
+		planeWidget->initializeCustomFunction();
+		planeWidget->SetInputData(imageViewer->GetInput());
+		planeWidget->SetImageViewer(imageViewer);
+		planeWidget->SetDefaultBound(imageViewer->GetBound());
+		planeWidget->SetInteractor(this->Interactor);
+		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
+		planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
 
-
-	//Set Current Bound
-	for (int j = 0; j < 3; j++)
-	{
-		double roiHalfSize[3];
-		roiHalfSize[j] = (bound[j * 2 + 1] - bound[j * 2])*0.25;
-
-		m_currentBound[j * 2] = m_focalPoint[j] - roiHalfSize[j] > bound[j * 2] ? m_focalPoint[j] - roiHalfSize[j] : bound[j * 2];
-		m_currentBound[j * 2 + 1] = m_focalPoint[j] + roiHalfSize[j] < bound[j * 2 + 1] ? m_focalPoint[j] + roiHalfSize[j] : bound[j * 2 + 1];
-
-		displayBound[j * 2] = m_focalPoint[j] - roiHalfSize[j] > bound[j * 2] ? m_focalPoint[j] - roiHalfSize[j] : bound[j * 2];
-		displayBound[j * 2 + 1] = m_focalPoint[j] + roiHalfSize[j] < bound[j * 2 + 1] ? m_focalPoint[j] + roiHalfSize[j] : bound[j * 2 + 1];
-
-		//Restrict display bound on the plane
-		if (orientation == j)
+		switch (orientation)
 		{
-			displayBound[j * 2] = m_focalPoint[j];
-			displayBound[j * 2 + 1] = m_focalPoint[j];
+		case 0:
+			planeWidgetCallback->SetPlaneWidget(
+				planeWidget,
+				mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
+				mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget());
+			planeWidget->SetNormalToXAxis(true);
+			break;
+		case 1:
+			planeWidgetCallback->SetPlaneWidget(
+				mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
+				planeWidget,
+				mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget());
+			planeWidget->SetNormalToYAxis(true);
+			break;
+		case 2:
+			planeWidgetCallback->SetPlaneWidget(
+				mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
+				mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
+				planeWidget);
+			planeWidget->SetNormalToZAxis(true);
+		default:
+			break;
 		}
+		double* bound = imageViewer->GetBound();
+		double displayBound[6];
+		double	m_currentBound[6];
+		double m_focalPoint[3];
+		//Calculate the cursor focal point
+		m_focalPoint[0] = origin[0] + m_sliceSplinBox[0]->value() * spacing[0];
+		m_focalPoint[1] = origin[1] + m_sliceSplinBox[1]->value() * spacing[1];
+		m_focalPoint[2] = origin[2] + m_sliceSplinBox[2]->value() * spacing[2];
+
+		//Set Current Bound
+		for (int j = 0; j < 3; j++)
+		{
+			double roiHalfSize[3];
+			roiHalfSize[j] = (bound[j * 2 + 1] - bound[j * 2])*0.25;
+
+			m_currentBound[j * 2] = m_focalPoint[j] - roiHalfSize[j] > bound[j * 2] ? m_focalPoint[j] - roiHalfSize[j] : bound[j * 2];
+			m_currentBound[j * 2 + 1] = m_focalPoint[j] + roiHalfSize[j] < bound[j * 2 + 1] ? m_focalPoint[j] + roiHalfSize[j] : bound[j * 2 + 1];
+
+			displayBound[j * 2] = m_focalPoint[j] - roiHalfSize[j] > bound[j * 2] ? m_focalPoint[j] - roiHalfSize[j] : bound[j * 2];
+			displayBound[j * 2 + 1] = m_focalPoint[j] + roiHalfSize[j] < bound[j * 2 + 1] ? m_focalPoint[j] + roiHalfSize[j] : bound[j * 2 + 1];
+
+			//Restrict display bound on the plane
+			if (orientation == j)
+			{
+				displayBound[j * 2] = m_focalPoint[j];
+				displayBound[j * 2 + 1] = m_focalPoint[j];
+			}
+		}
+		planeWidget->SetCurrentBound(m_currentBound);
+		planeWidget->PlaceWidget(displayBound);
+		planeWidget->On();
+		imageViewer->Render();
 	}
-	planeWidget->On();
-	imageViewer->Render();
 }
 
 MyPlaneWidget * InteractorStyleROI::GetPlaneWidget()
