@@ -30,8 +30,15 @@ public:
 	explicit MainWindow(); 	
 
 	static MainWindow* GetMainWindow();
-    MyImageViewer* GetMyImageViewer(int);
-    InteractorStyleSwitch* GetInteractorStyleImageSwitch(int);
+	MyImageViewer* GetMyImageViewer(int i) {
+		return m_2DimageViewer[i]; 
+	};
+	InteractorStyleSwitch* GetInteractorStyleImageSwitch(int i) {
+		return m_style[i];
+	};
+	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i) {
+		return m_interactor[i];
+	};
 	QString GetFileName(int);
 
 	int GetVisibleImageNo();

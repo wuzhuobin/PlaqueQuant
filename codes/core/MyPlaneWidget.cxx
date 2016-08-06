@@ -36,7 +36,8 @@ void MyPlaneWidget::initializeCustomFunction()
 
 void MyPlaneWidget::SetDefaultBound(double* bound)
 {
-	m_deafultBound = bound;
+	memcpy(m_deafultBound, bound, sizeof(m_deafultBound));
+
 }
 
 double* MyPlaneWidget::GetDefaultBound(){
@@ -53,7 +54,7 @@ MyImageViewer* MyPlaneWidget::GetImageViewer(){
 
 void MyPlaneWidget::SetCurrentBound(double* bound)
 {
-	m_currentBound = bound;
+	memcpy(m_currentBound, bound, sizeof(m_currentBound));
 }
 
 double* MyPlaneWidget::GetCurrentBound()
@@ -147,8 +148,9 @@ void MyPlaneWidget::ReplaceWidget(double bds[6])
 void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 {
 	MyPlaneWidget *planeWidget = 
-		reinterpret_cast<MyPlaneWidget*>(caller);
-	double* currentBound = planeWidget->GetCurrentBound();
+		dynamic_cast<MyPlaneWidget*>(caller);
+	//double* currentBound = planeWidget->GetCurrentBound();
+	double currentBound[6];
 	double* defaultBound = planeWidget->GetDefaultBound(); 		
 	double* p1	  = planeWidget->GetPoint1();
 	double* p2	  = planeWidget->GetPoint2();
@@ -179,6 +181,8 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 
 	if (planeWidget->GetNormalToXAxis())
 	{
+		currentBound[0] = planeWidget->GetCurrentBound()[0];
+		currentBound[1] = planeWidget->GetCurrentBound()[1];
 		currentBound[2] = p2[1];
 		currentBound[3] = p1[1];
 		currentBound[4] = p1[2];
@@ -188,6 +192,8 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 	{
 		currentBound[0] = p2[0];
 		currentBound[1] = p1[0];
+		currentBound[2] = planeWidget->GetCurrentBound()[2];
+		currentBound[3] = planeWidget->GetCurrentBound()[3];
 		currentBound[4] = p1[2];
 		currentBound[5] = p2[2];
 	}
@@ -197,6 +203,8 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 		currentBound[1] = p1[0];
 		currentBound[2] = p1[1];
 		currentBound[3] = p2[1];
+		currentBound[4] = planeWidget->GetCurrentBound()[4];
+		currentBound[5] = planeWidget->GetCurrentBound()[5];
 	}
 
 	//Update all PlaneWidget
@@ -222,13 +230,11 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 		}
 		m_planeWidget[i]->ReplaceWidget(displayBound);
 
-
 		//Decide if it can be displayed
 		if (focalPoint[i] >= currentBound[i * 2] && focalPoint[i] <= currentBound[i * 2 + 1])
 			m_planeWidget[i]->SetVisibility(true);
 		else
 			m_planeWidget[i]->SetVisibility(false);
-
 		m_planeWidget[i]->GetInteractor()->GetRenderWindow()->Render();
 	}
 }

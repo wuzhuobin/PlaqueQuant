@@ -904,10 +904,11 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 	ui.actionNavigation->setChecked(false);
 	ui.actionWindowLevel->setChecked(false);
 	ui.actionContour->setChecked(false);
-	//this->slotMultiPlanarView();	//Change to multiplanar view if we want to do segmentation
-
-	for (int i = 0; i < 3; i++)
-	{
+	if (segmentationView) {
+		slotMultiPlanarView();
+		//ui.actionMultiPlanarView->triggered();	//Change to multiplanar view if we want to do segmentation
+	}
+	for (int i = 0; i < 3; ++i) {
 		m_style[i]->SetInteractorStyleToROI();
 	}
 	//ui.actionSegmentation->setChecked(true);
@@ -968,7 +969,6 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 
 			m_planeWidget[i]->SetCurrentBound(m_currentBound);
 			m_planeWidget[i]->PlaceWidget(displayBound);
-			//m_planeWidget[i]->GetImageViewer()->GetInput()->Print(cout);
 
 			m_planeWidget[i]->On();
 			m_2DimageViewer[i]->Render();
@@ -1130,7 +1130,7 @@ void MainWindow::slotChangeSlice()
 			else
 				m_planeWidget[i]->SetVisibility(false);
 
-			m_planeWidget[i]->ReplaceWidget(displayBound);
+			//m_planeWidget[i]->ReplaceWidget(displayBound);
 		}
 	}
 	slotChangeIntensity();
@@ -1277,19 +1277,6 @@ QString MainWindow::GetFileName(int i)
 	}
     return FileName;
     
-}
-
-MyImageViewer* MainWindow::GetMyImageViewer(int i){
-    if(m_2DimageViewer[i])
-        return m_2DimageViewer[i];
-    else
-        return NULL;
-}
-InteractorStyleSwitch* MainWindow::GetInteractorStyleImageSwitch(int i){
-    if(m_style[i])
-        return m_style[i];
-    else
-        return NULL;
 }
 
 ImageType::Pointer MainWindow::ImageAlignment(ImageType::Pointer inputImage)
