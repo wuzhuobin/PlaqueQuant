@@ -109,6 +109,7 @@ public slots:
 	//Widget
 	virtual void slotRuler(bool b);
 	virtual void slotSetROIWidgetEnabled(bool b);
+	virtual void slotChangeROI(double* bound);
 	virtual void slotSelectROI();
 
 	//Widget running 
@@ -165,6 +166,8 @@ private:
 	ImageType::Pointer	m_itkT1C;
 	ImageType::Pointer	m_itk2DDIR;
 	ImageType::Pointer	m_itkMPRAGE;
+	
+	vtkImageData* vtkImage[5];
 	vtkImageData*		m_vtkT1;
 	vtkImageData*		m_vtkT2;
 	vtkImageData*		m_vtkT1C;

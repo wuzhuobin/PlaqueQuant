@@ -28,6 +28,7 @@ Copyright (C) 2016
 vtkStandardNewMacro(InteractorStyleNavigation);
 
 InteractorStyleNavigation::InteractorStyleNavigation()
+	:AbstractInteractorStyleImage()
 {
 }
 
@@ -53,6 +54,9 @@ void InteractorStyleNavigation::OnLeftButtonUp()
 {
 	this->CalculateIndex();
 	AbstractInteractorStyleImage::OnLeftButtonUp();
+	for (int i = 0; i < 6; ++i) {
+		qDebug() << extent[i];
+	}
 }
 
 

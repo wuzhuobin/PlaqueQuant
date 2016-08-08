@@ -35,6 +35,7 @@ public:
 	void SetPage(int);
 	//QString GetLumenPath();
 	//QString GetVesselWallPath();
+
 	QSpinBox* GetBrushSizeSpinBox();
 	QComboBox* GetBrushShapeComBox();
 	void GenerateReport();
@@ -44,6 +45,7 @@ public slots:
 	void slotChangeLayerNo();
 	void slotSelectROI();
 	void slotChangeOpacity();
+	void slotChangeROI(double* bound);
 	//void slotAddLumen();
 	//void slotAddVesselWall();
 	void NextBtnChangeText();

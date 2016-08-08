@@ -168,6 +168,9 @@ MainWindow::MainWindow()
 	m_itkT1C = NULL;
 	m_itk2DDIR = NULL;
 	m_itkMPRAGE = NULL;
+	for (int i = 0; i < 5; ++i) {
+		vtkImage[i] = NULL:
+	}
 	m_vtkT1 = NULL;
 	m_vtkT2 = NULL;
 	m_vtkT1C = NULL;
@@ -248,6 +251,11 @@ MainWindow::~MainWindow()
 		m_itkMPRAGE->Delete();
 		m_itkMPRAGE = NULL;
 	}*/
+
+	for (int i = 0; i < 5; ++i) {
+		if (vtkImage[i] != NULL)
+			vtkImage[i]->Delete();
+	}
 	if (m_vtkT1 != NULL) {
 		m_vtkT1->Delete();
 		m_vtkT1 = NULL;
@@ -898,11 +906,20 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 
 }
 
+void MainWindow::slotChangeROI(double * bound)
+{
+	//m_moduleWidget->slotChangeROI(bound);
+	//for (int i = 0; i < 6; ++i)
+}
+
 void MainWindow::slotSelectROI()
 {
 	for (int i = 0; i < 3; i++)
 	{
+		m_style[i]->GetROI()->SelectROI();
 		//m_2DimageViewer[i]->SetBound(m_currentBound);
+		//m_2DimageViewer[i]->SetBound(m_style[i]->GetROI()->GetPlaneWidget()->GetCurrentBound());
+		
 	}
 }
 void MainWindow::slot3DUpdate()

@@ -34,6 +34,7 @@ Copyright (C) 2016
 vtkStandardNewMacro(InteractorStylePolygonDraw);
 
 InteractorStylePolygonDraw::InteractorStylePolygonDraw()
+	:AbstractInteractorStyleImage()
 {
 	DOUBLE_CLICKED_FLAG = false;
 	CONTOUR_IS_ON_FLAG = false;

@@ -33,7 +33,6 @@ public:
 private:
 	double m_deafultBound[6];
 	double m_currentBound[6];
-	double m_displayBounf[6];
 	MyImageViewer* m_2DImageViewer;
 };
 

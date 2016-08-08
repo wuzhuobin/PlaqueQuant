@@ -13,7 +13,9 @@ public:
 	void OnMouseMove();
 	void OnLeftButtonDown();
 	void OnLeftButtonUp();
+	void SelectROI();
 	void UpdateAllWidget();
+	void UpdateAllWidget(double* bound);
 
 	MyPlaneWidget* GetPlaneWidget();
 
@@ -25,6 +27,8 @@ protected:
 private:
 	MyPlaneWidget* planeWidget;
 	MyPlaneWidgetCallback* planeWidgetCallback;
+
+	double displayBound[6];
 
 };
 

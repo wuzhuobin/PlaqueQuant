@@ -22,7 +22,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->BackBtn, SIGNAL(clicked()), this, SLOT(BackPage()));
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(slotChangeLayerNo()), Qt::UniqueConnection);
-	connect(ui->SetROIBtn, SIGNAL(clicked()), this, SLOT(slotSelectROI()));
+	connect(ui->segmentationPushButton, SIGNAL(clicked()), this, SLOT(slotSelectROI()));
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), ui->opacitySlider, SLOT(setValue(int)));
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
@@ -100,6 +100,16 @@ void ModuleWidget::slotChangeOpacity()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	mainWnd->slotOverlayOpacity(ui->opacitySpinBox->value()/100.0);
+
+}
+void ModuleWidget::slotChangeROI(double * bound)
+{
+	ui->centerSpinBox1->setValue((bound[0] + bound[1])*0.5);
+	ui->centerSpinBox2->setValue((bound[2] + bound[3])*0.5);
+	ui->centerSpinBox3->setValue((bound[4] + bound[5])*0.5);
+	ui->sizeSpinBox1->setValue(bound[1] - bound[0]);
+	ui->sizeSpinBox2->setValue(bound[3] - bound[2]);
+	ui->sizeSpinBox3->setValue(bound[5] - bound[4]);
 
 }
 void ModuleWidget::slotSelectROI()

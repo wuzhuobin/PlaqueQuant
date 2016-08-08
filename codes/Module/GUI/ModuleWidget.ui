@@ -62,7 +62,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -171,7 +171,7 @@
        <item>
         <widget class="QLabel" name="label_9">
          <property name="text">
-          <string>ROI corner position (x, y, z):</string>
+          <string>ROI center position (x, y, z):</string>
          </property>
         </widget>
        </item>
@@ -181,21 +181,21 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QSpinBox" name="spinBox_4">
+          <widget class="QSpinBox" name="centerSpinBox1">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_5">
+          <widget class="QSpinBox" name="centerSpinBox2">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_6">
+          <widget class="QSpinBox" name="centerSpinBox3">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
            </property>
@@ -216,21 +216,21 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QSpinBox" name="spinBox_7">
+          <widget class="QSpinBox" name="sizeSpinBox1">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_8">
+          <widget class="QSpinBox" name="sizeSpinBox2">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_9">
+          <widget class="QSpinBox" name="sizeSpinBox3">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
            </property>
@@ -239,14 +239,14 @@
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="resetROIPushButton">
          <property name="text">
           <string>Reset ROI</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="SetROIBtn">
+        <widget class="QPushButton" name="segmentationPushButton">
          <property name="text">
           <string>Segmentation</string>
          </property>

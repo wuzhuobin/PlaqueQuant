@@ -41,7 +41,7 @@ public:
 	void SetCurrentSlice(int slice);
 
 
-protected:
+//protected:
 	AbstractInteractorStyleImage();
 	~AbstractInteractorStyleImage();
 	

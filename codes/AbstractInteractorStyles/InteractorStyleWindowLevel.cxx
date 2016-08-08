@@ -31,6 +31,7 @@ void InteractorStyleWindowLevel::SetWindowLevelSpinBox(QDoubleSpinBox * w, QDoub
 }
 
 InteractorStyleWindowLevel::InteractorStyleWindowLevel()
+	:AbstractInteractorStyleImage()
 {
 
 }

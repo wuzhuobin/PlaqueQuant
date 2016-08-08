@@ -45,6 +45,7 @@ void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
 	imageViewer->GetInput()->GetExtent(extent);
 	imageViewer->GetInput()->GetSpacing(spacing);
 	imageViewer->GetInput()->GetOrigin(origin);
+
 }
 
 void AbstractInteractorStyleImage::SetSliceSpinBox(QSpinBox * x, QSpinBox * y, QSpinBox * z)

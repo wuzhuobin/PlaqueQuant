@@ -32,6 +32,7 @@ vtkStandardNewMacro(InteractorStylePaintBrush);
 #define SEGMENTATION_SQUARE 0
 
 InteractorStylePaintBrush::InteractorStylePaintBrush()
+	:AbstractInteractorStyleImage()
 {
 
 
