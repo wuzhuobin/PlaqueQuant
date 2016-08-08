@@ -118,6 +118,12 @@ void ModuleWidget::slotSelectROI()
 	mainWnd->slotSelectROI();
 }
 
+void ModuleWidget::slotResetROI()
+{
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	mainWnd->slotResetROI();
+}
+
 
 
 void ModuleWidget::slotReportGetInput()

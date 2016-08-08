@@ -31,6 +31,7 @@
 #include <vtkLookupTable.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
+#include <vtkExtractVOI.h>
 
 MainWindow::MainWindow() 
 {
@@ -166,6 +167,7 @@ MainWindow::MainWindow()
 	for (int i = 0; i < 5; ++i) {
 		itkImage[i] = NULL;
 		vtkImage[i] = NULL;
+		vtkImageOriginal[i] = NULL;
 	}
 	m_InfoDialog = NULL;
 
@@ -224,8 +226,14 @@ MainWindow::~MainWindow()
 	}
 
 	for (int i = 0; i < 5; ++i) {
-		if (vtkImage[i] != NULL)
+		if (vtkImage[i] != NULL) {
 			vtkImage[i]->Delete();
+			vtkImage[i] = NULL;
+		}
+		if (vtkImageOriginal[i] != NULL) {
+			vtkImageOriginal[i]->Delete();
+			vtkImageOriginal[i] = NULL;
+		}
 	}
 
 	if (m_moduleWidget != NULL) {
@@ -349,26 +357,16 @@ void MainWindow::slotOpenImage(QString dir)
 
 	//Update Recent Image
     visibleImageNum=wizard.getTotalFileNo();
-	if (wizard.getFileNames1() != NULL) {
-		FileNameList1 = *wizard.getFileNames1();
-		loadImage(1, &FileNameList1);
+	QStringList* wizardFileNames[5] = {
+		wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
+		wizard.getFileNames4(), wizard.getFileNames5()	};
+	for (int i = 0; i < 5; ++i) {
+		if (wizardFileNames[i] != NULL) {
+			FileNameList[i] = *wizardFileNames[i];
+			loadImage(i + 1, wizardFileNames[i]);
+		}
 	}
-	if (wizard.getFileNames2() != NULL) {
-		FileNameList2 = *wizard.getFileNames2();
-		loadImage(2, &FileNameList2);
-	}
-	if (wizard.getFileNames3() != NULL) {
-		FileNameList3 = *wizard.getFileNames3();
-		loadImage(3, &FileNameList3);
-	}
-	if (wizard.getFileNames4() != NULL) {
-		FileNameList4 = *wizard.getFileNames4();
-		loadImage(4, &FileNameList4);
-	}
-	if (wizard.getFileNames5() != NULL) {
-		FileNameList5 = *wizard.getFileNames5();
-		loadImage(5, &FileNameList5);
-	}
+
 	adjustForCurrentFile(wizard.getDirectory());
 	visualizeImage();
 
@@ -769,13 +767,29 @@ void MainWindow::slotChangeROI(double * bound)
 
 void MainWindow::slotSelectROI()
 {
-	for (int i = 0; i < 3; i++)
-	{
-		m_style[i]->GetROI()->SelectROI();
-		//m_2DimageViewer[i]->SetBound(m_currentBound);
-		//m_2DimageViewer[i]->SetBound(m_style[i]->GetROI()->GetPlaneWidget()->GetCurrentBound());
-		
+	int newExtent[6] = { 0 };
+	m_style[0]->GetROI()->SelectROI(newExtent);
+
+	for (int i = 0; i < 5; ++i) {
+		vtkImageOriginal[i] = vtkImage[i];
+		if (vtkImage[i] != NULL) {
+			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
+				vtkSmartPointer<vtkExtractVOI>::New();
+			extractVOIFilter->SetInputData(vtkImage[i]);
+			extractVOIFilter->SetVOI(newExtent);
+			extractVOIFilter->Update();
+			extractVOIFilter->GetOutput();
+			vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
+		}
 	}
+	visualizeImage();
+}
+void MainWindow::slotResetROI()
+{
+	for (int i = 0; i < 5; ++i) {
+		vtkImage[i] = vtkImageOriginal[i];
+	}
+	visualizeImage();
 }
 void MainWindow::slot3DUpdate()
 {
@@ -995,26 +1009,7 @@ QString MainWindow::GetFileName(int i)
     QString FileName;
 	QString path;
     int j = 0, start, end;
-    
-	switch (i) {
-	case 0:
-		path = FileNameList1.at(0);
-		break;
-	case 1:
-		path = FileNameList2.at(0);
-		break;
-	case 2:
-		path = FileNameList3.at(0);
-		break;
-	case 3:
-		path = FileNameList4.at(0);
-		break;
-	case 4:
-		path = FileNameList5.at(0);
-		break;
-	default:
-		;
-	}
+	path = FileNameList[i].at(0);
 	if (!path.isEmpty())
 	{
 		start = path.lastIndexOf("/");

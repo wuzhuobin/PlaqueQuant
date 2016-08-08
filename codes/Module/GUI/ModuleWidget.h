@@ -44,6 +44,7 @@ public slots:
     void slotSegmentationView();
 	void slotChangeLayerNo();
 	void slotSelectROI();
+	void slotResetROI();
 	void slotChangeOpacity();
 	void slotChangeROI(double* bound);
 	//void slotAddLumen();

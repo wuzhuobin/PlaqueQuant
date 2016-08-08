@@ -111,6 +111,7 @@ public slots:
 	virtual void slotSetROIWidgetEnabled(bool b);
 	virtual void slotChangeROI(double* bound);
 	virtual void slotSelectROI();
+	virtual void slotResetROI();
 
 	//Widget running 
 	virtual void slotShowProgressDialog(int value, QString text);
@@ -138,11 +139,8 @@ private:
 
 
     //File Name
-    QStringList FileNameList1;
-    QStringList FileNameList2;
-    QStringList FileNameList3;
-    QStringList FileNameList4;
-    QStringList FileNameList5;
+	QStringList FileNameList[5];
+
     
 	//3D ruler
 	vtkDistanceWidget* DistanceWidget3D;
@@ -162,19 +160,9 @@ private:
 	//Data
 	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
 	ImageType::Pointer itkImage[5];
-	//ImageType::Pointer	m_itkT1;
-	//ImageType::Pointer	m_itkT2;
-	//ImageType::Pointer	m_itkT1C;
-	//ImageType::Pointer	m_itk2DDIR;
-	//ImageType::Pointer	m_itkMPRAGE;
 	
 	vtkImageData* vtkImage[5];
-	//vtkImageData*		m_vtkT1;
-	//vtkImageData*		m_vtkT2;
-	//vtkImageData*		m_vtkT1C;
-	//vtkImageData*		m_vtk2DDIR;
-	//vtkImageData*		m_vtkMPRAGE;
-	//vtkPolyData*		m_vtkOutputPolyData;
+	vtkImageData* vtkImageOriginal[5];
 
     //Orientation
 	int m_orientation;

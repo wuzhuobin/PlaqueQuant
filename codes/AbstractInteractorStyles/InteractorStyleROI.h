@@ -13,7 +13,7 @@ public:
 	void OnMouseMove();
 	void OnLeftButtonDown();
 	void OnLeftButtonUp();
-	void SelectROI();
+	void SelectROI(int* newExtent);
 	void UpdateAllWidget();
 	void UpdateAllWidget(double* bound);
 
@@ -29,6 +29,7 @@ private:
 	MyPlaneWidgetCallback* planeWidgetCallback;
 
 	double displayBound[6];
+	vtkImageData* vtkImageOriginal[5];
 
 };
 

@@ -1,8 +1,6 @@
 #include "InteractorStyleROI.h"
 #include "MainWindow.h"
 
-#include "vtkExtractVOI.h"
-
 vtkStandardNewMacro(InteractorStyleROI);
 
 void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
@@ -105,19 +103,20 @@ void InteractorStyleROI::OnLeftButtonUp()
 	UpdateAllWidget();
 }
 
-void InteractorStyleROI::SelectROI()
+void InteractorStyleROI::SelectROI(int* newExtent)
 {
-	vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
-		vtkSmartPointer<vtkExtractVOI>::New();
-	extractVOIFilter->SetInputData(imageViewer->GetInput());
 	const double* bound = planeWidget->GetCurrentBound();
 	
-	int newExtent[6] = {
-		bound[0] - origin[0], (bound[1] - origin[0]) / spacing[0],
-		bound[2] - origin[1], (bound[3] - origin[1]) / spacing[1],
-		bound[4] - origin[2], (bound[5] - origin[2]) / spacing[2] };
-	extractVOIFilter->SetVOI(newExtent);
-	extractVOIFilter->Update();
+	newExtent[0] = (bound[0] - origin[0]) / spacing[0];
+	newExtent[1] = (bound[1] - origin[0]) / spacing[0];
+	newExtent[2] = (bound[2] - origin[1]) / spacing[1];
+	newExtent[3] = (bound[3] - origin[1]) / spacing[1];
+	newExtent[4] = (bound[4] - origin[2]) / spacing[2];
+	newExtent[5] = (bound[5] - origin[2]) / spacing[2];
+	
+
+
+
 
 	//imageViewer->SetInputData(extractVOIFilter->GetOutput());
 	for (int i = 0; i < 3; ++i) {
@@ -128,10 +127,6 @@ void InteractorStyleROI::SelectROI()
 		qDebug() << "origin:" << origin[i];
 		qDebug() << "newExtent:" << newExtent[i * 2] << newExtent[2 * i + 1];
 	}
-
-	//extractVOIFilter->SetVOI(planeWidget->GetCurrentBound());
-	extractVOIFilter->Update();
-
 }
 
 void InteractorStyleROI::UpdateAllWidget()
@@ -196,6 +191,9 @@ InteractorStyleROI::InteractorStyleROI()
 {
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();
+	for (int i = 0; i < 5; ++i) {
+		vtkImageOriginal[i] = NULL;
+	}
 }
 
 
@@ -206,5 +204,9 @@ InteractorStyleROI::~InteractorStyleROI()
 	}
 	if (planeWidgetCallback != NULL) {
 		planeWidgetCallback->Delete();
+	}
+	for (int i = 0; i < 5; ++i) {
+		if (vtkImageOriginal != NULL)
+			vtkImageOriginal[i]->Delete();
 	}
 }
