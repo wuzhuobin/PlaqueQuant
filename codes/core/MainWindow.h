@@ -19,7 +19,6 @@
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
 #include "InfoDialog.h"
-#include "MyPlaneWidget.h"
 #include "Overlay.h"
 
 class ModuleWidget;
@@ -136,11 +135,6 @@ private:
 	vtkRenderWindowInteractor*  m_interactor[3];
 	InteractorStyleSwitch*		m_style[3];
 
-    //ROI
-	MyPlaneWidget*			m_planeWidget[3];
-	MyPlaneWidgetCallback*	m_planeWidgetCallback[3];
-	double	m_currentBound[6];
-	bool	m_settingROI;
 
     //File Name
     QStringList FileNameList1;

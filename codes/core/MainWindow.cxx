@@ -158,15 +158,10 @@ MainWindow::MainWindow()
 
 	for (int i=0;i<3;i++)
 	{
-		m_planeWidgetCallback[i] = MyPlaneWidgetCallback::New();
-		m_planeWidget[i] = MyPlaneWidget::New();
-		m_currentBound[i] = NULL;
-		m_currentBound[i+3] = NULL;
 		m_focalPoint[i] = NULL;
 	}
 	DistanceWidget3D = NULL;
 	m_3Dinteractor = NULL;
-	m_settingROI = false;
 	ImageAlignment(NULL) = NULL;
 	m_itkT1 = NULL;
 	m_itkT2 = NULL;
@@ -229,16 +224,6 @@ MainWindow::~MainWindow()
 		m_3Dinteractor = NULL;
 	}
 
-	for (int i = 0; i < 3; ++i) {
-		if (m_planeWidget != NULL) {
-			m_planeWidget[i]->Delete();
-			m_planeWidget[i] = NULL;
-		}
-		if (m_planeWidgetCallback != NULL) {
-			m_planeWidgetCallback[i]->Delete();
-			m_planeWidgetCallback[i] = NULL;
-		}
-	}
 	if (DistanceWidget3D != NULL) {
 		DistanceWidget3D->Delete();
 		DistanceWidget3D = NULL;
@@ -906,84 +891,10 @@ void MainWindow::slotSetROIWidgetEnabled( bool b )
 	ui.actionContour->setChecked(false);
 	if (segmentationView) {
 		slotMultiPlanarView();
-		//ui.actionMultiPlanarView->triggered();	//Change to multiplanar view if we want to do segmentation
 	}
 	for (int i = 0; i < 3; ++i) {
 		m_style[i]->SetInteractorStyleToROI();
 	}
-	//ui.actionSegmentation->setChecked(true);
-	
-	
-	//if (false)
-	//{
-	//	//ROI
-
-	//	for (int i = 0; i < 3; i++)
-	//	{
-	//		m_planeWidget[i]->initializeCustomFunction();
-	//		m_planeWidget[i]->SetInputData(m_2DimageViewer[i]->GetInput());
-	//		m_planeWidget[i]->SetImageViewer(m_2DimageViewer[i]);
-	//		m_planeWidget[i]->SetDefaultBound(m_2DimageViewer[i]->GetBound());
-	//		m_planeWidget[i]->SetInteractor(m_interactor[i]);
-	//		m_planeWidget[i]->AddObserver(vtkCommand::InteractionEvent, m_planeWidgetCallback[i]);
-	//		m_planeWidget[i]->AddObserver(vtkCommand::EndInteractionEvent, m_planeWidgetCallback[i]);
-
-	//	}
-	//	m_planeWidgetCallback[0]->SetPlaneWidget(m_planeWidget[0], m_planeWidget[1], m_planeWidget[2]);
-	//	m_planeWidgetCallback[1]->SetPlaneWidget(m_planeWidget[0], m_planeWidget[1], m_planeWidget[2]);
-	//	m_planeWidgetCallback[2]->SetPlaneWidget(m_planeWidget[0], m_planeWidget[1], m_planeWidget[2]);
-
-	//	m_settingROI = true;
-
-	//	for (int i=0;i<3;i++)
-	//	{			
-	//		if (i==0)
-	//			m_planeWidget[i]->SetNormalToXAxis(true);
-	//		else if (i==1)
-	//			m_planeWidget[i]->SetNormalToYAxis(true);
-	//		else if (i==2)
-	//			m_planeWidget[i]->SetNormalToZAxis(true);
-
-	//		double* bound = m_2DimageViewer[i]->GetBound();
-	//		double displayBound[6];
-
-	//		//Set Current Bound
-	//		for (int j=0; j<3; j++)
-	//		{			
-	//			double roiHalfSize[3];
-	//			roiHalfSize[j] = (bound[j*2+1] - bound[j*2])*0.25;
-
-	//			m_currentBound[j*2]   = m_focalPoint[j]-roiHalfSize[j]>bound[j*2]?m_focalPoint[j]-roiHalfSize[j]:bound[j*2];
-	//			m_currentBound[j*2+1] = m_focalPoint[j]+roiHalfSize[j]<bound[j*2+1]?m_focalPoint[j]+roiHalfSize[j]:bound[j*2+1];
-	//			
-	//			displayBound[j*2]   = m_focalPoint[j]-roiHalfSize[j]>bound[j*2]?m_focalPoint[j]-roiHalfSize[j]:bound[j*2];
-	//			displayBound[j*2+1] = m_focalPoint[j]+roiHalfSize[j]<bound[j*2+1]?m_focalPoint[j]+roiHalfSize[j]:bound[j*2+1];
-
-	//			//Restrict display bound on the plane
-	//			if (i==j)
-	//			{
-	//				displayBound[j*2] = m_focalPoint[j];
-	//				displayBound[j*2+1] = m_focalPoint[j];
-	//			}
-	//		}
-
-	//		m_planeWidget[i]->SetCurrentBound(m_currentBound);
-	//		m_planeWidget[i]->PlaceWidget(displayBound);
-
-	//		m_planeWidget[i]->On();
-	//		m_2DimageViewer[i]->Render();
-	//	}
-	//}
-	//else
-	//{
-	//	m_settingROI = false;
-
-	//	for (int i=0;i<3;i++)
-	//	{
-	//		m_planeWidget[i]->Off();
-	//		m_2DimageViewer[i]->Render();
-	//	}
-	//}
 
 }
 
@@ -991,7 +902,7 @@ void MainWindow::slotSelectROI()
 {
 	for (int i = 0; i < 3; i++)
 	{
-		m_2DimageViewer[i]->SetBound(m_currentBound);
+		//m_2DimageViewer[i]->SetBound(m_currentBound);
 	}
 }
 void MainWindow::slot3DUpdate()
@@ -1099,39 +1010,6 @@ void MainWindow::slotChangeSlice()
 	for (int i=0;i<3;i++)
 	{
 		m_focalPoint[i] = m_2DimageViewer[i]->GetInput()->GetOrigin()[i] + m_2DimageViewer[i]->GetSlice() * m_2DimageViewer[i]->GetInput()->GetSpacing()[i];
-	}
-
-	//ROI
-	//Update ROI extent
-	if (m_settingROI)
-	{
-		for (int i=0;i<3;i++)
-		{				
-			double* currentBound = m_planeWidget[i]->GetCurrentBound();
-			double displayBound[6]; 
-			
-			for (int j=0;j<3;j++)
-			{	
-
-				displayBound[j*2]   = currentBound[j*2];
-				displayBound[j*2+1] = currentBound[j*2+1];
-				
-				//Restrict display bound on the plane
-				if (i==j)
-				{
-					displayBound[j*2]	= m_focalPoint[j];
-					displayBound[j*2+1] = m_focalPoint[j];
-				}
-
-			}
-
-			if (m_focalPoint[i]>=currentBound[i*2]&&m_focalPoint[i]<=currentBound[i*2+1])
-				m_planeWidget[i]->SetVisibility(true);
-			else
-				m_planeWidget[i]->SetVisibility(false);
-
-			//m_planeWidget[i]->ReplaceWidget(displayBound);
-		}
 	}
 	slotChangeIntensity();
 	for (int i=0; i<3; i++)
