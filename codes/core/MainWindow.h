@@ -161,18 +161,19 @@ private:
 	
 	//Data
 	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
-	ImageType::Pointer	m_itkT1;
-	ImageType::Pointer	m_itkT2;
-	ImageType::Pointer	m_itkT1C;
-	ImageType::Pointer	m_itk2DDIR;
-	ImageType::Pointer	m_itkMPRAGE;
+	ImageType::Pointer itkImage[5];
+	//ImageType::Pointer	m_itkT1;
+	//ImageType::Pointer	m_itkT2;
+	//ImageType::Pointer	m_itkT1C;
+	//ImageType::Pointer	m_itk2DDIR;
+	//ImageType::Pointer	m_itkMPRAGE;
 	
 	vtkImageData* vtkImage[5];
-	vtkImageData*		m_vtkT1;
-	vtkImageData*		m_vtkT2;
-	vtkImageData*		m_vtkT1C;
-    vtkImageData*		m_vtk2DDIR;
-	vtkImageData*		m_vtkMPRAGE;
+	//vtkImageData*		m_vtkT1;
+	//vtkImageData*		m_vtkT2;
+	//vtkImageData*		m_vtkT1C;
+	//vtkImageData*		m_vtk2DDIR;
+	//vtkImageData*		m_vtkMPRAGE;
 	//vtkPolyData*		m_vtkOutputPolyData;
 
     //Orientation

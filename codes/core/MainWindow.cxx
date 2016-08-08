@@ -163,19 +163,10 @@ MainWindow::MainWindow()
 	DistanceWidget3D = NULL;
 	m_3Dinteractor = NULL;
 	ImageAlignment(NULL) = NULL;
-	m_itkT1 = NULL;
-	m_itkT2 = NULL;
-	m_itkT1C = NULL;
-	m_itk2DDIR = NULL;
-	m_itkMPRAGE = NULL;
 	for (int i = 0; i < 5; ++i) {
-		vtkImage[i] = NULL:
+		itkImage[i] = NULL;
+		vtkImage[i] = NULL;
 	}
-	m_vtkT1 = NULL;
-	m_vtkT2 = NULL;
-	m_vtkT1C = NULL;
-	m_vtk2DDIR = NULL;
-	m_vtkMPRAGE = NULL;
 	m_InfoDialog = NULL;
 
 	//Segmentation
@@ -231,51 +222,12 @@ MainWindow::~MainWindow()
 		DistanceWidget3D->Delete();
 		DistanceWidget3D = NULL;
 	}
-	/*if (m_itkT1 != NULL) {
-		m_itkT1->Delete();
-		m_itkT1 = NULL;
-	}
-	if (m_itkT2 != NULL) {
-		m_itkT2->Delete();
-		m_itkT2 = NULL;
-	}
-	if (m_itkT1C != NULL) {
-		m_itkT1C->Delete();
-		m_itkT1C = NULL;
-	}
-	if (m_itk2DDIR != NULL) {
-		m_itk2DDIR->Delete();
-		m_itk2DDIR = NULL;
-	}
-	if (m_itkMPRAGE != NULL) {
-		m_itkMPRAGE->Delete();
-		m_itkMPRAGE = NULL;
-	}*/
 
 	for (int i = 0; i < 5; ++i) {
 		if (vtkImage[i] != NULL)
 			vtkImage[i]->Delete();
 	}
-	if (m_vtkT1 != NULL) {
-		m_vtkT1->Delete();
-		m_vtkT1 = NULL;
-	}
-	if (m_vtkT2 != NULL) {
-		m_vtkT2->Delete();
-		m_vtkT2 = NULL;
-	}
-	if (m_vtkT1C != NULL) {
-		m_vtkT1C->Delete();
-		m_vtkT1C = NULL;
-	}
-	if (m_vtk2DDIR != NULL) {
-		m_vtk2DDIR->Delete();
-		m_vtk2DDIR = NULL;
-	}
-	if (m_vtkMPRAGE != NULL) {
-		m_vtkMPRAGE->Delete();
-		m_vtkMPRAGE = NULL;
-	}
+
 	if (m_moduleWidget != NULL) {
 		delete m_moduleWidget;
 		m_moduleWidget = NULL;
@@ -304,7 +256,7 @@ void MainWindow::initializeViewers()
 
 	for (int i = 0 ; i < 3 ; i++)
 	{
-	    m_2DimageViewer[i]->SetInputData(m_vtkT1);
+	    m_2DimageViewer[i]->SetInputData(vtkImage[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
 		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
@@ -336,8 +288,8 @@ void MainWindow::addOverlay2ImageViewer()
 
 		//Overlay
 		SegmentationOverlay = new Overlay;
-		SegmentationOverlay->Initialize(m_itkT1, m_vtkT1->GetDimensions(),
-			m_vtkT1->GetSpacing(), m_vtkT1->GetOrigin(), VTK_DOUBLE);
+		SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
+			vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
 	}
 
 	//Add Overlay
@@ -504,99 +456,26 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr<<err<<std::endl;
 			return 1;
 		}	
+		for (int i = 0; i < n; ++i) {
+			itkImage[i] = ImageType::New();
+			itkImage[i]->Graft(orienter->GetOutput());
+			itkImage[i]->Update();
+			if (i > 0) {
+				connectorAfter->SetInput(ImageAlignment(itkImage[i]));
+				try
+				{
+					connectorAfter->Update();
+				}
+				catch (itk::ExceptionObject &err)
+				{
+					std::cerr << err << std::endl;
+					return 1;
+				}
+			}
 
-		//Get Data
-		if (n==1)
-		{
-			m_itkT1 = ImageType::New();
-			m_itkT1->Graft(orienter->GetOutput());
-			m_itkT1->Update();
-
-			m_vtkT1 = vtkImageData::New();
-			m_vtkT1->DeepCopy(connector->GetOutput());
-
+			vtkImage[i] = vtkImageData::New();
+			vtkImage[i]->DeepCopy(connector->GetOutput());
 		}
-		else if (n==2)
-		{
-			m_itkT2 = ImageType::New();
-			m_itkT2->Graft(orienter->GetOutput());
-			m_itkT2->Update();
-
-			
-			connectorAfter->SetInput(ImageAlignment(m_itkT2));
-			try
-			{
-				connectorAfter->Update();
-			}
-			catch(itk::ExceptionObject &err)
-			{
-				std::cerr<<err<<std::endl;
-				return 1;
-			}	
-			
-			m_vtkT2 = vtkImageData::New();
-			m_vtkT2->DeepCopy(connectorAfter->GetOutput());
-          
-		}
-		else if (n==3)
-		{
-			m_itkT1C = ImageType::New();
-			m_itkT1C->Graft(orienter->GetOutput());
-			m_itkT1C->Update();
-			connectorAfter->SetInput(ImageAlignment(m_itkT1C));
-			try
-			{
-				connectorAfter->Update();
-			}
-			catch(itk::ExceptionObject &err)
-			{
-				std::cerr<<err<<std::endl;
-				return 1;
-			}	
-
-			m_vtkT1C = vtkImageData::New();
-			m_vtkT1C->DeepCopy(connectorAfter->GetOutput());
-		}
-        else if (n==4)
-        {
-			m_itk2DDIR = ImageType::New();
-			m_itk2DDIR->Graft(orienter->GetOutput());
-			m_itk2DDIR->Update();
-
-			connectorAfter->SetInput(ImageAlignment(m_itk2DDIR));
-			try
-			{
-				connectorAfter->Update();
-			}
-			catch(itk::ExceptionObject &err)
-			{
-				std::cerr<<err<<std::endl;
-				return 1;
-			}	
-
-			m_vtk2DDIR = vtkImageData::New();
-			m_vtk2DDIR->DeepCopy(connectorAfter->GetOutput());
-        }
-		else if (n==5)
-        {
-			m_itkMPRAGE = ImageType::New();
-			m_itkMPRAGE->Graft(orienter->GetOutput());
-			m_itkMPRAGE->Update();
-
-			connectorAfter->SetInput(ImageAlignment(m_itkMPRAGE));
-			try
-			{
-				connectorAfter->Update();
-			}
-			catch(itk::ExceptionObject &err)
-			{
-				std::cerr<<err<<std::endl;
-				return 1;
-			}	
-
-			m_vtkMPRAGE = vtkImageData::New();
-			m_vtkMPRAGE->DeepCopy(connectorAfter->GetOutput());
-        }
 
 	}
 	else
@@ -643,35 +522,11 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr<<err<<std::endl;
 			return 1;
 		}	
-
-		//Get Data
-		if (n==1)
-		{
-			m_vtkT1 = vtkImageData::New();
-			m_vtkT1->DeepCopy(connector->GetOutput());
+		for (int i = 0; i < n; ++i) {
+			vtkImage[i] = vtkImageData::New();
+			vtkImage[i]->DeepCopy(connector->GetOutput());
 		}
-		else if (n==2)
-		{
 
-			m_vtkT2 = vtkImageData::New();
-			m_vtkT2->DeepCopy(connector->GetOutput());
-		}
-		else if (n==3)
-		{
-
-			m_vtkT1C = vtkImageData::New();
-			m_vtkT1C->DeepCopy(connector->GetOutput());
-		}
-        else if (n==4)
-        {  
-			m_vtk2DDIR = vtkImageData::New();
-			m_vtk2DDIR->DeepCopy(connector->GetOutput());
-        }
-		else if (n==5)
-        {  
-			m_vtkMPRAGE = vtkImageData::New();
-			m_vtkMPRAGE->DeepCopy(connector->GetOutput());
-        }
 	}
 
 	
@@ -1179,7 +1034,7 @@ ImageType::Pointer MainWindow::ImageAlignment(ImageType::Pointer inputImage)
 
 	 ImageRegistration* imageReg = new ImageRegistration(); 
 	 ImageType::Pointer outputImage;
-	 imageReg->SetFixedImage(m_itkT1);		//Use image 1 as the reference image
+	 imageReg->SetFixedImage(itkImage[0]);		//Use image 1 as the reference image
 	 imageReg->SetMovingImage(inputImage);
 	 imageReg->Update();
 
@@ -1198,25 +1053,7 @@ void MainWindow::slotChangeImageSeq(int image_no, int window_no)
 {
 	if (segmentationView)
 	{
-        switch (image_no)
-        {         
-            case 0:
-                m_2DimageViewer[window_no]->SetInputData(m_vtkT1);
-                break;
-            case 1:
-                m_2DimageViewer[window_no]->SetInputData(m_vtkT2);
-                break;
-            case 2:
-                m_2DimageViewer[window_no]->SetInputData(m_vtkT1C);
-                break;
-			case 3:
-                m_2DimageViewer[window_no]->SetInputData(m_vtk2DDIR);
-                break;
-			case 4:
-                m_2DimageViewer[window_no]->SetInputData(m_vtkMPRAGE);
-                break;
-                
-        }
+		m_2DimageViewer[window_no]->SetInputData(vtkImage[image_no]);
         m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
         m_2DimageViewer[window_no]->Render();
     }
@@ -1224,24 +1061,7 @@ void MainWindow::slotChangeImageSeq(int image_no, int window_no)
 	{
 		for (int i = 0 ; i < 3 ; i++)
 		{
-			switch (image_no)
-			{
-				case 0:
-                m_2DimageViewer[i]->SetInputData(m_vtkT1);
-                break;
-            case 1:
-                m_2DimageViewer[i]->SetInputData(m_vtkT2);
-                break;
-            case 2:
-                m_2DimageViewer[i]->SetInputData(m_vtkT1C);
-                break;
-			case 3:
-                m_2DimageViewer[i]->SetInputData(m_vtk2DDIR);
-                break;
-			case 4:
-                m_2DimageViewer[i]->SetInputData(m_vtkMPRAGE);
-                break;
-			}
+			m_2DimageViewer[i]->SetInputData(vtkImage[image_no]);
 			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
 			m_2DimageViewer[i]->Render();
 		}
@@ -1298,7 +1118,7 @@ void MainWindow::slotMultiPlanarView()
 
 	for (int i = 0; i<3; i++)
 	{
-		m_2DimageViewer[i]->SetInputData(m_vtkT1);
+		m_2DimageViewer[i]->SetInputData(vtkImage[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
 		m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
 
@@ -1339,27 +1159,19 @@ void MainWindow::slotSegmentationView()
 		if (m_2DimageViewer[i] != NULL) {
 			m_2DimageViewer[i]->Delete(); 
 			m_2DimageViewer[i] = MyImageViewer::New();
+			if (vtkImage[i] != NULL) {
+				m_2DimageViewer[i]->SetInputData(vtkImage[i]);
+			}
 		}
 	}
 	this->ui.image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 	this->ui.image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
 	this->ui.image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
-
-	if (m_vtkT1) {
-		m_2DimageViewer[0]->SetInputData(m_vtkT1);
-	}
-	if (m_vtkT2) {
-		m_2DimageViewer[1]->SetInputData(m_vtkT2);
-	}
-	if (m_vtkT1C) {
-		m_2DimageViewer[2]->SetInputData(m_vtkT1C);
-	}
 	
 	for (int i = 0; i < 3; i++)
 	{
 		if (i >= visibleImageNum)
 			break;
-
 		m_2DimageViewer[i]->SetSliceOrientation(m_orientation);
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(i));
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
@@ -1407,7 +1219,6 @@ void MainWindow::slotSegmentationView()
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
 
 	}
-	
 	this->slotChangeSlice();
 	this->addOverlay2ImageViewer();
 
@@ -1538,9 +1349,9 @@ void MainWindow::slotCenterline()
 {
 	// segmentation
 	VesselSegmentation* vesselSegmentation = new VesselSegmentation();
-	vesselSegmentation->SetT1(m_itkT1);
+	vesselSegmentation->SetT1(itkImage[0]);
 	vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput());
-	vesselSegmentation->SetMPRAGE(m_itkMPRAGE);
+	vesselSegmentation->SetMPRAGE(itkImage[4]);
 	vesselSegmentation->Update();
 
 	vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
