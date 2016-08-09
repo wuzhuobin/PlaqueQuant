@@ -118,15 +118,14 @@ void InteractorStyleROI::SelectROI(int* newExtent)
 
 
 
-	//imageViewer->SetInputData(extractVOIFilter->GetOutput());
-	for (int i = 0; i < 3; ++i) {
-		qDebug() << i;
-		qDebug() << "extent:" << extent[i * 2] << '\t' << extent[i * 2 + 1];
-		qDebug() << "spacing:" << spacing[i];
-		qDebug() << "bound:" << bound[i * 2] << '\t' << bound[i * 2 + 1];
-		qDebug() << "origin:" << origin[i];
-		qDebug() << "newExtent:" << newExtent[i * 2] << newExtent[2 * i + 1];
-	}
+	//for (int i = 0; i < 3; ++i) {
+	//	qDebug() << i;
+	//	qDebug() << "extent:" << extent[i * 2] << '\t' << extent[i * 2 + 1];
+	//	qDebug() << "spacing:" << spacing[i];
+	//	qDebug() << "bound:" << bound[i * 2] << '\t' << bound[i * 2 + 1];
+	//	qDebug() << "origin:" << origin[i];
+	//	qDebug() << "newExtent:" << newExtent[i * 2] << newExtent[2 * i + 1];
+	//}
 }
 
 void InteractorStyleROI::UpdateAllWidget()
@@ -191,9 +190,6 @@ InteractorStyleROI::InteractorStyleROI()
 {
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();
-	for (int i = 0; i < 5; ++i) {
-		vtkImageOriginal[i] = NULL;
-	}
 }
 
 
@@ -204,9 +200,5 @@ InteractorStyleROI::~InteractorStyleROI()
 	}
 	if (planeWidgetCallback != NULL) {
 		planeWidgetCallback->Delete();
-	}
-	for (int i = 0; i < 5; ++i) {
-		if (vtkImageOriginal != NULL)
-			vtkImageOriginal[i]->Delete();
 	}
 }

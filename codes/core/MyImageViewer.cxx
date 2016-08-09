@@ -395,11 +395,11 @@ void MyImageViewer::SetCursorBoundary()
 	image->GetExtent(extent);
 
 
-	Bound[0] = origin[0];
+	Bound[0] = origin[0] + extent[0] * spacing[0];
 	Bound[1] = origin[0] + extent[1] * spacing[0];
-	Bound[2] = origin[1];
+	Bound[2] = origin[1] + extent[2] * spacing[1];
 	Bound[3] = origin[1] + extent[3] * spacing[1];
-	Bound[4] = origin[2];
+	Bound[4] = origin[2] + extent[4] * spacing[2];
 	Bound[5] = origin[2] + extent[5] * spacing[2];
 
 	Cursor3D->SetTranslationMode(false);
@@ -419,26 +419,26 @@ void MyImageViewer::SetFocalPoint(double x, double y, double z)
 	SliceImplicitPlane->SetOrigin(x, y, z);
 }
 
-void MyImageViewer::AddPolyData(vtkPolyData* polydata, vtkProperty* property)
-{
-	ClipActor = vtkActor::New();
-	//vtkCutter* cutter = vtkCutter::New();
-	//cutter->SetInputData (dataset);
-	//cutter->SetCutFunction (this->SliceImplicitPlane);
-	vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-	//mapper->SetInputData(cutter->GetOutput());
-	mapper->SetInputData(polydata);
-	mapper->Update();
-	ClipActor = vtkActor::New();
-	ClipActor->SetMapper(mapper);
-	if (property)
-		ClipActor->SetProperty(property);
-	ClipActor->SetDragable(false);
-	this->Renderer->AddActor(ClipActor);
-	//cutter->Delete();
-	mapper->Delete();
-	//actor->Delete();
-}
+//void MyImageViewer::AddPolyData(vtkPolyData* polydata, vtkProperty* property)
+//{
+//	ClipActor = vtkActor::New();
+//	//vtkCutter* cutter = vtkCutter::New();
+//	//cutter->SetInputData (dataset);
+//	//cutter->SetCutFunction (this->SliceImplicitPlane);
+//	vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
+//	//mapper->SetInputData(cutter->GetOutput());
+//	mapper->SetInputData(polydata);
+//	mapper->Update();
+//	ClipActor = vtkActor::New();
+//	ClipActor->SetMapper(mapper);
+//	if (property)
+//		ClipActor->SetProperty(property);
+//	ClipActor->SetDragable(false);
+//	this->Renderer->AddActor(ClipActor);
+//	//cutter->Delete();
+//	mapper->Delete();
+//	//actor->Delete();
+//}
 
 void MyImageViewer::SetBound(double* b)
 {
@@ -468,69 +468,6 @@ double* MyImageViewer::GetFocalPoint()
 	return Cursor3D->GetFocalPoint();
 }
 
-void MyImageViewer::RemoveInput()
-{
-
-	if (this->WindowLevel)
-	{
-		this->WindowLevel->Delete();
-		this->WindowLevel = NULL;
-	}
-	if (this->imageMapToWindowLevelColors)
-	{
-		this->imageMapToWindowLevelColors->Delete();
-		this->imageMapToWindowLevelColors = NULL;
-	}
-	if (this->ImageActor)
-	{
-		this->ImageActor->Delete();
-		this->ImageActor = NULL;
-	}
-	if (this->Renderer)
-	{
-		this->Renderer->Delete();
-		this->Renderer = NULL;
-	}
-	/*
-	if (this->RenderWindow)
-	{
-	this->RenderWindow->Delete();
-	this->RenderWindow = NULL;
-	}
-	*/
-	if (this->Interactor)
-	{
-		this->Interactor->Delete();
-		this->Interactor = NULL;
-	}
-
-	if (this->InteractorStyle)
-	{
-		this->InteractorStyle->Delete();
-		this->InteractorStyle = NULL;
-	}
-
-	if (this->SliceImplicitPlane)
-	{
-		this->SliceImplicitPlane->Delete();
-		this->SliceImplicitPlane = NULL;
-	}
-
-}
-
-void MyImageViewer::RemoveInputLayer()
-{
-	if (this->drawActor)
-	{
-		this->drawActor->Delete();
-		this->drawActor = NULL;
-	}
-
-	if (this->imageMapToWindowLevelColors)
-		this->imageMapToWindowLevelColors->Delete();
-	this->imageMapToWindowLevelColors = vtkImageMapToWindowLevelColors::New();
-
-}
 void MyImageViewer::InitializeHeader(QString File)
 {
 	int* size = Renderer->GetSize();
@@ -541,7 +478,6 @@ void MyImageViewer::InitializeHeader(QString File)
 		Renderer->RemoveActor2D(HeaderActor);
 		//HeaderActor->Delete();
 	}
-	HeaderActor = vtkTextActor::New();
 	HeaderActor->GetTextProperty()->SetFontSize(15);
 	HeaderActor->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
 	Renderer->AddActor2D(HeaderActor);

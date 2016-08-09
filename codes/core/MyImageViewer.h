@@ -85,17 +85,14 @@ public:
 	// Render the resulting image.
 	virtual void Render(void);
 
-	void virtual SetInputData(vtkImageData * in);
-
 	// Description:
 	// Set/Get the input image to the viewer.
-	virtual void RemoveInput();
+	void virtual SetInputData(vtkImageData * in);
 	// Set Input Layer
 	virtual void SetInputDataLayer(vtkImageData *in);
 	virtual vtkImageData *GetInputLayer();
-	virtual void RemoveInputLayer();
 
-	virtual void AddPolyData(vtkPolyData* polydata, vtkProperty* property);
+	//virtual void AddPolyData(vtkPolyData* polydata, vtkProperty* property);
 
 	// Description:
 	// Set window and level for mapping pixels to colors.

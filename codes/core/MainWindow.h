@@ -81,6 +81,7 @@ public slots:
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
 	virtual void slotContourMode();
+	virtual void slotROIMode();
 	virtual void slotImage(int image);
 	virtual void slotMultiPlanarView();
 
@@ -92,7 +93,7 @@ public slots:
 	//virtual void slotRemoveOverlay();
 	virtual void slotOverlayVisibilty(bool b);
 	virtual void slotOverlayVisibilty(bool b, int);
-    virtual void slotOverlayOpacity(double);
+    virtual void slotOverlayOpacity(double op);
   
 	//Centerline
 	virtual void slotCenterline();
@@ -108,7 +109,6 @@ public slots:
 
 	//Widget
 	virtual void slotRuler(bool b);
-	virtual void slotSetROIWidgetEnabled(bool b);
 	virtual void slotChangeROI(double* bound);
 	virtual void slotSelectROI();
 	virtual void slotResetROI();
@@ -163,6 +163,8 @@ private:
 	
 	vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
+	vtkImageData* vtkImageOverlay;
+	vtkImageData* vtkImageOverlayOriginal;
 
     //Orientation
 	int m_orientation;

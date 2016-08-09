@@ -29,7 +29,6 @@ private:
 	MyPlaneWidgetCallback* planeWidgetCallback;
 
 	double displayBound[6];
-	vtkImageData* vtkImageOriginal[5];
 
 };
 

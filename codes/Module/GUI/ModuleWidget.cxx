@@ -23,6 +23,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(slotChangeLayerNo()), Qt::UniqueConnection);
 	connect(ui->segmentationPushButton, SIGNAL(clicked()), this, SLOT(slotSelectROI()));
+	connect(ui->resetROIPushButton, SIGNAL(clicked()), this, SLOT(slotResetROI()));
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), ui->opacitySlider, SLOT(setValue(int)));
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));

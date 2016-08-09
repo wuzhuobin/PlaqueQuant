@@ -32,6 +32,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkExtractVOI.h>
+#include <vtkImageIterator.h>
 
 MainWindow::MainWindow() 
 {
@@ -59,7 +60,7 @@ MainWindow::MainWindow()
 	connect(ui.actionContour, SIGNAL(triggered()), this, SLOT(slotContourMode()));
 	connect(ui.actionBrush, SIGNAL(triggered()), this, SLOT(slotBrushMode()));
 	connect(ui.actionRuler, SIGNAL(triggered(bool)), this, SLOT(slotRuler(bool)));
-	connect(ui.actionROI, SIGNAL(triggered(bool)), this, SLOT(slotSetROIWidgetEnabled(bool)));
+	connect(ui.actionROI, SIGNAL(triggered()), this, SLOT(slotROIMode()));
 
 
 	//minimun, maximum
@@ -156,19 +157,18 @@ MainWindow::MainWindow()
 
 	ui.image4View->GetRenderWindow()->AddRenderer(vtkSmartPointer<vtkRenderer>::New());
 
-
-	for (int i=0;i<3;i++)
-	{
-		m_focalPoint[i] = NULL;
-	}
 	DistanceWidget3D = NULL;
 	m_3Dinteractor = NULL;
 	ImageAlignment(NULL) = NULL;
+	
 	for (int i = 0; i < 5; ++i) {
-		itkImage[i] = NULL;
-		vtkImage[i] = NULL;
-		vtkImageOriginal[i] = NULL;
+		itkImage[i] = ImageType::New();
+		vtkImage[i] = vtkImageData::New();
+		vtkImageOriginal[i] = vtkImage[i];
 	}
+	vtkImageOverlay = vtkImageData::New();
+	vtkImageOverlayOriginal = vtkImageOverlay;
+
 	m_InfoDialog = NULL;
 
 	//Segmentation
@@ -227,15 +227,18 @@ MainWindow::~MainWindow()
 
 	for (int i = 0; i < 5; ++i) {
 		if (vtkImage[i] != NULL) {
-			vtkImage[i]->Delete();
+			if (vtkImageOriginal[i] != vtkImage[i]) {
+				vtkImage[i]->Delete();
+			}
+			if (vtkImageOriginal[i] != NULL) {
+				vtkImageOriginal[i]->Delete();
+				vtkImageOriginal[i] = NULL;
+			}
 			vtkImage[i] = NULL;
 		}
-		if (vtkImageOriginal[i] != NULL) {
-			vtkImageOriginal[i]->Delete();
-			vtkImageOriginal[i] = NULL;
-		}
-	}
 
+
+	}
 	if (m_moduleWidget != NULL) {
 		delete m_moduleWidget;
 		m_moduleWidget = NULL;
@@ -247,7 +250,6 @@ MainWindow::~MainWindow()
 	if (SegmentationOverlay != NULL) {
 		delete SegmentationOverlay;
 	}
-
 
 }
 
@@ -270,7 +272,6 @@ void MainWindow::initializeViewers()
         m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 
-
 		//Update style
 		m_style[i]->SetViewers(m_2DimageViewer[i]);
 		m_style[i]->initializeQWidget(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox, 
@@ -278,11 +279,6 @@ void MainWindow::initializeViewers()
 			m_moduleWidget->GetBrushSizeSpinBox(), 
 			m_moduleWidget->GetBrushShapeComBox(),
 			NULL, NULL);
-		//m_style[i]->SetAutoAdjustCameraClippingRange(true);
-		//m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
-		//m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL,ui.levelDoubleSpinBoxUL);
-		//m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
-		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
 		
@@ -296,8 +292,23 @@ void MainWindow::addOverlay2ImageViewer()
 
 		//Overlay
 		SegmentationOverlay = new Overlay;
+		//vtkImageOverlay->SetExtent(vtkImage[0]->GetExtent());
+		//vtkImageOverlay->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+		//vtkImageIterator<unsigned char> it(vtkImageOverlay, vtkImageOverlay->GetExtent());
+
+		//while (!it.IsAtEnd())
+		//{
+
+		//	for(unsigned char* valIt = it.BeginSpan(); valIt != it.EndSpan(); ++valIt)
+		//	{
+		//		*valIt = .0;
+		//	}
+		//	it.NextSpan();
+		//}
+		SegmentationOverlay->SetInputImageData(vtkImageOverlay);
 		SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
 			vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
+		vtkImageOverlay = SegmentationOverlay->GetOutput();
 	}
 
 	//Add Overlay
@@ -305,7 +316,7 @@ void MainWindow::addOverlay2ImageViewer()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
-		m_2DimageViewer[i]->SetInputDataLayer(SegmentationOverlay->GetOutput());
+		m_2DimageViewer[i]->SetInputDataLayer(vtkImageOverlay);
 
 	}
 	this->slotOverlayVisibilty(true);
@@ -366,6 +377,7 @@ void MainWindow::slotOpenImage(QString dir)
 			loadImage(i + 1, wizardFileNames[i]);
 		}
 	}
+	//copy for segmentationROI to recover the original image
 
 	adjustForCurrentFile(wizard.getDirectory());
 	visualizeImage();
@@ -455,7 +467,6 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			return 1;
 		}	
 		for (int i = 0; i < n; ++i) {
-			itkImage[i] = ImageType::New();
 			itkImage[i]->Graft(orienter->GetOutput());
 			itkImage[i]->Update();
 			if (i > 0) {
@@ -471,7 +482,6 @@ bool MainWindow::loadImage(int n, QStringList* list )
 				}
 			}
 
-			vtkImage[i] = vtkImageData::New();
 			vtkImage[i]->DeepCopy(connector->GetOutput());
 		}
 
@@ -521,7 +531,6 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			return 1;
 		}	
 		for (int i = 0; i < n; ++i) {
-			vtkImage[i] = vtkImageData::New();
 			vtkImage[i]->DeepCopy(connector->GetOutput());
 		}
 
@@ -534,11 +543,26 @@ bool MainWindow::loadImage(int n, QStringList* list )
 
 bool MainWindow::visualizeImage()
 {	
-
-	initializeViewers();
-	//Enable Actions 
 	setActionsEnable(true);
-	ui.actionMultiPlanarView->setChecked(true);
+
+	//initializeViewers();
+	//for (int i = 0; i < 5; ++i) {
+	//	if (vtkImage[i] != NULL) {
+	//		vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
+	//			vtkSmartPointer<vtkExtractVOI>::New();
+	//		extractVOIFilter->SetVOI(100, 300, 100, 300, 10, 25);
+	//		extractVOIFilter->SetInputData(vtkImage[i]);
+	//		extractVOIFilter->Update();
+	//		vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
+	//	}
+	//}
+
+	ui.actionMultiPlanarView->trigger();
+	//for (int i = 0; i < 3; ++i) {
+	//	m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
+	//}
+	//Enable Actions 
+	//ui.actionMultiPlanarView->setChecked(true);
 	//Update UI stuff
     //Assume the four images have equal number of slices
 	ui.xSpinBox->setMaximum(m_2DimageViewer[0]->GetInput()->GetDimensions()[0]);
@@ -559,7 +583,6 @@ bool MainWindow::visualizeImage()
 	//Update Cursor
 	this->slotChangeSlice();
 	this->slotNavigationMode();
-    
 				
 	return 0;
 }
@@ -745,18 +768,14 @@ void MainWindow::slotRuler(bool b)
 	//this->Set3DRulerEnabled(b);
 }
 
-void MainWindow::slotSetROIWidgetEnabled( bool b )
+void MainWindow::slotROIMode()
 {
-	ui.actionNavigation->setChecked(false);
-	ui.actionWindowLevel->setChecked(false);
-	ui.actionContour->setChecked(false);
 	if (segmentationView) {
 		slotMultiPlanarView();
 	}
 	for (int i = 0; i < 3; ++i) {
 		m_style[i]->SetInteractorStyleToROI();
 	}
-
 }
 
 void MainWindow::slotChangeROI(double * bound)
@@ -767,29 +786,63 @@ void MainWindow::slotChangeROI(double * bound)
 
 void MainWindow::slotSelectROI()
 {
+	qDebug() << vtkImage[0] << '\t' << vtkImageOriginal[0];
+	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
+
 	int newExtent[6] = { 0 };
 	m_style[0]->GetROI()->SelectROI(newExtent);
-
+	vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
+		vtkSmartPointer<vtkExtractVOI>::New();
+	// Extract VOI of the overlay Image data
+	extractVOIFilter->SetVOI(newExtent);
+	extractVOIFilter->SetInputData(vtkImageOverlay);
+	extractVOIFilter->Update();
+	// make sure the vtkImageOverlayOriginal won't be deleted 
+	// delete multiple segmentations of vtkImageOverlay data 
+	if (vtkImageOverlay != vtkImageOverlayOriginal) {
+		vtkImageOverlay->Delete();
+	}
+	vtkImageOverlay = vtkImageData::New();
+	vtkImageOverlay->DeepCopy(extractVOIFilter->GetOutput());
+	// Extract VOI of the vtkImage data
 	for (int i = 0; i < 5; ++i) {
-		vtkImageOriginal[i] = vtkImage[i];
 		if (vtkImage[i] != NULL) {
-			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
-				vtkSmartPointer<vtkExtractVOI>::New();
+
 			extractVOIFilter->SetInputData(vtkImage[i]);
-			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			extractVOIFilter->GetOutput();
+			// make sure the vtkImageOriginal won't be deleted 
+			// delete multiple segmentations of vtkImage data 
+			if (vtkImage[i] != vtkImageOriginal[i]) {
+				vtkImage[i]->Delete();
+			}
+			vtkImage[i] = vtkImageData::New();
 			vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
 		}
 	}
-	visualizeImage();
+	ui.actionMultiPlanarView->trigger();
+	ui.actionNavigation->trigger();
+	qDebug() << vtkImage[0] << '\t' << vtkImageOriginal[0];
+	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
 }
 void MainWindow::slotResetROI()
 {
+	qDebug() << vtkImage[0] <<'\t' <<vtkImageOriginal[0];
+	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
 	for (int i = 0; i < 5; ++i) {
-		vtkImage[i] = vtkImageOriginal[i];
+		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL) {
+			vtkImage[i]->Delete();
+			vtkImage[i] = vtkImageOriginal[i];
+		}
 	}
-	visualizeImage();
+	if (vtkImageOverlay != NULL && vtkImageOverlay != vtkImageOverlayOriginal) {
+		vtkImageOverlay->Delete();
+		vtkImageOverlay = vtkImageOverlayOriginal;
+	}
+	qDebug() << vtkImage[0] << '\t' << vtkImageOriginal[0];
+	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
+
+	ui.actionMultiPlanarView->trigger();
+	ui.actionNavigation->trigger();
 }
 void MainWindow::slot3DUpdate()
 {
@@ -1125,19 +1178,12 @@ void MainWindow::slotMultiPlanarView()
 			m_moduleWidget->GetBrushSizeSpinBox(),
 			m_moduleWidget->GetBrushShapeComBox(),
 			NULL, NULL);
-		//m_style[i]->SetAutoAdjustCameraClippingRange(true);
-		//m_style[i]->SetSliceSpinBox(ui.xSpinBox, ui.ySpinBox, ui.zSpinBox);
-		//m_style[i]->SetWindowLevelSpinBox(ui.windowDoubleSpinBoxUL, ui.levelDoubleSpinBoxUL);
-		//m_style[i]->SetDrawBrushSizeSpinBox(m_moduleWidget->GetBrushSizeSpinBox());
-		//m_style[i]->SetDrawBrushShapeComBox(m_moduleWidget->GetBrushShapeComBox());
 
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
-//  m_interactor[i]->Initialize();
 	}
 
 	this->slotChangeSlice();
 	this->addOverlay2ImageViewer();
-
 
 }
 
