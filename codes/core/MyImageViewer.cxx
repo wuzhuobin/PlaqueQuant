@@ -98,6 +98,8 @@ MyImageViewer::MyImageViewer()
 	annotationRenderer->SetLayer(1);
 
 	RenderWindow->SetNumberOfLayers(2);
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -320,6 +322,7 @@ void MyImageViewer::Render()
 	{
 		this->RenderWindow->Render();
 	}
+
 }
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)

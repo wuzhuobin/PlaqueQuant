@@ -6,6 +6,7 @@
 #include <QDragEnterEvent> 
 #include <QDropEvent>
 #include <QAction>
+#include <QActionGroup>
 #include <QMenu>
 
 #include "ui_MainWindow.h"
@@ -130,6 +131,14 @@ private:
 	QMenu ChangeBaseImageURMenu;
 	QMenu ChangeBaseImageLLMenu;
 
+	//widgetGroup
+	QActionGroup widgetGroup;
+	//viewerGroup 
+	QActionGroup viewerGroup;
+	//viewGroup
+	QActionGroup viewGroup;
+
+
     
 	//2D/3D view
 	MyImageViewer*				m_2DimageViewer[3];
@@ -140,7 +149,6 @@ private:
 
     //File Name
 	QStringList FileNameList[5];
-
     
 	//3D ruler
 	vtkDistanceWidget* DistanceWidget3D;
@@ -164,7 +172,6 @@ private:
 	vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
 	vtkImageData* vtkImageOverlay;
-	vtkImageData* vtkImageOverlayOriginal;
 
     //Orientation
 	int m_orientation;

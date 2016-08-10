@@ -51,11 +51,11 @@ InteractorStylePaintBrush::InteractorStylePaintBrush()
 
 InteractorStylePaintBrush::~InteractorStylePaintBrush()
 {
-	this->SetPaintBrushModeEnabled(false);
+	//this->SetPaintBrushModeEnabled(false);
 
 	// Clean again if the upper dosen't clean
 	if (m_brushActor != NULL && imageViewer != NULL) {
-		this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
+		//this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
 		this->m_brushActor->Delete();
 		this->m_brushActor = NULL;
 		this->m_brush->Delete();
@@ -135,6 +135,8 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
 	//Check if valid pick
+	qDebug() << "picked";
+	qDebug() << picked[0] << picked[1];
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
 	// Check if valid pick
@@ -150,6 +152,8 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 			index[i] = (picked[i] - origin[i]) / spacing[i];
 		}
 	}
+	qDebug() << "index";
+	qDebug() << index[0] << index[1] << index[2];
 	draw_index_old[0] = (int)(index[0] + 0.5);
 	draw_index_old[1] = (int)(index[1] + 0.5);
 	draw_index_old[2] = (int)(index[2] + 0.5);
@@ -364,7 +368,6 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 				extent[0], extent[1], extent[2], extent[3], 0, 0);
 			break;
 		}
-
 		imageViewer->GetannotationRenderer()->AddActor(m_brushActor);
 		imageViewer->GetannotationRenderer()->Render();
 	}
@@ -471,13 +474,13 @@ void InteractorStylePaintBrush::FillBox3D()
 		m_brush->FillBox(extent[0], extent[1], extent[2], extent[3]);
 		break;
 	case 1:
-		for (int x = 0; x < extent[1]; x++)
+		for (int x = extent[0]; x < extent[1]; x++)
 		{
 			m_brush->DrawSegment3D(x, 0, extent[4], x, 0, extent[5]);
 		}
 		break;
 	case 0:
-		for (int y = 0; y < extent[3]; y++)
+		for (int y = extent[2]; y < extent[3]; y++)
 		{
 			m_brush->DrawSegment3D(0,y, extent[4], 0, y, extent[5]);
 		}

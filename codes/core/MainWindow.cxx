@@ -10,7 +10,6 @@
 #include "ModuleWidget.h"
 
 
-#include <QActionGroup>
 #include <QUrl>
 #include <QFileInfo>
 #include <QFileDialog>
@@ -35,6 +34,7 @@
 #include <vtkImageIterator.h>
 
 MainWindow::MainWindow() 
+	:widgetGroup(this), viewerGroup(this), viewGroup(this)
 {
 	this->ui.setupUi(this);
 	
@@ -47,14 +47,13 @@ MainWindow::MainWindow()
 	connect(ui.actionHelp,						SIGNAL(triggered()), this, SLOT(slotHelp()));
 	
 	//widgets
-	QActionGroup* widgetGroup = new QActionGroup(this);
-	widgetGroup->addAction(ui.actionNavigation);
-	widgetGroup->addAction(ui.actionWindowLevel);
-	widgetGroup->addAction(ui.actionContour);
-	widgetGroup->addAction(ui.actionBrush);
-	widgetGroup->addAction(ui.actionRuler);
-	widgetGroup->addAction(ui.actionROI);
-	widgetGroup->setExclusive(true);
+	widgetGroup.addAction(ui.actionNavigation);
+	widgetGroup.addAction(ui.actionWindowLevel);
+	widgetGroup.addAction(ui.actionContour);
+	widgetGroup.addAction(ui.actionBrush);
+	widgetGroup.addAction(ui.actionRuler);
+	widgetGroup.addAction(ui.actionROI);
+	widgetGroup.setExclusive(true);
 	connect(ui.actionNavigation, SIGNAL(triggered()), this, SLOT(slotNavigationMode()));
 	connect(ui.actionWindowLevel, SIGNAL(triggered()), this, SLOT(slotWindowLevelMode()));
 	connect(ui.actionContour, SIGNAL(triggered()), this, SLOT(slotContourMode()));
@@ -64,13 +63,12 @@ MainWindow::MainWindow()
 
 
 	//minimun, maximum
-	QActionGroup* viewerGroup = new QActionGroup(this);
-	viewerGroup->addAction(ui.actionImage1);
-	viewerGroup->addAction(ui.actionImage2);
-	viewerGroup->addAction(ui.actionImage3);
-	viewerGroup->addAction(ui.actionImage4);
-	viewerGroup->addAction(ui.actionFourViews);
-	viewerGroup->setExclusive(true);
+	viewerGroup.addAction(ui.actionImage1);
+	viewerGroup.addAction(ui.actionImage2);
+	viewerGroup.addAction(ui.actionImage3);
+	viewerGroup.addAction(ui.actionImage4);
+	viewerGroup.addAction(ui.actionFourViews);
+	viewerGroup.setExclusive(true);
 	QSignalMapper* viewerMapper = new QSignalMapper(this);
 	viewerMapper->setMapping(ui.actionFourViews, 0);
 	viewerMapper->setMapping(ui.actionImage1, 1);
@@ -96,10 +94,9 @@ MainWindow::MainWindow()
 	connect(ui.URSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUR()));
 	connect(ui.LLSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageLL()));
 
-	QActionGroup* viewgroup = new QActionGroup(this);
-	viewgroup->addAction(ui.actionMultiPlanarView);
-	viewgroup->addAction(ui.actionAllAxialView);
-	viewgroup->setExclusive(true);
+	viewGroup.addAction(ui.actionMultiPlanarView);
+	viewGroup.addAction(ui.actionAllAxialView);
+	viewGroup.setExclusive(true);
 	connect(ui.actionMultiPlanarView, SIGNAL(triggered()), this, SLOT(slotMultiPlanarView()));
 	connect(ui.actionAllAxialView, SIGNAL(triggered()), this, SLOT(slotSegmentationView()));
 
@@ -167,7 +164,6 @@ MainWindow::MainWindow()
 		vtkImageOriginal[i] = vtkImage[i];
 	}
 	vtkImageOverlay = vtkImageData::New();
-	vtkImageOverlayOriginal = vtkImageOverlay;
 
 	m_InfoDialog = NULL;
 
@@ -197,22 +193,25 @@ MainWindow* MainWindow::GetMainWindow()
 
 MainWindow::~MainWindow()
 {
+	ui.image1View->SetRenderWindow(NULL);
 
+	ui.image2View->SetRenderWindow(NULL);
+
+	ui.image3View->SetRenderWindow(NULL);
+	
 	for (int i=0;i<3;i++)
 	{
+		if (m_2DimageViewer[i]) {
+			m_2DimageViewer[i]->Delete();
+			m_2DimageViewer[i] = NULL;
+		}
 		if (m_interactor[i]) {
 			m_interactor[i]->Delete();
 			m_interactor[i] = NULL;
 		}
-
 		if (m_style[i]) {
 			m_style[i]->Delete();
 			m_style[i] = NULL;
-		}
-
-		if (m_2DimageViewer[i]) {
-			m_2DimageViewer[i]->Delete();
-			m_2DimageViewer[i] = NULL;
 		}
 	}
 	if (m_3Dinteractor) {
@@ -229,6 +228,7 @@ MainWindow::~MainWindow()
 		if (vtkImage[i] != NULL) {
 			if (vtkImageOriginal[i] != vtkImage[i]) {
 				vtkImage[i]->Delete();
+				vtkImage[i] = NULL;
 			}
 			if (vtkImageOriginal[i] != NULL) {
 				vtkImageOriginal[i]->Delete();
@@ -292,19 +292,6 @@ void MainWindow::addOverlay2ImageViewer()
 
 		//Overlay
 		SegmentationOverlay = new Overlay;
-		//vtkImageOverlay->SetExtent(vtkImage[0]->GetExtent());
-		//vtkImageOverlay->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-		//vtkImageIterator<unsigned char> it(vtkImageOverlay, vtkImageOverlay->GetExtent());
-
-		//while (!it.IsAtEnd())
-		//{
-
-		//	for(unsigned char* valIt = it.BeginSpan(); valIt != it.EndSpan(); ++valIt)
-		//	{
-		//		*valIt = .0;
-		//	}
-		//	it.NextSpan();
-		//}
 		SegmentationOverlay->SetInputImageData(vtkImageOverlay);
 		SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
 			vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
@@ -374,7 +361,7 @@ void MainWindow::slotOpenImage(QString dir)
 	for (int i = 0; i < 5; ++i) {
 		if (wizardFileNames[i] != NULL) {
 			FileNameList[i] = *wizardFileNames[i];
-			loadImage(i + 1, wizardFileNames[i]);
+			loadImage(i, wizardFileNames[i]);
 		}
 	}
 	//copy for segmentationROI to recover the original image
@@ -466,11 +453,11 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr<<err<<std::endl;
 			return 1;
 		}	
-		for (int i = 0; i < n; ++i) {
-			itkImage[i]->Graft(orienter->GetOutput());
-			itkImage[i]->Update();
-			if (i > 0) {
-				connectorAfter->SetInput(ImageAlignment(itkImage[i]));
+		//for (int i = 0; i < n; ++i) {
+			itkImage[n]->Graft(orienter->GetOutput());
+			itkImage[n]->Update();
+			if (n > 0) {
+				connectorAfter->SetInput(ImageAlignment(itkImage[n]));
 				try
 				{
 					connectorAfter->Update();
@@ -481,9 +468,8 @@ bool MainWindow::loadImage(int n, QStringList* list )
 					return 1;
 				}
 			}
-
-			vtkImage[i]->DeepCopy(connector->GetOutput());
-		}
+			vtkImage[n]->DeepCopy(connector->GetOutput());
+		//}
 
 	}
 	else
@@ -530,9 +516,9 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr<<err<<std::endl;
 			return 1;
 		}	
-		for (int i = 0; i < n; ++i) {
-			vtkImage[i]->DeepCopy(connector->GetOutput());
-		}
+		//for (int i = 0; i < n; ++i) {
+			vtkImage[n]->DeepCopy(connector->GetOutput());
+		//}
 
 	}
 
@@ -543,25 +529,13 @@ bool MainWindow::loadImage(int n, QStringList* list )
 
 bool MainWindow::visualizeImage()
 {	
+
+	//Enable Actions 
 	setActionsEnable(true);
-
-	//initializeViewers();
-	//for (int i = 0; i < 5; ++i) {
-	//	if (vtkImage[i] != NULL) {
-	//		vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
-	//			vtkSmartPointer<vtkExtractVOI>::New();
-	//		extractVOIFilter->SetVOI(100, 300, 100, 300, 10, 25);
-	//		extractVOIFilter->SetInputData(vtkImage[i]);
-	//		extractVOIFilter->Update();
-	//		vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
-	//	}
-	//}
-
 	ui.actionMultiPlanarView->trigger();
 	//for (int i = 0; i < 3; ++i) {
 	//	m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
 	//}
-	//Enable Actions 
 	//ui.actionMultiPlanarView->setChecked(true);
 	//Update UI stuff
     //Assume the four images have equal number of slices
@@ -582,7 +556,7 @@ bool MainWindow::visualizeImage()
 	
 	//Update Cursor
 	this->slotChangeSlice();
-	this->slotNavigationMode();
+	ui.actionNavigation->triggered();
 				
 	return 0;
 }
@@ -786,29 +760,18 @@ void MainWindow::slotChangeROI(double * bound)
 
 void MainWindow::slotSelectROI()
 {
-	qDebug() << vtkImage[0] << '\t' << vtkImageOriginal[0];
-	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
 
-	int newExtent[6] = { 0 };
+	int newExtent[6];
 	m_style[0]->GetROI()->SelectROI(newExtent);
-	vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
-		vtkSmartPointer<vtkExtractVOI>::New();
 	// Extract VOI of the overlay Image data
-	extractVOIFilter->SetVOI(newExtent);
-	extractVOIFilter->SetInputData(vtkImageOverlay);
-	extractVOIFilter->Update();
-	// make sure the vtkImageOverlayOriginal won't be deleted 
-	// delete multiple segmentations of vtkImageOverlay data 
-	if (vtkImageOverlay != vtkImageOverlayOriginal) {
-		vtkImageOverlay->Delete();
-	}
-	vtkImageOverlay = vtkImageData::New();
-	vtkImageOverlay->DeepCopy(extractVOIFilter->GetOutput());
+
 	// Extract VOI of the vtkImage data
 	for (int i = 0; i < 5; ++i) {
 		if (vtkImage[i] != NULL) {
-
+			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
+				vtkSmartPointer<vtkExtractVOI>::New();
 			extractVOIFilter->SetInputData(vtkImage[i]);
+			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
 			// make sure the vtkImageOriginal won't be deleted 
 			// delete multiple segmentations of vtkImage data 
@@ -821,25 +784,15 @@ void MainWindow::slotSelectROI()
 	}
 	ui.actionMultiPlanarView->trigger();
 	ui.actionNavigation->trigger();
-	qDebug() << vtkImage[0] << '\t' << vtkImageOriginal[0];
-	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
 }
 void MainWindow::slotResetROI()
 {
-	qDebug() << vtkImage[0] <<'\t' <<vtkImageOriginal[0];
-	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
 	for (int i = 0; i < 5; ++i) {
 		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL) {
 			vtkImage[i]->Delete();
 			vtkImage[i] = vtkImageOriginal[i];
 		}
 	}
-	if (vtkImageOverlay != NULL && vtkImageOverlay != vtkImageOverlayOriginal) {
-		vtkImageOverlay->Delete();
-		vtkImageOverlay = vtkImageOverlayOriginal;
-	}
-	qDebug() << vtkImage[0] << '\t' << vtkImageOriginal[0];
-	qDebug() << vtkImageOverlay << '\t' << vtkImageOverlayOriginal;
 
 	ui.actionMultiPlanarView->trigger();
 	ui.actionNavigation->trigger();
@@ -1148,6 +1101,7 @@ void MainWindow::slotChangeBaseImageLL()
 
 void MainWindow::slotMultiPlanarView()
 {
+
 	segmentationView = false;
 	this->ui.image1View->SetRenderWindow(NULL);
 	this->ui.image2View->SetRenderWindow(NULL);
@@ -1163,6 +1117,7 @@ void MainWindow::slotMultiPlanarView()
 	this->ui.image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 	this->ui.image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
 	this->ui.image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
+
 
 	for (int i = 0; i<3; i++)
 	{
@@ -1184,7 +1139,10 @@ void MainWindow::slotMultiPlanarView()
 
 	this->slotChangeSlice();
 	this->addOverlay2ImageViewer();
-
+	QAction* action = widgetGroup.checkedAction();
+	if (action != NULL) {
+		action->triggered();
+	}
 }
 
 void MainWindow::slotSegmentationView()
@@ -1262,7 +1220,10 @@ void MainWindow::slotSegmentationView()
 	}
 	this->slotChangeSlice();
 	this->addOverlay2ImageViewer();
-
+	QAction* action = widgetGroup.checkedAction();
+	if (action != NULL) {
+		action->triggered();
+	}
 }
 
 void MainWindow::slotAddExternalOverlay()

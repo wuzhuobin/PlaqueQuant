@@ -35,23 +35,36 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 
 InteractorStyleSwitch::~InteractorStyleSwitch()
 {
-	InteractorStyleTesting->Delete();
-	InteractorStyleTesting = 0;
+	if (InteractorStyleTesting != NULL) {
+		InteractorStyleTesting->Delete();
+		InteractorStyleTesting = 0;
+	}
+	
+	if (WindowLevel != NULL) {
+		WindowLevel->Delete();
+		WindowLevel = NULL;
+	}
+	
+	if (Navigation != NULL) {
+		Navigation->Delete();
+		Navigation = NULL;
+	}
 
-	WindowLevel->Delete();
-	WindowLevel = 0;
+	if (PolygonDraw != NULL) {
+		PolygonDraw->Delete();
+		PolygonDraw = NULL;
+	}
+	
+	if (PaintBrush != NULL) {
+		PaintBrush->Delete();
+		PaintBrush = NULL;
+	}
 
-	Navigation->Delete();
-	Navigation = 0;
+	if (ROI != NULL) {
+		ROI->Delete();
+		ROI = NULL;
+	}
 
-	PolygonDraw->Delete();
-	PolygonDraw = 0;
-
-	PaintBrush->Delete();
-	PaintBrush = 0;
-
-	ROI->Delete();
-	ROI = 0;
 
 }
 
@@ -59,21 +72,21 @@ void InteractorStyleSwitch::InternalUpdate()
 {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
-	if (this->CurrentStyle != this->PolygonDraw) {
+	//if (this->CurrentStyle != this->PolygonDraw) 
 		this->PolygonDraw->SetPolygonModeEnabled(false);
-	}
 
 	//if (this->imageViewer->GetRenderWindow()) {
 	//	this->imageViewer->Render();
 	//}
 
-	if (this->CurrentStyle != this->PaintBrush)
+	//if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
+
+		this->ROI->SetPlaneWidgetEnabled(false);
 
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(true);
-	else
-		this->ROI->SetPlaneWidgetEnabled(false);
+		
 }
 
 void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
