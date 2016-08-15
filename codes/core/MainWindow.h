@@ -153,7 +153,7 @@ private:
 	QStringList FileNameList[5];
     
 	//3D ruler
-	Distance3DWidget distanceWidget3D;
+	Distance3DWidget* m_distance3DWidget;
 	//Recent File
 	int m_maxRecentImage;
 	QList<QAction*> recentFileActionList;

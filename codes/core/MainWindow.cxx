@@ -175,6 +175,10 @@ MainWindow::MainWindow()
 	overlayColor[3] = hemorrhage;
 	overlayColor[4] = lrnc;
 	overlayColor[5] = lm;
+
+
+	//distanceWidget3D
+	m_distance3DWidget = Distance3DWidget::New();
 }
 
 MainWindow* MainWindow::GetMainWindow()
@@ -197,8 +201,8 @@ MainWindow::~MainWindow()
 	ui.image2View->SetRenderWindow(NULL);
 
 	ui.image3View->SetRenderWindow(NULL);
-	
-	for (int i=0;i<3;i++)
+
+	for (int i = 0; i < 3; i++)
 	{
 		if (m_2DimageViewer[i]) {
 			m_2DimageViewer[i]->Delete();
@@ -246,6 +250,10 @@ MainWindow::~MainWindow()
 		delete SegmentationOverlay;
 	}
 
+	if (m_distance3DWidget != NULL) {
+		//delete distance3DWidget;
+		//distance3DWidget->Delete();
+	}
 }
 
 void MainWindow::initializeModule()
@@ -1332,8 +1340,11 @@ Overlay* MainWindow::GetOverlay()
 
 void MainWindow::Set3DRulerEnabled(bool b)
 {
-	distanceWidget3D.SetInteractor(ui.image4View->GetInteractor());
-	distanceWidget3D.Set3DRulerEnabled(b);
+	MyVtkDistanceRepresentation3D* rep = MyVtkDistanceRepresentation3D::New();
+	rep->SetDistanceWidget(this->m_distance3DWidget);
+	this->m_distance3DWidget->SetInteractor(ui.image4View->GetRenderWindow()->GetInteractor());
+	this->m_distance3DWidget->SetRepresentation(rep);
+	this->m_distance3DWidget->On();
 }
 
 
