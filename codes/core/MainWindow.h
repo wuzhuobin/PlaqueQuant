@@ -21,6 +21,7 @@
 #include "InteractorStyleSwitch.h"
 #include "InfoDialog.h"
 #include "Overlay.h"
+#include "Distance3DWidget.h"
 
 class ModuleWidget;
 class MainWindow: public QMainWindow
@@ -30,6 +31,7 @@ public:
 	explicit MainWindow(); 	
 
 	static MainWindow* GetMainWindow();
+	vtkRenderWindow* GetRenderWindow(int i);
 	MyImageViewer* GetMyImageViewer(int i) {
 		return m_2DimageViewer[i]; 
 	};
@@ -151,7 +153,7 @@ private:
 	QStringList FileNameList[5];
     
 	//3D ruler
-	vtkDistanceWidget* DistanceWidget3D;
+	Distance3DWidget distanceWidget3D;
 	//Recent File
 	int m_maxRecentImage;
 	QList<QAction*> recentFileActionList;

@@ -65,14 +65,15 @@ MyImageViewer::MyImageViewer()
 	this->LookUpTable->SetTableRange(0.0, 6);
 	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
 	this->LookUpTable->SetTableValue(1, 1, 0, 0, 1);
-	this->LookUpTable->SetTableValue(2, 0, 0, 1, 1);
-	this->LookUpTable->SetTableValue(3, 0, 1, 0, 1);
-	this->LookUpTable->SetTableValue(4, 1, 1, 0, 1);
-	this->LookUpTable->SetTableValue(5, 0, 1, 1, 1);
+	this->LookUpTable->SetTableValue(2, 0, 0, 1, 0.3);
+	this->LookUpTable->SetTableValue(3, 0, 1, 0, 0.5);
+	this->LookUpTable->SetTableValue(4, 1, 1, 0, 0.8);
+	this->LookUpTable->SetTableValue(5, 0, 1, 1, 0.9);
 	this->LookUpTable->SetTableValue(6, 1, 0, 1, 1);
 	this->LookUpTable->Build();
 
 	this->drawActor = vtkImageActor::New();
+	this->drawActor->GetProperty()->SetInterpolationTypeToLinear();
 	this->drawActor->GetProperty()->SetLookupTable(LookUpTable);
 	this->drawActor->SetVisibility(false);
 

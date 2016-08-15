@@ -25,6 +25,7 @@ public:
 private:
 	vtkImageData* m_vtkOverlay;
 	ImageType::Pointer m_itkOverlay;
+	DuplicatorType::Pointer m_duplicator;
 	int m_visible_image_no;
 };
 

@@ -45,18 +45,28 @@ else()
   include(${QT_USE_FILE})
 endif()
 
-Add_subdirectory(codes)
 
-include_directories(	
-	${CMAKE_BINARY_DIR}
-	${CMAKE_SOURCE_DIR}/include
-	${CMAKE_SOURCE_DIR}/codes/core
-	${CMAKE_SOURCE_DIR}/build/codes/Module
-	${CMAKE_SOURCE_DIR}/codes/Module/GUI
-	${CMAKE_SOURCE_DIR}/codes/Module/Pipeline
-	${CMAKE_SOURCE_DIR}/codes/AbstractInteractorStyles
+SET(
+	MAIN_INCLUDE_DIRS
+	${PROJECT_BINARY_DIR}
+	${PROJECT_SOURCE_DIR}
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/codes/core
+	${PROJECT_SOURCE_DIR}/build/codes/Module
+	${PROJECT_SOURCE_DIR}/codes/Module/GUI
+	${PROJECT_SOURCE_DIR}/codes/Module/Pipeline
+	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
+	# Source for Widgets
+	${PROJECT_SOURCE_DIR}/codes/Widgets
 
 )
+
+include_directories(
+	${MAIN_INCLUDE_DIRS}
+)
+
+
+Add_subdirectory(codes)
 
 file(
 	GLOB 
@@ -181,6 +191,7 @@ target_link_libraries(
 	${VMTK_LIBRARIES} 
 	${ITK_LIBRARIES} 
 	Module
+	Widgets
 )
 
 

@@ -145,7 +145,7 @@ MainWindow::MainWindow()
 		m_interactor[i] = vtkRenderWindowInteractor::New();
 		m_style[i] = InteractorStyleSwitch::New();
 	}
-
+	
 	ui.image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
 
 	ui.image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
@@ -154,7 +154,6 @@ MainWindow::MainWindow()
 
 	ui.image4View->GetRenderWindow()->AddRenderer(vtkSmartPointer<vtkRenderer>::New());
 
-	DistanceWidget3D = NULL;
 	m_3Dinteractor = NULL;
 	ImageAlignment(NULL) = NULL;
 	
@@ -219,10 +218,6 @@ MainWindow::~MainWindow()
 		m_3Dinteractor = NULL;
 	}
 
-	if (DistanceWidget3D != NULL) {
-		DistanceWidget3D->Delete();
-		DistanceWidget3D = NULL;
-	}
 
 	for (int i = 0; i < 5; ++i) {
 		if (vtkImage[i] != NULL) {
@@ -739,7 +734,7 @@ void MainWindow::slotRuler(bool b)
 		m_style[i]->SetInteractorStyleToInteractorStyleTesting();
 	}
 
-	//this->Set3DRulerEnabled(b);
+	this->Set3DRulerEnabled(b);
 }
 
 void MainWindow::slotROIMode()
@@ -807,13 +802,15 @@ void MainWindow::slot3DUpdate()
 	//Layer 1
 	SurfaceCreator* SegmentationOverlayCreator = new SurfaceCreator();
 	SegmentationOverlayCreator->SetInput(SegmentationOverlay->GetOutput());
+	SegmentationOverlayCreator->SetDiscrete(true);
 	SegmentationOverlayCreator->SetResamplingFactor(1.0);
-	SegmentationOverlayCreator->SetValue(1);
 	SegmentationOverlayCreator->Update();
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	mapper->SetInputData(SegmentationOverlayCreator->GetOutput());
-	mapper->SetScalarRange(0, 1);
+	mapper->SetLookupTable(this->m_2DimageViewer[0]->getLookupTable());
+	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	mapper->Update();
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
 	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
 	Actor->SetMapper(mapper);
@@ -821,6 +818,8 @@ void MainWindow::slot3DUpdate()
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui.image4View->GetRenderWindow()->Render();
+
+	delete(SegmentationOverlayCreator);
 }
 
 void MainWindow::slotChangeIntensity()
@@ -1008,6 +1007,24 @@ void MainWindow::slotShowProgressDialog( int value, QString text )
 
 
 
+
+vtkRenderWindow * MainWindow::GetRenderWindow(int i)
+{
+	switch (i)
+	{
+	case 1:
+		return ui.image1View->GetRenderWindow();
+	case 2:
+		return ui.image2View->GetRenderWindow();
+	case 3:
+		return ui.image3View->GetRenderWindow();
+	case 4:
+		return ui.image4View->GetRenderWindow();
+	default:
+		break;
+	}
+	return nullptr;
+}
 
 QString MainWindow::GetFileName(int i)
 {
@@ -1315,35 +1332,8 @@ Overlay* MainWindow::GetOverlay()
 
 void MainWindow::Set3DRulerEnabled(bool b)
 {
-	if (b)
-	{
-		if (DistanceWidget3D)
-			DistanceWidget3D->Delete();
-
-		DistanceWidget3D = vtkDistanceWidget::New();
-		DistanceWidget3D->SetInteractor(this->ui.image4View->GetRenderWindow()->GetInteractor());
-		DistanceWidget3D->SetPriority(this->ui.image4View->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
-		
-		vtkSmartPointer< vtkPointHandleRepresentation3D > rulerHandleRep3D = vtkSmartPointer< vtkPointHandleRepresentation3D >::New();
-	
-		vtkSmartPointer< vtkDistanceRepresentation2D > distanceRep3D = vtkSmartPointer< vtkDistanceRepresentation2D >::New();
-		distanceRep3D->SetHandleRepresentation(rulerHandleRep3D);
-		DistanceWidget3D->SetRepresentation(distanceRep3D);
-		distanceRep3D->InstantiateHandleRepresentation();
-		distanceRep3D->SetLabelFormat("%-#11.2f mm");
-		//distanceRep3D->GetAxis()->GetProperty()->SetColor(0, 1, 0);
-
-		DistanceWidget3D->CreateDefaultRepresentation();
-
-		DistanceWidget3D->On();
-	}
-	else
-	{
-		DistanceWidget3D->Off();
-
-	}
-
-	this->ui.image4View->GetRenderWindow()->Render();
+	distanceWidget3D.SetInteractor(ui.image4View->GetInteractor());
+	distanceWidget3D.Set3DRulerEnabled(b);
 }
 
 
