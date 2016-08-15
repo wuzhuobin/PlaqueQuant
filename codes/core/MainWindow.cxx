@@ -8,6 +8,7 @@
 #include "VesselSegmentation.h"
 #include "ExtractCenterline.h"
 #include "ModuleWidget.h"
+#include "GPUVolumeRenderingFilter.h"
 
 
 #include <QUrl>
@@ -807,27 +808,36 @@ void MainWindow::slot3DUpdate()
 		return;
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
 	
-	//Layer 1
-	SurfaceCreator* SegmentationOverlayCreator = new SurfaceCreator();
-	SegmentationOverlayCreator->SetInput(SegmentationOverlay->GetOutput());
-	SegmentationOverlayCreator->SetDiscrete(true);
-	SegmentationOverlayCreator->SetResamplingFactor(1.0);
-	SegmentationOverlayCreator->Update();
+	//Marching cubes
+	//SurfaceCreator* SegmentationOverlayCreator = new SurfaceCreator();
+	//SegmentationOverlayCreator->SetInput(SegmentationOverlay->GetOutput());
+	//SegmentationOverlayCreator->SetDiscrete(true);
+	//SegmentationOverlayCreator->SetResamplingFactor(1.0);
+	//SegmentationOverlayCreator->Update();
 
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(SegmentationOverlayCreator->GetOutput());
-	mapper->SetLookupTable(this->m_2DimageViewer[0]->getLookupTable());
-	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	mapper->Update();
-	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
-	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	Actor->SetMapper(mapper);
-	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
-	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
-	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+	//vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//mapper->SetInputData(SegmentationOverlayCreator->GetOutput());
+	//mapper->SetLookupTable(this->m_2DimageViewer[0]->getLookupTable());
+	//mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	//mapper->Update();
+	//vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
+	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	//Actor->SetMapper(mapper);
+	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
+
+	//Volume Render
+	GPUVolumeRenderingFilter* volumeRenderingFilter =
+		GPUVolumeRenderingFilter::New();
+	volumeRenderingFilter->SetInputData(SegmentationOverlay->GetOutput());
+	volumeRenderingFilter->SetLookUpTable(m_2DimageViewer[0]->getLookupTable());
+	volumeRenderingFilter->Update();
+	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->
+		AddVolume(volumeRenderingFilter->GetVolume());
+
+	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui.image4View->GetRenderWindow()->Render();
 
-	delete(SegmentationOverlayCreator);
 }
 
 void MainWindow::slotChangeIntensity()

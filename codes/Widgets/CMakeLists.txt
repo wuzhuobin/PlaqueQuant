@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-
+project(Widgets)
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
@@ -32,32 +32,34 @@ endif()
 include(${VMTK_USE_FILE})
 
 #link other libraries
-link_directories(${PROJECT_SOURCE_DIR}/lib)
-
-message(${PROJECT_SOURCE_DIR})
-
-include_directories(
-	${PROJECT_BINARY_DIR}
-	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/codes/core
-	${PROJECT_SOURCE_DIR}/build/codes/Module
-	${PROJECT_SOURCE_DIR}/codes/Module/GUI
-	${PROJECT_SOURCE_DIR}/codes/Module/Pipeline
-	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
+link_directories(
+	${PROJECT_SOURCE_DIR}/lib
 	)
 
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(
+	${MAIN_INCLUDE_DIRS}
+	)
+
+SET(
+	LIBRARY_OUTPUT_PATH 
+	${CMAKE_SOURCE_DIR}/lib
+	)
 
 SET(WIDGET_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Distance3DWidget.cxx
-)
+	)
 
 SET(WIDGET_INC 
 	${CMAKE_CURRENT_SOURCE_DIR}/Distance3DWidget.h
-)
+	)
 
-ADD_LIBRARY(Widgets ${WIDGET_SRC} ${WIDGET_INC})
-target_link_libraries(Widgets 
+ADD_LIBRARY(
+	Widgets 
+	${WIDGET_SRC} 
+	${WIDGET_INC}
+	)
+target_link_libraries(
+	Widgets 
 	${VTK_LIBRARIES} 
-	${VMTK_LIBRARIES} 
-	${ITK_LIBRARIES} )
+	${ITK_LIBRARIES}
+	)

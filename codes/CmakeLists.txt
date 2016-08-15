@@ -1,3 +1,6 @@
 #Add module to the project
 add_subdirectory(Module)
 add_subdirectory(Widgets)
+add_subdirectory(AbstractInteractorStyles)
+add_subdirectory(GPURenderWithLUT)
+add_subdirectory(Core)

@@ -1,3 +1,5 @@
+project(InteractorStyles)
+
 #ITK
 find_package(ITK REQUIRED)
 if (NOT ITK_FOUND)
@@ -24,39 +26,45 @@ else()
 endif()
 
 #link other libraries
-link_directories(${PROJECT_SOURCE_DIR}/lib)
-include_directories(
-	${INCLUDE_DIRECTORIES}
-)
+link_directories(
+	${PROJECT_SOURCE_DIR}/lib
+	)
 
+include_directories(
+	${MAIN_INCLUDE_DIRS}
+)
+SET(
+	LIBRARY_OUTPUT_PATH
+	${CMAKE_SOURCE_DIR}/lib
+	${EXECUTABLE_OUTPUT_PATH}
+)
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_SRC 
-	${CMAKE_CURRENT_SOURCE_DIR}/Abstract*.cxx
+	${PROJECT_SOURCE_DIR}/Abstract*.cxx
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_H 
-	${CMAKE_SOURCE_DIR}/Abstract*.h
+	${PROJECT_SOURCE_DIR}/Abstract*.h
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	INTERACTORS_SRC  
-	${CMAKE_SOURCE_DIR}/InteractorStyle*.cxx 
+	${PROJECT_SOURCE_DIR}/InteractorStyle*.cxx 
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	INTERACTORS_INC  
-	${CMAKE_SOURCE_DIR}/InteractorStyle*.h 
-	${CMAKE_SOURECE_DIR}/StyleSwitchMacro.h 
+	${PROJECT_SOURCE_DIR}/InteractorStyle*.h 
+	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h 
 	PARENT_SCOPE
 	)
-message( "${ABSTRACT_INTERACTORS_H}" )
 add_library(
-	InteractorStyle
+	InteractorStyles
 	${ABSTRACT_INTERACTORS_SRC}
 	${ABSTRACT_INTERACTORS_H}
 	${INTERACTORS_INC}
@@ -64,7 +72,7 @@ add_library(
 )
 
 target_link_libraries(
-	InteractorStyle
+	InteractorStyles
 	${VTK_LIBRARIES}
 )
 

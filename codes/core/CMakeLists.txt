@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
+
+project(Core)
+include_directories(${MAIN_INCLUDE_DIRS})
  
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
@@ -40,55 +43,55 @@ endif()
 
 SET(
 	QT_SRC
-	${CMAKE_SOURCE_DIR}/main.cxx
-	${CMAKE_SOURCE_DIR}/MainWindow.cxx
-	${CMAKE_SOURCE_DIR}/InfoDialog.cxx
-	${CMAKE_SOURCE_DIR}/MyProgressDialog.cxx
-	${CMAKE_SOURCE_DIR}/RegistrationWizard.cxx
-	${CMAKE_SOURCE_DIR}/ImageRegistration.cxx
-	${CMAKE_SOURCE_DIR}/Overlay.cxx
-	${CMAKE_SOURCE_DIR}/SurfaceCreator.cxx
-	${CMAKE_SOURCE_DIR}/AbstractFilter.cxx
-	${CMAKE_SOURCE_DIR}/ReportGenerator.cxx
-	${CMAKE_SOURCE_DIR}/ExtractCenterline.cpp
-	${CMAKE_SOURCE_DIR}/VesselSegmentation.cpp
+	${PROJECT_SOURCE_DIR}/main.cxx
+	${PROJECT_SOURCE_DIR}/MainWindow.cxx
+	${PROJECT_SOURCE_DIR}/InfoDialog.cxx
+	${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
+	${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
+	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
+	${PROJECT_SOURCE_DIR}/Overlay.cxx
+	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
+	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
+	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
+	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
+	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
 
 )
 
 SET(
 	QT_INC
-	${CMAKE_SOURCE_DIR}/MainWindow.h
-	${CMAKE_SOURCE_DIR}/InfoDialog.h
-	${CMAKE_SOURCE_DIR}/MyProgressDialog.h
-	${CMAKE_SOURCE_DIR}/RegistrationWizard.h
-	${CMAKE_SOURCE_DIR}/ImageRegistration.h
-	${CMAKE_SOURCE_DIR}/Overlay.h
-	${CMAKE_SOURCE_DIR}/SurfaceCreator.h
-	${CMAKE_SOURCE_DIR}/AbstractFilter.h
-	${CMAKE_SOURCE_DIR}/ReportGenerator.h
-	${CMAKE_SOURCE_DIR}/ExtractCenterline.h
-	${CMAKE_SOURCE_DIR}/VesselSegmentation.h
+	${PROJECT_SOURCE_DIR}/MainWindow.h
+	${PROJECT_SOURCE_DIR}/InfoDialog.h
+	${PROJECT_SOURCE_DIR}/MyProgressDialog.h
+	${PROJECT_SOURCE_DIR}/RegistrationWizard.h
+	${PROJECT_SOURCE_DIR}/ImageRegistration.h
+	${PROJECT_SOURCE_DIR}/Overlay.h
+	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
+	${PROJECT_SOURCE_DIR}/AbstractFilter.h
+	${PROJECT_SOURCE_DIR}/ReportGenerator.h
+	${PROJECT_SOURCE_DIR}/ExtractCenterline.h
+	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
 )
 
 SET(
 	QT_UI
-	${CMAKE_SOURCE_DIR}/MainWindow.ui
-	${CMAKE_SOURCE_DIR}/InfoDialog.ui
+	${PROJECT_SOURCE_DIR}/MainWindow.ui
+	${PROJECT_SOURCE_DIR}/InfoDialog.ui
 )
 
 SET(
 	CORE_SRC
-	${CMAKE_SOURCE_DIR}/MyImageViewer.cxx
+	${PROJECT_SOURCE_DIR}/MyImageViewer.cxx
 	# ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
-	${CMAKE_SOURCE_DIR}/MyPlaneWidget.cxx
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
 )
 
 SET(
 	CORE_INC
-	${CMAKE_SOURCE_DIR}MyImageViewer.h
+	${PROJECT_SOURCE_DIR}/MyImageViewer.h
 	  # ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.h
-	${CMAKE_SOURCE_DIR}/MyPlaneWidget.h
-	${CMAKE_SOURCE_DIR}/include/Define.h
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
+	# ${CMAKE_SOURCE_DIR}/include/Define.h
 
 )
 
@@ -108,7 +111,7 @@ QT5_WRAP_CPP(MOCSrcs ${QT_INC})
 QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
 
 add_executable(
-	Main
+	Core
 	MACOSX_BUNDLE 
 	${QT_WRAP} 
 	${UISrcs} 
@@ -125,7 +128,7 @@ add_executable(
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 target_link_libraries(
-	Main
+	Core
 	Qt5::Core
 	Qt5::Gui
 	Qt5::Widgets 
@@ -134,31 +137,34 @@ target_link_libraries(
 	${VMTK_LIBRARIES} 
 	${ITK_LIBRARIES} 
 	Module
+	InteractorStyles
+	Widgets 
+	GPURenderWithLUT
 )
 
 
 #Grouping in MSVC
 SOURCE_GROUP(
-	"_Generated" 	
-	FILES 
-	${UISrcs}
+	"Generated FIles" 
+	FILES
 	${RCC_RSRS}
+	${UISrcs}
 	${MOCSrcs}
-	)
+)
 SOURCE_GROUP(
-	"UI FILES" 	
+	"UI FILES" 
 	FILES 
 	${QT_UI}
-	)
+)
 SOURCE_GROUP(
 	"Header Files" 
 	FILES 
-	${CORE_INC}
 	${QT_INC}
-	)
+	${CORE_INC}
+)
 SOURCE_GROUP(
 	"Source Files" 
 	FILES 
-	${CORE_SRC}
 	${QT_SRC}
+	${CORE_SRC}
 )
