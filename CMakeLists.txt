@@ -49,16 +49,25 @@ endif()
 SET(
 	MAIN_INCLUDE_DIRS
 	${PROJECT_BINARY_DIR}
+	${PROJECT_BINARY_DIR}/include
+	${PROJECT_BINARY_DIR}/codes/Module
+	${PROJECT_BINARY_DIR}/codes/Core
+	# AbstractInteractorStyles
+	${PROJECT_BINARY_DIR}/codes/AbstractInteractorStyles
+	# Source for Widgets
+	${PROJECT_BINARY_DIR}/codes/Widgets
+	# Source for GPURender
+	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
+	
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/codes/Module
-	${PROJECT_SOURCE_DIR}/codes/core
+	${PROJECT_SOURCE_DIR}/codes/Core
 	# AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
 	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
-
 )
 SET(
 	LIBRARY_OUTPUT_PATH

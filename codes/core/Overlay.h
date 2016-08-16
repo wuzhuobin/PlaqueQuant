@@ -15,6 +15,7 @@ public:
 	void SetInputImageData(vtkImageData* imagedata);
 	void SetInputImageData(QString);
 	bool Update();
+	void Initialize(vtkImageData* img);
 	void Initialize(ImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
 	void SetPixel(int pos[3], double value);
 	void SetPixel(int pos[3], unsigned char value);

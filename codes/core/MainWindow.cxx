@@ -297,8 +297,9 @@ void MainWindow::addOverlay2ImageViewer()
 		//Overlay
 		SegmentationOverlay = new Overlay;
 		SegmentationOverlay->SetInputImageData(vtkImageOverlay);
-		SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
-			vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
+		SegmentationOverlay->Initialize(vtkImage[0]);
+		//SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
+			//vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
 		vtkImageOverlay = SegmentationOverlay->GetOutput();
 	}
 
@@ -310,7 +311,7 @@ void MainWindow::addOverlay2ImageViewer()
 		m_2DimageViewer[i]->SetInputDataLayer(vtkImageOverlay);
 
 	}
-	this->slotOverlayVisibilty(true);
+	//this->slotOverlayVisibilty(true);
 
 }
 void MainWindow::setActionsEnable( bool b )
@@ -801,11 +802,14 @@ void MainWindow::slotResetROI()
 	ui.actionMultiPlanarView->trigger();
 	ui.actionNavigation->trigger();
 }
+
+#include <vtkAxesActor.h>
+
 void MainWindow::slot3DUpdate()
 {
 
-	if (SegmentationOverlay == NULL)
-		return;
+	//if (SegmentationOverlay == NULL)
+	//	return;
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
 	
 	//Marching cubes
@@ -824,19 +828,68 @@ void MainWindow::slot3DUpdate()
 	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
 	//Actor->SetMapper(mapper);
 	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
+	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+	//this->ui.image4View->GetRenderWindow()->Render();
+
+	//vtkNIFTIImageReader* reader = vtkNIFTIImageReader::New();
+	//reader->SetFileName("E:\\ccode\\blood_vessel\\build\\codes\\core\\segmentation_right.nii");
+	//reader->Update();
+	//cout << " image\n";
+	//reader->GetOutput()->Print(cout);
+	
+	vtkLookupTable* lut = vtkLookupTable::New();
+	lut->SetNumberOfTableValues(7);
+	lut->SetTableRange(0.0, 6);
+	lut->SetTableValue(0, 0, 0, 0, 0);
+	lut->SetTableValue(1, 1, 0, 0, 0.8);
+	lut->SetTableValue(2, 0, 0, 1, 0.3);
+	lut->SetTableValue(3, 0, 1, 0, 0.5);
+	lut->SetTableValue(4, 1, 1, 0, 0.8);
+	lut->SetTableValue(5, 0, 1, 1, 0.9);
+	lut->SetTableValue(6, 1, 0, 1, 1);
+	lut->Build();
+
+	cout << "MainWindow Type: " << SegmentationOverlay->GetOutput()->GetScalarTypeAsString() << endl;
 
 	//Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
 		GPUVolumeRenderingFilter::New();
 	volumeRenderingFilter->SetInputData(SegmentationOverlay->GetOutput());
-	volumeRenderingFilter->SetLookUpTable(m_2DimageViewer[0]->getLookupTable());
+	//volumeRenderingFilter->SetInputData(reader->GetOutput());
+	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
+	//volumeRenderingFilter->SetLookUpTable(lut);
 	volumeRenderingFilter->Update();
 	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->
 		AddVolume(volumeRenderingFilter->GetVolume());
+	//cout << " volume\n";
+	//volumeRenderingFilter->GetVolume()->Print(cout);
 
-	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
-	//this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+	vtkAxesActor* a = vtkAxesActor::New();
+	a->SetTotalLength(5, 5, 5);
+	a->SetCylinderRadius(0.1);
+	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(a);
+	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddVolume(volumeRenderingFilter->GetVolume());
+	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3,0.3,0.3);
+	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+	this->ui.image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui.image4View->GetRenderWindow()->Render();
+
+	//vtkRenderer* ren = vtkRenderer::New();
+	//vtkRenderWindow* renwin = vtkRenderWindow::New();
+	//vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
+
+	//renwin->AddRenderer(ren);
+	//iren->SetRenderWindow(renwin);
+	//
+	//ren->AddActor(a);
+	//ren->AddVolume(volumeRenderingFilter->GetVolume());
+	//ren->ResetCameraClippingRange();
+	//ren->ResetCamera();
+
+	//iren->Initialize();
+	//renwin->Render();
+	//iren->Start();
 
 }
 
@@ -1270,6 +1323,7 @@ void MainWindow::slotAddExternalOverlay()
 	if (Path == "")
 		return;
 	SegmentationOverlay->SetInputImageData(Path);
+	addOverlay2ImageViewer();
 
 }
 

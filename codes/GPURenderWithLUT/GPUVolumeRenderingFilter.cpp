@@ -51,13 +51,15 @@ void GPUVolumeRenderingFilter::Update()
 		return;
 	}
 
-	double *range = this->LookUpTable->GetRange();
+	double range[2];
+	range[0] = 0;
+	range[1] = 6.;
 	int numberOfValues = this->LookUpTable->GetNumberOfTableValues();
 
 	cout << "Range: " << range[0] << " " << range[1] << endl;
 
-	vtkSmartPointer<vtkColorTransferFunction>  color = vtkSmartPointer<vtkColorTransferFunction>::New();
-	vtkSmartPointer<vtkPiecewiseFunction> compositeOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	vtkColorTransferFunction*  color = vtkColorTransferFunction::New();
+	vtkPiecewiseFunction* compositeOpacity = vtkPiecewiseFunction::New();
 	for (int i = 0; i < numberOfValues; i++)
 	{
 		cout << "Val: " << i / double(numberOfValues - 1) * (range[1] - range[0]) + range[0] << endl;

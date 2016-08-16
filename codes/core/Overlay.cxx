@@ -1,5 +1,7 @@
 #include "Overlay.h"
 
+#include <itkCastImageFilter.h>
+#include <vtkImageCast.h>
 
 Overlay::Overlay(QObject* parent) : QObject(parent)
 {
@@ -46,10 +48,14 @@ void Overlay::SetInputImageData(QString fileName)
 	{
 		std::cerr<<err<<std::endl;
 		return;
-	}	
+	}
+	vtkSmartPointer<vtkImageCast> castFilter =
+		vtkSmartPointer<vtkImageCast>::New();
+	castFilter->SetInputData(connector->GetOutput());
+	castFilter->SetOutputScalarTypeToDouble();
+	castFilter->Update();
 	m_vtkOverlay = vtkImageData::New();
-	m_vtkOverlay->DeepCopy(connector->GetOutput());
-
+	m_vtkOverlay->DeepCopy(castFilter->GetOutput());
 	
 }
 
@@ -72,17 +78,16 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 		std::cerr << err << std::endl;
 		return; // Since the goal of the example is to catch the exception, we declare this a success.
 	}
-
 	ImageType::Pointer m_itkOverlay = duplicator->GetOutput();
 
-	//itk::ImageRegionIterator<ImageType> itr(m_itkOverlay, m_itkOverlay->GetLargestPossibleRegion());
+	itk::ImageRegionIterator<ImageType> itr(m_itkOverlay, m_itkOverlay->GetLargestPossibleRegion());
 
-	////Set all pixel to zero
-	//while (!itr.IsAtEnd())
-	//{
-	//	itr.Set(0);
-	//	++itr;
-	//}
+	//Set all pixel to zero
+	while (!itr.IsAtEnd())
+	{
+		itr.Set(0);
+		++itr;
+	}
 
 	ConnectorType::Pointer connector = ConnectorType::New();
 	connector->SetInput(m_itkOverlay);
@@ -96,24 +101,24 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 	}
 
 	m_vtkOverlay = vtkImageData::New();
-	//m_vtkOverlay->DeepCopy(connector->GetOutput());
+	m_vtkOverlay->DeepCopy(connector->GetOutput());
 	//const int numofElements = dim[0] * dim[1] * dim[2];
-	m_vtkOverlay->SetDimensions(dim);
-	m_vtkOverlay->SetOrigin(origin);
-	m_vtkOverlay->SetSpacing(spacing);
-	m_vtkOverlay->AllocateScalars(type, 1);
+	//m_vtkOverlay->SetDimensions(dim);
+	//m_vtkOverlay->SetOrigin(origin);
+	//m_vtkOverlay->SetSpacing(spacing);
+	//m_vtkOverlay->AllocateScalars(VTK_DOUBLE, 1);
 
-	for (int i = 0; i < dim[0]; i++)
-	{
-		for (int j = 0; j < dim[1]; j++)
-		{
-			for (int k = 0; k < dim[2]; k++)
-			{
-				double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
-				*pixel = 0.;
-			}
-		}
-	}
+	//for (int i = 0; i < dim[0]; i++)
+	//{
+	//	for (int j = 0; j < dim[1]; j++)
+	//	{
+	//		for (int k = 0; k < dim[2]; k++)
+	//		{
+	//			float* pixel = static_cast<float*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
+	//			*pixel = 0.;
+	//		}
+	//	}
+	//}
    
     
 
@@ -138,6 +143,33 @@ bool Overlay::Update()
 		return EXIT_FAILURE;
 	else
 		return EXIT_SUCCESS;
+}
+
+void Overlay::Initialize(vtkImageData * img)
+{
+	m_vtkOverlay = vtkImageData::New();
+	m_vtkOverlay->SetDimensions(img->GetDimensions());
+	m_vtkOverlay->SetSpacing(img->GetSpacing());
+	m_vtkOverlay->SetOrigin(img->GetOrigin());
+	cout << img->GetScalarTypeAsString() << endl;
+	m_vtkOverlay->AllocateScalars(VTK_DOUBLE, img->GetNumberOfScalarComponents());
+	int dim[3];
+	m_vtkOverlay->GetDimensions(dim);
+
+	
+
+	for (int i = 0; i < dim[0]; i++)
+	{
+		for (int j = 0; j < dim[1]; j++)
+		{
+			for (int k = 0; k < dim[2]; k++)
+			{
+				double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
+				*pixel = 0.;
+			}
+		}
+	}
+
 }
 
 

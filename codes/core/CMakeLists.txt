@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(Core)
-include_directories(${MAIN_INCLUDE_DIRS})
- 
+include_directories(
+	${PROJECT_BINARY_DIR}
+	${MAIN_INCLUDE_DIRS})
+ # message("${PROJECT_BINARY_DIR}")
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
