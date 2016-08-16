@@ -50,16 +50,14 @@ void GPUVolumeRenderingFilter::Update()
 		vtkErrorMacro("No Input Data!");
 		return;
 	}
-
-	double range[2];
-	range[0] = 0;
-	range[1] = 6.;
+	double *range = this->LookUpTable->GetRange();
+	//double range[2] = { 0.0, 6.0 };
 	int numberOfValues = this->LookUpTable->GetNumberOfTableValues();
 
 	cout << "Range: " << range[0] << " " << range[1] << endl;
 
-	vtkColorTransferFunction*  color = vtkColorTransferFunction::New();
-	vtkPiecewiseFunction* compositeOpacity = vtkPiecewiseFunction::New();
+	vtkSmartPointer<vtkColorTransferFunction>  color = vtkSmartPointer<vtkColorTransferFunction>::New();
+	vtkSmartPointer<vtkPiecewiseFunction> compositeOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
 	for (int i = 0; i < numberOfValues; i++)
 	{
 		cout << "Val: " << i / double(numberOfValues - 1) * (range[1] - range[0]) + range[0] << endl;
