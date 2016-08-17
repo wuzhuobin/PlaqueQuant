@@ -844,9 +844,20 @@ void InteractorStylePaintBrush::Render()
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (m_brush == NULL)
 		return;
+	for (int i = 0; i < 3; ++i) {
+		cout << "m_brush before\n";
+		cout << m_brush->GetOutput()->GetSpacing()[i] << endl;
+		cout << m_brush->GetOutput()->GetOrigin()[i] << endl;
+	}
 	m_brush->Update();
 	m_brush->GetOutput()->SetOrigin(origin);
 	m_brush->GetOutput()->SetSpacing(spacing);
+
+	for (int i = 0; i < 3; ++i) {
+		cout << "m_brush after\n";
+		cout << m_brush->GetOutput()->GetSpacing()[i] << endl;
+		cout << m_brush->GetOutput()->GetOrigin()[i] << endl;
+	}
 	mainWnd->RenderAllViewer();
 }
 

@@ -1203,7 +1203,7 @@ void MainWindow::slotMultiPlanarView()
 	this->addOverlay2ImageViewer();
 	QAction* action = widgetGroup.checkedAction();
 	if (action != NULL) {
-		action->triggered();
+		action->trigger();
 	}
 }
 
@@ -1284,7 +1284,7 @@ void MainWindow::slotSegmentationView()
 	this->addOverlay2ImageViewer();
 	QAction* action = widgetGroup.checkedAction();
 	if (action != NULL) {
-		action->triggered();
+		action->trigger();
 	}
 }
 
@@ -1301,8 +1301,11 @@ void MainWindow::slotAddExternalOverlay()
 	SegmentationOverlay->SetInputImageData(Path);
 	vtkImageOverlay = SegmentationOverlay->GetOutput();
 
-	if(m_2DimageViewer[0]->GetInput()!=NULL)
+	if (m_2DimageViewer[0]->GetInput() != NULL) {
 		addOverlay2ImageViewer();
+		viewerGroup.checkedAction()->trigger();
+	}
+
 
 }
 
