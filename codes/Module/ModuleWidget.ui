@@ -62,7 +62,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -882,7 +882,7 @@
           <string>Lumen</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../resources/Project.qrc">
+          <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/redbox.png</normaloff>:/icons/redbox.png</iconset>
          </property>
         </item>
@@ -891,7 +891,7 @@
           <string>Vessel Wall</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../resources/Project.qrc">
+          <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/bluebox.png</normaloff>:/icons/bluebox.png</iconset>
          </property>
         </item>
@@ -900,7 +900,7 @@
           <string>Calcification</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../resources/Project.qrc">
+          <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/greenbox.png</normaloff>:/icons/greenbox.png</iconset>
          </property>
         </item>
@@ -909,7 +909,7 @@
           <string>Hemorrhage</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../resources/Project.qrc">
+          <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/yellowbox.png</normaloff>:/icons/yellowbox.png</iconset>
          </property>
         </item>
@@ -918,7 +918,7 @@
           <string>LRNC</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../resources/Project.qrc">
+          <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/lightbluebox.png</normaloff>:/icons/lightbluebox.png</iconset>
          </property>
         </item>
@@ -927,7 +927,7 @@
           <string>LM</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../resources/Project.qrc">
+          <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/purplebox.png</normaloff>:/icons/purplebox.png</iconset>
          </property>
         </item>
@@ -1028,7 +1028,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../resources/Project.qrc"/>
+  <include location="../../resources/Project.qrc"/>
  </resources>
  <connections/>
 </ui>

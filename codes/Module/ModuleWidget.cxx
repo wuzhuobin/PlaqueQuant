@@ -18,6 +18,10 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->BrushSizeSlider->setMinimum(1);
 	this->ui->BrushSizeSpinBox->setMaximum(40);
 	this->ui->BrushSizeSpinBox->setMinimum(1);
+
+	ui->BackBtn->setVisible(false);
+	ui->NextBtn->setVisible(false);
+	//connect
 	connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
 	connect(ui->BackBtn, SIGNAL(clicked()), this, SLOT(BackPage()));
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);

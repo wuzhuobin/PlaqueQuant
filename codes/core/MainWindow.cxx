@@ -296,7 +296,6 @@ void MainWindow::addOverlay2ImageViewer()
 
 		//Overlay
 		SegmentationOverlay = new Overlay;
-		SegmentationOverlay->SetInputImageData(vtkImageOverlay);
 		SegmentationOverlay->Initialize(vtkImage[0]);
 		//SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
 			//vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
@@ -317,8 +316,8 @@ void MainWindow::addOverlay2ImageViewer()
 void MainWindow::setActionsEnable( bool b )
 {	
 	//switch after open the image
-	ui.actionOpenImage->setEnabled(!b);
-	ui.menuRecentImage->setEnabled(!b);
+	//ui.actionOpenImage->setEnabled(!b);
+	//ui.menuRecentImage->setEnabled(!b);
 	ui.actionSave->setEnabled(b);
 	ui.actionNavigation->setEnabled(b);
 	ui.actionWindowLevel->setEnabled(b);
@@ -537,11 +536,13 @@ bool MainWindow::visualizeImage()
 
 	//Enable Actions 
 	setActionsEnable(true);
+	//connected to slotMultiPlanarView
 	ui.actionMultiPlanarView->trigger();
+
+
 	//for (int i = 0; i < 3; ++i) {
 	//	m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
 	//}
-	//ui.actionMultiPlanarView->setChecked(true);
 	//Update UI stuff
     //Assume the four images have equal number of slices
 	ui.xSpinBox->setMaximum(m_2DimageViewer[0]->GetInput()->GetDimensions()[0]);
@@ -561,7 +562,8 @@ bool MainWindow::visualizeImage()
 	
 	//Update Cursor
 	this->slotChangeSlice();
-	ui.actionNavigation->triggered();
+	//connected to slotNavigationMode()
+	ui.actionNavigation->trigger();
 				
 	return 0;
 }
@@ -750,8 +752,10 @@ void MainWindow::slotRuler(bool b)
 void MainWindow::slotROIMode()
 {
 	if (segmentationView) {
-		slotMultiPlanarView();
+		//connected to slotMultiPlanarView()
+		ui.actionMultiPlanarView->trigger();
 	}
+	m_moduleWidget->SetPage(0);
 	for (int i = 0; i < 3; ++i) {
 		m_style[i]->SetInteractorStyleToROI();
 	}
@@ -1295,6 +1299,8 @@ void MainWindow::slotAddExternalOverlay()
 	if (Path == "")
 		return;
 	SegmentationOverlay->SetInputImageData(Path);
+	vtkImageOverlay = SegmentationOverlay->GetOutput();
+
 	if(m_2DimageViewer[0]->GetInput()!=NULL)
 		addOverlay2ImageViewer();
 
