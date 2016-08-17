@@ -135,8 +135,6 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
 	//Check if valid pick
-	qDebug() << "picked";
-	qDebug() << picked[0] << picked[1];
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
 	// Check if valid pick
@@ -152,8 +150,6 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 			index[i] = (picked[i] - origin[i]) / spacing[i];
 		}
 	}
-	qDebug() << "index";
-	qDebug() << index[0] << index[1] << index[2];
 	draw_index_old[0] = (int)(index[0] + 0.5);
 	draw_index_old[1] = (int)(index[1] + 0.5);
 	draw_index_old[2] = (int)(index[2] + 0.5);
@@ -848,7 +844,6 @@ void InteractorStylePaintBrush::Render()
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (m_brush == NULL)
 		return;
-
 	m_brush->Update();
 	m_brush->GetOutput()->SetOrigin(origin);
 	m_brush->GetOutput()->SetSpacing(spacing);

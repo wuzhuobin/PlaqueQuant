@@ -19,9 +19,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->BrushSizeSpinBox->setMaximum(40);
 	this->ui->BrushSizeSpinBox->setMinimum(1);
 
-	ui->BackBtn->setVisible(false);
-	ui->NextBtn->setVisible(false);
 	//connect
+	connect(ui->generateReportPushButton, SIGNAL(clicked()), this, SLOT(slotReportGetInput()));
 	connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
 	connect(ui->BackBtn, SIGNAL(clicked()), this, SLOT(BackPage()));
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);
@@ -33,6 +32,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
 
+	this->GenerateReportPushButtonVisible();
 }
 
 ModuleWidget::~ModuleWidget()
@@ -40,33 +40,31 @@ ModuleWidget::~ModuleWidget()
     delete ui;
 }
 
-void ModuleWidget::NextBtnChangeText()
+void ModuleWidget::GenerateReportPushButtonVisible()
 {
 	int index = ui->stackedWidget->currentIndex();
-	if (index == 0 || index == 1 || index == 2)
-	{
-		ui->NextBtn->setText("Next");
+	if (index == 4)	{
+		ui->NextBtn->setVisible(false);
+		ui->generateReportPushButton->setVisible(true);
 	}
-	if (index == 3)
-	{
-		ui->NextBtn->setText("Generate Report");
-		disconnect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
-		connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(slotReportGetInput()));
+	else {
+		ui->NextBtn->setVisible(true);
+		ui->generateReportPushButton->setVisible(false);
 	}
+	
 }
 void ModuleWidget::NextPage()
 {
 	int index = ui->stackedWidget->currentIndex();
-	
 	ui->stackedWidget->setCurrentIndex(index + 1);
-	this->NextBtnChangeText();
+	this->GenerateReportPushButtonVisible();
 }
 
 void ModuleWidget::BackPage()
 {
 	int index = ui->stackedWidget->currentIndex();
 	ui->stackedWidget->setCurrentIndex(index - 1);
-	this->NextBtnChangeText();
+	this->GenerateReportPushButtonVisible();
 
 }
 
