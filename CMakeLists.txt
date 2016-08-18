@@ -58,6 +58,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
+	${PROJECT_BINARY_DIR}/codes/MeasurementFor3D 
 	
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/codes/Module
@@ -68,6 +69,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
+	${PROJECT_SOURCE_DIR}/codes/MeasurementFor3D 
 )
 SET(
 	LIBRARY_OUTPUT_PATH

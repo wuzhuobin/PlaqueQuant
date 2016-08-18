@@ -9,6 +9,7 @@
 #include "ExtractCenterline.h"
 #include "ModuleWidget.h"
 #include "GPUVolumeRenderingFilter.h"
+#include "MeasurementFor3D.h"
 
 
 #include <QUrl>
@@ -566,6 +567,18 @@ bool MainWindow::visualizeImage()
 	ui.actionNavigation->trigger();
 				
 	return 0;
+}
+
+void MainWindow::slotMeasureCurrentVolumeOfEveryLabelPushButton()
+{
+	MeasurementFor3D measure;
+	measure.SetInputData(SegmentationOverlay->GetOutput());
+	measure.SetLookupTable(m_2DimageViewer[0]->getLookupTable());
+	measure.Update();
+	double* volumes = measure.GetVolumes();
+	
+
+	delete[] volumes;
 }
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)

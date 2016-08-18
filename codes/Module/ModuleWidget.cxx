@@ -6,6 +6,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ModuleWidget)
 {
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
+
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
     //Recent Parameters
@@ -31,6 +33,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), ui->opacitySlider, SLOT(setValue(int)));
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
+	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
+		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabelPushButton()));
+
 
 	this->GenerateReportPushButtonVisible();
 }

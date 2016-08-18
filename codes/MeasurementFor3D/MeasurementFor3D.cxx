@@ -34,7 +34,9 @@ void MeasurementFor3D::Update()
 	double spacing[3];
 	int extent[6];
 	double pixelSize = 1;
-	int* numberOfPixels = new int[lookupTable->GetNumberOfTableValues()];
+	int num = lookupTable->GetNumberOfColors();
+	int* numberOfPixels = new int[num];
+	volumes = new double[num];
 
 	overlay->GetSpacing(spacing);
 	overlay->GetExtent(extent);
@@ -42,33 +44,34 @@ void MeasurementFor3D::Update()
 	for (int i = 0; i < 3; ++i) {
 		pixelSize *= spacing[i];
 	}
+	// initialize the numberOfPixels
+	for (int i = 0; i < num; ++i) {
+		numberOfPixels[i] = 0;
+	}
 	// iterate an overlay to calculate the number of pixels
-	for (int index = 0; index < lookupTable->GetNumberOfColors(); ++index) {
-		numberOfPixels[index] = 0;
-		for (int i = extent[0]; i < extent[1]; ++i) {
-			for (int j = extent[2]; j < extent[3]; ++j) {
-				for (int k = extent[4]; k < extent[5]; ++k) {
-					double* val = static_cast<double*>(overlay->GetScalarPointer(i, j, k));
-
-					if (*val == index) {
-						++numberOfPixels[index];
-					}
-				}
-
-
+	for (int i = extent[0]; i < extent[1]; ++i) {
+		for (int j = extent[2]; j < extent[3]; ++j) {
+			for (int k = extent[4]; k < extent[5]; ++k) {
+				double* val = static_cast<double*>(overlay->GetScalarPointer(i, j, k));
+				numberOfPixels[int(*val)]++;
 			}
 		}
-		volumes[index] = numberOfPixels[index] * pixelSize;
-		cout << "3D Measurement: \n";
-		cout << volumes[index] << endl;
+		
 	}
-
-
+	
+	for (int index = 1; index < num; ++index) {
+		volumes[index] = numberOfPixels[index] * pixelSize;
+		cout << "3D Measurement " << index <<": \n";
+		cout << volumes[index] << endl;
+		if (index > 2) {
+			volumes[0] += volumes[index];
+		}
+	}
 	delete[] numberOfPixels;
 }
 
-void MeasurementFor3D::GetVolumes(double* volumes)
+double* MeasurementFor3D::GetVolumes()
 {
-	memcpy(volumes, this->volumes, sizeof(this->volumes));
+	return this->volumes;
 }
 

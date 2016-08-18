@@ -665,6 +665,58 @@
          <property name="title">
           <string>Algorithm</string>
          </property>
+         <widget class="QLabel" name="label_6">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>70</y>
+            <width>242</width>
+            <height>15</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>3D Measurement</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="measureCurrentVolumeOfEveryLabelPushButton">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>100</y>
+            <width>242</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Measure Current Volume of Every Label</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_5">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>20</y>
+            <width>242</width>
+            <height>15</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>2D Measurement</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>211</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Maximum Wall Thickness</string>
+          </property>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -771,7 +823,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableWidget" name="tableWidget">
+           <widget class="QTableWidget" name="measurement2DTableWidget">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -848,7 +900,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableWidget" name="tableWidget_2">
+           <widget class="QTableWidget" name="measurement3DTableWidget">
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>130</number>
             </attribute>
@@ -880,6 +932,11 @@
             <row>
              <property name="text">
               <string>LRNC /mm^3</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>LM /mm^3</string>
              </property>
             </row>
             <column>
@@ -925,9 +982,9 @@
           </item>
          </layout>
          <zorder>label_2</zorder>
-         <zorder>tableWidget</zorder>
+         <zorder>measurement2DTableWidget</zorder>
          <zorder>label_3</zorder>
-         <zorder>tableWidget_2</zorder>
+         <zorder>measurement3DTableWidget</zorder>
          <zorder></zorder>
         </widget>
        </item>

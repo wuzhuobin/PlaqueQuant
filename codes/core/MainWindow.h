@@ -123,6 +123,9 @@ public slots:
 	bool loadImage(int, QStringList*list);
 	bool visualizeImage();
 
+	//Alogrithm
+	void slotMeasureCurrentVolumeOfEveryLabelPushButton();
+
 private:
 	//UI
 	Ui_MainWindow ui;

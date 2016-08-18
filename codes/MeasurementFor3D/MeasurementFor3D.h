@@ -14,10 +14,12 @@ public:
 	void SetInputData(vtkImageData* overlay);
 	void SetLookupTable(vtkLookupTable* lookupTable);
 	void Update();
-	void GetVolumes(double* volumes);
+	double*  GetVolumes();
 
 private:
 
+
+	//double volumeofTotalPlaque = 0;
 	//double volumeOfLumen = 0;
 	//double volumeOfVesselWall = 0;
 	//double volumeOfCalcification = 0;
