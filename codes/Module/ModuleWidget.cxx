@@ -1,6 +1,8 @@
 #include "ModuleWidget.h"
 #include "ui_ModuleWidget.h"
 
+#include <qtablewidget.h>
+
 
 ModuleWidget::ModuleWidget(QWidget *parent) : 
     QWidget(parent),
@@ -34,7 +36,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
 	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
-		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabelPushButton()));
+		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 
 	this->GenerateReportPushButtonVisible();
@@ -76,6 +78,7 @@ void ModuleWidget::BackPage()
 void ModuleWidget::SetPage(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
+	GenerateReportPushButtonVisible();
 }
 void ModuleWidget::SetBrushSize()
 {
@@ -137,6 +140,19 @@ void ModuleWidget::slotResetROI()
 void ModuleWidget::slotReportGetInput()
 {
 	this->GenerateReport();
+}
+
+void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes)
+{
+	cout << "volumes\n";
+	ui->measurement3DTableWidget->clearContents();
+	
+	for (int i = 0; i < numOfVolumes; ++i) {
+		ui->measurement3DTableWidget->setItem(i, 0,
+			new QTableWidgetItem(QString::number(volumes[i])));
+		cout << volumes[i] << endl;
+	}
+	
 }
 
 void ModuleWidget::GenerateReport()

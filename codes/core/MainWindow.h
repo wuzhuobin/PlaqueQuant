@@ -124,7 +124,7 @@ public slots:
 	bool visualizeImage();
 
 	//Alogrithm
-	void slotMeasureCurrentVolumeOfEveryLabelPushButton();
+	void slotMeasureCurrentVolumeOfEveryLabel();
 
 private:
 	//UI

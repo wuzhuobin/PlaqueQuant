@@ -11,9 +11,8 @@ MeasurementFor3D::MeasurementFor3D()
 
 MeasurementFor3D::~MeasurementFor3D()
 {
-	if (volumes != NULL) {
-		delete[] volumes;
-		volumes = NULL;
+	if (this->volumes != NULL) {
+		delete volumes;
 	}
 }
 
@@ -58,7 +57,7 @@ void MeasurementFor3D::Update()
 		}
 		
 	}
-	
+	volumes[0] = 0;
 	for (int index = 1; index < num; ++index) {
 		volumes[index] = numberOfPixels[index] * pixelSize;
 		cout << "3D Measurement " << index <<": \n";

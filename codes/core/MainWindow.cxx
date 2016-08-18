@@ -569,16 +569,17 @@ bool MainWindow::visualizeImage()
 	return 0;
 }
 
-void MainWindow::slotMeasureCurrentVolumeOfEveryLabelPushButton()
+void MainWindow::slotMeasureCurrentVolumeOfEveryLabel()
 {
 	MeasurementFor3D measure;
 	measure.SetInputData(SegmentationOverlay->GetOutput());
 	measure.SetLookupTable(m_2DimageViewer[0]->getLookupTable());
 	measure.Update();
 	double* volumes = measure.GetVolumes();
-	
+	m_moduleWidget->slotMeasureCurrentVolumeOfEveryLabel(volumes, 
+		m_2DimageViewer[0]->getLookupTable()->GetNumberOfColors());
 
-	delete[] volumes;
+
 }
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)

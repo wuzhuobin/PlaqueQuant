@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>302</width>
     <height>840</height>
    </rect>
   </property>
@@ -893,17 +893,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>3D Measurement</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QTableWidget" name="measurement3DTableWidget">
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>130</number>
             </attribute>
+            <row>
+             <property name="text">
+              <string>Total Plaque /mm^3</string>
+             </property>
+            </row>
             <row>
              <property name="text">
               <string>Lumen /mm^3</string>
@@ -912,11 +910,6 @@
             <row>
              <property name="text">
               <string>Vessel Wall /mm^3</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Total Plaque /mm^3</string>
              </property>
             </row>
             <row>
@@ -944,6 +937,13 @@
               <string>Volume</string>
              </property>
             </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>3D Measurement</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -984,8 +984,8 @@
          <zorder>label_2</zorder>
          <zorder>measurement2DTableWidget</zorder>
          <zorder>label_3</zorder>
-         <zorder>measurement3DTableWidget</zorder>
          <zorder></zorder>
+         <zorder>measurement3DTableWidget</zorder>
         </widget>
        </item>
       </layout>
