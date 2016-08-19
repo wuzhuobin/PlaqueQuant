@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
+    <width>300</width>
     <height>840</height>
    </rect>
   </property>
@@ -62,7 +62,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -669,7 +669,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>70</y>
+            <y>190</y>
             <width>242</width>
             <height>15</height>
            </rect>
@@ -682,7 +682,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>100</y>
+            <y>210</y>
             <width>242</width>
             <height>23</height>
            </rect>
@@ -694,8 +694,8 @@
          <widget class="QLabel" name="label_5">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>20</y>
+            <x>0</x>
+            <y>140</y>
             <width>242</width>
             <height>15</height>
            </rect>
@@ -707,14 +707,40 @@
          <widget class="QPushButton" name="pushButton_2">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>40</y>
+            <x>0</x>
+            <y>160</y>
             <width>211</width>
             <height>23</height>
            </rect>
           </property>
           <property name="text">
            <string>Maximum Wall Thickness</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="autoLumenSegmentationPushButton">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>100</y>
+            <width>211</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Auto Lumen Segmentation</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_7">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>80</y>
+            <width>242</width>
+            <height>15</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Automatic Segmentation</string>
           </property>
          </widget>
         </widget>
@@ -893,15 +919,17 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>3D Measurement</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QTableWidget" name="measurement3DTableWidget">
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>130</number>
             </attribute>
-            <row>
-             <property name="text">
-              <string>Total Plaque /mm^3</string>
-             </property>
-            </row>
             <row>
              <property name="text">
               <string>Lumen /mm^3</string>
@@ -910,6 +938,11 @@
             <row>
              <property name="text">
               <string>Vessel Wall /mm^3</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Total Plaque /mm^3</string>
              </property>
             </row>
             <row>
@@ -937,13 +970,6 @@
               <string>Volume</string>
              </property>
             </column>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>3D Measurement</string>
-            </property>
            </widget>
           </item>
           <item>
@@ -984,8 +1010,8 @@
          <zorder>label_2</zorder>
          <zorder>measurement2DTableWidget</zorder>
          <zorder>label_3</zorder>
-         <zorder></zorder>
          <zorder>measurement3DTableWidget</zorder>
+         <zorder></zorder>
         </widget>
        </item>
       </layout>

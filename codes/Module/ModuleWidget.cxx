@@ -24,7 +24,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->BrushSizeSpinBox->setMinimum(1);
 
 	//connect
-	connect(ui->generateReportPushButton, SIGNAL(clicked()), this, SLOT(slotReportGetInput()));
+	connect(ui->generateReportPushButton, SIGNAL(clicked()), 
+		this, SLOT(slotReportGetInput()));
+	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()), mainWnd, SLOT(slotCenterline()));
 	connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
 	connect(ui->BackBtn, SIGNAL(clicked()), this, SLOT(BackPage()));
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);

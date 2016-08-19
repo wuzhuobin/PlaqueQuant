@@ -1,11 +1,12 @@
 #include "Overlay.h"
 
 #include <itkCastImageFilter.h>
+#include <itkVTKImageToImageFilter.h>
 #include <vtkImageCast.h>
 
 Overlay::Overlay(QObject* parent) : QObject(parent)
 {
-	m_itkOverlay = NULL;
+	m_itkOverlay = ImageType::New();
 	m_vtkOverlay = NULL;
 }
 
@@ -147,24 +148,8 @@ bool Overlay::Update()
 
 void Overlay::Initialize(vtkImageData * img)
 {
-	ReaderType::Pointer reader = ReaderType::New();
-	reader->SetFileName("C:/Users/lwong/Source/datacenter/segmentation_right.nii");
-	reader->Update();
-
-	//re-orient
-	OrienterType::Pointer orienter = OrienterType::New();
-	orienter->UseImageDirectionOn();
-	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-	orienter->SetInput(reader->GetOutput());
-	orienter->Update();
-
-	ConnectorType::Pointer connector = ConnectorType::New();
-	connector->SetInput(orienter->GetOutput());
-	connector->Update();
-
-
 	m_vtkOverlay = vtkImageData::New();
-	m_vtkOverlay->DeepCopy(connector->GetOutput());
+	m_vtkOverlay->DeepCopy(img);
 	
 	vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
 	castfilter->SetInputData(m_vtkOverlay);
@@ -201,14 +186,28 @@ vtkImageData* Overlay::GetOutput()
 	if (!m_vtkOverlay)
 		return NULL;
 	else
-	return m_vtkOverlay;
+		return m_vtkOverlay;
 }
 
 ImageType::Pointer Overlay::GetITKOutput()
 {
-	if (!m_itkOverlay)
+
+	if (!m_vtkOverlay)
 		return NULL;
-	else
+	else {
+		vtkSmartPointer<vtkImageCast> imageCastFilter =
+			vtkSmartPointer<vtkImageCast>::New();
+		imageCastFilter->SetInputData(this->GetOutput());
+		imageCastFilter->SetOutputScalarTypeToFloat();
+		imageCastFilter->Update();
+
+		itk::VTKImageToImageFilter<FloatImageType>::Pointer vtkImageToImageFilter =
+			itk::VTKImageToImageFilter<FloatImageType>::New();
+		vtkImageToImageFilter->SetInput(imageCastFilter->GetOutput());
+		vtkImageToImageFilter->Update();
+
+		m_itkOverlay = vtkImageToImageFilter->GetOutput();
 		return m_itkOverlay;
+	}
 
 }

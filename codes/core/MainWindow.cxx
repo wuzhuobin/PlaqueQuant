@@ -1465,11 +1465,12 @@ void MainWindow::Set3DRulerEnabled(bool b)
 
 void MainWindow::slotCenterline()
 {
+	cout << "slotCenterLine" << endl;
 	// segmentation
 	VesselSegmentation* vesselSegmentation = new VesselSegmentation();
 	vesselSegmentation->SetT1(itkImage[0]);
 	vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput());
-	vesselSegmentation->SetMPRAGE(itkImage[4]);
+	vesselSegmentation->SetMPRAGE(itkImage[1]);
 	vesselSegmentation->Update();
 
 	vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
