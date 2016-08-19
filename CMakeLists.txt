@@ -58,6 +58,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
+	${PROJECT_BINARY_DIR}/codes/MeasurementFor3D 
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
@@ -69,6 +70,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
+	${PROJECT_SOURCE_DIR}/codes/MeasurementFor3D 
 )
 
 SET(

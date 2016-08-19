@@ -49,11 +49,12 @@ public slots:
 	void slotChangeROI(double* bound);
 	//void slotAddLumen();
 	//void slotAddVesselWall();
-	void NextBtnChangeText();
+	void GenerateReportPushButtonVisible();
 	void NextPage();
 	void BackPage();
 	void SetBrushSize();
 	void slotReportGetInput();
+	void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
 
 signals:
 	void finished();

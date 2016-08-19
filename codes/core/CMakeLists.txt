@@ -144,6 +144,7 @@ target_link_libraries(
 	InteractorStyles
 	Widgets 
 	GPURenderWithLUT
+	MeasurementFor3D
 )
 
 

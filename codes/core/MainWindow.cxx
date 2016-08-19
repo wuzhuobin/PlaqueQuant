@@ -9,6 +9,7 @@
 #include "ExtractCenterline.h"
 #include "ModuleWidget.h"
 #include "GPUVolumeRenderingFilter.h"
+#include "MeasurementFor3D.h"
 
 
 #include <QUrl>
@@ -597,6 +598,19 @@ bool MainWindow::visualizeImage()
 	ui->actionNavigation->trigger();
 				
 	return 0;
+}
+
+void MainWindow::slotMeasureCurrentVolumeOfEveryLabel()
+{
+	MeasurementFor3D measure;
+	measure.SetInputData(SegmentationOverlay->GetOutput());
+	measure.SetLookupTable(m_2DimageViewer[0]->getLookupTable());
+	measure.Update();
+	double* volumes = measure.GetVolumes();
+	m_moduleWidget->slotMeasureCurrentVolumeOfEveryLabel(volumes, 
+		m_2DimageViewer[0]->getLookupTable()->GetNumberOfColors());
+
+
 }
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)
@@ -1273,7 +1287,7 @@ void MainWindow::slotMultiPlanarView()
 	this->slotChangeSlice();
 	QAction* action = widgetGroup.checkedAction();
 	if (action != NULL) {
-		action->triggered();
+		action->trigger();
 	}
 }
 
@@ -1324,7 +1338,7 @@ void MainWindow::slotSegmentationView()
 
 	QAction* action = widgetGroup.checkedAction();
 	if (action != NULL) {
-		action->triggered();
+		action->trigger();
 	}
 }
 
@@ -1341,8 +1355,11 @@ void MainWindow::slotAddExternalOverlay()
 	this->SegmentationOverlay->SetInputImageData(Path);
 	//this->vtkImageOverlay = SegmentationOverlay->GetOutput();
 
-	if(m_2DimageViewer[0]->GetInput()!=NULL)
+	if (m_2DimageViewer[0]->GetInput() != NULL) {
 		addOverlay2ImageViewer();
+		viewerGroup.checkedAction()->trigger();
+	}
+
 
 }
 

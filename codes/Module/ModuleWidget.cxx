@@ -1,11 +1,15 @@
 #include "ModuleWidget.h"
 #include "ui_ModuleWidget.h"
 
+#include <qtablewidget.h>
+
 
 ModuleWidget::ModuleWidget(QWidget *parent) : 
     QWidget(parent),
     ui(new Ui::ModuleWidget)
 {
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
+
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
     //Recent Parameters
@@ -19,9 +23,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->BrushSizeSpinBox->setMaximum(40);
 	this->ui->BrushSizeSpinBox->setMinimum(1);
 
-	ui->BackBtn->setVisible(false);
-	ui->NextBtn->setVisible(false);
 	//connect
+	connect(ui->generateReportPushButton, SIGNAL(clicked()), this, SLOT(slotReportGetInput()));
 	connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
 	connect(ui->BackBtn, SIGNAL(clicked()), this, SLOT(BackPage()));
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);
@@ -32,7 +35,11 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), ui->opacitySlider, SLOT(setValue(int)));
 	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
 	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
+	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
+		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
+
+	this->GenerateReportPushButtonVisible();
 }
 
 ModuleWidget::~ModuleWidget()
@@ -40,39 +47,38 @@ ModuleWidget::~ModuleWidget()
     delete ui;
 }
 
-void ModuleWidget::NextBtnChangeText()
+void ModuleWidget::GenerateReportPushButtonVisible()
 {
 	int index = ui->stackedWidget->currentIndex();
-	if (index == 0 || index == 1 || index == 2)
-	{
-		ui->NextBtn->setText("Next");
+	if (index == 4)	{
+		ui->NextBtn->setVisible(false);
+		ui->generateReportPushButton->setVisible(true);
 	}
-	if (index == 3)
-	{
-		ui->NextBtn->setText("Generate Report");
-		disconnect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
-		connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(slotReportGetInput()));
+	else {
+		ui->NextBtn->setVisible(true);
+		ui->generateReportPushButton->setVisible(false);
 	}
+	
 }
 void ModuleWidget::NextPage()
 {
 	int index = ui->stackedWidget->currentIndex();
-	
 	ui->stackedWidget->setCurrentIndex(index + 1);
-	this->NextBtnChangeText();
+	this->GenerateReportPushButtonVisible();
 }
 
 void ModuleWidget::BackPage()
 {
 	int index = ui->stackedWidget->currentIndex();
 	ui->stackedWidget->setCurrentIndex(index - 1);
-	this->NextBtnChangeText();
+	this->GenerateReportPushButtonVisible();
 
 }
 
 void ModuleWidget::SetPage(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
+	GenerateReportPushButtonVisible();
 }
 void ModuleWidget::SetBrushSize()
 {
@@ -134,6 +140,19 @@ void ModuleWidget::slotResetROI()
 void ModuleWidget::slotReportGetInput()
 {
 	this->GenerateReport();
+}
+
+void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes)
+{
+	cout << "volumes\n";
+	ui->measurement3DTableWidget->clearContents();
+	
+	for (int i = 0; i < numOfVolumes; ++i) {
+		ui->measurement3DTableWidget->setItem(i, 0,
+			new QTableWidgetItem(QString::number(volumes[i])));
+		cout << volumes[i] << endl;
+	}
+	
 }
 
 void ModuleWidget::GenerateReport()
