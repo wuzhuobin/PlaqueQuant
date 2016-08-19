@@ -67,7 +67,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkImageData.h>
 #include <vtkInteractorStyleImage.h>
 
-
 #include <QString>
 
 

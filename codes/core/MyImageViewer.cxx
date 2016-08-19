@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkLeaderActor2D.h>
 
+
 vtkStandardNewMacro(MyImageViewer);
 
 //----------------------------------------------------------------------------
@@ -88,7 +89,7 @@ MyImageViewer::MyImageViewer()
 
 
 	this->drawActor = vtkImageActor::New();
-	this->drawActor->GetProperty()->SetInterpolationTypeToLinear();
+	this->drawActor->GetProperty()->SetInterpolationTypeToNearest();
 	this->drawActor->GetProperty()->SetLookupTable(LookUpTable);
 	this->drawActor->SetVisibility(false);
 
@@ -171,6 +172,7 @@ MyImageViewer::~MyImageViewer()
 void MyImageViewer::SetSliceOrientation(int orientation)
 {
 	Superclass::SetSliceOrientation(orientation);
+
 	switch (orientation)
 	{
 	case 0:
@@ -196,6 +198,7 @@ void MyImageViewer::UpdateDisplayExtent()
 	Superclass::UpdateDisplayExtent();
 	vtkAlgorithm *input = this->GetInputAlgorithm();
 	vtkInformation* outInfo = input->GetOutputInformation(0);
+
 	int *w_ext = outInfo->Get(
 		vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
 	if (this->GetInputLayer())
@@ -225,20 +228,26 @@ void MyImageViewer::UpdateDisplayExtent()
 void MyImageViewer::InstallPipeline()
 {
 	Superclass::InstallPipeline();
+	// add label view prop to renderer
 	if (this->annotationRenderer && this->drawActor)
 	{
 		this->annotationRenderer->AddViewProp(this->drawActor);
 	}
+
+	// add cursor 
 	if (this->Renderer && this->CursorActor)
 	{
 		this->Renderer->AddActor(this->CursorActor);
 	}
 
+	// Setup connection with window level mapper
 	if (this->drawActor && this->imageMapToWindowLevelColors)
 	{
 		this->drawActor->GetMapper()->SetInputConnection(this->imageMapToWindowLevelColors->GetOutputPort());
 	}
-	if (this->RenderWindow && this->annotationRenderer) {
+
+	// add the renderer to render window if it hasn't been added
+	if (this->RenderWindow && this->annotationRenderer && !this->RenderWindow->HasRenderer(this->annotationRenderer)) {
 		this->RenderWindow->AddRenderer(this->annotationRenderer); 
 	}
 }
@@ -311,6 +320,7 @@ void MyImageViewer::Render()
 			case MyImageViewer::SLICE_ORIENTATION_YZ:
 				xs = w_ext[3] - w_ext[2] + 1;
 				ys = w_ext[5] - w_ext[4] + 1;
+				this->Renderer->GetActiveCamera()->Azimuth(180);
 				break;
 			}
 
@@ -349,6 +359,7 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 	double* range = in->GetScalarRange();
 	this->SetColorWindow(range[1] - range[0]);
 	this->SetColorLevel((range[1] + range[0])*0.5);
+
 	DefaultWindowLevel[0] = this->GetColorWindow();
 	DefaultWindowLevel[1] = this->GetColorLevel();
 
@@ -360,8 +371,10 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 {
 	this->imageMapToWindowLevelColors->SetInputData(in);
+	this->imageMapToWindowLevelColors->Update();
 	this->UpdateDisplayExtent();
 	this->drawActor->SetInputData(this->imageMapToWindowLevelColors->GetOutput());
+	this->drawActor->Update();
 	double* range = LookUpTable->GetRange();
 	imageMapToWindowLevelColors->SetWindow(range[1] - range[0]);
 	imageMapToWindowLevelColors->SetLevel((range[1] + range[0])*0.5);

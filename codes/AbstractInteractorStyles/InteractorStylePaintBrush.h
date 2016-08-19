@@ -62,6 +62,8 @@ protected:
 	virtual void OnRightButtonDown();
 	virtual void OnRightButtonUp();
 
+	virtual void Render();
+
 private:
 	void DrawCircle(int x0, int y0, int x1, int y1, double radius);
 	void DrawLine3D(int x0, int y0, int x1, int y1);
@@ -70,7 +72,6 @@ private:
 	void UpdateBorderWidgetPosition();
 	void Write2ImageData();
 	void ReadfromImageData();
-	void Render();
 
 	bool CheckValidPick(double*);
 

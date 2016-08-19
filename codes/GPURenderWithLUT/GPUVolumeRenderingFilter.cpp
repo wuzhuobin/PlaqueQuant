@@ -1,4 +1,5 @@
 #include <vtkSmartPointer.h>
+#include <vtkImageCast.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include "GPUVolumeRenderingFilter.h"
@@ -36,7 +37,16 @@ GPUVolumeRenderingFilter::~GPUVolumeRenderingFilter()
 void GPUVolumeRenderingFilter::SetInputData(vtkImageData *dat)
 {
 	this->InputData = dat;
-	this->GPUVolumeMapper->SetInputData(dat);
+	if (dat->GetScalarType() != VTK_UNSIGNED_INT) {
+		vtkSmartPointer<vtkImageCast> castFilter = vtkSmartPointer<vtkImageCast>::New();
+		castFilter->SetInputData(dat);
+		castFilter->SetOutputScalarTypeToUnsignedInt();
+		castFilter->Update();
+		this->GPUVolumeMapper->SetInputData(castFilter->GetOutput());
+	}
+	else {
+		this->GPUVolumeMapper->SetInputData(dat);
+	}
 }
 
 void GPUVolumeRenderingFilter::Update()
@@ -50,8 +60,8 @@ void GPUVolumeRenderingFilter::Update()
 		vtkErrorMacro("No Input Data!");
 		return;
 	}
-	double *range = this->LookUpTable->GetRange();
-	//double range[2] = { 0.0, 6.0 };
+	//double *range = this->LookUpTable->GetRange();
+	double range[2] = { 0.0, 6.0 };
 	int numberOfValues = this->LookUpTable->GetNumberOfTableValues();
 
 	cout << "Range: " << range[0] << " " << range[1] << endl;

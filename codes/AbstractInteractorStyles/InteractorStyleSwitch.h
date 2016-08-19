@@ -74,6 +74,10 @@ public:
 		QCheckBox* drawVolumetric,
 		QCheckBox* drawIsotropic);
 	virtual void SetCurrentSlice(int slice);
+	virtual void SetOrientation(int);
+	virtual void SetEnabled(int);
+	virtual void SetEnabledOn();
+	virtual void SetEnabledOff();
 
 protected:
 	InteractorStyleSwitch();

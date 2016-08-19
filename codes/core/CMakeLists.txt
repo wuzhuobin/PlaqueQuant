@@ -4,6 +4,8 @@ project(Core)
 include_directories(
 	${PROJECT_BINARY_DIR}
 	${MAIN_INCLUDE_DIRS})
+
+message(${MAIN_INCLUDE_DIRS})
  # message("${PROJECT_BINARY_DIR}")
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)

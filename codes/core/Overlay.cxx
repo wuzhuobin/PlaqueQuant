@@ -17,24 +17,20 @@ void Overlay::SetInputImageData(vtkImageData* vtkimagedata)
 {
 	m_vtkOverlay = vtkimagedata;
 }
-/*
-void Overlay::SetInputImageData(ImageType::Pointer itkimagedata)
-{
-	
-}
-*/
+
+
 void Overlay::SetInputImageData(QString fileName)
 {
-	NiftiReaderType::Pointer reader = NiftiReaderType::New();
+	ReaderType::Pointer reader = ReaderType::New();
 	reader->SetFileName(fileName.toStdString().c_str());
 	reader->Update();
 
-		//re-orient
-		OrienterType::Pointer orienter = OrienterType::New();
-		orienter->UseImageDirectionOn();
-		orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-		orienter->SetInput(reader->GetOutput());
-		orienter->Update();
+	//re-orient
+	OrienterType::Pointer orienter = OrienterType::New();
+	orienter->UseImageDirectionOn();
+	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	orienter->SetInput(reader->GetOutput());
+	orienter->Update();
 
 	ConnectorType::Pointer connector = ConnectorType::New();
 
@@ -54,10 +50,9 @@ void Overlay::SetInputImageData(QString fileName)
 	castFilter->SetInputData(connector->GetOutput());
 	castFilter->SetOutputScalarTypeToDouble();
 	castFilter->Update();
-	m_vtkOverlay = vtkImageData::New();
-	m_vtkOverlay->DeepCopy(castFilter->GetOutput());
 	
-}
+	this->m_vtkOverlay->DeepCopy(castFilter->GetOutput());
+}	
 
 void Overlay::SetVisibleImageNo(int n)
 {
@@ -127,6 +122,9 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 void Overlay::SetPixel(int pos[3], double value)
 {
 		double * pixel = static_cast<double *>(m_vtkOverlay->GetScalarPointer(pos[0], pos[1], pos[2]));
+		if (pixel == nullptr) {
+			return;
+		}
 		pixel[0] = value;
 		//cout << pixel[0] << endl;
 }
@@ -134,6 +132,8 @@ void Overlay::SetPixel(int pos[3], double value)
 void Overlay::SetPixel(int pos[3], unsigned char value)
 {
 	unsigned char * pixel = static_cast<uchar *>(m_vtkOverlay->GetScalarPointer(pos[0], pos[1], pos[2]));
+	if (pixel == nullptr)
+		return;
 	pixel[0] = value;
 	//cout << pixel[0] << endl;
 }
@@ -147,16 +147,39 @@ bool Overlay::Update()
 
 void Overlay::Initialize(vtkImageData * img)
 {
+	ReaderType::Pointer reader = ReaderType::New();
+	reader->SetFileName("C:/Users/lwong/Source/datacenter/segmentation_right.nii");
+	reader->Update();
+
+	//re-orient
+	OrienterType::Pointer orienter = OrienterType::New();
+	orienter->UseImageDirectionOn();
+	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	orienter->SetInput(reader->GetOutput());
+	orienter->Update();
+
+	ConnectorType::Pointer connector = ConnectorType::New();
+	connector->SetInput(orienter->GetOutput());
+	connector->Update();
+
+
 	m_vtkOverlay = vtkImageData::New();
-	m_vtkOverlay->SetDimensions(img->GetDimensions());
-	m_vtkOverlay->SetSpacing(img->GetSpacing());
-	m_vtkOverlay->SetOrigin(img->GetOrigin());
-	cout << img->GetScalarTypeAsString() << endl;
-	m_vtkOverlay->AllocateScalars(VTK_DOUBLE, img->GetNumberOfScalarComponents());
+	m_vtkOverlay->DeepCopy(connector->GetOutput());
+	
+	vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
+	castfilter->SetInputData(m_vtkOverlay);
+	castfilter->SetOutputScalarTypeToDouble();
+	castfilter->Update();
+
+	m_vtkOverlay->DeepCopy(castfilter->GetOutput());
+	//m_vtkOverlay->SetDimensions(img->GetDimensions());
+	//m_vtkOverlay->SetSpacing(img->GetSpacing());
+	//m_vtkOverlay->SetOrigin(img->GetOrigin());
+	////cout << img->GetScalarTypeAsString() << endl;
+	//m_vtkOverlay->AllocateScalars(VTK_DOUBLE, img->GetNumberOfScalarComponents());
 	int dim[3];
 	m_vtkOverlay->GetDimensions(dim);
 
-	
 
 	for (int i = 0; i < dim[0]; i++)
 	{
@@ -165,7 +188,7 @@ void Overlay::Initialize(vtkImageData * img)
 			for (int k = 0; k < dim[2]; k++)
 			{
 				double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
-				*pixel = 0.;
+				*pixel = 0;
 			}
 		}
 	}

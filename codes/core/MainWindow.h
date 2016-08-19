@@ -45,6 +45,7 @@ public:
 
 	int GetVisibleImageNo();
 	void RenderAllViewer();
+	void RenderAll2DViewers();
 	void Set3DRulerEnabled(bool b);
 	void SetImageLayerNo(int);
 	int GetImageLayerNo();
@@ -125,7 +126,7 @@ public slots:
 
 private:
 	//UI
-	Ui_MainWindow ui;
+	Ui_MainWindow* ui;
 	void setActionsEnable(bool b);
 
 	//menu for changing images
@@ -144,6 +145,9 @@ private:
     
 	//2D/3D view
 	MyImageViewer*				m_2DimageViewer[3];
+	vtkRenderWindow*			m_3DimageViewer;
+	vtkRenderer*				m_3DDataRenderer;
+	vtkRenderer*				m_3DAnnotationRenderer;
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
 	InteractorStyleSwitch*		m_style[3];
@@ -191,6 +195,7 @@ private:
 
 	//Segmentation view flag
 	bool segmentationView;
+	bool INITIALIZED_FLAG;
 
 
 	//Overlay

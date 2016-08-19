@@ -58,7 +58,8 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
-	
+
+	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/codes/Module
 	${PROJECT_SOURCE_DIR}/codes/Core
@@ -69,6 +70,7 @@ SET(
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
 )
+
 SET(
 	LIBRARY_OUTPUT_PATH
 	${CMAKE_SOURCE_DIR}/lib

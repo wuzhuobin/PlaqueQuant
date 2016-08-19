@@ -173,6 +173,36 @@ void InteractorStyleSwitch::SetCurrentSlice(int slice)
 	this->ROI->SetCurrentSlice(slice);
 }
 
+void InteractorStyleSwitch::SetOrientation(int index)
+{
+	this->Navigation->SetOrientation(index);
+	this->PaintBrush->SetOrientation(index);
+	this->PolygonDraw->SetOrientation(index);
+	this->ROI->SetOrientation(index);
+	this->WindowLevel->SetOrientation(index);
+}
+
+void InteractorStyleSwitch::SetEnabled(int i)
+{
+	Superclass::SetEnabled(i);
+
+	this->Navigation->SetEnabled(i);
+	this->PaintBrush->SetEnabled(i);
+	this->PolygonDraw->SetEnabled(i);
+	this->WindowLevel->SetEnabled(i);
+	this->ROI->SetEnabled(i);
+}
+
+void InteractorStyleSwitch::SetEnabledOn()
+{
+	this->SetEnabled(1);
+}
+
+void InteractorStyleSwitch::SetEnabledOff()
+{
+	this->SetEnabled(0);
+}
+
 
 void InteractorStyleSwitch::SetInteractor(vtkRenderWindowInteractor *iren)
 {

@@ -77,8 +77,10 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		imageViewer->Render();
 	}
 	else {
-		planeWidget->Off();
-		imageViewer->Render();
+		if (imageViewer) {
+			planeWidget->Off();
+			imageViewer->Render();
+		}
 	}
 }
 
@@ -188,6 +190,8 @@ MyPlaneWidget * InteractorStyleROI::GetPlaneWidget()
 InteractorStyleROI::InteractorStyleROI()
 	:InteractorStyleNavigation()
 {
+	this->imageViewer = NULL;
+
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();
 }

@@ -721,6 +721,8 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[1] = y;
 				pos[2] = m_sliceSplinBox[orientation]->value();
 				double * val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
+				if (val == nullptr)
+					continue;
 				if (*val > 0) {
 					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
@@ -849,10 +851,11 @@ void InteractorStylePaintBrush::Render()
 	if (m_brush == NULL)
 		return;
 
+	mainWnd->RenderAll2DViewers();
+
 	m_brush->Update();
 	m_brush->GetOutput()->SetOrigin(origin);
 	m_brush->GetOutput()->SetSpacing(spacing);
-	mainWnd->RenderAllViewer();
 }
 
 

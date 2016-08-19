@@ -46,7 +46,10 @@ void InteractorStyleNavigation::OnMouseMove()
 		return;
 	}
 	AbstractInteractorStyleImage::OnMouseMove();
-	SynchronizedZooming();
+
+	if (m_rightFunctioning) {
+		SynchronizedZooming();
+	}
 }
 
 
