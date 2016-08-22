@@ -3,6 +3,7 @@
 #include <itkCastImageFilter.h>
 #include <itkVTKImageToImageFilter.h>
 #include <vtkImageCast.h>
+#include <vtkSimpleImageToImageFilter.h>
 
 Overlay::Overlay(QObject* parent) : QObject(parent)
 {
@@ -115,9 +116,16 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 	//		}
 	//	}
 	//}
-   
-    
+}
 
+void Overlay::DisplayExtentOn()
+{
+	
+}
+
+void Overlay::DisplayExtentOff()
+{
+	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
 }
 
 void Overlay::SetPixel(int pos[3], double value)
@@ -178,6 +186,7 @@ void Overlay::Initialize(vtkImageData * img)
 		}
 	}
 
+	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
 }
 
 
@@ -186,7 +195,15 @@ vtkImageData* Overlay::GetOutput()
 	if (!m_vtkOverlay)
 		return NULL;
 	else
-		return m_vtkOverlay;
+		return this->m_vtkOverlay;
+}
+
+vtkImageData * Overlay::GetVTKImageData()
+{
+	if (!m_vtkOverlay)
+		return NULL;
+	else
+		return this->m_vtkOverlay;
 }
 
 ImageType::Pointer Overlay::GetITKOutput()

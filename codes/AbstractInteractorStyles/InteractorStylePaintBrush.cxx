@@ -649,11 +649,30 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 
 void InteractorStylePaintBrush::ReadfromImageData()
 {
-
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	//Clear Layer
 	m_brush->SetDrawColor(0, 0, 0, 0);
 	this->FillBox3D();
+
+	mainWnd->GetOverlay()->GetDisplayExtent(this->extent);
+	switch (this->orientation)
+	{
+	case 0:
+		m_brushActor->SetDisplayExtent(
+			0, 0, extent[2], extent[3], extent[4], extent[5]);
+		break;
+
+	case 1:
+		m_brushActor->SetDisplayExtent(
+			extent[0], extent[1], 0, 0, extent[4], extent[5]);
+		break;
+
+	case 2:
+		m_brushActor->SetDisplayExtent(
+			extent[0], extent[1], extent[2], extent[3], 0, 0);
+		break;
+	}
+
 
 	int pos[3];
 	switch (orientation)
@@ -666,7 +685,9 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = m_sliceSplinBox[orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
-				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
+				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
+				if (val == nullptr)
+					continue;
 				if (*val > 0) {
 					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
@@ -691,8 +712,10 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = x;
 				pos[1] = m_sliceSplinBox[orientation]->value();
 				pos[2] = z;
-				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
-				if (*val > 0) {
+				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
+				if (val == nullptr)
+					continue;
+				if (*val > 0 || true) {
 					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
 							double rgba[4];
@@ -700,6 +723,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
 							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
+							//m_brush->SetDrawColor(255, 0, 0, 1);
 							m_brush->DrawSegment3D(x, 0, z, x, 0, z);
 							break;
 						}
@@ -716,7 +740,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = m_sliceSplinBox[orientation]->value();
-				double * val = static_cast<double *>(mainWnd->GetOverlay()->GetOutput()->GetScalarPointer(pos));
+				double * val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
@@ -836,6 +860,8 @@ void InteractorStylePaintBrush::Write2ImageData()
 		}
 		break;
 	}
+
+	mainWnd->GetOverlay()->Update();
 	mainWnd->GetOverlay()->GetOutput()->Modified();
 
 }

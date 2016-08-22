@@ -185,7 +185,7 @@ MainWindow::MainWindow()
 		itkImage[i] = ImageType::New();
 		//vtkImage[i] = vtkImageData::New();
 		vtkImage[i] = NULL;
-		vtkImageOriginal[i] = vtkImage[i];
+		vtkImageOriginal[i] = NULL;
 	}
 	vtkImageOverlay = vtkImageData::New();
 
@@ -390,13 +390,13 @@ void MainWindow::slotOpenImage(QString dir)
 	QStringList* wizardFileNames[5] = {
 		wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
 		wizard.getFileNames4(), wizard.getFileNames5()	};
+	// load image into vairalbes
 	for (int i = 0; i < 5; ++i) {
 		if (wizardFileNames[i] != NULL) {
 			FileNameList[i] = *wizardFileNames[i];
 			this->loadImage(i, wizardFileNames[i]);
 		}
 	}
-	//copy for segmentationROI to recover the original image
 
 	adjustForCurrentFile(wizard.getDirectory());
 	visualizeImage();
@@ -487,24 +487,23 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr<<err<<std::endl;
 			return 1;
 		}	
-		//for (int i = 0; i < n; ++i) {
-			this->itkImage[n]->Graft(orienter->GetOutput());
-			this->itkImage[n]->Update();
-			if (n > 0) {
-				connectorAfter->SetInput(ImageAlignment(itkImage[n]));
-				try
-				{
-					connectorAfter->Update();
-				}
-				catch (itk::ExceptionObject &err)
-				{
-					std::cerr << err << std::endl;
-					return 1;
-				}
+
+		this->itkImage[n]->Graft(orienter->GetOutput());
+		this->itkImage[n]->Update();
+		if (n > 0) {
+			connectorAfter->SetInput(ImageAlignment(itkImage[n]));
+			try
+			{
+				connectorAfter->Update();
 			}
-			this->vtkImage[n] = vtkImageData::New();
-			this->vtkImage[n]->DeepCopy(connector->GetOutput());
-		//}
+			catch (itk::ExceptionObject &err)
+			{
+				std::cerr << err << std::endl;
+				return 1;
+			}
+		}
+		this->vtkImage[n] = vtkImageData::New();
+		this->vtkImage[n]->DeepCopy(connector->GetOutput());
 
 	}
 	else
@@ -670,7 +669,6 @@ void MainWindow::slotHelp()
 
 void MainWindow::slotNavigationMode()
 {	
-
 	for (int i = 0; i < 3; i++)
 	{
 		if (segmentationView && i >= visibleImageNum)
@@ -827,32 +825,45 @@ void MainWindow::slotSelectROI()
 			extractVOIFilter->SetInputData(vtkImage[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			// make sure the vtkImageOriginal won't be deleted 
-			// delete multiple segmentations of vtkImage data 
-			if (vtkImage[i] != vtkImageOriginal[i]) {
-				vtkImage[i]->Delete();
-			}
+
+			vtkImageOriginal[i] = vtkImageData::SafeDownCast(extractVOIFilter->GetInput());
+
+
 			vtkImage[i] = vtkImageData::New();
 			vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
 		}
 	}
+
+	//if (this->SegmentationOverlay) {
+	//	this->SegmentationOverlay->SetDisplayExtent(newExtent);
+	//	this->SegmentationOverlay->DisplayExtentOn();
+	//}
+
+	/*for (int i = 0; i < 3; i++)
+	{
+		this->m_2DimageViewer[i]->SetBound(m_style[i]->GetROI()->GetPlaneWidget()->GetCurrentBound());
+		this->m_2DimageViewer[i]->SetDisplayExtent(newExtent);
+	}
+*/
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
 }
 void MainWindow::slotResetROI()
 {
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 5; ++i) 
+	{
 		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL) {
-			vtkImage[i]->Delete();
-			vtkImage[i] = vtkImageOriginal[i];
+			vtkImage[i] = this->vtkImageOriginal[i];
 		}
+	}
+
+	if (this->SegmentationOverlay) {
+		this->SegmentationOverlay->DisplayExtentOff();
 	}
 
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
 }
-
-#include <vtkAxesActor.h>
 
 void MainWindow::slot3DUpdate()
 {
@@ -1251,7 +1262,7 @@ void MainWindow::slotMultiPlanarView()
 			this->m_style[i]->SetOrientation(i);
 			m_2DimageViewer[i]->InitializeOrientationText();
 
-
+			// Show view props for overlay
 			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
 			for (int j = 0; j < props->GetNumberOfItems(); j++)
 			{
@@ -1265,29 +1276,36 @@ void MainWindow::slotMultiPlanarView()
 				reinterpret_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(true);
 			}
 
-			// Make sure view up is correct
-			switch (i)
-			{
-			case 0:
-				this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
-				break;
-			case 1:
-				this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
-				break;
-			case 2:
-				this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-				break;
-			default:
-				break;
-			}
 
 		}
+
 	}
 
 	this->slotChangeSlice();
 	QAction* action = widgetGroup.checkedAction();
 	if (action != NULL) {
 		action->trigger();
+	}
+
+	// Correct view up
+	for (int i = 0; i < 3; i++)
+	{
+
+		// Make sure view up is correct
+		switch (i)
+		{
+		case 0:
+			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
+			break;
+		case 1:
+			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
+			break;
+		case 2:
+			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -1384,7 +1402,6 @@ void MainWindow::slotOverlayVisibilty(bool b)
 	{
 		if (m_2DimageViewer[i] != NULL) {
 			m_2DimageViewer[i]->GetdrawActor()->SetVisibility(b);
-			m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
 			m_2DimageViewer[i]->Render();
 		}
 	}

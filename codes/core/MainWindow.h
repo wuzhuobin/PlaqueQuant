@@ -181,6 +181,7 @@ private:
 	vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
 	vtkImageData* vtkImageOverlay;
+	vtkImageData* vtkImageOverlayOriginal;
 
     //Orientation
 	int m_orientation;
