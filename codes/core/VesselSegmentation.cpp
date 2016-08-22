@@ -1,5 +1,7 @@
 #include <VesselSegmentation.h>
 
+#include "itkImageFileWriter.h"
+
 VesselSegmentation::VesselSegmentation(void)
 {
 	m_wallSurface = vtkSmartPointer<vtkPolyData>::New();
@@ -32,7 +34,7 @@ void VesselSegmentation::SetInputSegmentationImage(FloatImageType::Pointer input
 	LabelImageToLabelMapFilterType::Pointer labelImageToLabelMapFilter = LabelImageToLabelMapFilterType::New();
 	labelImageToLabelMapFilter->SetInput(m_inputSegmentation);
 	labelImageToLabelMapFilter->Update();
-	m_labelMap = labelImageToLabelMapFilter->GetOutput();
+	m_labelMap		= labelImageToLabelMapFilter->GetOutput();
 	cout << "Label map conversion success"<<endl;
 	
 	m_hasInputSegmentation = 1;
@@ -71,9 +73,13 @@ void VesselSegmentation::Update()
 
 			// mask the vessel image
 			MaskImageFilterType::Pointer T1ImageMaskFilter = MaskImageFilterType::New();			;
-			T1ImageMaskFilter->SetInput(invertImageFilter->GetOutput());
-			T1ImageMaskFilter->SetMaskImage(m_inputSegmentation);
-			T1ImageMaskFilter->Update();
+			try {
+				T1ImageMaskFilter->SetInput(invertImageFilter->GetOutput());
+				T1ImageMaskFilter->SetMaskImage(m_inputSegmentation);
+				T1ImageMaskFilter->Update();
+			}catch(itk::ExceptionObject &e){
+				std::cerr << e.what() << endl;
+			}
 			m_maskedT1_invert = T1ImageMaskFilter->GetOutput();
 
 			// Otsu thresholding
@@ -103,21 +109,53 @@ void VesselSegmentation::Update()
 			lumenCaster->Update();
 			m_lumenImage = lumenCaster->GetOutput();
 			cout << "Lumen segmentation success." << endl;
-
+				
 			// subtract wall image by lumen image to get wall image
+			BinarThresholdImageFilterType::Pointer wallBinaryFilter = BinarThresholdImageFilterType::New();
+			wallBinaryFilter->SetInsideValue(1);
+			wallBinaryFilter->SetOutsideValue(0);
+			wallBinaryFilter->SetLowerThreshold(0.5);
+			wallBinaryFilter->SetUpperThreshold(999999999999);
+			wallBinaryFilter->SetInput(m_wallImage);
+			wallBinaryFilter->Update();
+			m_wallImage->Graft(wallBinaryFilter->GetOutput());
+
+			BinarThresholdImageFilterType::Pointer lumenBinaryFilter = BinarThresholdImageFilterType::New();
+			lumenBinaryFilter->SetInsideValue(1);
+			lumenBinaryFilter->SetOutsideValue(0);
+			lumenBinaryFilter->SetLowerThreshold(0.5);
+			lumenBinaryFilter->SetUpperThreshold(999999999999);
+			lumenBinaryFilter->SetInput(m_lumenImage);
+			lumenBinaryFilter->Update();
+			m_lumenImage->Graft(lumenBinaryFilter->GetOutput());
+
 			SubtractImageFilterType::Pointer lumenSubtractFilter = SubtractImageFilterType::New();
 			lumenSubtractFilter->SetInput1(m_wallImage);
 			lumenSubtractFilter->SetInput2(m_lumenImage);
 			lumenSubtractFilter->Update();
 			m_wallImage = lumenSubtractFilter->GetOutput();
 
-			// convert lumen image to label map
-			LabelImageToLabelMapFilterType::Pointer LumenImageToLabelMapFilter = LabelImageToLabelMapFilterType::New();
-			LumenImageToLabelMapFilter->SetInput(m_lumenImage);
-			LumenImageToLabelMapFilter->Update();
-			m_lumenLabelMap = LumenImageToLabelMapFilter->GetOutput();
-			m_lumenLabelMap->GetLabelObject(1)->SetLabel(2);
+			//itk::ImageFileWriter<FloatImageType>::Pointer writer = itk::ImageFileWriter<FloatImageType>::New();
+			//writer->SetFileName("C:\\Users\\user\\Desktop\\wall.nii");
+			//writer->SetInput(m_wallImage);
+			//writer->Write();
 
+			//writer->SetFileName("C:\\Users\\user\\Desktop\\lumen.nii");
+			//writer->SetInput(m_lumenImage);
+			//writer->Write();
+
+			// convert lumen image to label map
+			try {
+				LabelImageToLabelMapFilterType::Pointer LumenImageToLabelMapFilter = LabelImageToLabelMapFilterType::New();
+				LumenImageToLabelMapFilter->SetInput(m_lumenImage);
+				LumenImageToLabelMapFilter->Update();
+				m_lumenLabelMap = LumenImageToLabelMapFilter->GetOutput();
+				m_lumenLabelMap->GetLabelObject(1)->SetLabel(2);
+			}catch(itk::ExceptionObject &e){
+				std::cerr << m_lumenLabelMap << endl;
+				std::cerr << e.what() << endl;
+			}
+			
 			// generate vtk vessel lumen surface;
 			ImageToVTKImageType::Pointer lumenConverter = ImageToVTKImageType::New();
 			lumenConverter->SetInput(m_lumenImage);
