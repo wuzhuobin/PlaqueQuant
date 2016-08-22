@@ -320,7 +320,7 @@ void MyImageViewer::Render()
 			case MyImageViewer::SLICE_ORIENTATION_YZ:
 				xs = w_ext[3] - w_ext[2] + 1;
 				ys = w_ext[5] - w_ext[4] + 1;
-				this->Renderer->GetActiveCamera()->Azimuth(180);
+				//this->Renderer->GetActiveCamera()->Azimuth(180);
 				break;
 			}
 
