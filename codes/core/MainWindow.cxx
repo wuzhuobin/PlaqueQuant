@@ -395,6 +395,7 @@ void MainWindow::slotOpenImage(QString dir)
 		if (wizardFileNames[i] != NULL) {
 			FileNameList[i] = *wizardFileNames[i];
 			this->loadImage(i, wizardFileNames[i]);
+			this->vtkImage[0]->GetExtent(this->m_boundingExtent);
 		}
 	}
 
@@ -815,6 +816,7 @@ void MainWindow::slotSelectROI()
 
 	int newExtent[6];
 	m_style[0]->GetROI()->SelectROI(newExtent);
+	m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
 	// Extract VOI of the overlay Image data
 
 	// Extract VOI of the vtkImage data
@@ -834,17 +836,15 @@ void MainWindow::slotSelectROI()
 		}
 	}
 
-	//if (this->SegmentationOverlay) {
-	//	this->SegmentationOverlay->SetDisplayExtent(newExtent);
-	//	this->SegmentationOverlay->DisplayExtentOn();
-	//}
-
-	/*for (int i = 0; i < 3; i++)
+	if (this->SegmentationOverlay) {
+		this->SegmentationOverlay->SetDisplayExtent(newExtent);
+	}
+	
+	for (int i = 0; i < 3; i++)
 	{
 		this->m_2DimageViewer[i]->SetBound(m_style[i]->GetROI()->GetPlaneWidget()->GetCurrentBound());
-		this->m_2DimageViewer[i]->SetDisplayExtent(newExtent);
 	}
-*/
+
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
 }
@@ -936,6 +936,28 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 	disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+
+	// Clamp the index to within the extent
+	for (int i = 0; i < 3; i++)
+	{
+		switch (i)
+		{
+		case 0:
+			y = { y < this->m_boundingExtent[2] ? this->m_boundingExtent[2] : y };
+			y = { y > this->m_boundingExtent[3] ? this->m_boundingExtent[3] : y };
+			break;
+
+		case 1:
+			x = { x < this->m_boundingExtent[0] ? this->m_boundingExtent[0] : x };
+			x = { x > this->m_boundingExtent[1] ? this->m_boundingExtent[1] : x };
+			break;
+		case 2:
+			z = { z < this->m_boundingExtent[4] ? this->m_boundingExtent[4] : z };
+			z = { z > this->m_boundingExtent[5] ? this->m_boundingExtent[5] : z };
+			break;
+		}
+	}
+
 	ui->xSpinBox->setValue(x);
 	ui->ySpinBox->setValue(y);
 	ui->zSpinBox->setValue(z);

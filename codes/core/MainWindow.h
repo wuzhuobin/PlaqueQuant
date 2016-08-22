@@ -205,6 +205,7 @@ private:
 	//Overlay
 	Overlay* SegmentationOverlay;
 	int m_layer_no;		//Main Image
+	int m_boundingExtent[6];
 
 	const int* overlayColor[6];
 
