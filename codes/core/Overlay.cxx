@@ -2,6 +2,8 @@
 
 #include <itkCastImageFilter.h>
 #include <itkVTKImageToImageFilter.h>
+
+#include <vtkImageMagnitude.h>
 #include <vtkImageCast.h>
 #include <vtkSimpleImageToImageFilter.h>
 
@@ -26,6 +28,9 @@ void Overlay::SetInputImageData(QString fileName)
 	ReaderType::Pointer reader = ReaderType::New();
 	reader->SetFileName(fileName.toStdString().c_str());
 	reader->Update();
+	std::cerr << __FUNCSIG__ << endl;
+	ImageType::Pointer image = reader->GetOutput();
+	std::cerr << image<< endl;
 
 	//re-orient
 	OrienterType::Pointer orienter = OrienterType::New();
@@ -221,25 +226,41 @@ vtkImageData * Overlay::GetVTKImageData()
 		return this->m_vtkOverlay;
 }
 
-ImageType::Pointer Overlay::GetITKOutput()
+//FloatImageType::Pointer Overlay::GetITKOutput(ImageType format)
+//{
+//	return FloatImageType::Pointer();
+//}
+
+ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 {
 
-	if (!m_vtkOverlay)
-		return NULL;
-	else {
-		vtkSmartPointer<vtkImageCast> imageCastFilter =
-			vtkSmartPointer<vtkImageCast>::New();
-		imageCastFilter->SetInputData(this->GetOutput());
-		imageCastFilter->SetOutputScalarTypeToFloat();
-		imageCastFilter->Update();
+	//if (!m_vtkOverlay)
+	//	return NULL;
+	//else {
 
-		itk::VTKImageToImageFilter<FloatImageType>::Pointer vtkImageToImageFilter =
-			itk::VTKImageToImageFilter<FloatImageType>::New();
-		vtkImageToImageFilter->SetInput(imageCastFilter->GetOutput());
+		itk::VTKImageToImageFilter<itk::Image<double, 3>>::Pointer vtkImageToImageFilter =
+			itk::VTKImageToImageFilter<itk::Image<double, 3>>::New();
+		vtkImageToImageFilter->SetInput(this->GetOutput());
 		vtkImageToImageFilter->Update();
 
-		m_itkOverlay = vtkImageToImageFilter->GetOutput();
-		return m_itkOverlay;
-	}
+		itk::CastImageFilter< itk::Image<double, 3>, itk::Image<float, 3> >::Pointer castImageFilter =
+			itk::CastImageFilter< itk::Image<double, 3>, itk::Image<float, 3> >::New();
+		castImageFilter->SetInput(vtkImageToImageFilter->GetOutput());
+		castImageFilter->Update();
+
+		m_duplicator = DuplicatorType::New();
+		m_duplicator->SetInputImage(castImageFilter->GetOutput());
+		m_duplicator->Update();
+		m_duplicator->GetOutput()->SetDirection(format->GetDirection());
+
+		m_itkOverlay->Graft(m_duplicator->GetOutput());
+		cout << __FUNCSIG__ << endl;
+		cout << "m_vtkOverlay" << endl;
+		m_vtkOverlay->Print(cerr);
+		cout << "m_itkOverlay" << endl;
+		cout << m_itkOverlay << endl;
+
+	//}
+	return m_itkOverlay;
 
 }

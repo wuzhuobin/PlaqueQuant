@@ -2,10 +2,12 @@
 #define OVERLAY_H
 
 #include <vtkExtractVOI.h>
-#include "vtkImageData.h"
+#include <vtkImageData.h>
+#include <vtkVersion.h>
 #include <QObject>
 #include "Define.h"
-#include <vtkVersion.h>
+typedef itk::Image<float, 3> FloatImageType;
+
 class Overlay : public QObject
 {
 	Q_OBJECT
@@ -34,6 +36,13 @@ public:
 	vtkImageData* GetOutput();
 	vtkImageData* GetVTKImageData();
 	ImageType::Pointer GetITKOutput();
+	/**
+	 * convert the m_vtkOverlay to itk::ImageData and save it in m_itkOverlay
+	 * then return it with the same spacing, origin and direction as the format image
+	 * @param	format set the output image direction the same as the format image
+	 * @return	m_itkOverlay
+	 */
+	FloatImageType::Pointer GetITKOutput(ImageType::Pointer format);
 
 private:
 
@@ -41,6 +50,8 @@ private:
 	vtkImageData* m_vtkOverlayHolder;
 	ImageType::Pointer m_itkOverlay;
 	DuplicatorType::Pointer m_duplicator;
+	//itk::VTKImageToImageFilter<FloatImageType>::Pointer vtkImageToImageFilter;
+	//vtkSmartPointer<vtkImageCast> imageCastFilter;
 	int m_visible_image_no;
 
 	int DisplayExtent[6];

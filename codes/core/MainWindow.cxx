@@ -39,6 +39,8 @@
 #include <vtkCamera.h>
 #include <vtkImageCast.h>
 
+//#include <itkImageFileWriter.h>
+
 MainWindow::MainWindow() 
 	:widgetGroup(this), viewerGroup(this), viewGroup(this)
 {
@@ -918,9 +920,6 @@ void MainWindow::slot3DUpdate()
 	//interacotr->Initialize();
 	//rwin->Render();
 	//interacotr->Start();
-
-	//volumeRenderingFilter->Delete();
-
 }
 
 void MainWindow::slotChangeIntensity()
@@ -1516,7 +1515,13 @@ void MainWindow::slotCenterline()
 	// segmentation
 	VesselSegmentation* vesselSegmentation = new VesselSegmentation();
 	vesselSegmentation->SetT1(itkImage[0]);
-	vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput());
+	;
+	//itk::ImageFileWriter<FloatImageType>::Pointer writer = itk::ImageFileWriter<FloatImageType>::New();
+	//writer->SetInput(segmentatonImage);
+	//writer->SetFileName("C:\\Users\\user\\Desktop\\test.nii");
+	//writer->Write();
+
+	vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput(itkImage[0]));
 	vesselSegmentation->SetMPRAGE(itkImage[1]);
 	vesselSegmentation->Update();
 
@@ -1621,17 +1626,23 @@ void MainWindow::slotCenterline()
 	sphereActor->SetMapper(sphereMapper);
 	sphereActor->GetProperty()->SetColor(1, 0, 0);
 
-	vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New();
-	ren->AddActor(lumenActor);
-	//ren->AddActor(plaqueActor);
-	ren->AddActor(wallActor);
-	//ren->AddActor(lumenCenterlineActor);
-	ren->AddActor(wallCenterlineActor);
-	ren->AddActor(sphereActor);
-	ren->AddActor2D(scalarBar);
+	m_3DDataRenderer->AddActor(lumenActor);
+	m_3DDataRenderer->AddActor(wallActor);
+	m_3DDataRenderer->AddActor(wallCenterlineActor);
+	m_3DDataRenderer->AddActor(sphereActor);
+	m_3DDataRenderer->AddActor2D(scalarBar);
 
-	vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
-	renWin->AddRenderer(ren);
+	//vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New();
+	//ren->AddActor(lumenActor);
+	////ren->AddActor(plaqueActor);
+	//ren->AddActor(wallActor);
+	////ren->AddActor(lumenCenterlineActor);
+	//ren->AddActor(wallCenterlineActor);
+	//ren->AddActor(sphereActor);
+	//ren->AddActor2D(scalarBar);
+
+	//vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
+	//renWin->AddRenderer(ren);
 
 	vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 	//vtkSmartPointer<MouseInteractorStylePP> style = vtkSmartPointer<MouseInteractorStylePP>::New();
@@ -1639,8 +1650,8 @@ void MainWindow::slotCenterline()
 	//style->SetCenterline(wallCenterline);
 	//style->SetSphere(sphere);
 	//iren->SetInteractorStyle(style);
-	iren->SetRenderWindow(renWin);
+	//iren->SetRenderWindow(renWin);
 
-	renWin->Render();
+	m_3DDataRenderer->Render();
 
 }

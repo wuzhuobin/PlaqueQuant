@@ -34,6 +34,7 @@
 #include <itkMergeLabelMapFilter.h>
 #include <itkChangeLabelImageFilter.h>
 #include <itkSubtractImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
 
 #include <itkVTKImageToImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -65,6 +66,7 @@ typedef itk::LabelShapeKeepNObjectsImageFilter<UnsignedShortImageType>				LabelS
 typedef itk::ChangeLabelImageFilter<FloatImageType, FloatImageType>					ChangeLabelImageFilterType;
 typedef itk::SubtractImageFilter<FloatImageType, FloatImageType>						SubtractImageFilterType;
 typedef itk::ImageToVTKImageFilter<FloatImageType>									ImageToVTKImageType;
+typedef itk::BinaryThresholdImageFilter<FloatImageType, FloatImageType>								BinarThresholdImageFilterType;
 
 //VTK
 #include "vtkImageData.h"
