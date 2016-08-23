@@ -50,6 +50,10 @@ public:
 	void SetImageLayerNo(int);
 	int GetImageLayerNo();
 	Overlay* GetOverlay();
+	vtkImageData** GetImageData() {
+		return this->vtkImage;
+	}
+
 	~MainWindow();
 	
 	enum SLICE_ORIENTATION

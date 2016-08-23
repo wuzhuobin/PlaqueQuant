@@ -486,6 +486,10 @@ void InteractorStylePaintBrush::FillBox3D()
 
 void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 {
+	// Check for Extent
+	int brushExtent[6];
+	this->m_brush->GetUpdateExtent(brushExtent);
+
 	int index[6];
 	switch (orientation)
 	{
@@ -520,6 +524,8 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 		index[5] = 0;
 		break;
 	}
+
+
 	m_brush->DrawSegment3D(index[0], index[1], index[2], index[3], index[4], index[5]);
 }
 
@@ -650,28 +656,35 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 void InteractorStylePaintBrush::ReadfromImageData()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	//Clear Layer
-	m_brush->SetDrawColor(0, 0, 0, 0);
-	this->FillBox3D();
 
 	mainWnd->GetOverlay()->GetDisplayExtent(this->extent);
+	
 	switch (this->orientation)
 	{
 	case 0:
-		m_brushActor->SetDisplayExtent(
-			0, 0, extent[2], extent[3], extent[4], extent[5]);
+		m_brush->SetExtent(0, 0, extent[2], extent[3], extent[4], extent[5]);
+		m_brush->Update();
+		m_brushActor->SetDisplayExtent(0, 0, extent[2], extent[3], extent[4], extent[5]);
+		m_brushActor->Update();
 		break;
-
 	case 1:
-		m_brushActor->SetDisplayExtent(
-			extent[0], extent[1], 0, 0, extent[4], extent[5]);
+		m_brush->SetExtent(extent[0], extent[1], 0, 0, extent[4], extent[5]);
+		m_brush->Update();
+		m_brushActor->SetDisplayExtent(extent[0], extent[1], 0, 0, extent[4], extent[5]);
+		m_brushActor->Update();
 		break;
 
 	case 2:
-		m_brushActor->SetDisplayExtent(
-			extent[0], extent[1], extent[2], extent[3], 0, 0);
+		m_brush->SetExtent(extent[0], extent[1], extent[2], extent[3], 0, 0);
+		m_brush->Update();
+		m_brushActor->SetDisplayExtent(extent[0], extent[1], extent[2], extent[3], 0, 0);
+		m_brushActor->Update();
 		break;
 	}
+
+	//Clear Layer
+	m_brush->SetDrawColor(0, 0, 0, 0);
+	this->FillBox3D();
 
 
 	int pos[3];
@@ -695,8 +708,13 @@ void InteractorStylePaintBrush::ReadfromImageData()
 							uchar rgbaUCHAR[4];
 							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
 							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
-							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
-							m_brush->DrawSegment3D(0, y, z, 0, y, z);
+							try {
+								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
+								m_brush->DrawSegment3D(0, y, z, 0, y, z);
+							}
+							catch (...) {
+								cout << "FUCK";
+							}
 							break;
 						}
 					}
@@ -722,9 +740,14 @@ void InteractorStylePaintBrush::ReadfromImageData()
 							uchar rgbaUCHAR[4];
 							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
 							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
-							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
-							//m_brush->SetDrawColor(255, 0, 0, 1);
-							m_brush->DrawSegment3D(x, 0, z, x, 0, z);
+							try {
+								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
+								//m_brush->SetDrawColor(255, 0, 0, 1);
+								m_brush->DrawSegment3D(x, 0, z, x, 0, z);
+							}
+							catch (...) {
+								cout << "FUCK";
+							}
 							break;
 						}
 					}

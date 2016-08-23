@@ -118,6 +118,21 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 	//}
 }
 
+void Overlay::SetDisplayExtent(int *extent)
+{
+	memcpy(this->DisplayExtent, extent, sizeof(int) * 6);
+}
+
+int * Overlay::GetDisplayExtent()
+{
+	return this->DisplayExtent;
+}
+
+void Overlay::GetDisplayExtent(int *extent)
+{
+	memcpy(extent, this->DisplayExtent, sizeof(int) * 6);
+}
+
 void Overlay::DisplayExtentOn()
 {
 	

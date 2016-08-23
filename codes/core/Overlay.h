@@ -18,9 +18,9 @@ public:
 	void Initialize(vtkImageData* img);
 	void Initialize(ImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
 
-	vtkSetVector6Macro(DisplayExtent, int);
-	vtkGetVector6Macro(DisplayExtent, int);
-
+	void SetDisplayExtent(int*);
+	int* GetDisplayExtent();
+	void GetDisplayExtent(int*);
 
 	void DisplayExtentOn();
 	void DisplayExtentOff();
@@ -30,8 +30,6 @@ public:
 	void SetPixel(int pos[3], double value);
 	void SetPixel(int pos[3], unsigned char value);
 	void SetVisibleImageNo(int);
-	
-	virtual void Modified() {}
 
 	vtkImageData* GetOutput();
 	vtkImageData* GetVTKImageData();

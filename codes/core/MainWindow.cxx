@@ -822,14 +822,15 @@ void MainWindow::slotSelectROI()
 	// Extract VOI of the vtkImage data
 	for (int i = 0; i < 5; ++i) {
 		if (vtkImage[i] != NULL) {
+			vtkImageOriginal[i] = vtkImage[i];
+
 			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
 				vtkSmartPointer<vtkExtractVOI>::New();
 			extractVOIFilter->SetInputData(vtkImage[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
 
-			vtkImageOriginal[i] = vtkImageData::SafeDownCast(extractVOIFilter->GetInput());
-
+			//vtkImageOriginal[i] = vtkImageData::SafeDownCast(extractVOIFilter->GetInput());
 
 			vtkImage[i] = vtkImageData::New();
 			vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
@@ -847,13 +848,17 @@ void MainWindow::slotSelectROI()
 
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
+
+	this->slotChangeSlice(0, 0, 0);
 }
 void MainWindow::slotResetROI()
 {
 	for (int i = 0; i < 5; ++i) 
 	{
 		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL) {
+			vtkImageData* temp = vtkImage[i];
 			vtkImage[i] = this->vtkImageOriginal[i];
+			temp->Delete();
 		}
 	}
 
@@ -863,6 +868,8 @@ void MainWindow::slotResetROI()
 
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
+
+	this->slotChangeSlice(0, 0, 0);
 }
 
 void MainWindow::slot3DUpdate()
@@ -1328,6 +1335,7 @@ void MainWindow::slotMultiPlanarView()
 		default:
 			break;
 		}
+		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 	}
 }
 
