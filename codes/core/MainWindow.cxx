@@ -189,7 +189,7 @@ MainWindow::MainWindow()
 		vtkImage[i] = NULL;
 		vtkImageOriginal[i] = NULL;
 	}
-	vtkImageOverlay = vtkImageData::New();
+	//vtkImageOverlay = vtkImageData::New();
 
 	m_InfoDialog = NULL;
 
@@ -1507,7 +1507,7 @@ void MainWindow::Set3DRulerEnabled(bool b)
 	this->m_distance3DWidget->SetRepresentation(rep);
 	this->m_distance3DWidget->On();
 }
-
+#include <itkImageFileWriter.h>
 
 void MainWindow::slotCenterline()
 {
@@ -1515,122 +1515,127 @@ void MainWindow::slotCenterline()
 	// segmentation
 	VesselSegmentation* vesselSegmentation = new VesselSegmentation();
 	vesselSegmentation->SetT1(itkImage[0]);
-	;
-	//itk::ImageFileWriter<FloatImageType>::Pointer writer = itk::ImageFileWriter<FloatImageType>::New();
-	//writer->SetInput(segmentatonImage);
-	//writer->SetFileName("C:\\Users\\user\\Desktop\\test.nii");
-	//writer->Write();
-
 	vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput(itkImage[0]));
 	vesselSegmentation->SetMPRAGE(itkImage[1]);
 	vesselSegmentation->Update();
 
-	vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
-	vesselSegmentation->GetVesselLumenSurface(lumen);
+	FloatImageType::Pointer outputSegmentation = FloatImageType::New();
+	vesselSegmentation->GetOutputSegmentationImage(outputSegmentation);
+	itk::ImageFileWriter<FloatImageType>::Pointer imageFileWriter =
+		itk::ImageFileWriter<FloatImageType>::New();
+	imageFileWriter->SetFileName("C:\\Users\\user\\Desktop\\seg.nii");
+	imageFileWriter->Update();
 
-	vtkSmartPointer<vtkPolyData> plaque = vtkSmartPointer<vtkPolyData>::New();
-	vesselSegmentation->GetPlaqueSurface(plaque);
 
-	vtkSmartPointer<vtkPolyData> wall = vtkSmartPointer<vtkPolyData>::New();
-	vesselSegmentation->GetVesselWallSurface(wall);
+	this->SegmentationOverlay->SetInputImageData(outputSegmentation);
 
-	// calculate centerlines
-	ExtractCenterline* lumenExtractCenterline = new ExtractCenterline;
-	lumenExtractCenterline->SetSurface(lumen);
-	lumenExtractCenterline->Update();
-	vtkSmartPointer<vtkPolyData> lumenCapped = vtkSmartPointer<vtkPolyData>::New();
-	lumenExtractCenterline->GetCappedSurface(lumenCapped);
-	vtkSmartPointer<vtkPolyData> lumenCenterline = vtkSmartPointer<vtkPolyData>::New();
-	lumenExtractCenterline->GetCenterline(lumenCenterline);
 
-	ExtractCenterline* wallExtractCenterline = new ExtractCenterline;
-	wallExtractCenterline->SetSurface(wall);
-	wallExtractCenterline->Update();
-	vtkSmartPointer<vtkPolyData> wallCapped = vtkSmartPointer<vtkPolyData>::New();
-	wallExtractCenterline->GetCappedSurface(wallCapped);
-	vtkSmartPointer<vtkPolyData> wallCenterline = vtkSmartPointer<vtkPolyData>::New();
-	wallExtractCenterline->GetCenterline(wallCenterline);
+	//vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
+	//vesselSegmentation->GetVesselLumenSurface(lumen);
 
-	vtkSmartPointer<vtkPolyDataMapper> lumenMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	lumenMapper->SetInputData(lumen);
+	//vtkSmartPointer<vtkPolyData> plaque = vtkSmartPointer<vtkPolyData>::New();
+	//vesselSegmentation->GetPlaqueSurface(plaque);
 
-	vtkSmartPointer<vtkPolyDataMapper> plaqueMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	plaqueMapper->SetInputData(plaque);
+	//vtkSmartPointer<vtkPolyData> wall = vtkSmartPointer<vtkPolyData>::New();
+	//vesselSegmentation->GetVesselWallSurface(wall);
 
-	vtkSmartPointer<vtkPolyDataMapper> wallMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	wallMapper->SetInputData(wall);
+	//// calculate centerlines
+	//ExtractCenterline* lumenExtractCenterline = new ExtractCenterline;
+	//lumenExtractCenterline->SetSurface(lumen);
+	//lumenExtractCenterline->Update();
+	//vtkSmartPointer<vtkPolyData> lumenCapped = vtkSmartPointer<vtkPolyData>::New();
+	//lumenExtractCenterline->GetCappedSurface(lumenCapped);
+	//vtkSmartPointer<vtkPolyData> lumenCenterline = vtkSmartPointer<vtkPolyData>::New();
+	//lumenExtractCenterline->GetCenterline(lumenCenterline);
 
-	// Create Lookup Table to match color
-	vtkSmartPointer<vtkLookupTable> LUT = vtkSmartPointer<vtkLookupTable>::New();
-	double LUTmin = min(lumenCenterline->GetScalarRange()[0], wallCenterline->GetScalarRange()[0]);
-	double LUTmax = max(lumenCenterline->GetScalarRange()[1], wallCenterline->GetScalarRange()[1]);
+	//ExtractCenterline* wallExtractCenterline = new ExtractCenterline;
+	//wallExtractCenterline->SetSurface(wall);
+	//wallExtractCenterline->Update();
+	//vtkSmartPointer<vtkPolyData> wallCapped = vtkSmartPointer<vtkPolyData>::New();
+	//wallExtractCenterline->GetCappedSurface(wallCapped);
+	//vtkSmartPointer<vtkPolyData> wallCenterline = vtkSmartPointer<vtkPolyData>::New();
+	//wallExtractCenterline->GetCenterline(wallCenterline);
 
-	LUT->SetTableRange(LUTmin, LUTmax);
-	LUT->Build();
-	LUT->SetTableValue(0, 1.0, 0.0, 0.0, 1);  //Red
-	LUT->SetTableValue(1, 0.0, 1.0, 0.0, 1); // Green
-	LUT->SetTableValue(2, 0.0, 0.0, 1.0, 1); // Blue
+	//vtkSmartPointer<vtkPolyDataMapper> lumenMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//lumenMapper->SetInputData(lumen);
 
-											 // scalar bar
-	vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-	scalarBar->SetLookupTable(LUT);
-	scalarBar->SetTitle("Vessel Radius");
-	scalarBar->SetNumberOfLabels(4);
+	//vtkSmartPointer<vtkPolyDataMapper> plaqueMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//plaqueMapper->SetInputData(plaque);
 
-	vtkSmartPointer<vtkPolyDataMapper> lumenCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	lumenCenterlineMapper->SetInputData(lumenCenterline);
-	lumenCenterlineMapper->ScalarVisibilityOn();
-	lumenCenterlineMapper->SetScalarModeToUsePointData();
-	lumenCenterlineMapper->SetColorModeToMapScalars();
-	lumenCenterlineMapper->SetLookupTable(LUT);
-	lumenCenterlineMapper->SetUseLookupTableScalarRange(1);
+	//vtkSmartPointer<vtkPolyDataMapper> wallMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//wallMapper->SetInputData(wall);
 
-	vtkSmartPointer<vtkPolyDataMapper> wallCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	wallCenterlineMapper->SetInputData(wallCenterline);
-	wallCenterlineMapper->ScalarVisibilityOn();
-	wallCenterlineMapper->SetScalarModeToUsePointData();
-	wallCenterlineMapper->SetColorModeToMapScalars();
-	wallCenterlineMapper->SetLookupTable(LUT);
-	wallCenterlineMapper->SetUseLookupTableScalarRange(1);
+	//// Create Lookup Table to match color
+	//vtkSmartPointer<vtkLookupTable> LUT = vtkSmartPointer<vtkLookupTable>::New();
+	//double LUTmin = min(lumenCenterline->GetScalarRange()[0], wallCenterline->GetScalarRange()[0]);
+	//double LUTmax = max(lumenCenterline->GetScalarRange()[1], wallCenterline->GetScalarRange()[1]);
 
-	vtkSmartPointer<vtkActor> lumenActor = vtkSmartPointer<vtkActor>::New();
-	lumenActor->SetMapper(lumenMapper);
-	lumenActor->GetProperty()->SetColor(1, 0, 0);
-	lumenActor->GetProperty()->SetOpacity(0.5);
+	//LUT->SetTableRange(LUTmin, LUTmax);
+	//LUT->Build();
+	//LUT->SetTableValue(0, 1.0, 0.0, 0.0, 1);  //Red
+	//LUT->SetTableValue(1, 0.0, 1.0, 0.0, 1); // Green
+	//LUT->SetTableValue(2, 0.0, 0.0, 1.0, 1); // Blue
 
-	vtkSmartPointer<vtkActor> plaqueActor = vtkSmartPointer<vtkActor>::New();
-	plaqueActor->SetMapper(plaqueMapper);
-	plaqueActor->GetProperty()->SetColor(0, 1, 0);
-	plaqueActor->GetProperty()->SetOpacity(0.2);
+	//										 // scalar bar
+	//vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+	//scalarBar->SetLookupTable(LUT);
+	//scalarBar->SetTitle("Vessel Radius");
+	//scalarBar->SetNumberOfLabels(4);
 
-	vtkSmartPointer<vtkActor> wallActor = vtkSmartPointer<vtkActor>::New();
-	wallActor->SetMapper(wallMapper);
-	wallActor->GetProperty()->SetColor(0, 0, 1);
-	wallActor->GetProperty()->SetOpacity(0.3);
+	//vtkSmartPointer<vtkPolyDataMapper> lumenCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//lumenCenterlineMapper->SetInputData(lumenCenterline);
+	//lumenCenterlineMapper->ScalarVisibilityOn();
+	//lumenCenterlineMapper->SetScalarModeToUsePointData();
+	//lumenCenterlineMapper->SetColorModeToMapScalars();
+	//lumenCenterlineMapper->SetLookupTable(LUT);
+	//lumenCenterlineMapper->SetUseLookupTableScalarRange(1);
 
-	vtkSmartPointer<vtkActor> lumenCenterlineActor = vtkSmartPointer<vtkActor>::New();
-	lumenCenterlineActor->SetMapper(lumenCenterlineMapper);
+	//vtkSmartPointer<vtkPolyDataMapper> wallCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//wallCenterlineMapper->SetInputData(wallCenterline);
+	//wallCenterlineMapper->ScalarVisibilityOn();
+	//wallCenterlineMapper->SetScalarModeToUsePointData();
+	//wallCenterlineMapper->SetColorModeToMapScalars();
+	//wallCenterlineMapper->SetLookupTable(LUT);
+	//wallCenterlineMapper->SetUseLookupTableScalarRange(1);
 
-	vtkSmartPointer<vtkActor> wallCenterlineActor = vtkSmartPointer<vtkActor>::New();
-	wallCenterlineActor->SetMapper(wallCenterlineMapper);
+	//vtkSmartPointer<vtkActor> lumenActor = vtkSmartPointer<vtkActor>::New();
+	//lumenActor->SetMapper(lumenMapper);
+	//lumenActor->GetProperty()->SetColor(1, 0, 0);
+	//lumenActor->GetProperty()->SetOpacity(0.5);
 
-	// pick point spheres
-	vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-	sphere->SetRadius(0.5);
-	sphere->SetCenter(lumenCenterline->GetPoint(0));
+	//vtkSmartPointer<vtkActor> plaqueActor = vtkSmartPointer<vtkActor>::New();
+	//plaqueActor->SetMapper(plaqueMapper);
+	//plaqueActor->GetProperty()->SetColor(0, 1, 0);
+	//plaqueActor->GetProperty()->SetOpacity(0.2);
 
-	vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	sphereMapper->SetInputConnection(sphere->GetOutputPort());
+	//vtkSmartPointer<vtkActor> wallActor = vtkSmartPointer<vtkActor>::New();
+	//wallActor->SetMapper(wallMapper);
+	//wallActor->GetProperty()->SetColor(0, 0, 1);
+	//wallActor->GetProperty()->SetOpacity(0.3);
 
-	vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
-	sphereActor->SetMapper(sphereMapper);
-	sphereActor->GetProperty()->SetColor(1, 0, 0);
+	//vtkSmartPointer<vtkActor> lumenCenterlineActor = vtkSmartPointer<vtkActor>::New();
+	//lumenCenterlineActor->SetMapper(lumenCenterlineMapper);
 
-	m_3DDataRenderer->AddActor(lumenActor);
-	m_3DDataRenderer->AddActor(wallActor);
-	m_3DDataRenderer->AddActor(wallCenterlineActor);
-	m_3DDataRenderer->AddActor(sphereActor);
-	m_3DDataRenderer->AddActor2D(scalarBar);
+	//vtkSmartPointer<vtkActor> wallCenterlineActor = vtkSmartPointer<vtkActor>::New();
+	//wallCenterlineActor->SetMapper(wallCenterlineMapper);
+
+	//// pick point spheres
+	//vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+	//sphere->SetRadius(0.5);
+	//sphere->SetCenter(lumenCenterline->GetPoint(0));
+
+	//vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//sphereMapper->SetInputConnection(sphere->GetOutputPort());
+
+	//vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
+	//sphereActor->SetMapper(sphereMapper);
+	//sphereActor->GetProperty()->SetColor(1, 0, 0);
+	//m_3DDataRenderer->RemoveAllViewProps();
+	//m_3DDataRenderer->AddActor(lumenActor);
+	//m_3DDataRenderer->AddActor(wallActor);
+	//m_3DDataRenderer->AddActor(wallCenterlineActor);
+	//m_3DDataRenderer->AddActor(sphereActor);
+	//m_3DDataRenderer->AddActor2D(scalarBar);
 
 	//vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New();
 	//ren->AddActor(lumenActor);
@@ -1644,7 +1649,7 @@ void MainWindow::slotCenterline()
 	//vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
 	//renWin->AddRenderer(ren);
 
-	vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+	//vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 	//vtkSmartPointer<MouseInteractorStylePP> style = vtkSmartPointer<MouseInteractorStylePP>::New();
 	//style->SetSurface(wall);
 	//style->SetCenterline(wallCenterline);
