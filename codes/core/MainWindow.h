@@ -19,6 +19,7 @@
 #include "Define.h"
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
+#include "InteractorStyleSwitch3D.h"
 #include "InfoDialog.h"
 #include "Overlay.h"
 #include "Distance3DWidget.h"
@@ -29,6 +30,7 @@ class MainWindow: public QMainWindow
 	Q_OBJECT
 public:
 	explicit MainWindow(); 	
+	~MainWindow();
 
 	static MainWindow* GetMainWindow();
 	vtkRenderWindow* GetRenderWindow(int i);
@@ -44,17 +46,18 @@ public:
 	QString GetFileName(int);
 
 	int GetVisibleImageNo();
+	int GetImageLayerNo();
+
 	void RenderAllViewer();
 	void RenderAll2DViewers();
 	void Set3DRulerEnabled(bool b);
 	void SetImageLayerNo(int);
-	int GetImageLayerNo();
 	Overlay* GetOverlay();
 	vtkImageData** GetImageData() {
 		return this->vtkImage;
 	}
 
-	~MainWindow();
+	Ui_MainWindow* GetUI();
 	
 	enum SLICE_ORIENTATION
   {
@@ -62,6 +65,17 @@ public:
     SLICE_ORIENTATION_XZ = 1,
     SLICE_ORIENTATION_XY = 2
   };
+
+	enum LABEL_MAPPING {
+		LABEL_NULL = 0,
+		LABEL_LUMEN = 1,
+		LABEL_VESSEL_WALL = 2,
+		LABEL_CALCIFICATION = 3,
+		LABEL_HEMORRHAGE = 4,
+		LABEL_IRNC = 5,
+		LABEL_LM = 6
+	};
+
 
 public slots:
 	//GUI
@@ -131,6 +145,8 @@ public slots:
 	//Alogrithm
 	void slotMeasureCurrentVolumeOfEveryLabel();
 
+
+
 private:
 	//UI
 	Ui_MainWindow* ui;
@@ -158,6 +174,7 @@ private:
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	vtkRenderWindowInteractor*  m_interactor[3];
 	InteractorStyleSwitch*		m_style[3];
+	InteractorStyleSwitch3D*	m_style3D;
 
 
     //File Name
@@ -177,11 +194,9 @@ private:
 	void initializeModule();
 	void addOverlay2ImageViewer();
 
-	
 	//Data
 	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
 	ImageType::Pointer itkImage[5];
-	
 	vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
 	vtkImageData* vtkImageOverlay;
@@ -219,6 +234,17 @@ private:
 	const int hemorrhage[3] = { 255, 255, 0 };
 	const int lrnc[3] = { 0, 255, 255 };
 	const int lm[3] = { 255, 0, 255 };
+
+	
+/*
+
+	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
+	this->LookUpTable->SetTableValue(1, 1, 0, 0, 0.5);
+	this->LookUpTable->SetTableValue(2, 0, 0, 1, 0.9);
+	this->LookUpTable->SetTableValue(3, 0, 1, 0, 0.1);
+	this->LookUpTable->SetTableValue(4, 1, 1, 0, 0.7);
+	this->LookUpTable->SetTableValue(5, 0, 1, 1, 0.4);
+	this->LookUpTable->SetTableValue(6, 1, 0, 1, 0.5);*/
 
 };
  

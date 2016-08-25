@@ -162,13 +162,14 @@ MainWindow::MainWindow()
 	ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
 
 	/// Set up 3D renderer
+	this->m_style3D = InteractorStyleSwitch3D::New();
 	this->m_3Dinteractor = vtkRenderWindowInteractor::New();
 	this->m_3DimageViewer = vtkRenderWindow::New();
-	//this->m_3DimageViewer->SetNumberOfLayers(2);
+	this->m_3DimageViewer->SetNumberOfLayers(2);
 	this->m_3DimageViewer->SetInteractor(this->m_3Dinteractor);
-	this->m_3Dinteractor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
-	//this->m_3DAnnotationRenderer = vtkRenderer::New();
-	//this->m_3DAnnotationRenderer->SetLayer(1);
+	this->m_3Dinteractor->SetInteractorStyle(this->m_style3D);
+	this->m_3DAnnotationRenderer = vtkRenderer::New();
+	this->m_3DAnnotationRenderer->SetLayer(1);
 	this->m_3DDataRenderer = vtkRenderer::New();
 	this->m_3DDataRenderer->SetLayer(0);
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
@@ -881,23 +882,24 @@ void MainWindow::slot3DUpdate()
 	//	return;
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
 	
-	////Marching cubes
-	//SurfaceCreator* surfaceCreator = new SurfaceCreator();
-	//surfaceCreator->SetInput(SegmentationOverlay->GetOutput());
-	//surfaceCreator->SetDiscrete(true);
-	//surfaceCreator->SetResamplingFactor(1.0);
-	//surfaceCreator->Update();
+	///Marching cubes
+	SurfaceCreator* surfaceCreator = new SurfaceCreator();
+	surfaceCreator->SetInput(SegmentationOverlay->GetOutput());
+	surfaceCreator->SetDiscrete(true);
+	surfaceCreator->SetResamplingFactor(1.0);
+	surfaceCreator->Update();
 
-	//vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//mapper->SetInputData(surfaceCreator->GetOutput());
-	//mapper->SetLookupTable(this->m_2DimageViewer[0]->getLookupTable());
-	//mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	//mapper->Update();
-	//vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
-	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	//Actor->SetMapper(mapper);
-	//this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
-	//delete surfaceCreator;
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(surfaceCreator->GetOutput());
+	mapper->SetLookupTable(this->m_2DimageViewer[0]->getLookupTable());
+	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	mapper->Update();
+	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
+	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	Actor->SetMapper(mapper);
+	Actor->GetProperty()->SetOpacity(0.1);
+	Actor->SetPickable(1);
+	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
 
 	///Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
@@ -905,6 +907,7 @@ void MainWindow::slot3DUpdate()
 	
 	volumeRenderingFilter->SetInputData(this->SegmentationOverlay->GetOutput());
 	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
+	volumeRenderingFilter->GetVolume()->SetPickable(1);
 	volumeRenderingFilter->Update();
 
 	this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
@@ -912,14 +915,16 @@ void MainWindow::slot3DUpdate()
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui->image4View->GetRenderWindow()->Render();
 
-	//vtkRenderWindow* rwin = vtkRenderWindow::New();
-	//rwin->AddRenderer(vtkRenderer::New());
-	//rwin->GetRenderers()->GetFirstRenderer()->AddVolume(volumeRenderingFilter->GetVolume());
-	//vtkRenderWindowInteractor* interacotr = vtkRenderWindowInteractor::New();
-	//rwin->SetInteractor(interacotr);
-	//interacotr->Initialize();
-	//rwin->Render();
-	//interacotr->Start();
+	delete surfaceCreator;
+
+	/*vtkRenderWindow* rwin = vtkRenderWindow::New();
+	rwin->AddRenderer(vtkRenderer::New());
+	rwin->GetRenderers()->GetFirstRenderer()->AddVolume(volumeRenderingFilter->GetVolume());
+	vtkRenderWindowInteractor* interacotr = vtkRenderWindowInteractor::New();
+	rwin->SetInteractor(interacotr);
+	interacotr->Initialize();
+	rwin->Render();
+	interacotr->Start();*/
 }
 
 void MainWindow::slotChangeIntensity()
@@ -1496,6 +1501,11 @@ Overlay* MainWindow::GetOverlay()
 		return SegmentationOverlay;
 	else
 		return NULL;
+}
+
+Ui_MainWindow * MainWindow::GetUI()
+{
+	return this->ui;
 }
 
 

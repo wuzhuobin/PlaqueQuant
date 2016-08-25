@@ -5,7 +5,6 @@ include_directories(
 	${PROJECT_BINARY_DIR}
 	${MAIN_INCLUDE_DIRS})
 
-message(${MAIN_INCLUDE_DIRS})
  # message("${PROJECT_BINARY_DIR}")
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
@@ -48,33 +47,32 @@ endif()
 SET(
 	QT_SRC
 	${PROJECT_SOURCE_DIR}/main.cxx
-	${PROJECT_SOURCE_DIR}/MainWindow.cxx
+	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
+	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
+	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
 	${PROJECT_SOURCE_DIR}/InfoDialog.cxx
+	${PROJECT_SOURCE_DIR}/MainWindow.cxx
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
 	${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
-	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
-	${PROJECT_SOURCE_DIR}/Overlay.cxx
-	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
-	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
 	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
-	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
+	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
 
 )
 
 SET(
 	QT_INC
-	${PROJECT_SOURCE_DIR}/MainWindow.h
+	${PROJECT_SOURCE_DIR}/AbstractFilter.h
+	${PROJECT_SOURCE_DIR}/ExtractCenterline.h
+	${PROJECT_SOURCE_DIR}/ImageRegistration.h
 	${PROJECT_SOURCE_DIR}/InfoDialog.h
+	${PROJECT_SOURCE_DIR}/MainWindow.h
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.h
 	${PROJECT_SOURCE_DIR}/RegistrationWizard.h
-	${PROJECT_SOURCE_DIR}/ImageRegistration.h
-	${PROJECT_SOURCE_DIR}/Overlay.h
-	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
-	${PROJECT_SOURCE_DIR}/AbstractFilter.h
 	${PROJECT_SOURCE_DIR}/ReportGenerator.h
-	${PROJECT_SOURCE_DIR}/ExtractCenterline.h
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
+	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
+
 )
 
 SET(
@@ -142,6 +140,7 @@ target_link_libraries(
 	${ITK_LIBRARIES} 
 	Module
 	InteractorStyles
+	AbstractData
 	Widgets 
 	GPURenderWithLUT
 	MeasurementFor3D

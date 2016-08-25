@@ -95,9 +95,7 @@ void InteractorStylePolygonDraw::OnMouseMove()
 void InteractorStylePolygonDraw::OnKeyPress()
 {
 	std::string key = this->Interactor->GetKeySym();
-
-	std::cout << key << endl;
-
+	
 	if (key == "Escape") {
 		this->SetPolygonModeEnabled(false);
 	}

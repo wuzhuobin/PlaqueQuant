@@ -45,6 +45,7 @@ typedef itk::Image< PixelType, ImageDimension >		ImageType;
 typedef itk::GDCMSeriesFileNames					NamesGeneratorType;
 typedef itk::ImageSeriesReader< ImageType >			ReaderType;
 typedef itk::ImageFileReader<ImageType>				NiftiReaderType;
+typedef itk::ImageFileWriter<ImageType>				NiftiWriterType;
 typedef itk::GDCMImageIO							ImageIOType;
 typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
 typedef itk::OrientImageFilter<ImageType,ImageType> OrienterType;
@@ -74,5 +75,6 @@ typedef itk::BinaryThresholdImageFilter<FloatImageType, FloatImageType>								B
 #include "vtkNIFTIImageWriter.h"
 #include <vtkNIFTIImageHeader.h>
 #include "vtkNIFTIImageReader.h"
+
 
 #endif //DEFINE_H

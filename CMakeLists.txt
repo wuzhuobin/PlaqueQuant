@@ -48,17 +48,22 @@ endif()
 
 SET(
 	MAIN_INCLUDE_DIRS
+	### Directories for MOC Sources ###
 	${PROJECT_BINARY_DIR}
 	${PROJECT_BINARY_DIR}/include
 	${PROJECT_BINARY_DIR}/codes/Module
 	${PROJECT_BINARY_DIR}/codes/Core
 	# AbstractInteractorStyles
 	${PROJECT_BINARY_DIR}/codes/AbstractInteractorStyles
+	# Abstract Data structure
+	${PROJECT_BINARY_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
 	${PROJECT_BINARY_DIR}/codes/MeasurementFor3D 
+	# Source for maximum wall thickness
+	${PROJECT_BINAR_DIR}/codes/MaximumWallThickness
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
@@ -66,11 +71,14 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/Core
 	# AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
+	${PROJECT_SOURCE_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
 	${PROJECT_SOURCE_DIR}/codes/MeasurementFor3D 
+	# Source for maxmimum wall thickness
+	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 )
 
 SET(

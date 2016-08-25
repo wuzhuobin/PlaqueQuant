@@ -335,6 +335,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 			break;
 		}
 		}
+		Ui_MainWindow* ui = mainWnd->GetUI();
+		
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
 		m_brush->Update();
@@ -713,7 +715,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 								m_brush->DrawSegment3D(0, y, z, 0, y, z);
 							}
 							catch (...) {
-								cout << "FUCK";
+								break;
 							}
 							break;
 						}
@@ -746,7 +748,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 								m_brush->DrawSegment3D(x, 0, z, x, 0, z);
 							}
 							catch (...) {
-								cout << "FUCK";
+								break;
 							}
 							break;
 						}
