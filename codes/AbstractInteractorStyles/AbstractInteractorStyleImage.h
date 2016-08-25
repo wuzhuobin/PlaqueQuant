@@ -24,7 +24,6 @@ Copyright (C) 2016
 #include <vtkInteractorStyleImage.h>
 #include <vtkObjectFactory.h>
 
-#include "AbstractInteractorStyle.h"
 #include "MyImageViewer.h"
 
 class AbstractInteractorStyleImage : public vtkInteractorStyleImage
@@ -41,7 +40,7 @@ public:
 	void SetCurrentSlice(int slice);
 
 
-//protected:
+protected:
 	AbstractInteractorStyleImage();
 	~AbstractInteractorStyleImage();
 	
