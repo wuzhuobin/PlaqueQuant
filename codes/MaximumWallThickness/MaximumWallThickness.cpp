@@ -1,83 +1,297 @@
+#include <vtkCenterOfMass.h>
+#include <vtkConnectivityFilter.h>
+#include <vtkImageCast.h>
+#include <vtkNIFTIImageWriter.h>
+#include <vtkGeometryFilter.h>
+#include <vtkSplineFilter.h>
+#include <vtkParametricSpline.h>
+#include "MainWindow.h"
 #include "MaximumWallThickness.h"
-
+#include "vtkKdTree.h"
 
 MaximumWallThickness::MaximumWallThickness(vtkImageData * image, int internalEdgeValue, int externalEdgeValue)
-	:image(image)
 {
-	edgeValue[0] = (internalEdgeValue);
-	edgeValue[1] = externalEdgeValue;
-	this->extent = image->GetExtent();
+	this->m_image = vtkSmartPointer<vtkImageData>::New();
+	this->m_image->DeepCopy(image);
+
+	image->GetExtent(this->m_extent);
 	
-	for (int num = 0; num < EDGENUM; ++num) {
-		edgePoints[num] = new std::list<EdgePoint>[extent[5] - extent[4] + 1];
-		centers[num] = new EdgePoint[extent[5] - extent[4] + 1];
-	}
-
-
+	this->m_contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+	this->m_sliceImage = NULL;
 	
 }
 
 MaximumWallThickness::~MaximumWallThickness()
 {
-	for (int num = 0; num < EDGENUM; ++num) {
-		delete[] edgePoints[num];
-		delete[] centers[num];
+	if (this->m_sliceImage) {
+		this->m_sliceImage->Delete();
+		this->m_sliceImage = NULL;
 	}
 }
 
-bool MaximumWallThickness::valueTransform()
-{
-	vtkSmartPointer<vtkImageShiftScale> shiftScaleFilter =
-		vtkSmartPointer<vtkImageShiftScale>::New();
-	shiftScaleFilter->SetInputData(image);
-	shiftScaleFilter->SetOutputScalarType(VTK_INT);
-	shiftScaleFilter->Update();
 
+
+std::vector<MaximumWallThickness::DistanceLoopPair> MaximumWallThickness::GetDistanceLoopPairVect()
+{
+	return this->m_distanceVect;
+}
+
+void MaximumWallThickness::SetSliceNumber(int i)
+{
+	this->m_sliceNumber = i;
+}
+
+void MaximumWallThickness::Update()
+{
+	if (!this->ExtractSlice()) {
+		throw ERROR_EXTRACT_SLICE;
+		return;
+	}
+
+	if (!this->ValueTransform()) {
+		throw ERROR_VALUE_TRANSFORM;
+		return;
+	}
+
+	if (!this->ExtractLoops()) {
+		throw ERROR_EXTRACT_LOOP;
+		return;
+	}
+
+	//if (!this->EdgeDetection()) {
+	//	throw ERROR_EDGE_DETECTION;
+	//	return;
+	//}
+
+
+	if (!this->ThicknessCal()) {
+		throw ERROR_THICKNESS_CAL;
+		return;
+	}
+
+}
+
+int MaximumWallThickness::CheckNumberOfBranches()
+{
+	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
+	thres->ThresholdBetween(MainWindow::LABEL_LUMEN - 0.1, MainWindow::LABEL_LUMEN + 0.1);
+	thres->SetInputData(this->m_sliceImage);
+	thres->SetOutValue(0);
+	thres->SetInValue(1);
+	thres->ReplaceInOn();
+	thres->Update();
+
+	this->m_contourFilter->SetInputData(thres->GetOutput());
+	this->m_contourFilter->SetValue(0, 0.1);
+	this->m_contourFilter->SetNumberOfContours(1);
+	this->m_contourFilter->Update();
+
+	//// Debug
+	//cout << "Range: " << this->m_sliceImage->GetScalarTypeAsString() << " " << this->m_sliceImage->GetScalarRange()[0] << " " << this->m_sliceImage->GetScalarRange()[1];
+	//vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+	//actor->SetInputData(thres->GetOutput());
+	//actor->Update();
+	////std::vector<vtkActor*> renme({ GetActor(contourFilter->GetOutput()) });
+	////ActorRenderers* ren = new ActorRenderers;
+	////ren->SetRenderList(renme);
+	////ren->Render();
+
+
+	vtkSmartPointer<vtkConnectivityFilter> connectivity = vtkSmartPointer<vtkConnectivityFilter>::New();
+	connectivity->SetInputConnection(this->m_contourFilter->GetOutputPort());
+	connectivity->SetExtractionModeToAllRegions();
+	connectivity->Update();
+
+	//// Debug
+	//ActorRenderers* ren = new ActorRenderers;
+	//ren->AddActor(GetActor(this->m_contourFilter->GetOutput()));
+	//ren->AddViewProp(actor);
+	//ren->GetInteractor()->SetInteractorStyle(vtkInteractorStyleImage::New());
+	//ren->Render();
+	//delete ren;
+
+	return connectivity->GetNumberOfExtractedRegions();
+}
+
+bool MaximumWallThickness::ValueTransform()
+{
+	vtkSmartPointer<vtkImageCast> castFilter =
+		vtkSmartPointer<vtkImageCast>::New();
+	castFilter->SetInputData(this->m_sliceImage);
+	castFilter->SetOutputScalarType(VTK_DOUBLE);
+	castFilter->Update();
+
+	this->m_sliceImage->DeepCopy(castFilter->GetOutput());
 
 	return true;
 }
 
-bool MaximumWallThickness::extractVOI()
+/* Extract the slice from the input image specified by m_sliceNumber */
+bool MaximumWallThickness::ExtractSlice()
 {
-	for (int num = 0; num < EDGENUM; ++num) {
-		edgeImage[num] = vtkSmartPointer<vtkImageData>::New();
-		edgeImage[num]->DeepCopy(image);
-		vtkSmartPointer<vtkExtractVOI> extractFilter =
-			vtkSmartPointer<vtkExtractVOI>::New();
-		extractFilter->SetInputData(edgeImage[num]);
-		extractFilter->SetVOI(extent);
-		extractFilter->Update();
-		edgeImage[num] = extractFilter->GetOutput();
+	this->m_image->GetExtent(m_extent);
+	// Set the extent to the slice being handled only
+	this->m_extent[4] = this->m_sliceNumber;
+	this->m_extent[5] = this->m_sliceNumber;
 
-	}
+	vtkSmartPointer<vtkExtractVOI> extractVOIFilter = vtkSmartPointer<vtkExtractVOI>::New();
+	extractVOIFilter->SetInputData(this->m_image);
+	extractVOIFilter->SetVOI(this->m_extent);
+	extractVOIFilter->Update();
+
+	// check if the variable is declared
+	if (m_sliceImage == NULL)
+		this->m_sliceImage = vtkImageData::New();
+
+	// copy the extracted image
+	this->m_sliceImage->DeepCopy(extractVOIFilter->GetOutput());
 
 	return true;
 }
 
-bool MaximumWallThickness::thresholdImage()
+bool MaximumWallThickness::ExtractLoops()
 {
-	for (int num = 0; num < EDGENUM; ++num) {
-		vtkSmartPointer<vtkImageThreshold> thresholdFilter =
-			vtkSmartPointer<vtkImageThreshold>::New();
-		thresholdFilter->SetInputData(edgeImage[num]);
-		thresholdFilter->ThresholdBetween(edgeValue[num], edgeValue[num]);
-		thresholdFilter->SetInValue(image->GetScalarTypeMax());
-		thresholdFilter->SetOutValue(image->GetScalarTypeMin());
-		thresholdFilter->Update();
-		edgeImage[num] = thresholdFilter->GetOutput();
+	int numOfLoops = this->CheckNumberOfBranches();
+	int vesselWallLabel = MainWindow::LABEL_CALCIFICATION;
+
+	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
+	thres->ThresholdBetween(MainWindow::LABEL_LUMEN - 0.1, MainWindow::LABEL_LUMEN + 0.1);
+	thres->SetInputData(this->m_sliceImage);
+	thres->SetOutValue(0);
+	thres->SetInValue(1);
+	thres->ReplaceInOn();
+	thres->Update();
+
+	/// Setup contour filter 
+	this->m_contourFilter->SetInputData(thres->GetOutput());
+	this->m_contourFilter->SetNumberOfContours(1);
+	this->m_contourFilter->SetValue(0, 0.1);
+	this->m_contourFilter->ComputeScalarsOn();
+	this->m_contourFilter->ComputeNormalsOn();
+	this->m_contourFilter->Update();
+
+	/// Extract loops
+	// extract loops representing vessel wall
+	vtkSmartPointer<vtkPolyData> vesselWallLoops = vtkSmartPointer<vtkPolyData>::New();
+	vesselWallLoops->DeepCopy(m_contourFilter->GetOutput());
+
+	// extract loops representing lumen
+	thres->ThresholdByLower(0.1);
+	thres->Update();
+	this->m_contourFilter->SetInputData(thres->GetOutput());
+	this->m_contourFilter->Update();
+
+	vtkSmartPointer<vtkPolyData> lumenWallLoops = vtkSmartPointer<vtkPolyData>::New();
+	lumenWallLoops->DeepCopy(this->m_contourFilter->GetOutput());
+
+	/// Pair loops
+	// push each loops into the vector
+	std::vector<vtkPolyData*> l_loopsVesselVect, l_loopsLumenVect;
+	if (numOfLoops > 1) {
+		vtkSmartPointer<vtkThreshold> l_thresFilter = vtkSmartPointer<vtkThreshold>::New();
+		vtkSmartPointer<vtkConnectivityFilter>l_connectivityFilter = vtkSmartPointer<vtkConnectivityFilter>::New();
+		vtkSmartPointer<vtkGeometryFilter> l_geoFilter = vtkSmartPointer<vtkGeometryFilter>::New();
 		
+		// For vessel wall, seperate each loops from the original polydata
+		l_connectivityFilter->SetInputData(vesselWallLoops);
+		l_connectivityFilter->SetExtractionModeToAllRegions();
+		l_connectivityFilter->ColorRegionsOn();
+		l_connectivityFilter->Update();
+		l_thresFilter->SetInputConnection(l_connectivityFilter->GetOutputPort());
+		for (int i = 0; i < l_connectivityFilter->GetNumberOfExtractedRegions();i++)
+		{
+			l_thresFilter->ThresholdBetween(double(i) - 0.1, double(i) + 0.1);
+			l_thresFilter->Update();
+
+			l_geoFilter->SetInputConnection(l_thresFilter->GetOutputPort());
+			l_geoFilter->Update();
+
+			vtkPolyData* l_newPD = vtkPolyData::New();
+			l_newPD->DeepCopy(l_geoFilter->GetOutput());	
+			l_loopsVesselVect.push_back(l_newPD);
+		}
+
+		// For lumen
+		l_connectivityFilter->SetInputData(lumenWallLoops);
+		l_thresFilter->SetInputConnection(l_connectivityFilter->GetOutputPort());
+		for (int i = 0; i < l_connectivityFilter->GetNumberOfExtractedRegions(); i++)
+		{
+			l_thresFilter->ThresholdBetween(double(i) - 0.1, double(i) + 0.1);
+			l_thresFilter->Update();
+
+			l_geoFilter->SetInputConnection(l_thresFilter->GetOutputPort());
+			l_geoFilter->Update();
+
+			vtkPolyData* l_newPD = vtkPolyData::New();
+			l_newPD->DeepCopy(l_geoFilter->GetOutput());
+			l_loopsLumenVect.push_back(l_newPD);
+		}
+
+		// if there are different number of loops, the branch cannot be defined, throw error
+		if (l_loopsLumenVect.size() != l_loopsVesselVect.size()) {
+			throw ERROR_UNDEFINED_BRANCH;
+			return false;
+		}
+
+		// match loops by comparing center distance
+		vtkSmartPointer<vtkCenterOfMass> com = vtkSmartPointer<vtkCenterOfMass>::New();
+		for (int i = 0; i < l_loopsVesselVect.size();i++)
+		{
+			int l_partner;
+			double l_d = VTK_DOUBLE_MAX;
+			LoopPair* loopPair = new LoopPair;
+			vtkPolyData* l1 = vtkPolyData::New(), *l2 = vtkPolyData::New();
+			l1->DeepCopy(l_loopsVesselVect.at(i));
+
+			double com1[3];
+			com->SetInputData(l_loopsVesselVect.at(i));
+			com->SetUseScalarsAsWeights(false);
+			com->Update();
+			memcpy(com1, com->GetCenter(), sizeof(double) * 3);
+			for (int j = 0; j < l_loopsLumenVect.size(); j++)
+			{
+				double com2[3];
+				com->SetInputData(l_loopsLumenVect.at(j));
+				com->SetUseScalarsAsWeights(false);
+				com->Update();
+				memcpy(com2, com->GetCenter(),sizeof(double)*3);
+
+				double l_l_d = vtkMath::Distance2BetweenPoints(com1, com2);
+				if (l_l_d < l_d) {
+					l_partner = j;
+					l_d = l_l_d;
+				}
+			}
+
+			l2->DeepCopy(l_loopsLumenVect.at(l_partner));
+
+			loopPair->first = l1;
+			loopPair->second = l2;
+			this->m_loopPairVect.push_back(*loopPair);
+		}
 	}
+	else {
+		LoopPair* loopPair = new LoopPair;
+		vtkPolyData* l1 = vtkPolyData::New(), *l2 = vtkPolyData::New();
+		l1->DeepCopy(vesselWallLoops);
+		l2->DeepCopy(lumenWallLoops);
+		loopPair->first = l1;
+		loopPair->second = l2;
+
+		this->m_loopPairVect.push_back(*loopPair);
+	}
+	
 	return true;
 }
 
-bool MaximumWallThickness::edgeDetection()
+bool MaximumWallThickness::EdgeDetection()
 {
 	// sobel edge detector with Non-Maximum-Suppression
 	for (int num = 0; num < EDGENUM; ++num) {
 
 		vtkSmartPointer<vtkImageSobel2D> sobelFilter =
 			vtkSmartPointer<vtkImageSobel2D>::New();
-		sobelFilter->SetInputData(edgeImage[num]);
+		sobelFilter->SetInputData(m_edgeImage[num]);
 		sobelFilter->Update();
 		//Euclidean distance
 		// using imageMathematics
@@ -131,7 +345,21 @@ bool MaximumWallThickness::edgeDetection()
 		nonMaximumSuppressionFilter->SetVectorInputData(sobelFilter->GetOutput());
 		nonMaximumSuppressionFilter->Update();
 
-		edgeImage[num] = nonMaximumSuppressionFilter->GetOutput();
+		vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
+		castfilter->SetInputConnection(nonMaximumSuppressionFilter->GetOutputPort());
+		castfilter->SetOutputScalarTypeToInt();
+		castfilter->Update();
+
+		m_edgeImage[num]->DeepCopy(castfilter->GetOutput());
+
+		/// OUTPUT the image for debug
+		//char filename[256];
+		//sprintf(filename, "../../sobleOutput%i.nii.gz", num);
+		//vtkSmartPointer<vtkNIFTIImageWriter> writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
+		//writer->SetInputData(m_edgeImage[num]);
+		//writer->SetFileName(filename);
+		//writer->Update();
+		//writer->Write();
 
 	}
 
@@ -211,154 +439,86 @@ bool MaximumWallThickness::edgeDetection()
 	return true;
 }
 
-bool MaximumWallThickness::thicknessCal()
+bool MaximumWallThickness::ThicknessCal()
 {
-	using namespace std;
+	if (this->m_loopPairVect.size() == 0)
+		return false;
 
+	// clean the output vector
+	this->m_distanceVect.clear();
 
-	for (int num = 0; num < EDGENUM; num++) {
+	vtkSmartPointer<vtkParametricSpline> spline = vtkSmartPointer<vtkParametricSpline>::New();
 
-		list<EdgePoint>* edgePointer = edgePoints[num];
-		EdgePoint* centersPointer = centers[num];
-		double* spacing = edgeImage[num]->GetSpacing();
-		//cout << spacing[0] << '\t' << spacing[1] << '\t' << spacing[2] << endl;
-		for (int k = extent[4]; k <= extent[5]; k++) {
+	vtkSmartPointer<vtkSplineFilter> splineFilter = vtkSmartPointer<vtkSplineFilter>::New();
+	for (int i = 0; i < this->m_loopPairVect.size();i++)
+	{
+		std::pair<int, int> pids;
+		vtkSmartPointer<vtkPolyData> vesselLoop, lumenLoop;
+		vesselLoop = this->m_loopPairVect.at(i).first;
+		lumenLoop = this->m_loopPairVect.at(i).second;
 
-			edgePointer->clear();
-			
-			int centersX = 0;
-			int centersY = 0;
-			for (int j = extent[2]; j <= extent[3]; j++) {
-				for (int i = extent[0]; i <= extent[1]; i++) {
-					int* pointer = static_cast<int*>(edgeImage[num]->GetScalarPointer(i, j, k));
-					if (*pointer != image->GetScalarTypeMin()) {
-						EdgePoint e;
-						e.x = i * spacing[0];
-						e.y = j * spacing[1];
-						centersX += i * spacing[0];
-						centersY += j * spacing[1];
-						edgePointer->push_back(e);
-					}
-					
-				}
+		// Up-sample the lines for vessel wall
+		spline->SetPoints(vesselLoop->GetPoints());
+		splineFilter->SetInputData(vesselLoop);
+		splineFilter->SetNumberOfSubdivisions(5);
+		splineFilter->Update();
+		vesselLoop->DeepCopy(splineFilter->GetOutput());
+		cout << "Vessel: " << vesselLoop->GetNumberOfPoints() << endl;
+
+		// for lumen
+		spline->SetPoints(lumenLoop->GetPoints());
+		splineFilter->SetInputData(lumenLoop);
+		splineFilter->SetNumberOfSubdivisions(5);
+		splineFilter->Update();
+		lumenLoop->DeepCopy(splineFilter->GetOutput());
+		cout << "Lumen: " << lumenLoop->GetNumberOfPoints() << endl;
+
+		// Build kd tree
+		double d = VTK_DOUBLE_MIN;
+		vtkSmartPointer<vtkKdTree> kdtree = vtkSmartPointer<vtkKdTree>::New();
+		kdtree->BuildLocatorFromPoints(vesselLoop->GetPoints());
+		for (int j = 0; j < lumenLoop->GetNumberOfPoints(); j++)
+		{
+			double l_d;
+			int index = kdtree->FindClosestPoint(lumenLoop->GetPoint(j), l_d);
+			if (l_d > d) {
+				d = l_d;
+				pids.first = index;
+				pids.second = j;
 			}
-			//cout << "edgePointers number:" << edgePointer->size() << endl;
-			EdgePoint e;
-			//if(edgePointer->size() != 0){
-				e.x = (double)centersX / edgePointer->size();
-				e.y = (double)centersY / edgePointer->size();
-			//}
-			*centersPointer = e;
-			++centersPointer;
-			++edgePointer;
-
 		}
 
+		DistanceLoopPair dlp;
+		dlp.Distance = sqrt(d);
+		dlp.LoopPair = this->m_loopPairVect.at(i);
+		dlp.PIDs = pids;
+
+		this->m_distanceVect.push_back(dlp);
 	}
-
-
-	list<EdgePoint>* internalEdgePointer = edgePoints[0];
-	list<EdgePoint>* externalEdgePointer = edgePoints[1];
-	EdgePoint* internalCenterPointer = centers[0];
-
-	maximumWallThickness.clear();
-
-	
-	for (int k = extent[4]; k <= extent[5]; k++) {
-
-		list<pair<double, pair<EdgePoint, EdgePoint>>> wallThickness;
-		for (list<EdgePoint>::const_iterator internalEdgeIt = internalEdgePointer->cbegin(); 
-			internalEdgeIt != internalEdgePointer->cend(); ++internalEdgeIt) {
-			double kRL = (internalEdgeIt->y - internalCenterPointer->y) / 
-				(internalEdgeIt->x - internalCenterPointer->x);
-			double bRL = (internalEdgeIt->x * internalCenterPointer->y - 
-				internalEdgeIt->y * internalCenterPointer->x) / (internalEdgeIt->x - internalCenterPointer->x);
-			
-			list<pair<double, EdgePoint>> distancePL;
-			for (list<EdgePoint>::const_iterator externalEdgeIt = externalEdgePointer->cbegin();
-				externalEdgeIt != externalEdgePointer->cend(); ++externalEdgeIt) {
-				double temp = abs(kRL * externalEdgeIt->x - externalEdgeIt->y + bRL);
-				temp = temp / sqrt(pow(kRL, 2) + 1);
-				
-				distancePL.push_back(pair<double, EdgePoint>(temp, *externalEdgeIt));
-
-
-			}
-			distancePL.sort();
-
-			for (list<pair<double, EdgePoint>>::const_iterator distancePLIt = distancePL.cbegin();
-				distancePLIt != distancePL.cend();++distancePLIt) {
-				if ((internalEdgeIt->x > internalCenterPointer->x) == (distancePLIt->second.x > internalCenterPointer->x) &&
-					(internalEdgeIt->y > internalCenterPointer->y) == (distancePLIt->second.y > internalCenterPointer->y)) {
-					double temp;
-					temp = pow((internalEdgeIt->x - distancePLIt->second.x), 2);
-					temp += pow((internalEdgeIt->y - distancePLIt->second.y), 2);
-					temp = sqrt(temp);
-					pair<double, pair<EdgePoint, EdgePoint>> p1(temp,
-						pair<EdgePoint, EdgePoint>(*internalEdgeIt, distancePLIt->second));
-					wallThickness.push_back(p1);
-					break;
-				}
-			}
-		}	
-		wallThickness.sort();
-		maximumWallThickness.push_back(wallThickness.back());
-		
-
-		//cout << "slice " << k << " " << wallThickness.back().first << endl;
-		//cout << "internal" << wallThickness.back().second.first.x << '\t' << wallThickness.back().second.first.y << endl;
-		//cout << "external" << wallThickness.back().second.second.x << '\t' << wallThickness.back().second.second.y << endl;
-		wallThickness.clear();
-
-		++internalEdgePointer;
-		++externalEdgePointer;
-		++internalCenterPointer;
-	}
-
 
 
 	return true;
 }
 
-bool MaximumWallThickness::thicknessCal2()
-{
 
 
-
-	
-	return true;
-}
 
 bool MaximumWallThickness::output()
 {
 	using namespace std;
-	int k = extent[4];
-	list<EdgePoint>** edgePointer = edgePoints;
-	for (list<pair<double, pair<EdgePoint, EdgePoint>>>::const_iterator maximumWallThicknessIt = 
-		maximumWallThickness.cbegin(); maximumWallThicknessIt != maximumWallThickness.cend(); ++maximumWallThicknessIt) {
-		cout << "slice" << k << endl;
-		cout << "internal edge points:" << edgePointer[0][k - extent[4]].size() << endl;
-		cout << "external edge points:" << edgePointer[1][k - extent[4]].size() << endl;
-		cout << "distance: " << maximumWallThicknessIt->first << endl;
-		cout << "internal: " << maximumWallThicknessIt->second.first.x << '\t' <<
-			maximumWallThicknessIt->second.first.y << endl;
-		cout << "external: " << maximumWallThicknessIt->second.second.x << '\t' <<
-			maximumWallThicknessIt->second.second.y << endl;
-		++k;
-	}
+	int k = m_extent[4];
 
 	return true;
 }
 
 bool MaximumWallThickness::setExtent(int* extent)
 {
-
-	this->extent = extent;
+	memcpy(this->m_extent, extent, sizeof(int) * 6);
 	return true;
 }
 
 const int * MaximumWallThickness::getExtent()
 {
-	return extent;
+	return m_extent;
 }
 

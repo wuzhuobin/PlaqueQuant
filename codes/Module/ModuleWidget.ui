@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>411</width>
     <height>840</height>
    </rect>
   </property>
@@ -62,7 +62,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -704,7 +704,7 @@
            <string>2D Measurement</string>
           </property>
          </widget>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="maximumWallThicknessBtn">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -856,6 +856,12 @@
               <height>0</height>
              </size>
             </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>150</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>Arial</family>
@@ -913,7 +919,12 @@
             </row>
             <column>
              <property name="text">
-              <string>Value</string>
+              <string>Tract 1</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tract 2</string>
              </property>
             </column>
            </widget>

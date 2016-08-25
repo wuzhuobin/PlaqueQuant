@@ -21,6 +21,7 @@
 #include <vtkGeometryFilter.h>
 #include <vtkSubPixelPositionEdgels.h>
 #include <vtkStripper.h>
+#include <vtkContourFilter.h>
 
 #include <utility>
 #include <math.h>
@@ -28,48 +29,61 @@
 #include <iostream>
 
 
-class EdgePoint;
 class MaximumWallThickness
 {
 public:
 
 	const static int EDGENUM = 2;
 
-	MaximumWallThickness(vtkImageData* image, int internalEdgeValue = 1, int externalEdgeValue = 0);
+	MaximumWallThickness(vtkImageData* m_image, int internalEdgeValue = 1, int externalEdgeValue = 0);
 	~MaximumWallThickness();
 
-	bool valueTransform();
-	bool extractVOI();
-	bool thresholdImage();
-	bool edgeDetection();
-	bool thicknessCal();
-	bool thicknessCal2();
+
+	typedef std::pair<vtkPolyData*, vtkPolyData*> LoopPair;
+	struct DistanceLoopPair
+	{
+		LoopPair			LoopPair;
+		double				Distance;
+		std::pair<int, int> PIDs;
+	};
+	/* Do not modify the value, read only! */
+	std::vector<DistanceLoopPair>	GetDistanceLoopPairVect();
+
+	void SetSliceNumber(int);
+
+	void Update();
+
+	enum ERROR_CODE {
+		ERROR_VALUE_TRANSFORM = 1,
+		ERROR_EXTRACT_SLICE = 2,
+		ERROR_EXTRACT_LOOP = 3,
+		ERROR_UNDEFINED_BRANCH = 4,
+		ERROR_THICKNESS_CAL = 5
+	};
+
+private:
+	int CheckNumberOfBranches();
+
+	bool ValueTransform();
+	bool ExtractSlice();
+	bool ExtractLoops();
+	bool EdgeDetection();
+	bool ThicknessCal();
 	bool output();
-	bool setExtent(int* extent);
+	bool setExtent(int* m_extent);
 	const int* getExtent();
 
-//private:
+	vtkSmartPointer<vtkImageData> m_image;
+	vtkSmartPointer<vtkImageData> m_sliceImage;
+	vtkSmartPointer<vtkImageData> m_edgeImage[EDGENUM];
+	vtkSmartPointer<vtkContourFilter> m_contourFilter;
 
-	vtkSmartPointer<vtkImageData> image;
-	vtkSmartPointer<vtkImageData> edgeImage[EDGENUM];
+	std::vector<LoopPair> m_loopPairVect;
+	std::vector<DistanceLoopPair> m_distanceVect;
 
-
-	int edgeValue[EDGENUM];
-	int* extent;
-	
-
-
-	std::list<std::pair<double, std::pair<EdgePoint, EdgePoint>>> maximumWallThickness;
-	EdgePoint* centers[EDGENUM];
-	std::list<EdgePoint>* edgePoints[EDGENUM];
+	int m_sliceNumber;
+	int m_extent[6];
 
 };
 
-class EdgePoint : public std::pair<double, double> {
-
-public:
-	double x = this->first;
-	double y = this->second;
-
-};
 

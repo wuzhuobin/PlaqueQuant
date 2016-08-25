@@ -10,14 +10,24 @@
 #include <QDir>
 #include <QSpinBox>
 #include <QComboBox>
-#include "MyThread.h"
-#include "Define.h"
-#include "MainWindow.h"
-#include "ReportGenerator.h"
+#include <QHeaderView>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QApplication>
 #include <QUrl>
+
+#include <vtkStringArray.h>
+#include <vtkPointSetToLabelHierarchy.h>
+#include <vtkIntArray.h>
+#include <vtkLabelPlacementMapper.h>
+#include <vtkActor2D.h>
+#include <vtkActor.h>
+
+#include "MyThread.h"
+#include "Define.h"
+#include "MainWindow.h"
+#include "ReportGenerator.h"
+
 
 namespace Ui {
 class ModuleWidget;
@@ -55,6 +65,9 @@ public slots:
 	void SetBrushSize();
 	void slotReportGetInput();
 	void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
+	void slotCalculateMaximumWallThickness();
+
+	virtual void slotUpdateTableWidget();
 
 signals:
 	void finished();
@@ -68,6 +81,13 @@ private:
 	QStringList NameList, ParameterList;
     //bool First_Load;
     int m_visible_image_no;
+
+	vtkSmartPointer<vtkPolyData>					m_displayPD;
+	vtkSmartPointer<vtkActor>						m_lineActor;
+	vtkSmartPointer<vtkActor2D>						m_labelActor;
+	vtkSmartPointer<vtkStringArray>					m_labelArray;
+	vtkSmartPointer<vtkIntArray>					m_sizeArray;
+	vtkSmartPointer<vtkPointSetToLabelHierarchy>	m_p2labelfilter;
 
 	//QString lumen_Path, vesselWall_Path;
 };

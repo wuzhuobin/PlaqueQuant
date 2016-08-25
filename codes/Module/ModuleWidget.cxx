@@ -1,3 +1,10 @@
+#include <vtkLine.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkDistanceWidget.h>
+#include <vtkDistanceRepresentation2D.h>
+#include <vtkCellArray.h>
+#include "MaximumWallThickness.h"
 #include "ModuleWidget.h"
 #include "ui_ModuleWidget.h"
 
@@ -12,31 +19,53 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
-    //Recent Parameters
-    m_maxParameters = 10;
+    
+    // Initialize widget
+	m_maxParameters = 10;
+	this->m_labelActor = vtkSmartPointer<vtkActor2D>::New();
+	this->m_lineActor = vtkSmartPointer<vtkActor>::New();
+	this->m_displayPD = vtkSmartPointer<vtkPolyData>::New();
+	this->m_labelArray = vtkSmartPointer<vtkStringArray>::New();
+	this->m_labelArray->SetName("Distance");
+	this->m_sizeArray = vtkSmartPointer<vtkIntArray>::New();
+	this->m_sizeArray->SetName("Sizes");
+	this->m_p2labelfilter = vtkSmartPointer<vtkPointSetToLabelHierarchy>::New();
+	this->m_p2labelfilter->SetLabelArrayName("Distance");
+	this->m_p2labelfilter->SetPriorityArrayName("Sizes");
 
-    //Initialize the widget
-   // First_Load = true;
-    //slotLoadParameters();
+	this->m_lineActor->GetProperty()->SetColor(0, 1, 0);
+	this->m_lineActor->GetProperty()->SetLineWidth(2);
+	
+
+
+    /// Initialize the widget
 	this->ui->BrushSizeSlider->setMaximum(40);
 	this->ui->BrushSizeSlider->setMinimum(1);
 	this->ui->BrushSizeSpinBox->setMaximum(40);
 	this->ui->BrushSizeSpinBox->setMinimum(1);
+	// Set table widget properties
+	this->ui->measurement3DTableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->ui->measurement3DTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	this->ui->measurement2DTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->ui->measurement2DTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	this->ui->measurement2DTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	this->ui->measurement2DTableWidget->setColumnHidden(1, true);
+
 
 	//connect
-	connect(ui->generateReportPushButton, SIGNAL(clicked()), 
-		this, SLOT(slotReportGetInput()));
-	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()), mainWnd, SLOT(slotCenterline()));
-	connect(ui->NextBtn, SIGNAL(clicked()), this, SLOT(NextPage()));
-	connect(ui->BackBtn, SIGNAL(clicked()), this, SLOT(BackPage()));
-	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetBrushSize()),Qt::UniqueConnection);
-	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(slotChangeLayerNo()), Qt::UniqueConnection);
-	connect(ui->segmentationPushButton, SIGNAL(clicked()), this, SLOT(slotSelectROI()));
-	connect(ui->resetROIPushButton, SIGNAL(clicked()), this, SLOT(slotResetROI()));
-	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), ui->opacitySpinBox, SLOT(setValue(int)));
-	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), ui->opacitySlider, SLOT(setValue(int)));
-	connect(ui->opacitySlider, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
-	connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeOpacity()));
+	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
+	connect(ui->generateReportPushButton,		SIGNAL(clicked()), 					this,		SLOT(slotReportGetInput()));
+	connect(ui->labelComboBox,					SIGNAL(currentIndexChanged(int)),	this,		SLOT(slotChangeLayerNo()), Qt::UniqueConnection);
+	connect(ui->NextBtn,						SIGNAL(clicked()),					this,		SLOT(NextPage()));
+	connect(ui->BackBtn,						SIGNAL(clicked()),					this,		SLOT(BackPage()));
+	connect(ui->BrushSizeSlider,				SIGNAL(valueChanged(int)),			this,		SLOT(SetBrushSize()),Qt::UniqueConnection);
+	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
+	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
+	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
+	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
+	connect(ui->maximumWallThicknessBtn,		SIGNAL(clicked()),					this,		SLOT(slotCalculateMaximumWallThickness()));
+	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
+	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
 	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
 		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
@@ -156,6 +185,83 @@ void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int num
 	}
 	
 }
+
+void ModuleWidget::slotCalculateMaximumWallThickness()
+{
+	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
+
+	vtkImageData* overlayImage = mainwnd->GetOverlay()->GetVTKImageData();
+
+	MaximumWallThickness* calculator = new MaximumWallThickness(overlayImage);
+	calculator->SetSliceNumber(currentSlice);
+	try {
+		calculator->Update();
+	} 
+	catch (int e) {
+		return;
+	}
+	
+	// clean variables
+	this->m_labelArray->Reset();
+	this->m_sizeArray->Reset();
+
+	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+	std::vector<MaximumWallThickness::DistanceLoopPair> looppairs = calculator->GetDistanceLoopPairVect();
+	for (int i = 0; i < looppairs.size(); i++)
+	{
+		MaximumWallThickness::DistanceLoopPair l_lp = looppairs.at(i);
+		double p1[3], p2[3];
+		l_lp.LoopPair.first->GetPoint(l_lp.PIDs.first, p1);
+		l_lp.LoopPair.second->GetPoint(l_lp.PIDs.second, p2);
+
+		points->InsertNextPoint(p1);
+		points->InsertNextPoint(p2);
+		
+		cells->InsertNextCell(2);
+		cells->InsertCellPoint(points->GetNumberOfPoints() - 2);
+		cells->InsertCellPoint(points->GetNumberOfPoints() - 1);
+
+		// Update UI
+		this->m_sizeArray->InsertNextValue(3);
+		this->m_sizeArray->InsertNextValue(3);
+
+		char distanceString[25];
+		sprintf_s(distanceString, "%.3f mm", l_lp.Distance);
+		this->m_labelArray->InsertNextValue(distanceString);
+		this->m_labelArray->InsertNextValue(" ");
+
+	}
+
+	this->m_displayPD->SetPoints(points);
+	this->m_displayPD->SetLines(cells);
+	this->m_displayPD->GetPointData()->AddArray(this->m_labelArray);
+	this->m_displayPD->GetPointData()->AddArray(this->m_sizeArray);
+
+	this->m_p2labelfilter->SetInputData(this->m_displayPD);
+	this->m_p2labelfilter->Update();
+
+	vtkSmartPointer<vtkLabelPlacementMapper> labelMapper = vtkSmartPointer<vtkLabelPlacementMapper>::New();
+	labelMapper->SetInputConnection(this->m_p2labelfilter->GetOutputPort());
+	this->m_labelActor->SetMapper(labelMapper);
+
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(this->m_displayPD);
+	mapper->Update();
+
+	this->m_lineActor->SetMapper(mapper);
+
+	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor(this->m_lineActor);
+	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor2D(this->m_labelActor);
+	mainwnd->RenderAll2DViewers();
+}
+
+void ModuleWidget::slotUpdateTableWidget()
+{
+	//QTableWidget* table = ui->measurement2DTableWidget->
+}
+	
 
 void ModuleWidget::GenerateReport()
 {
