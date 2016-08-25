@@ -54,6 +54,7 @@ file(
 	GLOB 
 	INTERACTORS_SRC  
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.cxx 
+	${PROJECT_SOURCE_DIR}/LumenSegmentation.cxx
 	PARENT_SCOPE
 	)
 file(
@@ -61,6 +62,7 @@ file(
 	INTERACTORS_INC  
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.h 
 	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h 
+	${PROJECT_SOURCE_DIR}/LumenSegmentation.h
 	PARENT_SCOPE
 	)
 add_library(

@@ -34,7 +34,8 @@ public:
 	static InteractorStylePolygonDraw* New();
 
 	void SetPolygonModeEnabled(bool b);
-	void SetLabel(int label);
+	void SetVesselWallLabel(int vesselWallLabel);
+	void SetLumenWallLabel(int lumenWallLabel);
 
 protected:
 	InteractorStylePolygonDraw();
@@ -50,15 +51,21 @@ private:
 	bool CheckDoubleClicked();
 	void DisplayPolygon(vtkObject*, long unsigned, void*);
 	void FillPolygon();
+	void GenerateLumenWallContourWidget();
+
 
 	QTime m_timer;
 	int m_firstClickTimeStamp;
 
 	bool DOUBLE_CLICKED_FLAG;
 	bool CONTOUR_IS_ON_FLAG;
-	int label;
+	int vesselWallLabel;
+	int lumenWallLabel = 1;
 
-	vtkContourWidget* m_contourWidget;
-	vtkOrientedGlyphContourRepresentation* m_contourRep;
+	vtkContourWidget* m_vesselWallContourWidget;
+	vtkOrientedGlyphContourRepresentation* m_vesselWallContourRepresentation;
+	vtkContourWidget* m_lumenWallContourWidget;
+	vtkOrientedGlyphContourRepresentation* m_lumenWallContourRepresentation;
 	vtkSmartPointer<vtkCallbackCommand> m_callbackFunction;
+
 };

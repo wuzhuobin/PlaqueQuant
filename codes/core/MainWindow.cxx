@@ -1480,7 +1480,7 @@ void MainWindow::SetImageLayerNo(int layer)
 	{
 		if (m_style[i] != NULL) {
 			m_style[i]->GetPaintBrush()->SetDrawColor(overlayColor[m_layer_no-1]);
-			m_style[i]->GetPolygonDraw()->SetLabel(m_layer_no);
+			m_style[i]->GetPolygonDraw()->SetVesselWallLabel(m_layer_no);
 		}
 	}
 }
