@@ -72,24 +72,34 @@ void MaximumWallThickness::SetSliceImage(vtkImageData *im)
 
 void MaximumWallThickness::Update()
 {
-	if (!this->ExtractSlice()) {
-		throw ERROR_EXTRACT_SLICE;
-		return;
-	}
+	//if (!this->ExtractSlice()) {
+	//	throw ERROR_EXTRACT_SLICE;
+	//	return;
+	//}
 
-	if (!this->ValueTransform()) {
-		throw ERROR_VALUE_TRANSFORM;
-		return;
-	}
+	//if (!this->ValueTransform()) {
+	//	throw ERROR_VALUE_TRANSFORM;
+	//	return;
+	//}
 
-	if (!this->ExtractLoops()) {
-		throw ERROR_EXTRACT_LOOP;
-		return;
-	}
+	//if (!this->ExtractLoops()) {
+	//	throw ERROR_EXTRACT_LOOP;
+	//	return;
+	//}
 
-	if (!this->ThicknessCal()) {
-		throw ERROR_THICKNESS_CAL;
-		return;
+	//if (!this->ThicknessCal()) {
+	//	throw ERROR_THICKNESS_CAL;
+	//	return;
+	//}
+
+	try {
+		this->ExtractSlice();
+		this->ValueTransform();
+		this->ExtractLoops();
+		this->ThicknessCal();
+	}
+	catch (ERROR_CODE e) {
+		throw e;
 	}
 
 }

@@ -213,8 +213,9 @@ void ModuleWidget::slotUpdate2DMeasurements()
 	try {
 		mwt->Update();
 	}
-	catch (int e) {
-		return;
+	catch (MaximumWallThickness::ERROR_CODE e) {
+		cerr << "MaximumWallThickness error: " << e << endl;
+		//return;
 	}
 
 	// Calculate areas
@@ -223,20 +224,23 @@ void ModuleWidget::slotUpdate2DMeasurements()
 	try {
 		m2d->Update();
 	}
-	catch (int e) {
-		return;
+	catch (MeasurementFor2D::ERROR_CODE e) {
+		cerr << "MeasurementFor2D error: " << e << endl;
+		//return;
 	}
 
 	/// Write measurements to table
 	// Error checking
-	double lumenArea, vesselArea, distance; // #todo: Allow multiple branch
+	double lumenArea, vesselArea, NMI, distance; // #todo: Allow multiple branch
 	try {
 		lumenArea = m2d->GetOutput(0).LumenArea;
 		vesselArea = m2d->GetOutput(0).VesselWallArea;
+		NMI = vesselArea / (lumenArea + vesselArea);
 	}
 	catch (...) {
 		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem("Undefined"));
 		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem("Undefined"));
+		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem("Undefined"));
 	}
 	try {
 		distance = mwt->GetDistanceLoopPairVect().at(0).Distance;
@@ -250,6 +254,7 @@ void ModuleWidget::slotUpdate2DMeasurements()
 		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).LumenArea)));
 		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).VesselWallArea)));
 		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance)));
+		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(NMI)));
 	}
 	catch (...) {
 		cerr << "Error assigning items to table!\n";
@@ -269,7 +274,7 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	try {
 		calculator->Update();
 	} 
-	catch (int e) {
+	catch (MaximumWallThickness::ERROR_CODE e) {
 		return;
 	}
 	
