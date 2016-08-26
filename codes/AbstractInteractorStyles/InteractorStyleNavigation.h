@@ -37,8 +37,7 @@ protected:
 	virtual void OnLeftButtonUp();
 
 private:
-	void MoveSliceForward();
-	void MoveSliceBackward();
+
 
 
 	void SynchronizedZooming();
