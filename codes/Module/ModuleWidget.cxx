@@ -293,13 +293,15 @@ void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
 		this->ui->autoLumenSegmentationHorizontalSlider->setValue(
 			this->ui->autoLumenSegmentationHorizontalSlider->value());
 		this->ui->autoLumenSegmentationSpinBox->setEnabled(true);
-
+		this->ui->labelComboBox->setCurrentIndex(1);
+		this->ui->activeLabelLabel->setText("Vessel Wall Label");
 	}
 	else {
 		this->ui->lumenLabel->setHidden(true);
 		this->ui->lumenComboBox->setHidden(true);
 		this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(false);
 		this->ui->autoLumenSegmentationSpinBox->setEnabled(false);
+		this->ui->activeLabelLabel->setText("Active Label");
 
 	}
 }

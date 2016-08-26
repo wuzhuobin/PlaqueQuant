@@ -386,9 +386,8 @@ void MainWindow::slotExit()
 void MainWindow::slotOpenImage(QString dir)
 {
 	RegistrationWizard wizard(this,dir);
-	int isFinished = wizard.exec();
 
-	if (isFinished == QWizard::Rejected )
+	if (wizard.exec() == QWizard::Rejected )
 		return;
 
 	//Update Recent Image
@@ -409,16 +408,21 @@ void MainWindow::slotOpenImage(QString dir)
 	visualizeImage();
 
 	// initialize image select function 
-	for (int i = 0; i < visibleImageNum; i++)
+	ChangeBaseImageULMenu.clear();
+	ChangeBaseImageURMenu.clear();
+	ChangeBaseImageLLMenu.clear();
+	for (int i = 0; i < 5; i++)
 	{
-		QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
-		act1->setData(i);
+		if (vtkImage[i] != NULL) {
+			QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
+			act1->setData(i);
 
-		QAction* act2 = ChangeBaseImageURMenu.addAction(this->GetFileName(i));
-		act2->setData(i + 10);
+			QAction* act2 = ChangeBaseImageURMenu.addAction(this->GetFileName(i));
+			act2->setData(i + 10);
 
-		QAction* act3 = ChangeBaseImageLLMenu.addAction(this->GetFileName(i));
-		act3->setData(i + 20);
+			QAction* act3 = ChangeBaseImageLLMenu.addAction(this->GetFileName(i));
+			act3->setData(i + 20);
+		}
 	}
 	ui->ULSelectImgBtn->setMenu(&ChangeBaseImageULMenu);
 	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotSelectImageSeq(QAction*)));
@@ -1373,20 +1377,22 @@ void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;
 	segmentationView = true;
-
-	for (int i = 0; i < 3; i++)
+	// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
+	for (int i1 = 0, i2 = 0; i2 < 3; ++i2)
 	{
-
-		if (this->vtkImage[i] != NULL) {
-			this->m_2DimageViewer[i]->SetSliceOrientationToXY();
-			this->m_style[i]->SetOrientation(2);
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-			this->m_2DimageViewer[i]->InitializeOrientationText();
-			this->m_2DimageViewer[i]->SetInputData(vtkImage[i]);
+		for (; i1 < 5 && i2 < 3; ++i1) {
+			if (this->vtkImage[i1] != NULL) {
+				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
+				this->m_style[i2]->SetOrientation(2);
+				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+				this->m_2DimageViewer[i2]->InitializeOrientationText();
+				this->m_2DimageViewer[i2]->SetInputData(vtkImage[i1]);
+				++i2;
+			}
 		}
-		else {
+		if(i1 >= 5) {
 			// disable view props
-			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
+			vtkPropCollection* props = this->m_2DimageViewer[i2]->GetRenderer()->GetViewProps();
 			props->InitTraversal();
 			for (int j = 0; j < props->GetNumberOfItems(); j++)
 			{
@@ -1394,22 +1400,22 @@ void MainWindow::slotSegmentationView()
 				props->GetNextProp()->SetVisibility(false);
 			}
 
-			vtkPropCollection* annProps = m_2DimageViewer[i]->GetannotationRenderer()->GetViewProps();
+			vtkPropCollection* annProps = m_2DimageViewer[i2]->GetannotationRenderer()->GetViewProps();
 			annProps->InitTraversal();
 			for (int j = 0; j < annProps->GetNumberOfItems(); j++)
 			{
 				//static_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(false);
 				annProps->GetNextProp()->SetVisibility(false);
 			}
+
+			this->m_2DimageViewer[i2]->GetRenderWindow()->Modified();
+			this->m_2DimageViewer[i2]->GetRenderWindow()->Render();
+			this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 			
-
-
-
-			this->m_2DimageViewer[i]->GetRenderWindow()->Modified();
-			this->m_2DimageViewer[i]->GetRenderWindow()->Render();
-			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Disable();
 		}
+
 	}
+
 
 	this->RenderAllViewer();
 	this->slotChangeSlice();
