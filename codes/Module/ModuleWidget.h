@@ -65,6 +65,7 @@ public slots:
 	void SetBrushSize();
 	void slotReportGetInput();
 	void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
+	void slotUpdate2DMeasurements();
 	void slotCalculateMaximumWallThickness();
 
 	virtual void slotUpdateTableWidget();
@@ -73,9 +74,12 @@ signals:
 	void finished();
 	void busy(int, QString);
 
+protected:
+	virtual void InternalUpdate();
+    
 private:
     Ui::ModuleWidget *ui;
-    
+
     //Recent Parameters
     int m_maxParameters;
 	QStringList NameList, ParameterList;
@@ -89,6 +93,7 @@ private:
 	vtkSmartPointer<vtkIntArray>					m_sizeArray;
 	vtkSmartPointer<vtkPointSetToLabelHierarchy>	m_p2labelfilter;
 
+	
 	//QString lumen_Path, vesselWall_Path;
 };
 

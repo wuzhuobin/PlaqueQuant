@@ -22,6 +22,21 @@ void Overlay::SetInputImageData(vtkImageData* vtkimagedata)
 	m_vtkOverlay = vtkimagedata;
 }
 
+void Overlay::SetInputImageData(FloatImageType::Pointer imageData)
+{
+	//re-orient
+	OrienterType::Pointer orienter = OrienterType::New();
+	orienter->UseImageDirectionOn();
+	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	orienter->SetInput(imageData);
+	orienter->Update();
+
+	ConnectorType::Pointer connector = ConnectorType::New();
+	connector->SetInput(orienter->GetOutput());
+	connector->Update();
+
+	SetInputImageData(connector->GetOutput());
+}
 
 void Overlay::SetInputImageData(QString fileName)
 {

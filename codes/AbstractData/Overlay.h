@@ -27,6 +27,7 @@ public:
 	void DisplayExtentOn();
 	void DisplayExtentOff();
 
+	void SetInputImageData(FloatImageType::Pointer imagedata);
 	void SetInputImageData(vtkImageData* imagedata);
 	void SetInputImageData(QString);
 	void SetPixel(int pos[3], double value);
