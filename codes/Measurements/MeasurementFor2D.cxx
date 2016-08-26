@@ -39,7 +39,7 @@ int MeasurementFor2D::CountCluster(int x, int y)
 				continue;
 			}
 			if (this->CheckCoordIndexInList(index)) {
-				return;
+				return 0;
 			}
 			else {
 				if (*val == this->SliceImage->GetScalarComponentAsDouble(x, y, this->SliceNumber, 0)) {

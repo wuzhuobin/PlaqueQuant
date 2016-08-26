@@ -30,7 +30,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PolygonDraw = InteractorStylePolygonDraw::New();
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
-	Ruler = InteractorStyleRuler::New();
+	//Ruler = InteractorStyleRuler::New();
 	this->CurrentStyle = 0;
 }
 
@@ -66,10 +66,10 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 		ROI = NULL;
 	}
 	
-	if (Ruler != NULL) {
-		Ruler->Delete();
-		Ruler = NULL;
-	}
+	//if (Ruler != NULL) {
+	//	//Ruler->Delete();
+	//	Ruler = NULL;
+	//}
 
 
 
@@ -85,13 +85,13 @@ void InteractorStyleSwitch::InternalUpdate()
 
 	this->ROI->SetPlaneWidgetEnabled(false);
 
-	this->Ruler->SetDistanceWidgetEnabled(false);
+	//this->Ruler->SetDistanceWidgetEnabled(false);
 
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(true);
 
-	if (this->CurrentStyle = this->Ruler)
-		this->Ruler->SetDistanceWidgetEnabled(true);
+	//if (this->CurrentStyle = this->Ruler);
+		//this->Ruler->SetDistanceWidgetEnabled(true);
 
 }
 
@@ -116,7 +116,7 @@ void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
 	this->PolygonDraw->SetAutoAdjustCameraClippingRange(value);
 	this->PaintBrush->SetAutoAdjustCameraClippingRange(value);
 	this->ROI->SetAutoAdjustCameraClippingRange(value);
-	this->Ruler->SetAutoAdjustCameraClippingRange(value);
+	//this->Ruler->SetAutoAdjustCameraClippingRange(value);
 	this->Modified();
 }
 
@@ -129,7 +129,7 @@ void InteractorStyleSwitch::SetDefaultRenderer(vtkRenderer* renderer)
 	this->PolygonDraw->SetDefaultRenderer(renderer);
 	this->PaintBrush->SetDefaultRenderer(renderer);
 	this->ROI->SetDefaultRenderer(renderer);
-	this->Ruler->SetDefaultRenderer(renderer);
+	//this->this->RulerSetDefaultRenderer(renderer);
 }
 
 void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
@@ -141,7 +141,7 @@ void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
 	this->PolygonDraw->SetCurrentRenderer(renderer);
 	this->PaintBrush->SetCurrentRenderer(renderer);
 	this->ROI->SetCurrentRenderer(renderer);
-	this->Ruler->SetCurrentRenderer(renderer);
+	//this->Ruler->SetCurrentRenderer(renderer);
 }
 
 void InteractorStyleSwitch::SetViewers(MyImageViewer* imageViewer)
@@ -152,7 +152,7 @@ void InteractorStyleSwitch::SetViewers(MyImageViewer* imageViewer)
 	this->PolygonDraw->SetImageViewer(imageViewer);
 	this->PaintBrush->SetImageViewer(imageViewer);
 	this->ROI->SetImageViewer(imageViewer);
-	this->Ruler->SetImageViewer(imageViewer);
+	//this->Ruler->SetImageViewer(imageViewer);
 }
 
 void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * sliceY, QSpinBox * sliceZ, 
@@ -172,7 +172,7 @@ void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * slic
 	this->PaintBrush->SetDrawVolumetricCheckBox(drawVolumetric);
 	this->PaintBrush->SetDrawIsotropicCheckBox(drawIsotropic);
 	this->ROI->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-	this->Ruler->SetSliceSpinBox(sliceX, sliceY, sliceZ);
+	//this->Ruler->SetSliceSpinBox(sliceX, sliceY, sliceZ);
 }
 
 void InteractorStyleSwitch::SetCurrentSlice(int slice)
@@ -182,7 +182,7 @@ void InteractorStyleSwitch::SetCurrentSlice(int slice)
 	this->PaintBrush->SetCurrentSlice(slice);
 	this->PolygonDraw->SetCurrentSlice(slice);
 	this->ROI->SetCurrentSlice(slice);
-	this->Ruler->SetCurrentSlice(slice);
+	//this->Ruler->SetCurrentSlice(slice);
 }
 
 void InteractorStyleSwitch::SetOrientation(int index)
@@ -192,7 +192,7 @@ void InteractorStyleSwitch::SetOrientation(int index)
 	this->PolygonDraw->SetOrientation(index);
 	this->ROI->SetOrientation(index);
 	this->WindowLevel->SetOrientation(index);
-	this->Ruler->SetOrientation(index);
+	//this->Ruler->SetOrientation(index);
 }
 
 void InteractorStyleSwitch::SetEnabled(int i)
@@ -204,7 +204,7 @@ void InteractorStyleSwitch::SetEnabled(int i)
 	this->PolygonDraw->SetEnabled(i);
 	this->WindowLevel->SetEnabled(i);
 	this->ROI->SetEnabled(i);
-	this->Ruler->SetEnabled(i);
+	//this->Ruler->SetEnabled(i);
 }
 
 void InteractorStyleSwitch::SetEnabledOn()

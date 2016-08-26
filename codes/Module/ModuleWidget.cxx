@@ -51,6 +51,33 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->measurement2DTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	this->ui->measurement2DTableWidget->setColumnHidden(1, true);
 
+	// setting of the contourWidget of auto lumen segmentation
+	this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(false);
+	this->ui->autoLumenSegmentationHorizontalSlider->setMaximum(500);
+	this->ui->autoLumenSegmentationHorizontalSlider->setMinimum(1);
+	this->ui->autoLumenSegmentationHorizontalSlider->setValue(60);
+	this->ui->autoLumenSegmentationSpinBox->setValue(
+		this->ui->autoLumenSegmentationHorizontalSlider->value());
+	this->ui->autoLumenSegmentationSpinBox->setMaximum(
+	this->ui->autoLumenSegmentationHorizontalSlider->maximum());
+	this->ui->autoLumenSegmentationSpinBox->setMinimum(
+		this->ui->autoLumenSegmentationHorizontalSlider->minimum());
+	this->ui->autoLumenSegmentationSpinBox->setEnabled(false);
+	this->ui->autoLumenSegmentationCheckBox->setChecked(false);
+	this->ui->lumenComboBox->setHidden(true);
+	this->ui->lumenLabel->setHidden(true);
+	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
+		ui->autoLumenSegmentationHorizontalSlider, SLOT(setValue(int)));
+	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),
+		ui->autoLumenSegmentationSpinBox, SLOT(setValue(int)));
+	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), this,
+		SLOT(slotEnableAutoLumenSegmentation(bool)));
+	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), mainWnd, 
+		SLOT(slotEnableAutoLumenSegmentation(bool)));
+	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), mainWnd, 
+		SLOT(slotSetContourFilterGenerateValues(int)));
+
+
 
 	//connect
 	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
@@ -66,8 +93,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->maximumWallThicknessBtn,		SIGNAL(clicked()),					this,		SLOT(slotCalculateMaximumWallThickness()));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
-	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
-		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
+	//connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
+	//	mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 
 	this->GenerateReportPushButtonVisible();
@@ -255,6 +282,26 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor(this->m_lineActor);
 	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor2D(this->m_labelActor);
 	mainwnd->RenderAll2DViewers();
+}
+
+void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
+{
+	if (flag) {
+		this->ui->lumenLabel->setHidden(false);
+		this->ui->lumenComboBox->setHidden(false);
+		this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(true);
+		this->ui->autoLumenSegmentationHorizontalSlider->setValue(
+			this->ui->autoLumenSegmentationHorizontalSlider->value());
+		this->ui->autoLumenSegmentationSpinBox->setEnabled(true);
+
+	}
+	else {
+		this->ui->lumenLabel->setHidden(true);
+		this->ui->lumenComboBox->setHidden(true);
+		this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(false);
+		this->ui->autoLumenSegmentationSpinBox->setEnabled(false);
+
+	}
 }
 
 void ModuleWidget::slotUpdateTableWidget()

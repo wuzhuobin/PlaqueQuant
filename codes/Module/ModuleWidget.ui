@@ -62,7 +62,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -377,6 +377,43 @@
             <property name="text">
              <string>Close Polygon as the user select vertics</string>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_6">
+            <property name="title">
+             <string>Auto Lumen Segmentation </string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_20">
+             <item>
+              <widget class="QCheckBox" name="autoLumenSegmentationCheckBox">
+               <property name="text">
+                <string>Enable</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Range</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="autoLumenSegmentationHorizontalSlider">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="autoLumenSegmentationSpinBox"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -943,17 +980,17 @@
             </attribute>
             <row>
              <property name="text">
+              <string>Total Plaque /mm^3</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
               <string>Lumen /mm^3</string>
              </property>
             </row>
             <row>
              <property name="text">
               <string>Vessel Wall /mm^3</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Total Plaque /mm^3</string>
              </property>
             </row>
             <row>
@@ -1071,20 +1108,8 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_9">
-      <property name="spacing">
-       <number>7</number>
-      </property>
-      <property name="topMargin">
-       <number>11</number>
-      </property>
-      <property name="rightMargin">
-       <number>12</number>
-      </property>
-      <property name="bottomMargin">
-       <number>11</number>
-      </property>
       <item>
-       <widget class="QLabel" name="label_12">
+       <widget class="QLabel" name="label_31">
         <property name="font">
          <font>
           <family>Arial</family>
@@ -1160,6 +1185,42 @@
          <property name="icon">
           <iconset resource="../../resources/Project.qrc">
            <normaloff>:/icons/purplebox.png</normaloff>:/icons/purplebox.png</iconset>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lumenLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Lumen Label:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="lumenComboBox">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>13</width>
+          <height>13</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>Lumen</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../resources/Project.qrc">
+           <normaloff>:/icons/redbox.png</normaloff>:/icons/redbox.png</iconset>
          </property>
         </item>
        </widget>

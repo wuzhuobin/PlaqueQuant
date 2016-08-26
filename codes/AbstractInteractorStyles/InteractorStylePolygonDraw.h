@@ -36,6 +36,8 @@ public:
 	void SetPolygonModeEnabled(bool b);
 	void SetVesselWallLabel(int vesselWallLabel);
 	void SetLumenWallLabel(int lumenWallLabel);
+	void EnableAutoLumenSegmentation(bool flag);
+	void SetContourFilterGenerateValues(int generateValues);
 
 protected:
 	InteractorStylePolygonDraw();
@@ -56,10 +58,13 @@ private:
 
 	QTime m_timer;
 	int m_firstClickTimeStamp;
+	int m_generateValue = 60;
 
 	bool DOUBLE_CLICKED_FLAG;
 	bool CONTOUR_IS_ON_FLAG;
-	int vesselWallLabel;
+	bool AUTO_LUMEN_SEGMENTATION_ENABLE_FLAG;
+
+	int vesselWallLabel = 1;
 	int lumenWallLabel = 1;
 
 	vtkContourWidget* m_vesselWallContourWidget;

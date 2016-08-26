@@ -66,6 +66,7 @@ public slots:
 	void slotReportGetInput();
 	void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
 	void slotCalculateMaximumWallThickness();
+	void slotEnableAutoLumenSegmentation(bool flag);
 
 	virtual void slotUpdateTableWidget();
 

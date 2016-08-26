@@ -99,6 +99,8 @@ public slots:
 	virtual void slotAbout();
 	virtual void slotHelp();
 	virtual void slot3DUpdate();
+	//virtual void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
+
 	virtual void slotNavigationMode();
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
@@ -107,7 +109,9 @@ public slots:
 	virtual void slotImage(int image);
 	virtual void slotMultiPlanarView();
 
-
+	// Auto Lumen Segmenation 
+	virtual void slotEnableAutoLumenSegmentation(bool flag);
+	virtual void slotSetContourFilterGenerateValues(int generateValues);
 
 	//Overlay
     

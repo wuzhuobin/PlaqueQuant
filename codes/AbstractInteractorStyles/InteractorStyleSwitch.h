@@ -44,7 +44,7 @@ public:
 	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
 	vtkGetMacro(ROI, InteractorStyleROI*);
-	vtkGetMacro(Ruler, InteractorStyleRuler*)
+	//vtkGetMacro(Ruler, InteractorStyleRuler*)
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
@@ -54,7 +54,7 @@ public:
 	SetInteractorStyleMacro(PolygonDraw);
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
-	SetInteractorStyleMacro(Ruler);
+	//SetInteractorStyleMacro(Ruler);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
@@ -62,7 +62,7 @@ public:
 	CurrentStyleMacro(PolygonDraw);
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
-	CurrentStyleMacro(Ruler);
+	//CurrentStyleMacro(Ruler);
 
 	//bool CurrentStyleIsNavigation();
 	//bool CurrentStyleIsWindowLevel();
@@ -98,7 +98,7 @@ private:
 	InteractorStylePolygonDraw* PolygonDraw;
 	InteractorStylePaintBrush*	PaintBrush;
 	InteractorStyleROI* ROI;
-	InteractorStyleRuler* Ruler;
+	//InteractorStyleRuler* Ruler;
 	vtkInteractorStyle*	CurrentStyle;
 };
 

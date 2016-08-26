@@ -47,6 +47,10 @@ MainWindow::MainWindow()
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
 	
+	//Initialize
+	initializeModule();
+	setActionsEnable(false);
+
 	this->setWindowTitle("PlaqueQuant");
 	
 	// Set up action signals and slots
@@ -117,6 +121,7 @@ MainWindow::MainWindow()
 
 	//3D view
 	connect(ui->updateBtn, SIGNAL(clicked()), this, SLOT(slot3DUpdate()));
+	connect(ui->updateBtn, SIGNAL(clicked()), this, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 
 	//Initial Segmentation window
@@ -143,9 +148,7 @@ MainWindow::MainWindow()
 	//Initial Visible image number
 	visibleImageNum = 0;
     
-	//Initialize
-	initializeModule();
-	setActionsEnable(false);
+
     
     
 	//Parameter
@@ -933,6 +936,7 @@ void MainWindow::slot3DUpdate()
 	interacotr->Start();*/
 }
 
+
 void MainWindow::slotChangeIntensity()
 {
 	double intensity[3];
@@ -1349,6 +1353,22 @@ void MainWindow::slotMultiPlanarView()
 	}
 }
 
+void MainWindow::slotEnableAutoLumenSegmentation(bool flag)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
+	}
+}
+
+void MainWindow::slotSetContourFilterGenerateValues(int generateValues)
+{
+	for (int i = 0; i < 3; ++i) {
+		this->m_style[i]->GetPolygonDraw()->
+			SetContourFilterGenerateValues(generateValues);
+	}
+}
+
 void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;
@@ -1543,7 +1563,7 @@ void MainWindow::slotCenterline()
 	imageFileWriter->Update();
 
 
-	this->SegmentationOverlay->SetInputImageData(outputSegmentation);
+	//this->SegmentationOverlay->SetInputImageData(outputSegmentation);
 
 
 	//vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
