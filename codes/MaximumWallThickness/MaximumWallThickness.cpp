@@ -10,12 +10,11 @@
 #include "MaximumWallThickness.h"
 #include "vtkKdTree.h"
 
-MaximumWallThickness::MaximumWallThickness(vtkImageData * image, int internalEdgeValue, int externalEdgeValue)
-{
-	this->m_image = vtkSmartPointer<vtkImageData>::New();
-	this->m_image->DeepCopy(image);
+vtkStandardNewMacro(MaximumWallThickness);
 
-	image->GetExtent(this->m_extent);
+MaximumWallThickness::MaximumWallThickness()
+{
+	this->m_image = NULL;
 	
 	this->m_contourFilter = vtkSmartPointer<vtkContourFilter>::New();
 	this->m_sliceImage = NULL;
@@ -24,10 +23,6 @@ MaximumWallThickness::MaximumWallThickness(vtkImageData * image, int internalEdg
 
 MaximumWallThickness::~MaximumWallThickness()
 {
-	if (this->m_sliceImage) {
-		this->m_sliceImage->Delete();
-		this->m_sliceImage = NULL;
-	}
 }
 
 
@@ -37,9 +32,42 @@ std::vector<MaximumWallThickness::DistanceLoopPair> MaximumWallThickness::GetDis
 	return this->m_distanceVect;
 }
 
+void MaximumWallThickness::SetImage(vtkImageData *im)
+{
+	if (this->m_image) {
+		this->m_image->Delete();
+	}
+
+	this->m_image = vtkSmartPointer<vtkImageData>::New();
+	this->m_image->DeepCopy(im);
+	this->m_image->GetExtent(this->m_extent);
+}
+
 void MaximumWallThickness::SetSliceNumber(int i)
 {
 	this->m_sliceNumber = i;
+}
+
+void MaximumWallThickness::SetSliceImage(vtkImageData *im)
+{
+	if (this->m_sliceImage != NULL) {
+		this->m_sliceImage->Delete();
+		this->m_sliceImage = NULL;
+	}
+
+	this->m_sliceImage = vtkSmartPointer<vtkImageData>::New();
+	this->m_sliceImage->DeepCopy(im);
+
+	// check extent
+	this->m_sliceImage->GetExtent(this->m_extent);
+	if (this->m_extent[4] != this->m_extent[5]) {
+		this->m_sliceImage->Delete();
+		this->m_sliceImage = NULL;
+		throw ERROR_INPUT_NOT_A_SLICE;
+	}
+	else {
+		this->m_sliceNumber = this->m_extent[4];
+	}
 }
 
 void MaximumWallThickness::Update()
@@ -58,12 +86,6 @@ void MaximumWallThickness::Update()
 		throw ERROR_EXTRACT_LOOP;
 		return;
 	}
-
-	//if (!this->EdgeDetection()) {
-	//	throw ERROR_EDGE_DETECTION;
-	//	return;
-	//}
-
 
 	if (!this->ThicknessCal()) {
 		throw ERROR_THICKNESS_CAL;
@@ -130,8 +152,16 @@ bool MaximumWallThickness::ValueTransform()
 /* Extract the slice from the input image specified by m_sliceNumber */
 bool MaximumWallThickness::ExtractSlice()
 {
+	// check if the variable is declared
+	if (m_sliceImage == NULL)
+		this->m_sliceImage = vtkImageData::New();
+	else {
+		// if slice image is manually set, skip the remaining
+		return true;
+	}
+
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	mainwnd->GetOverlay()->GetDisplayExtent(m_extent);
+	mainwnd->GetOverlay()->GetDisplayExtent(m_extent); // Extent is obtained from distplayed extent of overlay
 
 	// Set the extent to the slice being handled only
 	this->m_extent[4] = this->m_sliceNumber;
@@ -141,10 +171,6 @@ bool MaximumWallThickness::ExtractSlice()
 	extractVOIFilter->SetInputData(this->m_image);
 	extractVOIFilter->SetVOI(this->m_extent);
 	extractVOIFilter->Update();
-
-	// check if the variable is declared
-	if (m_sliceImage == NULL)
-		this->m_sliceImage = vtkImageData::New();
 
 	// copy the extracted image
 	this->m_sliceImage->DeepCopy(extractVOIFilter->GetOutput());
@@ -501,27 +527,5 @@ bool MaximumWallThickness::ThicknessCal()
 
 
 	return true;
-}
-
-
-
-
-bool MaximumWallThickness::output()
-{
-	using namespace std;
-	int k = m_extent[4];
-
-	return true;
-}
-
-bool MaximumWallThickness::setExtent(int* extent)
-{
-	memcpy(this->m_extent, extent, sizeof(int) * 6);
-	return true;
-}
-
-const int * MaximumWallThickness::getExtent()
-{
-	return m_extent;
 }
 

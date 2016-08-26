@@ -29,13 +29,15 @@
 #include <iostream>
 
 
-class MaximumWallThickness
+class MaximumWallThickness : public vtkObject
 {
 public:
+	vtkTypeMacro(MaximumWallThickness, vtkObject);
+	static MaximumWallThickness* New();
 
 	const static int EDGENUM = 2;
 
-	MaximumWallThickness(vtkImageData* m_image, int internalEdgeValue = 1, int externalEdgeValue = 0);
+	MaximumWallThickness();
 	~MaximumWallThickness();
 
 
@@ -49,7 +51,14 @@ public:
 	/* Do not modify the value, read only! */
 	std::vector<DistanceLoopPair>	GetDistanceLoopPairVect();
 
+	/* Two ways to specify the region of interest 
+		1. Set image slice number, then default extent is extracted from SegmentationOverlay of mainwnd
+		2. Directly set slice image
+	*/
+	void SetImage(vtkImageData*);
 	void SetSliceNumber(int);
+	void SetSliceImage(vtkImageData*);
+
 
 	void Update();
 
@@ -58,7 +67,9 @@ public:
 		ERROR_EXTRACT_SLICE = 2,
 		ERROR_EXTRACT_LOOP = 3,
 		ERROR_UNDEFINED_BRANCH = 4,
-		ERROR_THICKNESS_CAL = 5
+		ERROR_THICKNESS_CAL = 5, 
+
+		ERROR_INPUT_NOT_A_SLICE = 6
 	};
 
 private:
@@ -69,9 +80,6 @@ private:
 	bool ExtractLoops();
 	bool EdgeDetection();
 	bool ThicknessCal();
-	bool output();
-	bool setExtent(int* m_extent);
-	const int* getExtent();
 
 	vtkSmartPointer<vtkImageData> m_image;
 	vtkSmartPointer<vtkImageData> m_sliceImage;
