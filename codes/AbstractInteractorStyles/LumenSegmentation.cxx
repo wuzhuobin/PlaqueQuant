@@ -82,6 +82,7 @@ vtkOrientedGlyphContourRepresentation * LumenSegmentaiton::GetLumenWallContourRe
 {
 	return this->lumenWallContourRepresentation;
 }
+#include <vtkXMLPolyDataWriter.h>
 
 void LumenSegmentaiton::Update()
 {
@@ -210,6 +211,28 @@ void LumenSegmentaiton::Update()
 				//connectivityFilter->SetExtractionModeToSpecifiedRegions();
 				//connectivityFilter->AddSpecifiedRegion(i);
 				//connectivityFilter->Update();
+
+
+				// waiting for debuging 
+				//vtkSmartPointer<vtkCleanPolyData> clearPolyData =
+				//	vtkSmartPointer<vtkCleanPolyData>::New();
+				//clearPolyData->SetInputData(lumenWallPolyData);
+				//clearPolyData->SetAbsoluteTolerance(0.1);
+				//clearPolyData->SetToleranceIsAbsolute(true);
+				//clearPolyData->Update();
+
+				//vtkSmartPointer<vtkXMLPolyDataWriter> w =
+				//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+				//w->SetInputData(lumenWallPolyData);
+				//w->SetFileName("C:\\Users\\user\\Desktop\\before.vtp");
+				//w->Update();
+
+				//lumenWallPolyData->DeepCopy(clearPolyData->GetOutput());
+				//w->SetInputData(lumenWallPolyData);
+				//w->SetFileName("C:\\Users\\user\\Desktop\\after.vtp");
+				//w->Update();
+
+
 				this->m_contour = lumenWallPolyData;
 				LumenSegmentaiton::ResequenceLumenWallPolyData(lumenWallPolyData);
 			}

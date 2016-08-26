@@ -94,8 +94,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->maximumWallThicknessBtn,		SIGNAL(clicked()),					this,		SLOT(slotCalculateMaximumWallThickness()));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
-	//connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
-	//	mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
+	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
+		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 
 	this->GenerateReportPushButtonVisible();
@@ -396,10 +396,14 @@ void ModuleWidget::InternalUpdate()
 
 	int currentIndex = this->ui->stackedWidget->currentIndex();
 	if (currentIndex == 4) {
+		slotUpdate2DMeasurements();
+		mainwnd->slotMeasureCurrentVolumeOfEveryLabel();
 		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()), Qt::QueuedConnection);
+		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), mainwnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()), Qt::QueuedConnection);
 	}
 	else {
 		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()));
+		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), mainwnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 	}
 }
 
@@ -407,7 +411,7 @@ void ModuleWidget::GenerateReport()
 {
 	//General 
 	//Basic Information to fill
-	QString FilePath = "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/result.pdf";
+	QFileInfo fileInfo("./report.pdf");
 	QString ReportName = "Plaque Quantification Report";
 	QString PatientName = "Chan Tai Man";
 	QString PatientID = "11223344";
@@ -418,26 +422,32 @@ void ModuleWidget::GenerateReport()
 	QString MRISide = "R";
 	QString DoctorName = "Dr. Lau";
 	//Stenosis Measurement
-	QString StenosisPercent = "30%";
+	QString StenosisPercent = this->ui->spinBox_2->text();
 	//2D Measurement
-	QString LumenArea = "20";
-	QString VesselWallArea = "40";
-	QString WallThickness = "4.2";
-	QString NWI = "0.67";
+	QString LumenArea = this->ui->measurement2DTableWidget->item(0, 0)->text();
+	QString VesselWallArea = this->ui->measurement2DTableWidget->item(1, 0)->text();
+	QString WallThickness = this->ui->measurement2DTableWidget->item(2, 0)->text();
+	QString NWI = this->ui->measurement2DTableWidget->item(3, 0)->text();
 	//3D Measurement
-	QString LumenVolume = "600";
-	QString WallVolume = "800";
-	QString PlaqueVolume = "200";
+	QString LumenVolume = this->ui->measurement3DTableWidget->item(1, 0)->text();
+	QString WallVolume = this->ui->measurement3DTableWidget->item(2, 0)->text();
+	QString PlaqueVolume = this->ui->measurement3DTableWidget->item(0, 0)->text();
 	//Plaque Composition
-	QString Calcification = "140";
-	QString CalcificationPercent = "70%";
-	QString Hemorrhage = "30";
-	QString HemorrhagePercent = "15%";
-	QString LRNC = "10";
-	QString LRNCPercent = "5%";
+
+	double plaqueVolumeNum = this->ui->measurement3DTableWidget->item(0, 0)->data(Qt::DisplayRole).toDouble();
+	double calcificationNum = this->ui->measurement3DTableWidget->item(3, 0)->data(Qt::DisplayRole).toDouble();
+	double hemorrhageNum = this->ui->measurement3DTableWidget->item(4, 0)->data(Qt::DisplayRole).toDouble();
+	double LRNCNum = this->ui->measurement3DTableWidget->item(5, 0)->data(Qt::DisplayRole).toDouble();
+
+	QString Calcification = this->ui->measurement3DTableWidget->item(3, 0)->text();
+	QString CalcificationPercent = QString::number(calcificationNum/plaqueVolumeNum) + "%";
+	QString Hemorrhage = this->ui->measurement3DTableWidget->item(4, 0)->text();
+	QString HemorrhagePercent = QString::number(hemorrhageNum/plaqueVolumeNum) + "%";
+	QString LRNC = this->ui->measurement3DTableWidget->item(5, 0)->text();
+	QString LRNCPercent = QString::number(LRNCNum/plaqueVolumeNum) + "%";
 
 	ReportGenerator* reportGenerator = new ReportGenerator;
-	reportGenerator->SetDirectory(FilePath);
+	reportGenerator->SetDirectory(fileInfo.absoluteFilePath());
 	reportGenerator->SetReportName(ReportName);
 
 	//Table
@@ -560,7 +570,7 @@ void ModuleWidget::GenerateReport()
 	//Update
 	reportGenerator->Update();
 
-	QDesktopServices::openUrl(QUrl("C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/result.pdf"));
+	QDesktopServices::openUrl(fileInfo.absoluteFilePath());
 
 	delete reportGenerator;
 

@@ -55,7 +55,7 @@ void MeasurementFor2D::CountLabels()
 
 	double spacing[3], voxelVolume;
 	this->SliceImage->GetSpacing(spacing);
-	voxelVolume = spacing[0] * spacing[1] * spacing[2];
+	voxelVolume = spacing[0] * spacing[1] ;
 	Measurements2D output;
 
 
