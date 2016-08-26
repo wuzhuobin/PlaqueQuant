@@ -1,5 +1,26 @@
-#include <vtkSmartPointer.h>
+#include <vtkImageAccumulate.h>
 #include "MeasurementFor2D.h"
+#include "MainWindow.h"
+
+vtkStandardNewMacro(MeasurementFor2D);
+
+MeasurementFor2D::Measurements2D MeasurementFor2D::GetOutput(int i)
+{
+	if (this->m_outputList.size() - 1 < i || i < 0) {
+		throw ERROR_OUTPUT_NOT_EXIST;
+	}
+	return this->m_outputList.at(i);
+}
+
+MeasurementFor2D::MeasurementFor2D()
+{
+	this->SliceImage = NULL;
+}
+
+MeasurementFor2D::~MeasurementFor2D()
+{
+}
+
 
 void MeasurementFor2D::SetSliceImage(vtkImageData *im)
 {
@@ -10,11 +31,41 @@ void MeasurementFor2D::SetSliceImage(vtkImageData *im)
 	this->SliceImage->DeepCopy(im);
 
 	this->SliceImage->GetExtent(this->ImageExtent);
+	if (this->ImageExtent[4] != this->ImageExtent[5]) {
+		this->SliceImage->Delete();
+		this->SliceImage = NULL;
+		throw ERROR_INPUT_NOT_A_SLICE;
+	}
 }
 
-MeasurementFor2D::MeasurementFor2D()
+void MeasurementFor2D::Update()
 {
+	this->CountLabels();
+}
 
+
+void MeasurementFor2D::CountLabels()
+{
+	vtkSmartPointer<vtkImageAccumulate> imageAccumulate = vtkSmartPointer<vtkImageAccumulate>::New();
+	imageAccumulate->SetInputData(this->SliceImage);
+	imageAccumulate->SetComponentExtent(0, 6.,0,0,0,0); // #LookupTable
+	imageAccumulate->SetComponentOrigin(0, 0, 0);
+	imageAccumulate->SetComponentSpacing(1, 0, 0);
+	imageAccumulate->Update();
+
+	double spacing[3], voxelVolume;
+	this->SliceImage->GetSpacing(spacing);
+	voxelVolume = spacing[0] * spacing[1] * spacing[2];
+	Measurements2D output;
+
+
+	int *val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(MainWindow::LABEL_LUMEN, 0, 0));
+	output.LumenArea = (*val * voxelVolume);
+
+	val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(MainWindow::LABEL_VESSEL_WALL, 0, 0));
+	output.VesselWallArea = (*val * voxelVolume);
+
+	this->m_outputList.push_back(output);
 }
 
 int MeasurementFor2D::CountCluster(int x, int y)
@@ -39,7 +90,7 @@ int MeasurementFor2D::CountCluster(int x, int y)
 				continue;
 			}
 			if (this->CheckCoordIndexInList(index)) {
-				return 0;
+				return count;
 			}
 			else {
 				if (*val == this->SliceImage->GetScalarComponentAsDouble(x, y, this->SliceNumber, 0)) {

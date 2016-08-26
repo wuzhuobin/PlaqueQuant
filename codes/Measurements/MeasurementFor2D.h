@@ -12,7 +12,8 @@ public:
 	vtkTypeMacro(MeasurementFor2D, vtkObject);
 	static MeasurementFor2D* New();
 
-	struct Measurements2D
+
+	struct Measurements2D 
 	{
 		double LumenArea;
 		double VesselWallArea;
@@ -20,10 +21,18 @@ public:
 		double MaximumWallThickness;
 	};
 
-	void SetSliceImage(vtkImageData*);
+
+	Measurements2D GetOutput(int);
+	void SetSliceImage(vtkImageData* );
+	void Update();
 
 	vtkSetMacro(SliceNumber, int);
 	vtkGetMacro(SliceNumber, int);
+
+	enum ERROR_CODE {
+		ERROR_OUTPUT_NOT_EXIST = 1,
+		ERROR_INPUT_NOT_A_SLICE = 6
+	};
 
 protected:
 	MeasurementFor2D();
@@ -31,19 +40,19 @@ protected:
 
 private:
 	typedef std::pair<int, int> CoordIndex;
+	
+	void CountLabels();
 
 	int CountCluster(int, int);
 	bool CheckCoordIndexInList(CoordIndex);
 
-	vtkImageData* SliceImage;
+	vtkSmartPointer<vtkImageData> SliceImage;
 
 	int SliceNumber;
 	int ImageExtent[6];
 
 	std::vector<CoordIndex> m_countedList;
-
-
-
+	std::vector<Measurements2D> m_outputList;
 };
 
 

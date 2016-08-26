@@ -5,6 +5,7 @@
 #include <vtkDistanceRepresentation2D.h>
 #include <vtkCellArray.h>
 #include "MaximumWallThickness.h"
+#include "MeasurementFor2D.h"
 #include "ModuleWidget.h"
 #include "ui_ModuleWidget.h"
 
@@ -123,6 +124,8 @@ void ModuleWidget::NextPage()
 	int index = ui->stackedWidget->currentIndex();
 	ui->stackedWidget->setCurrentIndex(index + 1);
 	this->GenerateReportPushButtonVisible();
+
+	this->InternalUpdate();
 }
 
 void ModuleWidget::BackPage()
@@ -131,6 +134,7 @@ void ModuleWidget::BackPage()
 	ui->stackedWidget->setCurrentIndex(index - 1);
 	this->GenerateReportPushButtonVisible();
 
+	this->InternalUpdate();
 }
 
 void ModuleWidget::SetPage(int index)
@@ -213,6 +217,77 @@ void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int num
 	
 }
 
+void ModuleWidget::slotUpdate2DMeasurements()
+{
+	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
+
+	vtkImageData* overlayImage = mainwnd->GetOverlay()->GetVTKImageData();
+	int extent[6];
+	mainwnd->GetOverlay()->GetDisplayExtent(extent);
+	extent[4] = currentSlice;
+	extent[5] = currentSlice;
+
+	// Extract slice image
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	voi->SetInputData(overlayImage);
+	voi->SetVOI(extent);
+	voi->Update();
+
+	// calculate wall thickness
+	vtkSmartPointer<MaximumWallThickness> mwt = vtkSmartPointer<MaximumWallThickness>::New();
+	mwt->SetSliceImage(voi->GetOutput());
+	try {
+		mwt->Update();
+	}
+	catch (MaximumWallThickness::ERROR_CODE e) {
+		cerr << "MaximumWallThickness error: " << e << endl;
+		//return;
+	}
+
+	// Calculate areas
+	vtkSmartPointer<MeasurementFor2D> m2d = vtkSmartPointer<MeasurementFor2D>::New();
+	m2d->SetSliceImage(voi->GetOutput());
+	try {
+		m2d->Update();
+	}
+	catch (MeasurementFor2D::ERROR_CODE e) {
+		cerr << "MeasurementFor2D error: " << e << endl;
+		//return;
+	}
+
+	/// Write measurements to table
+	// Error checking
+	double lumenArea, vesselArea, NMI, distance; // #todo: Allow multiple branch
+	try {
+		lumenArea = m2d->GetOutput(0).LumenArea;
+		vesselArea = m2d->GetOutput(0).VesselWallArea;
+		NMI = vesselArea / (lumenArea + vesselArea);
+	}
+	catch (...) {
+		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem("Undefined"));
+		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem("Undefined"));
+		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem("Undefined"));
+	}
+	try {
+		distance = mwt->GetDistanceLoopPairVect().at(0).Distance;
+	}
+	catch (...) {
+		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem("Undefined"));
+	}
+
+	// Write to table
+	try {
+		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).LumenArea)));
+		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).VesselWallArea)));
+		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance)));
+		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(NMI)));
+	}
+	catch (...) {
+		cerr << "Error assigning items to table!\n";
+	}
+}
+
 void ModuleWidget::slotCalculateMaximumWallThickness()
 {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
@@ -220,12 +295,13 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 
 	vtkImageData* overlayImage = mainwnd->GetOverlay()->GetVTKImageData();
 
-	MaximumWallThickness* calculator = new MaximumWallThickness(overlayImage);
+	vtkSmartPointer<MaximumWallThickness> calculator = vtkSmartPointer<MaximumWallThickness>::New();
+	calculator->SetImage(overlayImage);
 	calculator->SetSliceNumber(currentSlice);
 	try {
 		calculator->Update();
 	} 
-	catch (int e) {
+	catch (MaximumWallThickness::ERROR_CODE e) {
 		return;
 	}
 	
@@ -311,6 +387,21 @@ void ModuleWidget::slotUpdateTableWidget()
 	//QTableWidget* table = ui->measurement2DTableWidget->
 }
 	
+
+void ModuleWidget::InternalUpdate()
+{
+	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	Ui_MainWindow* main_ui = mainwnd->GetUI();
+	// if page is 5
+
+	int currentIndex = this->ui->stackedWidget->currentIndex();
+	if (currentIndex == 4) {
+		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()), Qt::QueuedConnection);
+	}
+	else {
+		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()));
+	}
+}
 
 void ModuleWidget::GenerateReport()
 {
