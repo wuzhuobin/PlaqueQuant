@@ -60,18 +60,17 @@ MyImageViewer::MyImageViewer()
 	//Disable the warning
 	//this->WindowLevel->SetGlobalWarningDisplay(false);
 	//this->imageMapToWindowLevelColors->SetGlobalWarningDisplay(false);
-	///set label Look Up Table
-	// wrong
+	///set label Look Up Table #LookupTable
 	this->LookUpTable = vtkLookupTable::New();
 	this->LookUpTable->SetNumberOfTableValues(7);
 	this->LookUpTable->SetTableRange(0.0, 6);
 	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
-	this->LookUpTable->SetTableValue(1, 1, 0, 0, 0.5);
-	this->LookUpTable->SetTableValue(2, 0, 0, 1, 0.9);
-	this->LookUpTable->SetTableValue(3, 0, 1, 0, 0.1);
-	this->LookUpTable->SetTableValue(4, 1, 1, 0, 0.7);
-	this->LookUpTable->SetTableValue(5, 0, 1, 1, 0.4);
-	this->LookUpTable->SetTableValue(6, 1, 0, 1, 0.5);
+	this->LookUpTable->SetTableValue(1, 1, 0, 0, 0.3);
+	this->LookUpTable->SetTableValue(2, 0, 0, 1, 0.5);
+	this->LookUpTable->SetTableValue(3, 0, 1, 0, 0.05);
+	this->LookUpTable->SetTableValue(4, 1, 1, 0, 0.);
+	this->LookUpTable->SetTableValue(5, 0, 1, 1, 0.);
+	this->LookUpTable->SetTableValue(6, 1, 0, 1, 0.);
 	this->LookUpTable->Build();
 
 	// right

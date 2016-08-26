@@ -64,6 +64,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Measurements 
 	# Source for maximum wall thickness
 	${PROJECT_BINAR_DIR}/codes/MaximumWallThickness
+	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
@@ -79,6 +80,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/Measurements 
 	# Source for maxmimum wall thickness
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
+	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
 )
 
 SET(

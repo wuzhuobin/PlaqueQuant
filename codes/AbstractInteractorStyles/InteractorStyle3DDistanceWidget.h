@@ -32,7 +32,8 @@ public:
 protected:
 	InteractorStyle3DDistanceWidget();
 	~InteractorStyle3DDistanceWidget();
-
+	
+	virtual void OnMiddleButtonDown();
 	virtual void OnKeyPress();
 
 private:
@@ -40,6 +41,8 @@ private:
 
 	QTime m_clickTimer;
 	std::vector<Distance3DWidget*> m_distanceWidgetList;
+	std::vector<double*> m_coords;
+	std::vector<vtkActor*> m_ABActors;
 };
 
 

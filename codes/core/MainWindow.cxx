@@ -38,6 +38,9 @@
 #include <vtkImageIterator.h>
 #include <vtkCamera.h>
 #include <vtkImageCast.h>
+#include <vtkImageThreshold.h>
+
+#include "Centerline.h"
 
 //#include <itkImageFileWriter.h>
 
@@ -183,7 +186,7 @@ MainWindow::MainWindow()
 	ui->image4View->SetRenderWindow(this->m_3DimageViewer);
 
 	ImageAlignment(NULL) = NULL;
-	
+	this->m_centerlinePD = NULL;
 	for (int i = 0; i < 5; ++i) {
 		itkImage[i] = ImageType::New();
 		//vtkImage[i] = vtkImageData::New();
@@ -884,16 +887,55 @@ void MainWindow::slotResetROI()
 void MainWindow::slot3DUpdate()
 {
 
-	//if (SegmentationOverlay == NULL)
-	//	return;
+	if (SegmentationOverlay == NULL)
+		return;
+	/*vtkNIFTIImageReader* reader = vtkNIFTIImageReader::New();
+	reader->SetFileName("C:/Users/lwong/Source/datacenter/segmentation_right.nii");
+	reader->SetDataScalarTypeToDouble();
+	reader->Update();
+
+	vtkSmartPointer<vtkImageCast> imcast = vtkSmartPointer<vtkImageCast>::New();
+	imcast->SetInputConnection(reader->GetOutputPort());
+	imcast->SetOutputScalarTypeToDouble();
+	imcast->Update();
+*/
+
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
 	
-	///Marching cubes
+	// Extract VOI
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	voi->SetInputData(this->SegmentationOverlay->GetVTKImageData());
+	voi->SetVOI(this->SegmentationOverlay->GetDisplayExtent());
+	voi->Update();
+
+	// Threshold the iamge
+	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
+	thres->SetInputData(voi->GetOutput());
+	thres->ThresholdBetween(MainWindow::LABEL_LUMEN - 0.1, MainWindow::LABEL_LUMEN + 0.1);
+	thres->SetOutValue(0);
+	thres->SetInValue(10);
+	thres->Update();
+
+	/// Obtain centerline
 	SurfaceCreator* surfaceCreator = new SurfaceCreator();
-	surfaceCreator->SetInput(SegmentationOverlay->GetOutput());
-	surfaceCreator->SetDiscrete(true);
+	surfaceCreator->SetInput(thres->GetOutput());
+	surfaceCreator->SetValue(10);
+	surfaceCreator->SetDiscrete(false);
 	surfaceCreator->SetResamplingFactor(1.0);
 	surfaceCreator->Update();
+
+	Centerline* cl = new Centerline;
+	cl->SetSurface(surfaceCreator->GetOutput());
+	cl->Update();
+
+	if (m_centerlinePD != NULL) {
+		this->m_centerlinePD->Delete();
+		this->m_centerlinePD = NULL;
+	}
+	this->m_centerlinePD = vtkPolyData::New();
+	this->m_centerlinePD->DeepCopy(cl->GetCenterline());
+
+	delete cl;
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	mapper->SetInputData(surfaceCreator->GetOutput());
@@ -903,15 +945,16 @@ void MainWindow::slot3DUpdate()
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
 	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
 	Actor->SetMapper(mapper);
-	Actor->GetProperty()->SetOpacity(0.1);
+	Actor->GetProperty()->SetOpacity(0.9);
+	Actor->GetProperty()->SetRepresentationToSurface();
 	Actor->SetPickable(1);
-	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(Actor);
+	this->m_3DDataRenderer->AddActor(Actor);
 
 	///Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
 		GPUVolumeRenderingFilter::New();
 	
-	volumeRenderingFilter->SetInputData(this->SegmentationOverlay->GetOutput());
+	volumeRenderingFilter->SetInputData(voi->GetOutput());
 	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
 	volumeRenderingFilter->GetVolume()->SetPickable(1);
 	volumeRenderingFilter->Update();
@@ -921,7 +964,7 @@ void MainWindow::slot3DUpdate()
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui->image4View->GetRenderWindow()->Render();
 
-	delete surfaceCreator;
+	//delete surfaceCreator;
 
 	/*vtkRenderWindow* rwin = vtkRenderWindow::New();
 	rwin->AddRenderer(vtkRenderer::New());

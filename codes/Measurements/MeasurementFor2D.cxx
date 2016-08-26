@@ -53,17 +53,17 @@ void MeasurementFor2D::CountLabels()
 	imageAccumulate->SetComponentSpacing(1, 0, 0);
 	imageAccumulate->Update();
 
-	double spacing[3], voxelVolume;
+	double spacing[3], pixelArea;
 	this->SliceImage->GetSpacing(spacing);
-	voxelVolume = spacing[0] * spacing[1] * spacing[2];
+	pixelArea = spacing[0] * spacing[1];
 	Measurements2D output;
 
 
 	int *val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(MainWindow::LABEL_LUMEN, 0, 0));
-	output.LumenArea = (*val * voxelVolume);
+	output.LumenArea = (*val * pixelArea);
 
 	val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(MainWindow::LABEL_VESSEL_WALL, 0, 0));
-	output.VesselWallArea = (*val * voxelVolume);
+	output.VesselWallArea = (*val * pixelArea);
 
 	this->m_outputList.push_back(output);
 }

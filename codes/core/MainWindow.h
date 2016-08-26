@@ -52,9 +52,13 @@ public:
 	void RenderAll2DViewers();
 	void Set3DRulerEnabled(bool b);
 	void SetImageLayerNo(int);
-	Overlay* GetOverlay();
-	vtkImageData** GetImageData() {
+
+	Overlay*			GetOverlay();
+	vtkImageData**		GetImageData() {
 		return this->vtkImage;
+	}
+	vtkPolyData*		GetCenterlinePD() {
+		return this->m_centerlinePD;
 	}
 
 	Ui_MainWindow* GetUI();
@@ -199,6 +203,7 @@ private:
 	ImageType::Pointer itkImage[5];
 	vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
+	vtkPolyData* m_centerlinePD;
 	//vtkImageData* vtkImageOverlay;
 	//vtkImageData* vtkImageOverlayOriginal;
 

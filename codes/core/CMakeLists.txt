@@ -145,6 +145,7 @@ target_link_libraries(
 	GPURenderWithLUT
 	Measurements
 	MaximumWallThickness
+	CenterlineBranching
 )
 
 
