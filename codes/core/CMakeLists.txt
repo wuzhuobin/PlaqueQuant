@@ -143,7 +143,8 @@ target_link_libraries(
 	AbstractData
 	Widgets 
 	GPURenderWithLUT
-	MeasurementFor3D
+	Measurements
+	MaximumWallThickness
 )
 
 

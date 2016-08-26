@@ -679,6 +679,8 @@ void MainWindow::slotNavigationMode()
 			break;
 		m_style[i]->SetInteractorStyleToNavigation();
 	}
+
+	this->slotRuler(false);
 }
 
 void MainWindow::slotWindowLevelMode()
@@ -690,6 +692,8 @@ void MainWindow::slotWindowLevelMode()
 			break;
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
+
+	this->slotRuler(false);
 }	
 
 void MainWindow::slotBrushMode()
@@ -702,6 +706,8 @@ void MainWindow::slotBrushMode()
 	}
 	//Update ui
 	m_moduleWidget->SetPage(2);
+
+	this->slotRuler(false);
 }
 
 void MainWindow::slotContourMode()
@@ -714,6 +720,8 @@ void MainWindow::slotContourMode()
 		//m_style[i]->SetMode(4);
 	}
 	m_moduleWidget->SetPage(1);
+
+	this->slotRuler(false);
 }
 
 void MainWindow::slotImage(int image)
@@ -786,14 +794,10 @@ void MainWindow::slotImage(int image)
 
 void MainWindow::slotRuler(bool b)
 {
-
 	for (int i=0;i<3;i++)
 	{
-		//m_2DimageViewer[i]->SetRulerEnabled(b);
-		m_style[i]->SetInteractorStyleToInteractorStyleTesting();
+		m_2DimageViewer[i]->SetRulerEnabled(b);
 	}
-
-	this->Set3DRulerEnabled(b);
 }
 
 void MainWindow::slotROIMode()
@@ -806,6 +810,8 @@ void MainWindow::slotROIMode()
 	for (int i = 0; i < 3; ++i) {
 		m_style[i]->SetInteractorStyleToROI();
 	}
+
+	this->slotRuler(false);
 }
 
 void MainWindow::slotChangeROI(double * bound)

@@ -61,7 +61,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
-	${PROJECT_BINARY_DIR}/codes/MeasurementFor3D 
+	${PROJECT_BINARY_DIR}/codes/Measurements 
 	# Source for maximum wall thickness
 	${PROJECT_BINAR_DIR}/codes/MaximumWallThickness
 
@@ -76,7 +76,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
-	${PROJECT_SOURCE_DIR}/codes/MeasurementFor3D 
+	${PROJECT_SOURCE_DIR}/codes/Measurements 
 	# Source for maxmimum wall thickness
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 )
