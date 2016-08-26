@@ -444,7 +444,7 @@ void ModuleWidget::GenerateReport()
 	QString Hemorrhage = this->ui->measurement3DTableWidget->item(4, 0)->text();
 	QString HemorrhagePercent = QString::number(hemorrhageNum/plaqueVolumeNum) + "%";
 	QString LRNC = this->ui->measurement3DTableWidget->item(5, 0)->text();
-	QString LRNCPercent = QString::number(LRNCNum/plaqueVolumeNum) + "%";
+	QString LRNCPercent = QString::number(LRNCNum/ plaqueVolumeNum) + "%";
 
 	ReportGenerator* reportGenerator = new ReportGenerator;
 	reportGenerator->SetDirectory(fileInfo.absoluteFilePath());
@@ -453,7 +453,7 @@ void ModuleWidget::GenerateReport()
 	//Table
 	int headerColor[4] = { 155, 155, 155, 255 };
 	reportGenerator->AddTable(0, "Information", QStringList(), QStringList(), 5, 4);
-	reportGenerator->SetTableSize(0, 700, 185);
+	reportGenerator->SetTableSize(0, 680, 185);
 	reportGenerator->SetTableItem(0, 0, 0, "Patient Information");
 	reportGenerator->SetTableItemBackgroundColor(0, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(0, 0, 0, 2);
@@ -481,7 +481,7 @@ void ModuleWidget::GenerateReport()
 
 
 	reportGenerator->AddTable(1, "Stenosis Measurement", QStringList(), QStringList(), 2, 4);
-	reportGenerator->SetTableSize(1, 700, 74);
+	reportGenerator->SetTableSize(1, 680, 74);
 	reportGenerator->SetTableItem(1, 0, 0, "Stenosis Measurement");
 	reportGenerator->SetTableItemBackgroundColor(1, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(1, 0, 0, 4);
@@ -494,7 +494,7 @@ void ModuleWidget::GenerateReport()
 
 
 	reportGenerator->AddTable(2, "2D Measurement", QStringList(), QStringList(), 4, 4);
-	reportGenerator->SetTableSize(2, 700, 148);
+	reportGenerator->SetTableSize(2, 680, 148);
 	reportGenerator->SetTableItem(2, 0, 0, "2D Measurement");
 	reportGenerator->SetTableItemBackgroundColor(2, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(2, 0, 0, 4);
@@ -517,7 +517,7 @@ void ModuleWidget::GenerateReport()
 	reportGenerator->SetTableItemRowSpan(2, 2, 3, 2);
 
 	reportGenerator->AddTable(3, "3D Measurement", QStringList(), QStringList(), 3, 4);
-	reportGenerator->SetTableSize(3, 700, 111);
+	reportGenerator->SetTableSize(3, 680, 111);
 	reportGenerator->SetTableItem(3, 0, 0, "3D Measurement");
 	reportGenerator->SetTableItemBackgroundColor(3, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(3, 0, 0, 4);
@@ -532,7 +532,7 @@ void ModuleWidget::GenerateReport()
 	reportGenerator->SetTableItem(3, 2, 3, PlaqueVolume);
 
 	reportGenerator->AddTable(4, "Plaque Composition", QStringList(), QStringList(), 4, 4);
-	reportGenerator->SetTableSize(4, 700, 148);
+	reportGenerator->SetTableSize(4, 680, 148);
 	reportGenerator->SetTableItem(4, 0, 0, "Plaque Composition");
 	reportGenerator->SetTableItemBackgroundColor(4, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(4, 0, 0, 4);
@@ -554,7 +554,7 @@ void ModuleWidget::GenerateReport()
 	reportGenerator->AddFigure(0, "2D result", "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/2dresult.png");
 	reportGenerator->AddFigure(1, "3D result", "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/3dresult.png");
 	reportGenerator->AddTable(5, "Images", QStringList(), QStringList(), 10, 4);
-	reportGenerator->SetTableSize(5, 700, 350);
+	reportGenerator->SetTableSize(5, 680, 350);
 	reportGenerator->SetTableItemRowSpan(5, 1, 0, 9);
 	reportGenerator->SetTableItemRowSpan(5, 1, 2, 9);
 	reportGenerator->SetTableItemColumnSpan(5, 0, 0, 2);

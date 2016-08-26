@@ -1335,26 +1335,26 @@ void MainWindow::slotMultiPlanarView()
 	}
 
 	// Correct view up
-	for (int i = 0; i < 3; i++)
-	{
+	//for (int i = 0; i < 3; i++)
+	//{
 
-		// Make sure view up is correct
-		switch (i)
-		{
-		case 0:
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
-			break;
-		case 1:
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
-			break;
-		case 2:
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-			break;
-		default:
-			break;
-		}
-		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
-	}
+	//	// Make sure view up is correct
+	//	switch (i)
+	//	{
+	//	case 0:
+	//		this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
+	//		break;
+	//	case 1:
+	//		this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
+	//		break;
+	//	case 2:
+	//		this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//	this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
+	//}
 }
 
 void MainWindow::slotEnableAutoLumenSegmentation(bool flag)
@@ -1382,11 +1382,11 @@ void MainWindow::slotSegmentationView()
 	{
 		for (; i1 < 5 && i2 < 3; ++i1) {
 			if (this->vtkImage[i1] != NULL) {
+				this->m_2DimageViewer[i2]->SetInputData(vtkImage[i1]);
 				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
 				this->m_style[i2]->SetOrientation(2);
 				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
 				this->m_2DimageViewer[i2]->InitializeOrientationText();
-				this->m_2DimageViewer[i2]->SetInputData(vtkImage[i1]);
 				++i2;
 			}
 		}
