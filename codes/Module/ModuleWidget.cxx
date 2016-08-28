@@ -89,8 +89,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->BrushSizeSlider,				SIGNAL(valueChanged(int)),			this,		SLOT(SetBrushSize()),Qt::UniqueConnection);
 	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
-	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
-	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
+	//connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
+	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity(int)));
 	connect(ui->maximumWallThicknessBtn,		SIGNAL(clicked()),					this,		SLOT(slotCalculateMaximumWallThickness()));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
@@ -163,17 +163,24 @@ void ModuleWidget::slotSegmentationView()
 
 void ModuleWidget::slotChangeLayerNo()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	int layer = ui->labelComboBox->currentIndex() + 1;
-	mainwnd->SetImageLayerNo(layer);
+	const double* value = mainWnd->GetLookupTable()->GetTableValue(layer);
+
+	ui->opacitySpinBox->setValue(value[3] * 100);
+	mainWnd->SetImageLayerNo(layer);
 
 }
 
-void ModuleWidget::slotChangeOpacity()
+void ModuleWidget::slotChangeOpacity(int opacity)
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotOverlayOpacity(ui->opacitySpinBox->value()/100.0);
-
+	int layer = ui->labelComboBox->currentIndex() + 1;
+	double* value = mainWnd->GetLookupTable()->GetTableValue(layer);
+	value[3] = opacity * 0.01;
+	mainWnd->GetLookupTable()->SetTableValue(layer, value);
+	mainWnd->GetLookupTable()->Build();
+	mainWnd->RenderAllViewer();
 }
 void ModuleWidget::slotChangeROI(double * bound)
 {
@@ -355,8 +362,8 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 
 	this->m_lineActor->SetMapper(mapper);
 
-	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor(this->m_lineActor);
-	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor2D(this->m_labelActor);
+	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
+	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
 	mainwnd->RenderAll2DViewers();
 }
 

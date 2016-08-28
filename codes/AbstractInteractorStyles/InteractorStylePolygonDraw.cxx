@@ -175,7 +175,7 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 		MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(imageViewer);
 		if (viewer != NULL) {
 			cout << "viewer" << endl;
-			m_vesselWallContourRepresentation->SetRenderer(viewer->GetannotationRenderer());
+			m_vesselWallContourRepresentation->SetRenderer(viewer->GetAnnotationRenderer());
 		}
 		else {
 			m_vesselWallContourRepresentation->SetRenderer(imageViewer->GetRenderer());
@@ -193,7 +193,7 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 		if (viewer != NULL) {
 			cout << "viewer" << endl;
 
-			m_vesselWallContourWidget->SetDefaultRenderer(viewer->GetannotationRenderer());
+			m_vesselWallContourWidget->SetDefaultRenderer(viewer->GetAnnotationRenderer());
 		}
 		else {
 			m_vesselWallContourWidget->SetDefaultRenderer(imageViewer->GetRenderer());
@@ -262,7 +262,7 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		m_lumenWallContourRepresentation = vtkOrientedGlyphContourRepresentation::New();
 		MyImageViewer* viewer2 = dynamic_cast<MyImageViewer*>(imageViewer);
 		if (viewer2 != NULL) {
-			m_lumenWallContourRepresentation->SetRenderer(viewer2->GetannotationRenderer());
+			m_lumenWallContourRepresentation->SetRenderer(viewer2->GetAnnotationRenderer());
 		}
 		else {
 			m_lumenWallContourRepresentation->SetRenderer(imageViewer->GetRenderer());
@@ -277,7 +277,7 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		m_lumenWallContourWidget->SetInteractor(this->Interactor);
 		m_lumenWallContourWidget->SetRepresentation(m_lumenWallContourRepresentation);
 		if (viewer2 != NULL) {
-			m_lumenWallContourWidget->SetDefaultRenderer(viewer2->GetannotationRenderer());
+			m_lumenWallContourWidget->SetDefaultRenderer(viewer2->GetAnnotationRenderer());
 		}
 		else {
 			m_lumenWallContourWidget->SetDefaultRenderer(imageViewer->GetRenderer());

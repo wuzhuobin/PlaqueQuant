@@ -41,7 +41,6 @@ void InteractorStyleNavigation::OnMouseMove()
 	//if (m_rightFunctioning) {
 	//	this->SynchronizedZooming();
 	//}
-	cout << m_leftFunctioning << endl;
 	if (m_leftFunctioning) {
 		this->CalculateIndex();
 		return;

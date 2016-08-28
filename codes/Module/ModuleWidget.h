@@ -55,7 +55,7 @@ public slots:
 	void slotChangeLayerNo();
 	void slotSelectROI();
 	void slotResetROI();
-	void slotChangeOpacity();
+	void slotChangeOpacity(int opactiy);
 	void slotChangeROI(double* bound);
 	//void slotAddLumen();
 	//void slotAddVesselWall();

@@ -44,6 +44,9 @@ public:
 	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i) {
 		return m_interactor[i];
 	};
+	vtkLookupTable* GetLookupTable() {
+		return this->LookupTable;
+	};
 	QString GetFileName(int);
 
 	int GetVisibleImageNo();
@@ -120,7 +123,7 @@ public slots:
 	//virtual void slotRemoveOverlay();
 	virtual void slotOverlayVisibilty(bool b);
 	virtual void slotOverlayVisibilty(bool b, int);
-    virtual void slotOverlayOpacity(double op);
+    virtual void slotOverlayOpacity(int opacity);
   
 	//Centerline
 	virtual void slotCenterline();
@@ -240,16 +243,16 @@ private:
 	const int lrnc[3] = { 0, 255, 255 };
 	const int lm[3] = { 255, 0, 255 };
 
-	
+	vtkLookupTable* LookupTable;
 /*
 
-	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
-	this->LookUpTable->SetTableValue(1, 1, 0, 0, 0.5);
-	this->LookUpTable->SetTableValue(2, 0, 0, 1, 0.9);
-	this->LookUpTable->SetTableValue(3, 0, 1, 0, 0.1);
-	this->LookUpTable->SetTableValue(4, 1, 1, 0, 0.7);
-	this->LookUpTable->SetTableValue(5, 0, 1, 1, 0.4);
-	this->LookUpTable->SetTableValue(6, 1, 0, 1, 0.5);*/
+	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
+	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.5);
+	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.9);
+	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.1);
+	this->LookupTable->SetTableValue(4, 1, 1, 0, 0.7);
+	this->LookupTable->SetTableValue(5, 0, 1, 1, 0.4);
+	this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);*/
 
 };
  
