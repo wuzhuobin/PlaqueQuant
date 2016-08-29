@@ -15,6 +15,7 @@
 #include <QDesktopServices>
 #include <QApplication>
 #include <QUrl>
+#include <QButtonGroup>
 
 #include <vtkStringArray.h>
 #include <vtkPointSetToLabelHierarchy.h>
@@ -94,6 +95,7 @@ private:
 	vtkSmartPointer<vtkIntArray>					m_sizeArray;
 	vtkSmartPointer<vtkPointSetToLabelHierarchy>	m_p2labelfilter;
 
+	QButtonGroup m_contourRadioButtonGroup;
 	
 	//QString lumen_Path, vesselWall_Path;
 };

@@ -39,6 +39,7 @@ public:
 	void EnableAutoLumenSegmentation(bool flag);
 	void SetContourFilterGenerateValues(int generateValues);
 	void GenerateLumenWallContourWidget();
+	void SetLineInterpolator(int i);
 
 protected:
 	InteractorStylePolygonDraw();
@@ -66,6 +67,7 @@ private:
 
 	int vesselWallLabel = 1;
 	int lumenWallLabel = 1;
+	vtkContourLineInterpolator* m_interpolator;
 
 	vtkContourWidget* m_vesselWallContourWidget;
 	vtkOrientedGlyphContourRepresentation* m_vesselWallContourRepresentation;

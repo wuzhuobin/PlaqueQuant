@@ -1480,6 +1480,26 @@ void MainWindow::slotSetContourFilterGenerateValues(int generateValues)
 	}
 }
 
+void MainWindow::slotSetLineInterpolatorToSmoothCurve(bool flag)
+{
+	if (flag) {
+		for (int i = 0; i < 3; i++)
+		{
+			m_style[i]->GetPolygonDraw()->SetLineInterpolator(0);
+		}
+	}
+}
+
+void MainWindow::slotSetLineInterpolatorToPolygon(bool flag)
+{
+	if (flag) {
+		for (int i = 0; i < 3; i++)
+		{
+			m_style[i]->GetPolygonDraw()->SetLineInterpolator(1);
+		}
+	}
+}
+
 void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;

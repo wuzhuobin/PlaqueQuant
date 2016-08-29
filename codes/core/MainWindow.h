@@ -122,6 +122,8 @@ public slots:
 	// Auto Lumen Segmenation 
 	virtual void slotEnableAutoLumenSegmentation(bool flag);
 	virtual void slotSetContourFilterGenerateValues(int generateValues);
+	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
+	virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
 	//Overlay
     

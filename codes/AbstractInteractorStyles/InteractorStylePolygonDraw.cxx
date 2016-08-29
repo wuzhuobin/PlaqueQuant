@@ -27,6 +27,8 @@ Copyright (C) 2016
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkMath.h>
+#include <vtkLinearContourLineInterpolator.h>
+#include <vtkBezierContourLineInterpolator.h>
 
 #include "InteractorStylePolygonDraw.h"
 #include "LumenSegmentation.h"
@@ -48,6 +50,7 @@ InteractorStylePolygonDraw::InteractorStylePolygonDraw()
 	m_lumenWallContourWidget = NULL;
 	m_vesselWallContourRepresentation = NULL;
 	m_lumenWallContourRepresentation = NULL;
+	this->m_interpolator = vtkBezierContourLineInterpolator::New();
 	vesselWallLabel = 1;
 	this->m_generateValue = 60;
 }
@@ -71,6 +74,10 @@ InteractorStylePolygonDraw::~InteractorStylePolygonDraw()
 	if (m_lumenWallContourWidget) {
 		m_lumenWallContourWidget->Delete();
 		m_lumenWallContourWidget = NULL;
+	}
+	if (m_interpolator) {
+		m_interpolator->Delete();
+		m_interpolator = NULL;
 	}
 }
 
@@ -183,7 +190,7 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 
 		m_vesselWallContourRepresentation->SetNeedToRender(true);
 		m_vesselWallContourRepresentation->GetLinesProperty()->SetColor(0, 0, 255);
-		m_vesselWallContourRepresentation->SetLineInterpolator(NULL);
+		m_vesselWallContourRepresentation->SetLineInterpolator(this->m_interpolator);
 		m_vesselWallContourRepresentation->AlwaysOnTopOn();
 		m_vesselWallContourRepresentation->BuildRepresentation();
 
@@ -269,7 +276,7 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		}
 		m_lumenWallContourRepresentation->SetNeedToRender(true);
 		m_lumenWallContourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
-		m_lumenWallContourRepresentation->SetLineInterpolator(NULL);
+		m_lumenWallContourRepresentation->SetLineInterpolator(this->m_interpolator);
 		m_lumenWallContourRepresentation->AlwaysOnTopOn();
 		m_lumenWallContourRepresentation->BuildRepresentation();
 
@@ -297,6 +304,25 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		m_lumenWallContourWidget->Initialize(ls->GetOutput());
 		m_lumenWallContourWidget->CloseLoop();
 		imageViewer->Render();
+	}
+}
+
+void InteractorStylePolygonDraw::SetLineInterpolator(int i)
+{
+	if (this->m_interpolator != NULL) {
+		this->m_interpolator->Delete();
+		this->m_interpolator = NULL;
+	}
+	switch (i)
+	{
+	case 0:
+		this->m_interpolator = vtkBezierContourLineInterpolator::New();
+		break;
+	case 1:
+		this->m_interpolator = vtkLinearContourLineInterpolator::New();
+		break;
+	default:
+		break;
 	}
 }
 

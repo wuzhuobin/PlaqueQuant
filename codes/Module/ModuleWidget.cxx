@@ -16,9 +16,10 @@
 #include <qtablewidget.h>
 
 
-ModuleWidget::ModuleWidget(QWidget *parent) : 
-    QWidget(parent),
-    ui(new Ui::ModuleWidget)
+ModuleWidget::ModuleWidget(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::ModuleWidget),
+	m_contourRadioButtonGroup(this)
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
 
@@ -71,6 +72,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->autoLumenSegmentationCheckBox->setChecked(false);
 	this->ui->lumenComboBox->setHidden(true);
 	this->ui->lumenLabel->setHidden(true);
+	this->m_contourRadioButtonGroup.addButton(this->ui->polygonRadionButton);
+	this->m_contourRadioButtonGroup.addButton(this->ui->smoothCurveRadioButton);
+	this->m_contourRadioButtonGroup.setExclusive(true);
 	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
 		ui->autoLumenSegmentationHorizontalSlider, SLOT(setValue(int)));
 	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),
@@ -81,6 +85,11 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		SLOT(slotEnableAutoLumenSegmentation(bool)));
 	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), mainWnd, 
 		SLOT(slotSetContourFilterGenerateValues(int)));
+	connect(ui->smoothCurveRadioButton, SIGNAL(toggled(bool)), mainWnd,
+		SLOT(slotSetLineInterpolatorToSmoothCurve(bool)));
+	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), mainWnd,
+		SLOT(slotSetLineInterpolatorToPolygon(bool)));
+
 
 	//setting of the ROI
 	ui->centerSpinBox1->setMaximum(9999);
