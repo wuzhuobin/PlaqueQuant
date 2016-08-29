@@ -295,7 +295,7 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		ls->SetVesselWallContourRepresentation(this->m_vesselWallContourRepresentation);
 		ls->Update();
 		m_lumenWallContourWidget->Initialize(ls->GetOutput());
-
+		m_lumenWallContourWidget->CloseLoop();
 		imageViewer->Render();
 	}
 }

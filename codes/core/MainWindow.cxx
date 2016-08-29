@@ -1474,6 +1474,9 @@ void MainWindow::slotSetContourFilterGenerateValues(int generateValues)
 	for (int i = 0; i < 3; ++i) {
 		this->m_style[i]->GetPolygonDraw()->
 			SetContourFilterGenerateValues(generateValues);
+		this->m_style[i]->GetPolygonDraw()->
+			GenerateLumenWallContourWidget();
+
 	}
 }
 

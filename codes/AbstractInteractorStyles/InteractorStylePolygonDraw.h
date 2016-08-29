@@ -38,6 +38,7 @@ public:
 	void SetLumenWallLabel(int lumenWallLabel);
 	void EnableAutoLumenSegmentation(bool flag);
 	void SetContourFilterGenerateValues(int generateValues);
+	void GenerateLumenWallContourWidget();
 
 protected:
 	InteractorStylePolygonDraw();
@@ -53,7 +54,6 @@ private:
 	bool CheckDoubleClicked();
 	void DisplayPolygon(vtkObject*, long unsigned, void*);
 	void FillPolygon();
-	void GenerateLumenWallContourWidget();
 
 
 	QTime m_timer;
