@@ -49,6 +49,7 @@ public:
 	};
 	QString GetFileName(int);
 
+	QWidget* GetModuleWidget();
 	int GetVisibleImageNo();
 	int GetImageLayerNo();
 

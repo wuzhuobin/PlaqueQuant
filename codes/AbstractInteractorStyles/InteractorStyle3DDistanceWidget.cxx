@@ -123,3 +123,7 @@ bool InteractorStyle3DDistanceWidget::CalculateIndex()
 	return true;
 }
 
+void InteractorStyle3DDistanceWidget::UpdateStenosisValue()
+{
+}
+
