@@ -215,9 +215,9 @@ MainWindow::MainWindow()
 	this->LookupTable->SetNumberOfTableValues(7);
 	this->LookupTable->SetTableRange(0.0, 6);
 	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
-	this->LookupTable->SetTableValue(1, 1, 0, 0, 1);
-	this->LookupTable->SetTableValue(2, 0, 0, 1, 1);
-	this->LookupTable->SetTableValue(3, 0, 1, 0, 1);
+	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.2);
+	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.05);
+	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.05);
 	this->LookupTable->SetTableValue(4, 1, 1, 0, 1);
 	this->LookupTable->SetTableValue(5, 0, 1, 1, 1);
 	this->LookupTable->SetTableValue(6, 1, 0, 1, 1);
@@ -880,6 +880,7 @@ void MainWindow::slotSelectROI()
 	for (int i = 0; i < 3; i++)
 	{
 		this->m_2DimageViewer[i]->SetBound(m_style[i]->GetROI()->GetPlaneWidget()->GetCurrentBound());
+		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 	}
 
 	ui->actionMultiPlanarView->trigger();
@@ -949,8 +950,15 @@ void MainWindow::slot3DUpdate()
 	surfaceCreator->Update();
 
 	Centerline* cl = new Centerline;
-	cl->SetSurface(surfaceCreator->GetOutput());
-	cl->Update();
+	try {
+		cl->SetSurface(surfaceCreator->GetOutput());
+		cl->Update();
+	}
+	catch (Centerline::ERROR_CODE e) {
+		cerr << "Error during centerline creation!";
+		return;
+	}
+
 
 	if (m_centerlinePD != NULL) {
 		this->m_centerlinePD->Delete();
@@ -961,18 +969,18 @@ void MainWindow::slot3DUpdate()
 
 	delete cl;
 
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(surfaceCreator->GetOutput());
-	mapper->SetLookupTable(this->LookupTable);
-	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	mapper->Update();
-	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
-	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	Actor->SetMapper(mapper);
-	Actor->GetProperty()->SetOpacity(0.9);
-	Actor->GetProperty()->SetRepresentationToSurface();
-	Actor->SetPickable(1);
-	this->m_3DDataRenderer->AddActor(Actor);
+	//vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//mapper->SetInputData(surfaceCreator->GetOutput());
+	//mapper->SetLookupTable(this->LookupTable);
+	//mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	//mapper->Update();
+	//vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
+	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	//Actor->SetMapper(mapper);
+	//Actor->GetProperty()->SetOpacity(0.9);
+	//Actor->GetProperty()->SetRepresentationToSurface();
+	//Actor->SetPickable(1);
+	//this->m_3DDataRenderer->AddActor(Actor);
 
 	///Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
@@ -1290,6 +1298,11 @@ vtkRenderWindow * MainWindow::GetRenderWindow(int i)
 	return nullptr;
 }
 
+MyImageViewer * MainWindow::GetMyImageViewer(int i)
+{
+	return m_2DimageViewer[i];
+}
+
 QString MainWindow::GetFileName(int i)
 {
     
@@ -1322,11 +1335,6 @@ ImageType::Pointer MainWindow::ImageAlignment(ImageType::Pointer inputImage)
 
 	 outputImage = imageReg->GetOutput();
 	 return outputImage;
-}
-
-QWidget * MainWindow::GetModuleWidget()
-{
-	return this->m_moduleWidget;
 }
 
 int MainWindow::GetVisibleImageNo()
@@ -1617,6 +1625,11 @@ void MainWindow::RenderAll2DViewers()
 	}
 }
 
+void MainWindow::UpdateStenosisValue(double val)
+{
+	this->m_moduleWidget->UpdateStenosisValue(val);
+}
+
 void MainWindow::SetImageLayerNo(int layer)
 {
 	m_layer_no = layer;
@@ -1634,12 +1647,38 @@ int MainWindow::GetImageLayerNo()
 	return m_layer_no;
 }
 
+vtkImageData ** MainWindow::GetImageData()
+{
+	return this->vtkImage;
+}
+
+InteractorStyleSwitch * MainWindow::GetInteractorStyleImageSwitch(int i)
+{
+	return m_style[i];
+}
+
+vtkRenderWindowInteractor * MainWindow::GetVtkRenderWindowInteractor(int i)
+{
+	return m_interactor[i];
+}
+
+vtkLookupTable * MainWindow::GetLookupTable()
+{
+	return this->LookupTable;
+}
+
+
 Overlay* MainWindow::GetOverlay()
 {
 	if (SegmentationOverlay)
 		return SegmentationOverlay;
 	else
 		return NULL;
+}
+
+vtkPolyData * MainWindow::GetCenterlinePD()
+{
+	return this->m_centerlinePD;
 }
 
 Ui_MainWindow * MainWindow::GetUI()

@@ -32,41 +32,32 @@ class MainWindow: public QMainWindow
 public:
 	explicit MainWindow(); 	
 	~MainWindow();
-
 	static MainWindow* GetMainWindow();
+
+	// Get Functions
 	vtkRenderWindow* GetRenderWindow(int i);
-	MyImageViewer* GetMyImageViewer(int i) {
-		return m_2DimageViewer[i]; 
-	};
-	InteractorStyleSwitch* GetInteractorStyleImageSwitch(int i) {
-		return m_style[i];
-	};
-	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i) {
-		return m_interactor[i];
-	};
-	vtkLookupTable* GetLookupTable() {
-		return this->LookupTable;
-	};
-	QString GetFileName(int);
+	MyImageViewer* GetMyImageViewer(int i);
+	InteractorStyleSwitch* GetInteractorStyleImageSwitch(int i);
+	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i);
+	vtkLookupTable* GetLookupTable();
 
-	QWidget* GetModuleWidget();
-	int GetVisibleImageNo();
-	int GetImageLayerNo();
+	Overlay*			GetOverlay();
+	QString				GetFileName(int);
+	int					GetVisibleImageNo();
+	int					GetImageLayerNo();
+	vtkImageData**		GetImageData();
+	vtkPolyData*		GetCenterlinePD();
+	Ui_MainWindow* GetUI();
 
-	void RenderAllViewer();
-	void RenderAll2DViewers();
+	// Set functions
 	void Set3DRulerEnabled(bool b);
 	void SetImageLayerNo(int);
 
-	Overlay*			GetOverlay();
-	vtkImageData**		GetImageData() {
-		return this->vtkImage;
-	}
-	vtkPolyData*		GetCenterlinePD() {
-		return this->m_centerlinePD;
-	}
+	// Ui Updates
+	void RenderAllViewer();
+	void RenderAll2DViewers();
+	void UpdateStenosisValue(double val);
 
-	Ui_MainWindow* GetUI();
 	
 	enum SLICE_ORIENTATION
   {

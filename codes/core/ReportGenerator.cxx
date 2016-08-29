@@ -1,10 +1,10 @@
-#include "ReportGenerator.h"
 #include <stdio.h>
 #include <process.h>
 #include <QDebug>
 #include <QHeaderView>
 #include <QPainter>
 #include <QTextCursor>
+#include "ReportGenerator.h"
 
 
 char* SpanText(char* text, char* style) {

@@ -34,6 +34,10 @@ public:
 	vtkPolyData* GetCenterline();
 	void GetLookupTable(vtkLookupTable* LUT);
 
+	enum ERROR_CODE {
+		ERROR_SURFACE_CAPPED = 1
+	};
+
 private:
 	vtkSmartPointer<vtkPolyData>			m_surface;
 	vtkSmartPointer<vtkPolyData>			m_centerline;

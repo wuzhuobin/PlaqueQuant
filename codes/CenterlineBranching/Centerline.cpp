@@ -25,6 +25,11 @@ void Centerline::SetSurface(vtkPolyData* surface)
 	vtkSmartPointer<vtkIdList> CapCenterIds = vtkSmartPointer<vtkIdList>::New();
 	this->CapSurface(surface, m_cappedSurface, CapCenterIds);
 
+	// if no points are returned
+	if (CapCenterIds->GetNumberOfIds() < 1) {
+		throw ERROR_SURFACE_CAPPED;
+	}
+
 	vtkSmartPointer<vtkIdList> sourceIds = vtkSmartPointer<vtkIdList>::New();
 	sourceIds->SetNumberOfIds(1);
 	sourceIds->SetId(0, CapCenterIds->GetId(0));

@@ -42,7 +42,7 @@ private:
 
 	QTime m_clickTimer;
 	std::vector<Distance3DWidget*> m_distanceWidgetList;
-	std::vector<double*> m_coords;
+	std::vector<int> m_ids;
 	std::vector<vtkActor*> m_ABActors;
 };
 

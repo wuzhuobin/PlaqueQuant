@@ -43,6 +43,7 @@ public:
 
 	void SetVisibleImageNo(int);
 	void SetPage(int);
+	void UpdateStenosisValue(double);
 	//QString GetLumenPath();
 	//QString GetVesselWallPath();
 

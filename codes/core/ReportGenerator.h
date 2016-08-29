@@ -2,7 +2,7 @@
 #define REPORTGENERATOR_H
 
 #include <QDateTime>
-#include "QPrinter.h"
+#include <QPrinter.h>
 #include <QTableWidget>
 #include <QTextDocument>
 #include <QTextEdit>

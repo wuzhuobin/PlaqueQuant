@@ -142,6 +142,10 @@ void ModuleWidget::SetPage(int index)
 	ui->stackedWidget->setCurrentIndex(index);
 	GenerateReportPushButtonVisible();
 }
+void ModuleWidget::UpdateStenosisValue(double val)
+{
+	ui->stenosisSpinBox->setValue(val * 100);
+}
 void ModuleWidget::SetBrushSize()
 {
 	ui->BrushSizeSpinBox->setValue((ui->BrushSizeSlider->value()));
@@ -430,7 +434,7 @@ void ModuleWidget::GenerateReport()
 	QString MRISide = "R";
 	QString DoctorName = "Dr. Lau";
 	//Stenosis Measurement
-	QString StenosisPercent = this->ui->spinBox_2->text();
+	QString StenosisPercent = this->ui->stenosisSpinBox->text();
 	//2D Measurement
 	QString LumenArea = this->ui->measurement2DTableWidget->item(0, 0)->text();
 	QString VesselWallArea = this->ui->measurement2DTableWidget->item(1, 0)->text();
