@@ -82,7 +82,13 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), mainWnd, 
 		SLOT(slotSetContourFilterGenerateValues(int)));
 
-
+	//setting of the ROI
+	ui->centerSpinBox1->setMaximum(9999);
+	ui->centerSpinBox2->setMaximum(9999);
+	ui->centerSpinBox3->setMaximum(9999);
+	ui->sizeSpinBox1->setMaximum(9999);
+	ui->sizeSpinBox2->setMaximum(9999);
+	ui->sizeSpinBox3->setMaximum(9999);
 
 	//connect
 	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
@@ -186,7 +192,7 @@ void ModuleWidget::slotChangeOpacity(int opacity)
 	mainWnd->GetLookupTable()->Build();
 	mainWnd->RenderAllViewer();
 }
-void ModuleWidget::slotChangeROI(double * bound)
+void ModuleWidget::slotChangeROI(int * bound)
 {
 	ui->centerSpinBox1->setValue((bound[0] + bound[1])*0.5);
 	ui->centerSpinBox2->setValue((bound[2] + bound[3])*0.5);

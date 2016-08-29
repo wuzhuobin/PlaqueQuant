@@ -606,12 +606,13 @@ bool MainWindow::visualizeImage()
 	//}
 	//Update UI stuff
     //Assume the four images have equal number of slices
-	ui->xSpinBox->setMaximum(m_2DimageViewer[0]->GetInput()->GetDimensions()[0]);
-	ui->ySpinBox->setMaximum(m_2DimageViewer[1]->GetInput()->GetDimensions()[1]);
-	ui->zSpinBox->setMaximum(m_2DimageViewer[2]->GetInput()->GetDimensions()[2]);
-	ui->xSpinBox->setValue(m_2DimageViewer[0]->GetSlice());
-	ui->ySpinBox->setValue(m_2DimageViewer[1]->GetSlice());
-	ui->zSpinBox->setValue(m_2DimageViewer[2]->GetSlice());
+	QSpinBox* spinBoxes[3] = {ui->xSpinBox, ui->ySpinBox, ui->zSpinBox};
+	const int* extent = vtkImage[0]->GetExtent();
+	for (int i = 0; i < 3; ++i) {
+		spinBoxes[i]->setMinimum(extent[i * 2]);
+		spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
+		spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
+	}
 	ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
 	ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
 
@@ -842,10 +843,11 @@ void MainWindow::slotROIMode()
 	this->slotRuler(false);
 }
 
-void MainWindow::slotChangeROI(double * bound)
+void MainWindow::slotChangeROI()
 {
-	//m_moduleWidget->slotChangeROI(bound);
-	//for (int i = 0; i < 6; ++i)
+	int extent[6];
+	m_style[0]->GetROI()->SelectROI(extent);
+	m_moduleWidget->slotChangeROI(extent);
 }
 
 void MainWindow::slotSelectROI()
@@ -1396,10 +1398,6 @@ void MainWindow::slotMultiPlanarView()
 		// Change input to same image, default 0
 		m_2DimageViewer[i]->SetInputData(vtkImage[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
-		if (!this->INITIALIZED_FLAG) {
-			const int* extent = m_2DimageViewer[i]->GetInput()->GetExtent();
-			m_2DimageViewer[i]->SetSlice((extent[2 * i + 1] - extent[2 * i])*0.5);
-		}
 		m_2DimageViewer[i]->Render();
 		// initialize stuff
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);

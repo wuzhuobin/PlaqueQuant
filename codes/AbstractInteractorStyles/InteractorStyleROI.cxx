@@ -134,7 +134,6 @@ void InteractorStyleROI::UpdateAllWidget()
 {
 	double* bound = planeWidget->GetCurrentBound();
 	UpdateAllWidget(bound);
-
 }
 
 void InteractorStyleROI::UpdateAllWidget(double * bound)

@@ -145,7 +145,7 @@ public slots:
 
 	//Widget
 	virtual void slotRuler(bool b);
-	virtual void slotChangeROI(double* bound);
+	virtual void slotChangeROI();
 	virtual void slotSelectROI();
 	virtual void slotResetROI();
 

@@ -189,15 +189,13 @@ void Overlay::Initialize(vtkImageData * img)
 	//m_vtkOverlay->SetOrigin(img->GetOrigin());
 	////cout << img->GetScalarTypeAsString() << endl;
 	//m_vtkOverlay->AllocateScalars(VTK_DOUBLE, img->GetNumberOfScalarComponents());
-	int dim[3];
-	m_vtkOverlay->GetDimensions(dim);
+	const int* extent = m_vtkOverlay->GetExtent();
 
-
-	for (int i = 0; i < dim[0]; i++)
+	for (int i = extent[0]; i <= extent[1]; i++)
 	{
-		for (int j = 0; j < dim[1]; j++)
+		for (int j = extent[2]; j <= extent[3]; j++)
 		{
-			for (int k = 0; k < dim[2]; k++)
+			for (int k = extent[4]; k <= extent[5]; k++)
 			{
 				double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
 				*pixel = 0;
