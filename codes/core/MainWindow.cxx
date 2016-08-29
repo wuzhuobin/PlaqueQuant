@@ -1023,6 +1023,9 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 
+	// Update the display extent
+	this->SegmentationOverlay->GetDisplayExtent(this->m_boundingExtent);
+
 	// Clamp the index to within the extent
 	for (int i = 0; i < 3; i++)
 	{
