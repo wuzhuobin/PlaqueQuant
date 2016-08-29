@@ -4,6 +4,10 @@
 #include <vtkDistanceWidget.h>
 #include <vtkDistanceRepresentation2D.h>
 #include <vtkCellArray.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+#include <vtkImageResize.h>
+
 #include "MaximumWallThickness.h"
 #include "MeasurementFor2D.h"
 #include "ModuleWidget.h"
@@ -421,6 +425,7 @@ void ModuleWidget::InternalUpdate()
 
 void ModuleWidget::GenerateReport()
 {
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	//General 
 	//Basic Information to fill
 	QFileInfo fileInfo("./report.pdf");
@@ -445,18 +450,42 @@ void ModuleWidget::GenerateReport()
 	QString WallVolume = this->ui->measurement3DTableWidget->item(2, 0)->text();
 	QString PlaqueVolume = this->ui->measurement3DTableWidget->item(0, 0)->text();
 	//Plaque Composition
-
 	double plaqueVolumeNum = this->ui->measurement3DTableWidget->item(0, 0)->data(Qt::DisplayRole).toDouble();
 	double calcificationNum = this->ui->measurement3DTableWidget->item(3, 0)->data(Qt::DisplayRole).toDouble();
 	double hemorrhageNum = this->ui->measurement3DTableWidget->item(4, 0)->data(Qt::DisplayRole).toDouble();
 	double LRNCNum = this->ui->measurement3DTableWidget->item(5, 0)->data(Qt::DisplayRole).toDouble();
-
 	QString Calcification = this->ui->measurement3DTableWidget->item(3, 0)->text();
 	QString CalcificationPercent = QString::number(calcificationNum/plaqueVolumeNum) + "%";
 	QString Hemorrhage = this->ui->measurement3DTableWidget->item(4, 0)->text();
 	QString HemorrhagePercent = QString::number(hemorrhageNum/plaqueVolumeNum) + "%";
 	QString LRNC = this->ui->measurement3DTableWidget->item(5, 0)->text();
 	QString LRNCPercent = QString::number(LRNCNum/ plaqueVolumeNum) + "%";
+	// Screen Shot
+	QString _2dResult = "./2dResult.png";
+	QString _3dResult = "./3dResult.png";
+	// Filter connecting
+	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter =
+		vtkSmartPointer<vtkWindowToImageFilter>::New();
+	windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+	windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
+	vtkSmartPointer<vtkImageResize> imageResizeFilter =
+		vtkSmartPointer<vtkImageResize>::New();
+	imageResizeFilter->SetInputConnection(windowToImageFilter->GetOutputPort());
+	imageResizeFilter->SetOutputDimensions(350, 350, 1);
+	vtkSmartPointer<vtkPNGWriter> writer =
+		vtkSmartPointer<vtkPNGWriter>::New();
+	writer->SetInputConnection(imageResizeFilter->GetOutputPort());
+	
+	// 2d
+	windowToImageFilter->SetInput(mainWnd->GetRenderWindow(3));
+	writer->SetFileName(_2dResult.toStdString().c_str());
+	writer->Update();
+	writer->Write();
+	//3d
+	windowToImageFilter->SetInput(mainWnd->GetRenderWindow(4));
+	writer->SetFileName(_3dResult.toStdString().c_str());
+	writer->Update();
+	writer->Write();
 
 	ReportGenerator* reportGenerator = new ReportGenerator;
 	reportGenerator->SetDirectory(fileInfo.absoluteFilePath());
@@ -563,8 +592,8 @@ void ModuleWidget::GenerateReport()
 
 	//Figure
 
-	reportGenerator->AddFigure(0, "2D result", "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/2dresult.png");
-	reportGenerator->AddFigure(1, "3D result", "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/3dresult.png");
+	reportGenerator->AddFigure(0, "2D result", _2dResult);
+	reportGenerator->AddFigure(1, "3D result", _3dResult);
 	reportGenerator->AddTable(5, "Images", QStringList(), QStringList(), 10, 4);
 	reportGenerator->SetTableSize(5, 680, 350);
 	reportGenerator->SetTableItemRowSpan(5, 1, 0, 9);
