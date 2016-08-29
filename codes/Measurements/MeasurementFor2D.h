@@ -12,6 +12,7 @@ public:
 	vtkTypeMacro(MeasurementFor2D, vtkObject);
 	static MeasurementFor2D* New();
 
+
 	struct Measurements2D 
 	{
 		double LumenArea;
@@ -19,6 +20,7 @@ public:
 		double NMI;
 		double MaximumWallThickness;
 	};
+
 
 	Measurements2D GetOutput(int);
 	void SetSliceImage(vtkImageData* );
@@ -51,8 +53,6 @@ private:
 
 	std::vector<CoordIndex> m_countedList;
 	std::vector<Measurements2D> m_outputList;
-
-	
 };
 
 

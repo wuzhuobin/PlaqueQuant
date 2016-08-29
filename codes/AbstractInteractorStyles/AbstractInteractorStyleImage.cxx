@@ -154,18 +154,20 @@ void AbstractInteractorStyleImage::MoveSliceForward()
 	if (m_slice < m_maxSlice)
 	{
 		m_slice += 1;
-		switch (orientation)
-		{
-		case 0:
-			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
-			break;
-		case 1:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_slice, m_sliceSplinBox[2]->value());
-			break;
-		case 2:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_sliceSplinBox[1]->value(), m_slice);
-			break;
-		}
+		this->imageViewer->SetSlice(m_slice);
+		mainWnd->slotUpdateSlice();
+	//	switch (orientation)
+	//	{
+	//	case 0:
+	//		mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
+	//		break;
+	//	case 1:
+	//		mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_slice, m_sliceSplinBox[2]->value());
+	//		break;
+	//	case 2:
+	//		mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_sliceSplinBox[1]->value(), m_slice);
+	//		break;
+	//	}
 
 	}
 }
@@ -176,18 +178,20 @@ void AbstractInteractorStyleImage::MoveSliceBackward()
 	if (m_slice > m_minSlice)
 	{
 		m_slice -= 1;
-		switch (orientation)
-		{
-		case 0:
-			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
-			break;
-		case 1:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_slice, m_sliceSplinBox[2]->value());
-			break;
-		case 2:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_sliceSplinBox[1]->value(), m_slice);
-			break;
-		}
+		this->imageViewer->SetSlice(m_slice);
+		mainWnd->slotUpdateSlice();
+	//	switch (orientation)
+	//	{
+	//	case 0:
+	//		mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
+	//		break;
+	//	case 1:
+	//		mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_slice, m_sliceSplinBox[2]->value());
+	//		break;
+	//	case 2:
+	//		mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_sliceSplinBox[1]->value(), m_slice);
+	//		break;
+	//	}
 
 	}
 }

@@ -55,7 +55,7 @@ public slots:
 	void slotChangeLayerNo();
 	void slotSelectROI();
 	void slotResetROI();
-	void slotChangeOpacity();
+	void slotChangeOpacity(int opactiy);
 	void slotChangeROI(double* bound);
 	//void slotAddLumen();
 	//void slotAddVesselWall();
@@ -67,6 +67,7 @@ public slots:
 	void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
 	void slotUpdate2DMeasurements();
 	void slotCalculateMaximumWallThickness();
+	void slotEnableAutoLumenSegmentation(bool flag);
 
 	virtual void slotUpdateTableWidget();
 

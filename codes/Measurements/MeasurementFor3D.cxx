@@ -1,6 +1,7 @@
 #include "MeasurementFor3D.h"
 
-
+#include <vtkImageAccumulate.h>
+#include <vtkSmartPointer.h>
 
 MeasurementFor3D::MeasurementFor3D()
 {
@@ -48,15 +49,31 @@ void MeasurementFor3D::Update()
 		numberOfPixels[i] = 0;
 	}
 	// iterate an overlay to calculate the number of pixels
-	for (int i = extent[0]; i < extent[1]; ++i) {
-		for (int j = extent[2]; j < extent[3]; ++j) {
-			for (int k = extent[4]; k < extent[5]; ++k) {
-				double* val = static_cast<double*>(overlay->GetScalarPointer(i, j, k));
-				numberOfPixels[int(*val)]++;
-			}
-		}
-		
+	//for (int i = extent[0]; i < extent[1]; ++i) {
+	//	for (int j = extent[2]; j < extent[3]; ++j) {
+	//		for (int k = extent[4]; k < extent[5]; ++k) {
+	//			double* val = static_cast<double*>(overlay->GetScalarPointer(i, j, k));
+	//			numberOfPixels[int(*val)]++;
+	//		}
+	//	}
+	//	
+	//}
+	// using vtkImageAccumulate instead of for loop 
+	vtkSmartPointer<vtkImageAccumulate> imageAccumulate =
+		vtkSmartPointer<vtkImageAccumulate>::New();
+	imageAccumulate->SetInputData(overlay);
+	imageAccumulate->SetComponentExtent(0, num-1, 0, 0, 0, 0); // #LookupTable
+	imageAccumulate->SetComponentOrigin(0, 0, 0);
+	imageAccumulate->SetComponentSpacing(1, 0, 0);
+	imageAccumulate->Update();
+	cerr << "numberOfPixels" << endl;
+	for (int i = 0; i < num - 1; ++i) {
+		numberOfPixels[i] = *static_cast<int*>(
+			imageAccumulate->GetOutput()->GetScalarPointer(i, 0, 0));
+		cerr << numberOfPixels[i];
 	}
+
+
 	volumes[0] = 0;
 	for (int index = 1; index < num; ++index) {
 		volumes[index] = numberOfPixels[index] * pixelSize;

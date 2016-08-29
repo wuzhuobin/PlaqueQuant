@@ -50,6 +50,10 @@ MainWindow::MainWindow()
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
 	
+	//Initialize
+	initializeModule();
+	setActionsEnable(false);
+
 	this->setWindowTitle("PlaqueQuant");
 	
 	// Set up action signals and slots
@@ -120,6 +124,7 @@ MainWindow::MainWindow()
 
 	//3D view
 	connect(ui->updateBtn, SIGNAL(clicked()), this, SLOT(slot3DUpdate()));
+	connect(ui->updateBtn, SIGNAL(clicked()), this, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 
 	//Initial Segmentation window
@@ -146,9 +151,7 @@ MainWindow::MainWindow()
 	//Initial Visible image number
 	visibleImageNum = 0;
     
-	//Initialize
-	initializeModule();
-	setActionsEnable(false);
+
     
     
 	//Parameter
@@ -206,7 +209,19 @@ MainWindow::MainWindow()
 	overlayColor[3] = hemorrhage;
 	overlayColor[4] = lrnc;
 	overlayColor[5] = lm;
-
+	
+	// #LookupTable
+	this->LookupTable = vtkLookupTable::New();
+	this->LookupTable->SetNumberOfTableValues(7);
+	this->LookupTable->SetTableRange(0.0, 6);
+	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
+	this->LookupTable->SetTableValue(1, 1, 0, 0, 1);
+	this->LookupTable->SetTableValue(2, 0, 0, 1, 1);
+	this->LookupTable->SetTableValue(3, 0, 1, 0, 1);
+	this->LookupTable->SetTableValue(4, 1, 1, 0, 1);
+	this->LookupTable->SetTableValue(5, 0, 1, 1, 1);
+	this->LookupTable->SetTableValue(6, 1, 0, 1, 1);
+	this->LookupTable->Build();
 
 	//distanceWidget3D
 	m_distance3DWidget = Distance3DWidget::New();
@@ -285,6 +300,10 @@ MainWindow::~MainWindow()
 		//delete distance3DWidget;
 		//distance3DWidget->Delete();
 	}
+	if (this->LookupTable != NULL) {
+		this->LookupTable->Delete();
+		this->LookupTable = NULL;
+	}
 }
 
 void MainWindow::initializeModule()
@@ -336,8 +355,9 @@ void MainWindow::addOverlay2ImageViewer()
 		{
 			if (segmentationView && i >= visibleImageNum)
 				break;
+			m_2DimageViewer[i]->SetLookupTable(this->LookupTable);
 			m_2DimageViewer[i]->SetInputDataLayer(SegmentationOverlay->GetOutput());
-			m_2DimageViewer[i]->GetannotationRenderer()->AddViewProp(this->m_2DimageViewer[i]->GetdrawActor());
+			m_2DimageViewer[i]->GetAnnotationRenderer()->AddViewProp(this->m_2DimageViewer[i]->GetdrawActor());
 		}
 
 	}
@@ -386,9 +406,8 @@ void MainWindow::slotExit()
 void MainWindow::slotOpenImage(QString dir)
 {
 	RegistrationWizard wizard(this,dir);
-	int isFinished = wizard.exec();
 
-	if (isFinished == QWizard::Rejected )
+	if (wizard.exec() == QWizard::Rejected )
 		return;
 
 	//Update Recent Image
@@ -409,16 +428,21 @@ void MainWindow::slotOpenImage(QString dir)
 	visualizeImage();
 
 	// initialize image select function 
-	for (int i = 0; i < visibleImageNum; i++)
+	ChangeBaseImageULMenu.clear();
+	ChangeBaseImageURMenu.clear();
+	ChangeBaseImageLLMenu.clear();
+	for (int i = 0; i < 5; i++)
 	{
-		QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
-		act1->setData(i);
+		if (vtkImage[i] != NULL) {
+			QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
+			act1->setData(i);
 
-		QAction* act2 = ChangeBaseImageURMenu.addAction(this->GetFileName(i));
-		act2->setData(i + 10);
+			QAction* act2 = ChangeBaseImageURMenu.addAction(this->GetFileName(i));
+			act2->setData(i + 10);
 
-		QAction* act3 = ChangeBaseImageLLMenu.addAction(this->GetFileName(i));
-		act3->setData(i + 20);
+			QAction* act3 = ChangeBaseImageLLMenu.addAction(this->GetFileName(i));
+			act3->setData(i + 20);
+		}
 	}
 	ui->ULSelectImgBtn->setMenu(&ChangeBaseImageULMenu);
 	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotSelectImageSeq(QAction*)));
@@ -939,7 +963,7 @@ void MainWindow::slot3DUpdate()
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	mapper->SetInputData(surfaceCreator->GetOutput());
-	mapper->SetLookupTable(this->m_2DimageViewer[0]->getLookupTable());
+	mapper->SetLookupTable(this->LookupTable);
 	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
 	mapper->Update();
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
@@ -960,6 +984,7 @@ void MainWindow::slot3DUpdate()
 	volumeRenderingFilter->Update();
 
 	this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
+
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3,0.3,0.3);
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui->image4View->GetRenderWindow()->Render();
@@ -976,26 +1001,27 @@ void MainWindow::slot3DUpdate()
 	interacotr->Start();*/
 }
 
-void MainWindow::slotChangeIntensity()
-{
-	double intensity[3];
-	for (int i = 0; i < 3; ++i) {
-		if (segmentationView && i >= visibleImageNum)
-			break;
-		intensity[i] = m_2DimageViewer[i]->GetInput()->GetScalarComponentAsDouble(
-			ui->xSpinBox->value(), ui->ySpinBox->value(), ui->zSpinBox->value(), 0
-		);
-		m_2DimageViewer[i]->InitializeIntensityText(QString::number(intensity[i]));
-		m_2DimageViewer[i]->Render();
-	}
-}
+
+//void MainWindow::slotChangeIntensity()
+//{
+//	double intensity[3];
+//	for (int i = 0; i < 3; ++i) {
+//		if (segmentationView && i >= visibleImageNum)
+//			break;
+//		intensity[i] = m_2DimageViewer[i]->GetInput()->GetScalarComponentAsDouble(
+//			ui->xSpinBox->value(), ui->ySpinBox->value(), ui->zSpinBox->value(), 0
+//		);
+//		m_2DimageViewer[i]->InitializeIntensityText(QString::number(intensity[i]));
+//		m_2DimageViewer[i]->Render();
+//	}
+//}
 
 
 void MainWindow::slotChangeSlice(int x, int y, int z)
 {
-	disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+	//disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+	//disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+	//disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 
 	// Clamp the index to within the extent
 	for (int i = 0; i < 3; i++)
@@ -1017,12 +1043,44 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 			break;
 		}
 	}
+	if (ui->xSpinBox->value() != x) {
+		ui->xSpinBox->setValue(x);
+	}
+	if (ui->ySpinBox->value() != y) {
+		ui->ySpinBox->setValue(y);
+	}
+	if (ui->zSpinBox->value() != z) {
+		ui->zSpinBox->setValue(z);
+	}
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
+	//this->slotChangeSlice();
+}
 
-	ui->xSpinBox->setValue(x);
-	ui->ySpinBox->setValue(y);
-	ui->zSpinBox->setValue(z);
-
-	this->slotChangeSlice();
+void MainWindow::slotUpdateSlice()
+{
+	if (segmentationView) {
+		for (int i = 0; i < visibleImageNum; ++i) {
+			if (m_2DimageViewer[i]->GetSlice() != ui->xSpinBox->value()) {
+				ui->xSpinBox->setValue(m_2DimageViewer[i]->GetSlice());
+			}
+		}
+	}
+	else {
+		if (m_2DimageViewer[0]->GetSlice() != ui->xSpinBox->value()) {
+			ui->xSpinBox->setValue(m_2DimageViewer[0]->GetSlice());
+		}
+		if (m_2DimageViewer[1]->GetSlice() != ui->ySpinBox->value()) {
+			ui->ySpinBox->setValue(m_2DimageViewer[1]->GetSlice());
+		}
+		if (m_2DimageViewer[2]->GetSlice() != ui->zSpinBox->value()) {
+			ui->zSpinBox->setValue(m_2DimageViewer[2]->GetSlice());
+		}
+	}
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
 }
 
 void MainWindow::slotChangeSlice()
@@ -1030,68 +1088,95 @@ void MainWindow::slotChangeSlice()
 	//Force update UI (QSpinBox) 
 	//Cause problem if the cursor move too fast
 	//QCoreApplication::processEvents();
-
-	if(segmentationView == true)
-	{
-
-		for (int i = 0; i < (3 < visibleImageNum ? 3 : visibleImageNum); i++) {
-			if (m_orientation == 0) {
+	if (segmentationView) {
+		for (int i = 0; i < visibleImageNum; ++i) {
+			if (m_2DimageViewer[i]->GetSlice() != ui->xSpinBox->value()) {
 				m_2DimageViewer[i]->SetSlice(ui->xSpinBox->value());
-				m_style[i]->SetCurrentSlice(ui->xSpinBox->value());
 			}
-			if (m_orientation == 1) {
-				m_2DimageViewer[i]->SetSlice(ui->ySpinBox->value());
-				m_style[i]->SetCurrentSlice(ui->ySpinBox->value());
-			}
-			if (m_orientation == 2) {
-				m_2DimageViewer[i]->SetSlice(ui->zSpinBox->value());
-				m_style[i]->SetCurrentSlice(ui->zSpinBox->value());
-			}
+			m_2DimageViewer[i]->SetFocalPointWithImageCoordinate(ui->xSpinBox->value(),
+				ui->ySpinBox->value(), ui->zSpinBox->value());
 		}
+	}
+	else {
+		if (m_2DimageViewer[0]->GetSlice() != ui->xSpinBox->value()) {
+			m_2DimageViewer[0]->SetSlice(ui->xSpinBox->value());
+		}
+		if (m_2DimageViewer[1]->GetSlice() != ui->ySpinBox->value()) {
+			m_2DimageViewer[1]->SetSlice(ui->ySpinBox->value());
+		}
+		if (m_2DimageViewer[2]->GetSlice() != ui->zSpinBox->value()) {
+			m_2DimageViewer[2]->SetSlice(ui->zSpinBox->value());
+		}
+		for (int i = 0; i < 3; ++i) {
+			m_2DimageViewer[i]->SetFocalPointWithImageCoordinate(ui->xSpinBox->value(),
+				ui->ySpinBox->value(), ui->zSpinBox->value());
+		}
+	}
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
 
-	//Calculate the cursor focal point
-    
-    m_focalPoint[0] = m_2DimageViewer[0]->GetInput()->GetOrigin()[0] + ui->xSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[0];
-    m_focalPoint[1] = m_2DimageViewer[0]->GetInput()->GetOrigin()[1] + ui->ySpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[1];
-    m_focalPoint[2] = m_2DimageViewer[0]->GetInput()->GetOrigin()[2] + ui->zSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[2];
-   
-	
-	for (int i=0; i<(3<visibleImageNum ? 3 : visibleImageNum); i++)
-	{
-		//Update the Cursor Position
-        m_2DimageViewer[i]->SetFocalPoint(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
-		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		m_2DimageViewer[i]->Render();
-	}
-    slotChangeIntensity();
-	}
-	else
-	{
-            m_2DimageViewer[0]->SetSlice(ui->xSpinBox->value());
-            m_style[0]->SetCurrentSlice(ui->xSpinBox->value());
-            m_2DimageViewer[1]->SetSlice(ui->ySpinBox->value());
-            m_style[1]->SetCurrentSlice(ui->ySpinBox->value());
-            m_2DimageViewer[2]->SetSlice(ui->zSpinBox->value());
-            m_style[2]->SetCurrentSlice(ui->zSpinBox->value());
-	
-	for (int i=0;i<3;i++)
-	{
-		m_focalPoint[i] = m_2DimageViewer[i]->GetInput()->GetOrigin()[i] + m_2DimageViewer[i]->GetSlice() * m_2DimageViewer[i]->GetInput()->GetSpacing()[i];
-	}
-	slotChangeIntensity();
-	for (int i=0; i<3; i++)
-	{
-		//Update the Cursor Position
-        m_2DimageViewer[i]->SetFocalPoint(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
-		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		m_2DimageViewer[i]->Render();
-	}
-	}
+	//if(segmentationView == true)
+	//{
 
-	//Connect back the spinbox
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//	for (int i = 0; i < (3 < visibleImageNum ? 3 : visibleImageNum); i++) {
+	//		if (m_orientation == 0) {
+	//			m_2DimageViewer[i]->SetSlice(ui->xSpinBox->value());
+	//			m_style[i]->SetCurrentSlice(ui->xSpinBox->value());
+	//		}
+	//		if (m_orientation == 1) {
+	//			m_2DimageViewer[i]->SetSlice(ui->ySpinBox->value());
+	//			m_style[i]->SetCurrentSlice(ui->ySpinBox->value());
+	//		}
+	//		if (m_orientation == 2) {
+	//			m_2DimageViewer[i]->SetSlice(ui->zSpinBox->value());
+	//			m_style[i]->SetCurrentSlice(ui->zSpinBox->value());
+	//		}
+	//	}
+
+	////Calculate the cursor focal point
+ //   
+ //   m_focalPoint[0] = m_2DimageViewer[0]->GetInput()->GetOrigin()[0] + ui->xSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[0];
+ //   m_focalPoint[1] = m_2DimageViewer[0]->GetInput()->GetOrigin()[1] + ui->ySpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[1];
+ //   m_focalPoint[2] = m_2DimageViewer[0]->GetInput()->GetOrigin()[2] + ui->zSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[2];
+ //  
+	//
+	//for (int i=0; i<(3<visibleImageNum ? 3 : visibleImageNum); i++)
+	//{
+	//	//Update the Cursor Position
+ //       m_2DimageViewer[i]->SetFocalPointWithWorldCoordinate(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
+	//	m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+	//	m_2DimageViewer[i]->Render();
+	//}
+ //   //slotChangeIntensity();
+	//}
+	//else
+	//{
+ //           m_2DimageViewer[0]->SetSlice(ui->xSpinBox->value());
+ //           m_style[0]->SetCurrentSlice(ui->xSpinBox->value());
+ //           m_2DimageViewer[1]->SetSlice(ui->ySpinBox->value());
+ //           m_style[1]->SetCurrentSlice(ui->ySpinBox->value());
+ //           m_2DimageViewer[2]->SetSlice(ui->zSpinBox->value());
+ //           m_style[2]->SetCurrentSlice(ui->zSpinBox->value());
+	//
+	//for (int i=0;i<3;i++)
+	//{
+	//	m_focalPoint[i] = m_2DimageViewer[i]->GetInput()->GetOrigin()[i] + m_2DimageViewer[i]->GetSlice() * m_2DimageViewer[i]->GetInput()->GetSpacing()[i];
+	//}
+	////slotChangeIntensity();
+	//for (int i=0; i<3; i++)
+	//{
+	//	//Update the Cursor Position
+ //       m_2DimageViewer[i]->SetFocalPointWithWorldCoordinate(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
+	//	m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+	//	m_2DimageViewer[i]->Render();
+	//}
+	//}
+
+	////Connect back the spinbox
+	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 }
 
 void MainWindow::slotChangeWindowLevel()
@@ -1236,6 +1321,11 @@ ImageType::Pointer MainWindow::ImageAlignment(ImageType::Pointer inputImage)
 	 return outputImage;
 }
 
+QWidget * MainWindow::GetModuleWidget()
+{
+	return this->m_moduleWidget;
+}
+
 int MainWindow::GetVisibleImageNo()
 {
 	return visibleImageNum;
@@ -1298,71 +1388,51 @@ void MainWindow::slotMultiPlanarView()
 
 	std::vector<QVTKWidget*> imageViews({ ui->image1View, ui->image2View, ui->image3View });
 
-	if (!this->INITIALIZED_FLAG) {
-		// Create  viewers if it hasn't been created
-		ui->image1View->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
-		ui->image2View->SetRenderWindow(m_2DimageViewer[1]->GetRenderWindow());
-		ui->image3View->SetRenderWindow(m_2DimageViewer[2]->GetRenderWindow());
-	}
-	
-
 	for (int i = 0; i < 3; ++i) {
 		if (!this->INITIALIZED_FLAG) {
-			//imageViews[i]->SetRenderWindow(m_2DimageViewer[0]->GetRenderWindow());
-
-
-			// Change input to same image, default 0
-			m_2DimageViewer[i]->SetInputData(vtkImage[0]);
-
-			// Change orientation to orthogonal views
-			m_2DimageViewer[i]->SetSliceOrientation(i);
-
-			// initialize stuff
-			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
-
-			// setup viewers
-			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-			m_style[i]->SetViewers(m_2DimageViewer[i]);
-			m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
-				ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
-				m_moduleWidget->GetBrushSizeSpinBox(),
-				m_moduleWidget->GetBrushShapeComBox(),
-				NULL, NULL);
-
-			m_interactor[i]->SetInteractorStyle(m_style[i]);
-			m_style[i]->SetOrientation(i);
-
-			// Set Flag to true after everything is done
-			if (i == 2)
-				this->INITIALIZED_FLAG = true;
+			imageViews[i]->SetRenderWindow(m_2DimageViewer[i]->GetRenderWindow());
 		}
-		else {
-			// else only change input and viewer orientation
-			m_2DimageViewer[i]->SetInputData(vtkImage[0]);
-			m_2DimageViewer[i]->SetSliceOrientation(i);
-			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
-			this->m_style[i]->SetOrientation(i);
-			m_2DimageViewer[i]->InitializeOrientationText();
+		// Change input to same image, default 0
+		m_2DimageViewer[i]->SetInputData(vtkImage[0]);
+		m_2DimageViewer[i]->SetSliceOrientation(i);
+		if (!this->INITIALIZED_FLAG) {
+			const int* extent = m_2DimageViewer[i]->GetInput()->GetExtent();
+			m_2DimageViewer[i]->SetSlice((extent[2 * i + 1] - extent[2 * i])*0.5);
+		}
+		m_2DimageViewer[i]->Render();
+		// initialize stuff
+		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
+		m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
 
+		// setup interactorStyle
+		m_style[i]->SetViewers(m_2DimageViewer[i]);
+		m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
+			ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
+			m_moduleWidget->GetBrushSizeSpinBox(),
+			m_moduleWidget->GetBrushShapeComBox(),
+			NULL, NULL);
+		m_style[i]->SetOrientation(i);
+
+		m_interactor[i]->SetInteractorStyle(m_style[i]);
+
+
+		if(this->INITIALIZED_FLAG){
+			// else only change input and viewer orientation
+			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
 			// Show view props for overlay
 			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
 			for (int j = 0; j < props->GetNumberOfItems(); j++)
 			{
 				reinterpret_cast<vtkProp*>(props->GetItemAsObject(j))->SetVisibility(true);
 			}
-
-
-			vtkPropCollection* annProps = m_2DimageViewer[i]->GetannotationRenderer()->GetViewProps();
+			vtkPropCollection* annProps = m_2DimageViewer[i]->GetAnnotationRenderer()->GetViewProps();
 			for (int j = 0; j < annProps->GetNumberOfItems(); j++)
 			{
 				reinterpret_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(true);
 			}
-
-
 		}
-
 	}
-
+	this->INITIALIZED_FLAG = true;
 	this->slotChangeSlice();
 	QAction* action = widgetGroup.checkedAction();
 	if (action != NULL) {
@@ -1370,25 +1440,41 @@ void MainWindow::slotMultiPlanarView()
 	}
 
 	// Correct view up
+	//for (int i = 0; i < 3; i++)
+	//{
+
+	//	// Make sure view up is correct
+	//	switch (i)
+	//	{
+	//	case 0:
+	//		this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
+	//		break;
+	//	case 1:
+	//		this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
+	//		break;
+	//	case 2:
+	//		this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//	this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
+	//}
+}
+
+void MainWindow::slotEnableAutoLumenSegmentation(bool flag)
+{
 	for (int i = 0; i < 3; i++)
 	{
+		m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
+	}
+}
 
-		// Make sure view up is correct
-		switch (i)
-		{
-		case 0:
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
-			break;
-		case 1:
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, 0, 1);
-			break;
-		case 2:
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-			break;
-		default:
-			break;
-		}
-		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
+void MainWindow::slotSetContourFilterGenerateValues(int generateValues)
+{
+	for (int i = 0; i < 3; ++i) {
+		this->m_style[i]->GetPolygonDraw()->
+			SetContourFilterGenerateValues(generateValues);
 	}
 }
 
@@ -1396,20 +1482,21 @@ void MainWindow::slotSegmentationView()
 {
 	m_orientation = SLICE_ORIENTATION_XY;
 	segmentationView = true;
-
-	for (int i = 0; i < 3; i++)
+	// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
+	for (int i1 = 0, i2 = 0; i2 < 3; ++i2)
 	{
-
-		if (this->vtkImage[i] != NULL) {
-			this->m_2DimageViewer[i]->SetSliceOrientationToXY();
-			this->m_style[i]->SetOrientation(2);
-			this->m_2DimageViewer[i]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-			this->m_2DimageViewer[i]->InitializeOrientationText();
-			this->m_2DimageViewer[i]->SetInputData(vtkImage[i]);
+		for (; i1 < 5 && i2 < 3; ++i1) {
+			if (this->vtkImage[i1] != NULL) {
+				this->m_2DimageViewer[i2]->SetInputData(vtkImage[i1]);
+				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
+				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+				this->m_style[i2]->SetOrientation(2);
+				++i2;
+			}
 		}
-		else {
+		if(i1 >= 5) {
 			// disable view props
-			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
+			vtkPropCollection* props = this->m_2DimageViewer[i2]->GetRenderer()->GetViewProps();
 			props->InitTraversal();
 			for (int j = 0; j < props->GetNumberOfItems(); j++)
 			{
@@ -1417,22 +1504,22 @@ void MainWindow::slotSegmentationView()
 				props->GetNextProp()->SetVisibility(false);
 			}
 
-			vtkPropCollection* annProps = m_2DimageViewer[i]->GetannotationRenderer()->GetViewProps();
+			vtkPropCollection* annProps = m_2DimageViewer[i2]->GetAnnotationRenderer()->GetViewProps();
 			annProps->InitTraversal();
 			for (int j = 0; j < annProps->GetNumberOfItems(); j++)
 			{
 				//static_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(false);
 				annProps->GetNextProp()->SetVisibility(false);
 			}
+			//this->m_2DimageViewer[i2]->SetInputData(NULL);
+			this->m_2DimageViewer[i2]->GetRenderWindow()->Modified();
+			this->m_2DimageViewer[i2]->GetRenderWindow()->Render();
+			this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 			
-
-
-
-			this->m_2DimageViewer[i]->GetRenderWindow()->Modified();
-			this->m_2DimageViewer[i]->GetRenderWindow()->Render();
-			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Disable();
 		}
+
 	}
+
 
 	this->RenderAllViewer();
 	this->slotChangeSlice();
@@ -1490,15 +1577,15 @@ void MainWindow::slotOverlayVisibilty(bool b)
 	}
 }
 
-void MainWindow::slotOverlayOpacity(double op)
+void MainWindow::slotOverlayOpacity(int opacity)
 {
-    for (int i=0;i<3;i++)
-    {
-		if (m_style[i] != NULL)
-			m_style[i]->GetPaintBrush()->SetDrawOpacity(op * 255);
-        m_2DimageViewer[i]->GetdrawActor()->SetOpacity(op);
-        m_2DimageViewer[i]->Render();
-    }
+  //  for (int i=0;i<3;i++)
+  //  {
+		//if (m_style[i] != NULL)
+		//	m_style[i]->GetPaintBrush()->SetDrawOpacity(op * 255);
+  //      m_2DimageViewer[i]->GetdrawActor()->SetOpacity(op);
+  //      m_2DimageViewer[i]->Render();
+  //  }
 }
 
 
@@ -1511,7 +1598,7 @@ void MainWindow::RenderAllViewer()
 		if (segmentationView && i >= visibleImageNum)
 			break;
 		//m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		//m_2DimageViewer[i]->GetannotationRenderer()->ResetCameraClippingRange();
+		//m_2DimageViewer[i]->GetAnnotationRenderer()->ResetCameraClippingRange();
 		m_2DimageViewer[i]->GetRenderWindow()->Render();
 	}
 }
@@ -1586,7 +1673,7 @@ void MainWindow::slotCenterline()
 	imageFileWriter->Update();
 
 
-	this->SegmentationOverlay->SetInputImageData(outputSegmentation);
+	//this->SegmentationOverlay->SetInputImageData(outputSegmentation);
 
 
 	//vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
