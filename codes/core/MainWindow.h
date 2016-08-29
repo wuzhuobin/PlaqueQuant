@@ -97,6 +97,7 @@ public slots:
 	virtual void slotOpenImage(QString dir);
 	virtual void slotOpenImage();
 	virtual void slotOpenRecentImage();
+	virtual void slotSaveSegmentation();
 	virtual void slotAbout();
 	virtual void slotHelp();
 	virtual void slot3DUpdate();
@@ -115,7 +116,6 @@ public slots:
 	virtual void slotSetContourFilterGenerateValues(int generateValues);
 
 	//Overlay
-    
 	virtual void slotAddExternalOverlay();
 	//virtual void slotRemoveOverlay();
 	virtual void slotOverlayVisibilty(bool b);

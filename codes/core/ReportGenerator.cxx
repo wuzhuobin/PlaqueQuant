@@ -98,6 +98,7 @@ bool ReportGenerator::HasFilledInAllRequiredInfo()
 void ReportGenerator::SetupPrinter()
 {
 	m_printer->setOutputFormat(QPrinter::PdfFormat);
+	m_printer->setResolution(600);
 	m_printer->setOutputFileName(m_pdfPath);
 	m_printer->setPaperSize(QPrinter::A4);
 	m_printer->setOrientation(QPrinter::Portrait);

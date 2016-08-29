@@ -256,6 +256,7 @@ void ModuleWidget::slotUpdate2DMeasurements()
 		mwt->Update();
 	}
 	catch (MaximumWallThickness::ERROR_CODE e) {
+		// #DisplayErrorMsgHere
 		cerr << "MaximumWallThickness error: " << e << endl;
 		//return;
 	}
@@ -267,6 +268,7 @@ void ModuleWidget::slotUpdate2DMeasurements()
 		m2d->Update();
 	}
 	catch (MeasurementFor2D::ERROR_CODE e) {
+		// #DisplayErrorMsgHere
 		cerr << "MeasurementFor2D error: " << e << endl;
 		//return;
 	}
@@ -317,6 +319,7 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 		calculator->Update();
 	} 
 	catch (MaximumWallThickness::ERROR_CODE e) {
+		// #DisplayErrorMsgHere
 		return;
 	}
 	
@@ -331,6 +334,11 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	{
 		MaximumWallThickness::DistanceLoopPair l_lp = looppairs.at(i);
 		double p1[3], p2[3];
+		if (l_lp.LoopPair.first->GetNumberOfPoints() == 0) {
+			// #DisplayErrorMsgHere
+			return;
+		}
+
 		l_lp.LoopPair.first->GetPoint(l_lp.PIDs.first, p1);
 		l_lp.LoopPair.second->GetPoint(l_lp.PIDs.second, p2);
 

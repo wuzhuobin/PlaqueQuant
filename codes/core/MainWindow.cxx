@@ -96,6 +96,7 @@ MainWindow::MainWindow()
 	connect(ui->actionImage3, SIGNAL(triggered()), viewerMapper, SLOT(map()));
 	connect(ui->actionImage4, SIGNAL(triggered()), viewerMapper, SLOT(map()));
 	connect(ui->actionFourViews, SIGNAL(triggered()), viewerMapper, SLOT(map()));
+	connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveSegmentation()));
 	connect(viewerMapper, SIGNAL(mapped(int)), this, SLOT(slotImage(int)));
 	connect(ui->ULBtn, SIGNAL(clicked()), ui->actionImage1, SLOT(trigger()));
 	connect(ui->URBtn, SIGNAL(clicked()), ui->actionImage2, SLOT(trigger()));
@@ -109,6 +110,7 @@ MainWindow::MainWindow()
 	connect(ui->ULSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUL()));
 	connect(ui->URSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUR()));
 	connect(ui->LLSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageLL()));
+
 
 	viewGroup.addAction(ui->actionMultiPlanarView);
 	viewGroup.addAction(ui->actionAllAxialView);
@@ -217,10 +219,10 @@ MainWindow::MainWindow()
 	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
 	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.2);
 	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.05);
-	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.05);
-	this->LookupTable->SetTableValue(4, 1, 1, 0, 1);
-	this->LookupTable->SetTableValue(5, 0, 1, 1, 1);
-	this->LookupTable->SetTableValue(6, 1, 0, 1, 1);
+	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.4);
+	this->LookupTable->SetTableValue(4, 1, 1, 0, 0.5);
+	this->LookupTable->SetTableValue(5, 0, 1, 1, 0.5);
+	this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);
 	this->LookupTable->Build();
 
 	//distanceWidget3D
@@ -472,6 +474,23 @@ void MainWindow::slotOpenRecentImage()
 	{
 		slotOpenImage(action->data().toString());
 	}
+}
+
+void MainWindow::slotSaveSegmentation()
+{
+	if (SegmentationOverlay == NULL)
+		return;
+
+	QDir dir = ".";
+	QString Path = QFileDialog::getSaveFileName(this, QString(tr("NIfTI")), dir.absolutePath(), tr("NlFTI Images (*nii, *nii.gz*)"));
+	if (Path == "")
+		return;
+
+	vtkSmartPointer<vtkNIFTIImageWriter> writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
+	writer->SetInputData(this->SegmentationOverlay->GetVTKImageData());
+	writer->SetFileName(Path.toStdString().c_str());
+	writer->Update();
+	writer->Write();
 }
 
 
@@ -996,7 +1015,7 @@ void MainWindow::slot3DUpdate()
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3,0.3,0.3);
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui->image4View->GetRenderWindow()->Render();
-
+	this->m_style3D->SetInteractorStyleTo3DDistanceWidget();
 	//delete surfaceCreator;
 
 	/*vtkRenderWindow* rwin = vtkRenderWindow::New();
