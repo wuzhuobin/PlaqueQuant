@@ -39,35 +39,14 @@ InteractorStyle3DDistanceWidget::~InteractorStyle3DDistanceWidget()
 
 void InteractorStyle3DDistanceWidget::OnMiddleButtonDown()
 {
-	int* pos = this->Interactor->GetEventPosition();
-	
-	vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
-	picker->SetVolumeOpacityIsovalue(0.4); // #LookupTable
-	picker->SetTolerance(0.0005);
-	picker->Pick(pos[0], pos[1], 0, this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-
-	double* worldPosition = picker->GetPickPosition();
-
-	vtkSmartPointer<vtkSphereSource> source = vtkSmartPointer<vtkSphereSource>::New();
-	source->SetCenter(worldPosition);
-	source->Update();
-
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputConnection(source->GetOutputPort());
-	mapper->Update();
-
-	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-	actor->SetMapper(mapper);
-
-	this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actor);
-	this->Interactor->Render();
-
 	AbstractInteractorStyle3D::OnMiddleButtonDown();
 }
 
 void InteractorStyle3DDistanceWidget::OnKeyPress()
 {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	
+
 	if (mainwnd->GetCenterlinePD() == NULL)
 		Superclass::OnKeyPress();
 	else {
@@ -142,5 +121,9 @@ bool InteractorStyle3DDistanceWidget::CalculateIndex()
 	
 
 	return true;
+}
+
+void InteractorStyle3DDistanceWidget::UpdateStenosisValue()
+{
 }
 

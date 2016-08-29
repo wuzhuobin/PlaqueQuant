@@ -76,9 +76,19 @@ public:
 	static MyImageViewer *New();
 	vtkTypeMacro(MyImageViewer, vtkImageViewer2);
 	void PrintSelf(ostream& os, vtkIndent indent);
-	virtual void InitializeHeader(QString);
-	virtual void InitializeIntensityText(QString);
+	// Text methods
+	virtual void InitializeHeader(QString File);
+	virtual void InitializeIntensityText(QString IntText);
+	// Orientation Text
 	virtual void InitializeOrientationText();
+	virtual void ResizeOrientationText();
+
+	// Cursor methods
+	virtual void SetBound(double* b);
+	virtual double* GetBound();
+	virtual void SetFocalPointWithWorldCoordinate(double x, double y, double z);
+	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
+	virtual double* GetFocalPoint();
 
 	// Description:
 	// Render the resulting image.
@@ -86,58 +96,64 @@ public:
 
 	// Description:
 	// Set/Get the input image to the viewer.
-	void virtual SetInputData(vtkImageData * in);
-	// Set Input Layer
+	virtual void SetInputData(vtkImageData * in);
+	// Set/Get Input Layer
 	virtual void SetInputDataLayer(vtkImageData *in);
 	virtual vtkImageData *GetInputLayer();
 
-	//virtual void AddPolyData(vtkPolyData* polydata, vtkProperty* property);
-
 	// Description:
-	// Set window and level for mapping pixels to colors.
-
+	// return DefaultWindowLevel
 	virtual double* GetDefaultWindowLevel();
-
-	virtual void InstallPipeline();
-
-	void virtual UnInstallPipeline();
+	
+	//ETX
 	virtual void SetSliceOrientation(int orientation);
-
-	virtual void UpdateDisplayExtent();
-
-	virtual void SetCursorBoundary();
-
-	virtual void SetBound(double* b);
-	virtual double* GetBound();
-	virtual double* GetFocalPoint();
 
 	// Description:
 	// Get the internal render window, renderer, image actor, and
 	// image map instances.
 	vtkGetObjectMacro(drawActor, vtkImageActor);
-	vtkGetObjectMacro(imageMapToWindowLevelColors, vtkImageMapToWindowLevelColors);
-	vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
-	vtkGetObjectMacro(annotationRenderer, vtkRenderer);
+	vtkGetObjectMacro(AnnotationWindowLevel, vtkImageMapToWindowLevelColors);
+	//vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
+	vtkGetObjectMacro(AnnotationRenderer, vtkRenderer);
+	// Description:
+	// Set your own Annotation Renderer
+	virtual void SetAnnotationRenderer(vtkRenderer *arg);
+
+	// LookupTable
 	virtual vtkLookupTable* getLookupTable();
+	virtual void SetLookupTable(vtkLookupTable* LookupTable);
 
-	//Cursor
-	virtual void SetFocalPoint(double x, double y, double z);
 
-	//Orientation Text
-	virtual void ResizeOrientationText();
+	// Description:
+	// Attach an interactor for the internal render window.
+	virtual void SetupInteractor(vtkRenderWindowInteractor* arg);
 
 	//Ruler
 	virtual void SetRulerEnabled(bool b);
 	virtual void SetProtractorEnabled(bool b);
 
+	// Description:
+	// Update the display extent manually so that the proper slice for the
+	// given orientation is displayed. It will also try to set a
+	// reasonable camera clipping range.
+	// This method is called automatically when the Input is changed, but
+	// most of the time the input of this class is likely to remain the same,
+	// i.e. connected to the output of a filter, or an image reader. When the
+	// input of this filter or reader itself is changed, an error message might
+	// be displayed since the current display extent is probably outside
+	// the new whole extent. Calling this method will ensure that the display
+	// extent is reset properly.
+	virtual void UpdateDisplayExtent();
+
 protected:
 	MyImageViewer();
 	~MyImageViewer();
 
-
+	virtual void InstallPipeline();
+	virtual void UnInstallPipeline();
 
 	//OrientationText
-	vtkTextActor*	TextActor[4];
+	vtkTextActor*	OrientationTextActor[4];
 
 	//Header
 	vtkTextActor* HeaderActor;
@@ -149,29 +165,26 @@ protected:
 	vtkCursor3D*		 Cursor3D;
 	vtkPolyDataMapper* Cursormapper;
 	vtkActor*			 CursorActor;
-
-	//BackGround
+	virtual void SetCursorBoundary();
+	//Bound of cursor
 	double Bound[6];
 
-	//Label
-	vtkImageMapToWindowLevelColors* imageMapToWindowLevelColors;
+	//Label and Annotation
+	vtkImageMapToWindowLevelColors* AnnotationWindowLevel;
 	vtkImageActor* drawActor;
-	vtkLookupTable* LookUpTable;
+	vtkRenderer* AnnotationRenderer;
 
-	//Clip polyData
-	vtkActor*	ClipActor;
+	// LookupTable for drawActor
+	vtkLookupTable* LookupTable;
+
 
 	//Widget
 	vtkDistanceWidget* DistanceWidget;
 
 	vtkAngleWidget*	 AngleWidget;
 	//Parameter
-	vtkPlane* SliceImplicitPlane;
+	//vtkPlane* SliceImplicitPlane;
 	double DefaultWindowLevel[2];
-
-	//annotation renderer
-	vtkRenderer* annotationRenderer;
-
 
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.

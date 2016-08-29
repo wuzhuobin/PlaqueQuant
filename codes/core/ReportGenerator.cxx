@@ -104,7 +104,7 @@ void ReportGenerator::SetupPrinter()
 	m_printer->setFullPage(false);
 	//QPagedPaintDevice::PageSize pagesize;
 	//m_printer->setPageSize(pagesize); // the document needs a valid PageSize
-	m_printer->setPageMargins(13, 5, 13, 0, QPrinter::Millimeter);
+	m_printer->setPageMargins(0, 0, 0, 0, QPrinter::Millimeter);
 }
 
 void ReportGenerator::AddInfo2PDF()

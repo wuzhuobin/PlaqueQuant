@@ -52,6 +52,33 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->ui->measurement2DTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	this->ui->measurement2DTableWidget->setColumnHidden(1, true);
 
+	// setting of the contourWidget of auto lumen segmentation
+	this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(false);
+	this->ui->autoLumenSegmentationHorizontalSlider->setMaximum(500);
+	this->ui->autoLumenSegmentationHorizontalSlider->setMinimum(1);
+	this->ui->autoLumenSegmentationHorizontalSlider->setValue(60);
+	this->ui->autoLumenSegmentationSpinBox->setValue(
+		this->ui->autoLumenSegmentationHorizontalSlider->value());
+	this->ui->autoLumenSegmentationSpinBox->setMaximum(
+	this->ui->autoLumenSegmentationHorizontalSlider->maximum());
+	this->ui->autoLumenSegmentationSpinBox->setMinimum(
+		this->ui->autoLumenSegmentationHorizontalSlider->minimum());
+	this->ui->autoLumenSegmentationSpinBox->setEnabled(false);
+	this->ui->autoLumenSegmentationCheckBox->setChecked(false);
+	this->ui->lumenComboBox->setHidden(true);
+	this->ui->lumenLabel->setHidden(true);
+	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
+		ui->autoLumenSegmentationHorizontalSlider, SLOT(setValue(int)));
+	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),
+		ui->autoLumenSegmentationSpinBox, SLOT(setValue(int)));
+	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), this,
+		SLOT(slotEnableAutoLumenSegmentation(bool)));
+	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), mainWnd, 
+		SLOT(slotEnableAutoLumenSegmentation(bool)));
+	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), mainWnd, 
+		SLOT(slotSetContourFilterGenerateValues(int)));
+
+
 
 	//connect
 	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
@@ -62,8 +89,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->BrushSizeSlider,				SIGNAL(valueChanged(int)),			this,		SLOT(SetBrushSize()),Qt::UniqueConnection);
 	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
-	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
-	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
+	//connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
+	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity(int)));
 	connect(ui->maximumWallThicknessBtn,		SIGNAL(clicked()),					this,		SLOT(slotCalculateMaximumWallThickness()));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
@@ -136,17 +163,24 @@ void ModuleWidget::slotSegmentationView()
 
 void ModuleWidget::slotChangeLayerNo()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	int layer = ui->labelComboBox->currentIndex() + 1;
-	mainwnd->SetImageLayerNo(layer);
+	const double* value = mainWnd->GetLookupTable()->GetTableValue(layer);
+
+	ui->opacitySpinBox->setValue(value[3] * 100);
+	mainWnd->SetImageLayerNo(layer);
 
 }
 
-void ModuleWidget::slotChangeOpacity()
+void ModuleWidget::slotChangeOpacity(int opacity)
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotOverlayOpacity(ui->opacitySpinBox->value()/100.0);
-
+	int layer = ui->labelComboBox->currentIndex() + 1;
+	double* value = mainWnd->GetLookupTable()->GetTableValue(layer);
+	value[3] = opacity * 0.01;
+	mainWnd->GetLookupTable()->SetTableValue(layer, value);
+	mainWnd->GetLookupTable()->Build();
+	mainWnd->RenderAllViewer();
 }
 void ModuleWidget::slotChangeROI(double * bound)
 {
@@ -328,10 +362,32 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 
 	this->m_lineActor->SetMapper(mapper);
 
-	// #HardcodeViewerIndex
-	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor(this->m_lineActor);
-	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor2D(this->m_labelActor);
+	// #MyViewerHardCode
+	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
+	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
 	mainwnd->RenderAll2DViewers();
+}
+
+void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
+{
+	if (flag) {
+		this->ui->lumenLabel->setHidden(false);
+		this->ui->lumenComboBox->setHidden(false);
+		this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(true);
+		this->ui->autoLumenSegmentationHorizontalSlider->setValue(
+			this->ui->autoLumenSegmentationHorizontalSlider->value());
+		this->ui->autoLumenSegmentationSpinBox->setEnabled(true);
+		this->ui->labelComboBox->setCurrentIndex(1);
+		this->ui->activeLabelLabel->setText("Vessel Wall Label");
+	}
+	else {
+		this->ui->lumenLabel->setHidden(true);
+		this->ui->lumenComboBox->setHidden(true);
+		this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(false);
+		this->ui->autoLumenSegmentationSpinBox->setEnabled(false);
+		this->ui->activeLabelLabel->setText("Active Label");
+
+	}
 }
 
 void ModuleWidget::slotUpdateTableWidget()
@@ -348,10 +404,14 @@ void ModuleWidget::InternalUpdate()
 
 	int currentIndex = this->ui->stackedWidget->currentIndex();
 	if (currentIndex == 4) {
+		slotUpdate2DMeasurements();
+		mainwnd->slotMeasureCurrentVolumeOfEveryLabel();
 		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()), Qt::QueuedConnection);
+		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), mainwnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()), Qt::QueuedConnection);
 	}
 	else {
 		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()));
+		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), mainwnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 	}
 }
 
@@ -359,7 +419,7 @@ void ModuleWidget::GenerateReport()
 {
 	//General 
 	//Basic Information to fill
-	QString FilePath = "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/result.pdf";
+	QFileInfo fileInfo("./report.pdf");
 	QString ReportName = "Plaque Quantification Report";
 	QString PatientName = "Chan Tai Man";
 	QString PatientID = "11223344";
@@ -370,32 +430,38 @@ void ModuleWidget::GenerateReport()
 	QString MRISide = "R";
 	QString DoctorName = "Dr. Lau";
 	//Stenosis Measurement
-	QString StenosisPercent = "30%";
+	QString StenosisPercent = this->ui->spinBox_2->text();
 	//2D Measurement
-	QString LumenArea = "20";
-	QString VesselWallArea = "40";
-	QString WallThickness = "4.2";
-	QString NWI = "0.67";
+	QString LumenArea = this->ui->measurement2DTableWidget->item(0, 0)->text();
+	QString VesselWallArea = this->ui->measurement2DTableWidget->item(1, 0)->text();
+	QString WallThickness = this->ui->measurement2DTableWidget->item(2, 0)->text();
+	QString NWI = this->ui->measurement2DTableWidget->item(3, 0)->text();
 	//3D Measurement
-	QString LumenVolume = "600";
-	QString WallVolume = "800";
-	QString PlaqueVolume = "200";
+	QString LumenVolume = this->ui->measurement3DTableWidget->item(1, 0)->text();
+	QString WallVolume = this->ui->measurement3DTableWidget->item(2, 0)->text();
+	QString PlaqueVolume = this->ui->measurement3DTableWidget->item(0, 0)->text();
 	//Plaque Composition
-	QString Calcification = "140";
-	QString CalcificationPercent = "70%";
-	QString Hemorrhage = "30";
-	QString HemorrhagePercent = "15%";
-	QString LRNC = "10";
-	QString LRNCPercent = "5%";
+
+	double plaqueVolumeNum = this->ui->measurement3DTableWidget->item(0, 0)->data(Qt::DisplayRole).toDouble();
+	double calcificationNum = this->ui->measurement3DTableWidget->item(3, 0)->data(Qt::DisplayRole).toDouble();
+	double hemorrhageNum = this->ui->measurement3DTableWidget->item(4, 0)->data(Qt::DisplayRole).toDouble();
+	double LRNCNum = this->ui->measurement3DTableWidget->item(5, 0)->data(Qt::DisplayRole).toDouble();
+
+	QString Calcification = this->ui->measurement3DTableWidget->item(3, 0)->text();
+	QString CalcificationPercent = QString::number(calcificationNum/plaqueVolumeNum) + "%";
+	QString Hemorrhage = this->ui->measurement3DTableWidget->item(4, 0)->text();
+	QString HemorrhagePercent = QString::number(hemorrhageNum/plaqueVolumeNum) + "%";
+	QString LRNC = this->ui->measurement3DTableWidget->item(5, 0)->text();
+	QString LRNCPercent = QString::number(LRNCNum/ plaqueVolumeNum) + "%";
 
 	ReportGenerator* reportGenerator = new ReportGenerator;
-	reportGenerator->SetDirectory(FilePath);
+	reportGenerator->SetDirectory(fileInfo.absoluteFilePath());
 	reportGenerator->SetReportName(ReportName);
 
 	//Table
 	int headerColor[4] = { 155, 155, 155, 255 };
 	reportGenerator->AddTable(0, "Information", QStringList(), QStringList(), 5, 4);
-	reportGenerator->SetTableSize(0, 700, 185);
+	reportGenerator->SetTableSize(0, 680, 185);
 	reportGenerator->SetTableItem(0, 0, 0, "Patient Information");
 	reportGenerator->SetTableItemBackgroundColor(0, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(0, 0, 0, 2);
@@ -423,7 +489,7 @@ void ModuleWidget::GenerateReport()
 
 
 	reportGenerator->AddTable(1, "Stenosis Measurement", QStringList(), QStringList(), 2, 4);
-	reportGenerator->SetTableSize(1, 700, 74);
+	reportGenerator->SetTableSize(1, 680, 74);
 	reportGenerator->SetTableItem(1, 0, 0, "Stenosis Measurement");
 	reportGenerator->SetTableItemBackgroundColor(1, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(1, 0, 0, 4);
@@ -436,7 +502,7 @@ void ModuleWidget::GenerateReport()
 
 
 	reportGenerator->AddTable(2, "2D Measurement", QStringList(), QStringList(), 4, 4);
-	reportGenerator->SetTableSize(2, 700, 148);
+	reportGenerator->SetTableSize(2, 680, 148);
 	reportGenerator->SetTableItem(2, 0, 0, "2D Measurement");
 	reportGenerator->SetTableItemBackgroundColor(2, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(2, 0, 0, 4);
@@ -459,7 +525,7 @@ void ModuleWidget::GenerateReport()
 	reportGenerator->SetTableItemRowSpan(2, 2, 3, 2);
 
 	reportGenerator->AddTable(3, "3D Measurement", QStringList(), QStringList(), 3, 4);
-	reportGenerator->SetTableSize(3, 700, 111);
+	reportGenerator->SetTableSize(3, 680, 111);
 	reportGenerator->SetTableItem(3, 0, 0, "3D Measurement");
 	reportGenerator->SetTableItemBackgroundColor(3, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(3, 0, 0, 4);
@@ -474,7 +540,7 @@ void ModuleWidget::GenerateReport()
 	reportGenerator->SetTableItem(3, 2, 3, PlaqueVolume);
 
 	reportGenerator->AddTable(4, "Plaque Composition", QStringList(), QStringList(), 4, 4);
-	reportGenerator->SetTableSize(4, 700, 148);
+	reportGenerator->SetTableSize(4, 680, 148);
 	reportGenerator->SetTableItem(4, 0, 0, "Plaque Composition");
 	reportGenerator->SetTableItemBackgroundColor(4, 0, 0, headerColor);
 	reportGenerator->SetTableItemColumnSpan(4, 0, 0, 4);
@@ -496,7 +562,7 @@ void ModuleWidget::GenerateReport()
 	reportGenerator->AddFigure(0, "2D result", "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/2dresult.png");
 	reportGenerator->AddFigure(1, "3D result", "C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/3dresult.png");
 	reportGenerator->AddTable(5, "Images", QStringList(), QStringList(), 10, 4);
-	reportGenerator->SetTableSize(5, 700, 350);
+	reportGenerator->SetTableSize(5, 680, 350);
 	reportGenerator->SetTableItemRowSpan(5, 1, 0, 9);
 	reportGenerator->SetTableItemRowSpan(5, 1, 2, 9);
 	reportGenerator->SetTableItemColumnSpan(5, 0, 0, 2);
@@ -512,7 +578,7 @@ void ModuleWidget::GenerateReport()
 	//Update
 	reportGenerator->Update();
 
-	QDesktopServices::openUrl(QUrl("C:/Users/user/Desktop/Andy/ReportGenerator/ReportGenerator/result.pdf"));
+	QDesktopServices::openUrl(fileInfo.absoluteFilePath());
 
 	delete reportGenerator;
 

@@ -154,6 +154,8 @@ void AbstractInteractorStyleImage::MoveSliceForward()
 	if (m_slice < m_maxSlice)
 	{
 		m_slice += 1;
+		//this->imageViewer->SetSlice(m_slice);
+		//mainWnd->slotUpdateSlice();
 		switch (orientation)
 		{
 		case 0:
@@ -176,6 +178,8 @@ void AbstractInteractorStyleImage::MoveSliceBackward()
 	if (m_slice > m_minSlice)
 	{
 		m_slice -= 1;
+		//this->imageViewer->SetSlice(m_slice);
+		//mainWnd->slotUpdateSlice();
 		switch (orientation)
 		{
 		case 0:

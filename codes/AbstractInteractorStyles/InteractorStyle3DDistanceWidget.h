@@ -38,6 +38,7 @@ protected:
 
 private:
 	bool CalculateIndex();
+	void UpdateStenosisValue();
 
 	QTime m_clickTimer;
 	std::vector<Distance3DWidget*> m_distanceWidgetList;

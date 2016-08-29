@@ -55,7 +55,7 @@ InteractorStylePaintBrush::~InteractorStylePaintBrush()
 
 	// Clean again if the upper dosen't clean
 	if (m_brushActor != NULL && imageViewer != NULL) {
-		//this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
+		//this->imageViewer->GetAnnotationRenderer()->RemoveActor(m_brushActor);
 		this->m_brushActor->Delete();
 		this->m_brushActor = NULL;
 		this->m_brush->Delete();
@@ -282,7 +282,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 	if (m_brush != NULL)
 	{
 		if (m_brushActor != NULL && imageViewer != NULL) {
-			this->imageViewer->GetannotationRenderer()->RemoveActor(m_brushActor);
+			this->imageViewer->GetAnnotationRenderer()->RemoveActor(m_brushActor);
 		}
 
 		m_brush->Delete();
@@ -298,7 +298,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());
-		m_borderWidget->SetCurrentRenderer(imageViewer->GetannotationRenderer());
+		m_borderWidget->SetCurrentRenderer(imageViewer->GetAnnotationRenderer());
 		m_borderWidget->SetRepresentation(m_retangleRep);
 		m_borderWidget->SetManagesCursor(false);
 		m_borderWidget->GetBorderRepresentation()->SetMoving(false);
@@ -366,8 +366,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 				extent[0], extent[1], extent[2], extent[3], 0, 0);
 			break;
 		}
-		imageViewer->GetannotationRenderer()->AddActor(m_brushActor);
-		imageViewer->GetannotationRenderer()->Render();
+		imageViewer->GetAnnotationRenderer()->AddActor(m_brushActor);
+		imageViewer->GetAnnotationRenderer()->Render();
 	}
 
 	this->PAINT_BRUSH_MODE_ENABLED = b;

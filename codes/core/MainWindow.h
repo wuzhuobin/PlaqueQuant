@@ -9,6 +9,7 @@
 #include <QActionGroup>
 #include <QMenu>
 
+
 #include "ui_MainWindow.h"
 
 #include <vtkActor.h>
@@ -43,8 +44,12 @@ public:
 	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i) {
 		return m_interactor[i];
 	};
+	vtkLookupTable* GetLookupTable() {
+		return this->LookupTable;
+	};
 	QString GetFileName(int);
 
+	QWidget* GetModuleWidget();
 	int GetVisibleImageNo();
 	int GetImageLayerNo();
 
@@ -89,6 +94,7 @@ public slots:
 	
 	virtual void slotChangeSlice();
 	virtual void slotChangeSlice(int, int, int);
+	virtual void slotUpdateSlice();
 	virtual void slotChangeWindowLevel();
 	virtual void slotChangeWindowLevelUL();
     virtual void slotChangeWindowLevelUR();
@@ -103,6 +109,8 @@ public slots:
 	virtual void slotAbout();
 	virtual void slotHelp();
 	virtual void slot3DUpdate();
+	//virtual void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
+
 	virtual void slotNavigationMode();
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
@@ -111,7 +119,9 @@ public slots:
 	virtual void slotImage(int image);
 	virtual void slotMultiPlanarView();
 
-
+	// Auto Lumen Segmenation 
+	virtual void slotEnableAutoLumenSegmentation(bool flag);
+	virtual void slotSetContourFilterGenerateValues(int generateValues);
 
 	//Overlay
     
@@ -119,7 +129,7 @@ public slots:
 	//virtual void slotRemoveOverlay();
 	virtual void slotOverlayVisibilty(bool b);
 	virtual void slotOverlayVisibilty(bool b, int);
-    virtual void slotOverlayOpacity(double op);
+    virtual void slotOverlayOpacity(int opacity);
   
 	//Centerline
 	virtual void slotCenterline();
@@ -131,7 +141,7 @@ public slots:
 	virtual void slotChangeImageSeq(int image_no, int window_no);
 	virtual void slotSelectImageSeq(QAction*);
 	//Intensity
-	virtual void slotChangeIntensity();
+	//virtual void slotChangeIntensity();
 
 	//Widget
 	virtual void slotRuler(bool b);
@@ -240,16 +250,16 @@ private:
 	const int lrnc[3] = { 0, 255, 255 };
 	const int lm[3] = { 255, 0, 255 };
 
-	
+	vtkLookupTable* LookupTable;
 /*
 
-	this->LookUpTable->SetTableValue(0, 0, 0, 0, 0);
-	this->LookUpTable->SetTableValue(1, 1, 0, 0, 0.5);
-	this->LookUpTable->SetTableValue(2, 0, 0, 1, 0.9);
-	this->LookUpTable->SetTableValue(3, 0, 1, 0, 0.1);
-	this->LookUpTable->SetTableValue(4, 1, 1, 0, 0.7);
-	this->LookUpTable->SetTableValue(5, 0, 1, 1, 0.4);
-	this->LookUpTable->SetTableValue(6, 1, 0, 1, 0.5);*/
+	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
+	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.5);
+	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.9);
+	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.1);
+	this->LookupTable->SetTableValue(4, 1, 1, 0, 0.7);
+	this->LookupTable->SetTableValue(5, 0, 1, 1, 0.4);
+	this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);*/
 
 };
  
