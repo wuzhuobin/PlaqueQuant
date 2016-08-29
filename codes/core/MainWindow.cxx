@@ -482,12 +482,15 @@ void MainWindow::slotSaveSegmentation()
 		return;
 
 	QDir dir = ".";
-	QString Path = QFileDialog::getSaveFileName(this, QString(tr("NIfTI")), dir.absolutePath(), tr("NlFTI Images (*nii, *nii.gz*)"));
+	QString Path = QFileDialog::getSaveFileName(this, QString(tr("NIfTI")), dir.absolutePath(), tr("NlFTI Images (*nii)"));
 	if (Path == "")
 		return;
 
-	vtkSmartPointer<vtkNIFTIImageWriter> writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
-	writer->SetInputData(this->SegmentationOverlay->GetVTKImageData());
+	ImageType::Pointer output = ImageType::New();
+	output->Graft(this->SegmentationOverlay->GetITKOutput(this->itkImage[0]));
+
+	WriterType::Pointer writer = WriterType::New();
+	writer->SetInput(output);
 	writer->SetFileName(Path.toStdString().c_str());
 	writer->Update();
 	writer->Write();
@@ -645,7 +648,6 @@ bool MainWindow::visualizeImage()
 	this->slotChangeSlice();
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
-
 				
 	return 0;
 }
@@ -989,18 +991,18 @@ void MainWindow::slot3DUpdate()
 
 	delete cl;
 
-	//vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//mapper->SetInputData(surfaceCreator->GetOutput());
-	//mapper->SetLookupTable(this->LookupTable);
-	//mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	//mapper->Update();
-	//vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
-	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	//Actor->SetMapper(mapper);
-	//Actor->GetProperty()->SetOpacity(0.9);
-	//Actor->GetProperty()->SetRepresentationToSurface();
-	//Actor->SetPickable(1);
-	//this->m_3DDataRenderer->AddActor(Actor);
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(this->m_centerlinePD);
+	mapper->SetLookupTable(this->LookupTable);
+	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	mapper->Update();
+	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
+	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	Actor->SetMapper(mapper);
+	Actor->GetProperty()->SetOpacity(0.9);
+	Actor->GetProperty()->SetRepresentationToSurface();
+	Actor->SetPickable(1);
+	this->m_3DDataRenderer->AddActor(Actor);
 
 	///Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
@@ -1083,9 +1085,9 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 	if (ui->zSpinBox->value() != z) {
 		ui->zSpinBox->setValue(z);
 	}
-	//cerr << __func__ << endl;
-	//cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
-	//	' ' << m_2DimageViewer[2]->GetSlice() << endl;
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
 	this->slotChangeSlice();
 }
 

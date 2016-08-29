@@ -301,6 +301,7 @@ void ModuleWidget::slotUpdate2DMeasurements()
 		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(NMI)));
 	}
 	catch (...) {
+		// #DisplayErrorMsgHere
 		cerr << "Error assigning items to table!\n";
 	}
 }
