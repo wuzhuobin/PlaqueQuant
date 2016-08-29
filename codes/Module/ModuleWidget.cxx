@@ -362,14 +362,9 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 
 	this->m_lineActor->SetMapper(mapper);
 
-<<<<<<< HEAD
-	// #HardcodeViewerIndex
-	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor(this->m_lineActor);
-	mainwnd->GetMyImageViewer(2)->GetannotationRenderer()->AddActor2D(this->m_labelActor);
-=======
+	// #MyViewerHardCode
 	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
 	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
->>>>>>> 502d561c3253e1580f46af5d27d870d955a7776d
 	mainwnd->RenderAll2DViewers();
 }
 
