@@ -86,7 +86,8 @@ public:
 	// Cursor methods
 	virtual void SetBound(double* b);
 	virtual double* GetBound();
-	virtual void SetFocalPoint(double x, double y, double z);
+	virtual void SetFocalPointWithWorldCoordinate(double x, double y, double z);
+	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
 	virtual double* GetFocalPoint();
 
 	// Description:

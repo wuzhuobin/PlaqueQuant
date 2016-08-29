@@ -89,6 +89,7 @@ public slots:
 	
 	virtual void slotChangeSlice();
 	virtual void slotChangeSlice(int, int, int);
+	virtual void slotUpdateSlice();
 	virtual void slotChangeWindowLevel();
 	virtual void slotChangeWindowLevelUL();
     virtual void slotChangeWindowLevelUR();
@@ -135,7 +136,7 @@ public slots:
 	virtual void slotChangeImageSeq(int image_no, int window_no);
 	virtual void slotSelectImageSeq(QAction*);
 	//Intensity
-	virtual void slotChangeIntensity();
+	//virtual void slotChangeIntensity();
 
 	//Widget
 	virtual void slotRuler(bool b);

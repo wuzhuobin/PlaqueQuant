@@ -100,6 +100,8 @@ void InteractorStyleNavigation::CalculateIndex()
 		{
 			index[i] = (picked[i] - origin[i]) / spacing[i];
 		}
+		//imageViewer->SetFocalPointWithWorldCoordinate(picked[0], picked[1], picked[2]);
+		//imageViewer->SetFocalPointWithImageCoordinate((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
 		mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
 	}
 

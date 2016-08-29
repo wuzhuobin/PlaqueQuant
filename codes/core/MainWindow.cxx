@@ -958,26 +958,26 @@ void MainWindow::slot3DUpdate()
 }
 
 
-void MainWindow::slotChangeIntensity()
-{
-	double intensity[3];
-	for (int i = 0; i < 3; ++i) {
-		if (segmentationView && i >= visibleImageNum)
-			break;
-		intensity[i] = m_2DimageViewer[i]->GetInput()->GetScalarComponentAsDouble(
-			ui->xSpinBox->value(), ui->ySpinBox->value(), ui->zSpinBox->value(), 0
-		);
-		m_2DimageViewer[i]->InitializeIntensityText(QString::number(intensity[i]));
-		m_2DimageViewer[i]->Render();
-	}
-}
+//void MainWindow::slotChangeIntensity()
+//{
+//	double intensity[3];
+//	for (int i = 0; i < 3; ++i) {
+//		if (segmentationView && i >= visibleImageNum)
+//			break;
+//		intensity[i] = m_2DimageViewer[i]->GetInput()->GetScalarComponentAsDouble(
+//			ui->xSpinBox->value(), ui->ySpinBox->value(), ui->zSpinBox->value(), 0
+//		);
+//		m_2DimageViewer[i]->InitializeIntensityText(QString::number(intensity[i]));
+//		m_2DimageViewer[i]->Render();
+//	}
+//}
 
 
 void MainWindow::slotChangeSlice(int x, int y, int z)
 {
-	disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+	//disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+	//disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+	//disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 
 	// Clamp the index to within the extent
 	for (int i = 0; i < 3; i++)
@@ -999,12 +999,44 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 			break;
 		}
 	}
+	if (ui->xSpinBox->value() != x) {
+		ui->xSpinBox->setValue(x);
+	}
+	if (ui->ySpinBox->value() != y) {
+		ui->ySpinBox->setValue(y);
+	}
+	if (ui->zSpinBox->value() != z) {
+		ui->zSpinBox->setValue(z);
+	}
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
+	//this->slotChangeSlice();
+}
 
-	ui->xSpinBox->setValue(x);
-	ui->ySpinBox->setValue(y);
-	ui->zSpinBox->setValue(z);
-
-	this->slotChangeSlice();
+void MainWindow::slotUpdateSlice()
+{
+	if (segmentationView) {
+		for (int i = 0; i < visibleImageNum; ++i) {
+			if (m_2DimageViewer[i]->GetSlice() != ui->xSpinBox->value()) {
+				ui->xSpinBox->setValue(m_2DimageViewer[i]->GetSlice());
+			}
+		}
+	}
+	else {
+		if (m_2DimageViewer[0]->GetSlice() != ui->xSpinBox->value()) {
+			ui->xSpinBox->setValue(m_2DimageViewer[0]->GetSlice());
+		}
+		if (m_2DimageViewer[1]->GetSlice() != ui->ySpinBox->value()) {
+			ui->ySpinBox->setValue(m_2DimageViewer[1]->GetSlice());
+		}
+		if (m_2DimageViewer[2]->GetSlice() != ui->zSpinBox->value()) {
+			ui->zSpinBox->setValue(m_2DimageViewer[2]->GetSlice());
+		}
+	}
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
 }
 
 void MainWindow::slotChangeSlice()
@@ -1012,68 +1044,95 @@ void MainWindow::slotChangeSlice()
 	//Force update UI (QSpinBox) 
 	//Cause problem if the cursor move too fast
 	//QCoreApplication::processEvents();
-
-	if(segmentationView == true)
-	{
-
-		for (int i = 0; i < (3 < visibleImageNum ? 3 : visibleImageNum); i++) {
-			if (m_orientation == 0) {
+	if (segmentationView) {
+		for (int i = 0; i < visibleImageNum; ++i) {
+			if (m_2DimageViewer[i]->GetSlice() != ui->xSpinBox->value()) {
 				m_2DimageViewer[i]->SetSlice(ui->xSpinBox->value());
-				m_style[i]->SetCurrentSlice(ui->xSpinBox->value());
 			}
-			if (m_orientation == 1) {
-				m_2DimageViewer[i]->SetSlice(ui->ySpinBox->value());
-				m_style[i]->SetCurrentSlice(ui->ySpinBox->value());
-			}
-			if (m_orientation == 2) {
-				m_2DimageViewer[i]->SetSlice(ui->zSpinBox->value());
-				m_style[i]->SetCurrentSlice(ui->zSpinBox->value());
-			}
+			m_2DimageViewer[i]->SetFocalPointWithImageCoordinate(ui->xSpinBox->value(),
+				ui->ySpinBox->value(), ui->zSpinBox->value());
 		}
+	}
+	else {
+		if (m_2DimageViewer[0]->GetSlice() != ui->xSpinBox->value()) {
+			m_2DimageViewer[0]->SetSlice(ui->xSpinBox->value());
+		}
+		if (m_2DimageViewer[1]->GetSlice() != ui->ySpinBox->value()) {
+			m_2DimageViewer[1]->SetSlice(ui->ySpinBox->value());
+		}
+		if (m_2DimageViewer[2]->GetSlice() != ui->zSpinBox->value()) {
+			m_2DimageViewer[2]->SetSlice(ui->zSpinBox->value());
+		}
+		for (int i = 0; i < 3; ++i) {
+			m_2DimageViewer[i]->SetFocalPointWithImageCoordinate(ui->xSpinBox->value(),
+				ui->ySpinBox->value(), ui->zSpinBox->value());
+		}
+	}
+	cerr << __func__ << endl;
+	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+		' ' << m_2DimageViewer[2]->GetSlice() << endl;
 
-	//Calculate the cursor focal point
-    
-    m_focalPoint[0] = m_2DimageViewer[0]->GetInput()->GetOrigin()[0] + ui->xSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[0];
-    m_focalPoint[1] = m_2DimageViewer[0]->GetInput()->GetOrigin()[1] + ui->ySpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[1];
-    m_focalPoint[2] = m_2DimageViewer[0]->GetInput()->GetOrigin()[2] + ui->zSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[2];
-   
-	
-	for (int i=0; i<(3<visibleImageNum ? 3 : visibleImageNum); i++)
-	{
-		//Update the Cursor Position
-        m_2DimageViewer[i]->SetFocalPoint(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
-		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		m_2DimageViewer[i]->Render();
-	}
-    slotChangeIntensity();
-	}
-	else
-	{
-            m_2DimageViewer[0]->SetSlice(ui->xSpinBox->value());
-            m_style[0]->SetCurrentSlice(ui->xSpinBox->value());
-            m_2DimageViewer[1]->SetSlice(ui->ySpinBox->value());
-            m_style[1]->SetCurrentSlice(ui->ySpinBox->value());
-            m_2DimageViewer[2]->SetSlice(ui->zSpinBox->value());
-            m_style[2]->SetCurrentSlice(ui->zSpinBox->value());
-	
-	for (int i=0;i<3;i++)
-	{
-		m_focalPoint[i] = m_2DimageViewer[i]->GetInput()->GetOrigin()[i] + m_2DimageViewer[i]->GetSlice() * m_2DimageViewer[i]->GetInput()->GetSpacing()[i];
-	}
-	slotChangeIntensity();
-	for (int i=0; i<3; i++)
-	{
-		//Update the Cursor Position
-        m_2DimageViewer[i]->SetFocalPoint(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
-		m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		m_2DimageViewer[i]->Render();
-	}
-	}
+	//if(segmentationView == true)
+	//{
 
-	//Connect back the spinbox
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//	for (int i = 0; i < (3 < visibleImageNum ? 3 : visibleImageNum); i++) {
+	//		if (m_orientation == 0) {
+	//			m_2DimageViewer[i]->SetSlice(ui->xSpinBox->value());
+	//			m_style[i]->SetCurrentSlice(ui->xSpinBox->value());
+	//		}
+	//		if (m_orientation == 1) {
+	//			m_2DimageViewer[i]->SetSlice(ui->ySpinBox->value());
+	//			m_style[i]->SetCurrentSlice(ui->ySpinBox->value());
+	//		}
+	//		if (m_orientation == 2) {
+	//			m_2DimageViewer[i]->SetSlice(ui->zSpinBox->value());
+	//			m_style[i]->SetCurrentSlice(ui->zSpinBox->value());
+	//		}
+	//	}
+
+	////Calculate the cursor focal point
+ //   
+ //   m_focalPoint[0] = m_2DimageViewer[0]->GetInput()->GetOrigin()[0] + ui->xSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[0];
+ //   m_focalPoint[1] = m_2DimageViewer[0]->GetInput()->GetOrigin()[1] + ui->ySpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[1];
+ //   m_focalPoint[2] = m_2DimageViewer[0]->GetInput()->GetOrigin()[2] + ui->zSpinBox->value() * m_2DimageViewer[0]->GetInput()->GetSpacing()[2];
+ //  
+	//
+	//for (int i=0; i<(3<visibleImageNum ? 3 : visibleImageNum); i++)
+	//{
+	//	//Update the Cursor Position
+ //       m_2DimageViewer[i]->SetFocalPointWithWorldCoordinate(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
+	//	m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+	//	m_2DimageViewer[i]->Render();
+	//}
+ //   //slotChangeIntensity();
+	//}
+	//else
+	//{
+ //           m_2DimageViewer[0]->SetSlice(ui->xSpinBox->value());
+ //           m_style[0]->SetCurrentSlice(ui->xSpinBox->value());
+ //           m_2DimageViewer[1]->SetSlice(ui->ySpinBox->value());
+ //           m_style[1]->SetCurrentSlice(ui->ySpinBox->value());
+ //           m_2DimageViewer[2]->SetSlice(ui->zSpinBox->value());
+ //           m_style[2]->SetCurrentSlice(ui->zSpinBox->value());
+	//
+	//for (int i=0;i<3;i++)
+	//{
+	//	m_focalPoint[i] = m_2DimageViewer[i]->GetInput()->GetOrigin()[i] + m_2DimageViewer[i]->GetSlice() * m_2DimageViewer[i]->GetInput()->GetSpacing()[i];
+	//}
+	////slotChangeIntensity();
+	//for (int i=0; i<3; i++)
+	//{
+	//	//Update the Cursor Position
+ //       m_2DimageViewer[i]->SetFocalPointWithWorldCoordinate(m_focalPoint[0],m_focalPoint[1],m_focalPoint[2]);
+	//	m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+	//	m_2DimageViewer[i]->Render();
+	//}
+	//}
+
+	////Connect back the spinbox
+	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 }
 
 void MainWindow::slotChangeWindowLevel()
@@ -1403,7 +1462,7 @@ void MainWindow::slotSegmentationView()
 				//static_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(false);
 				annProps->GetNextProp()->SetVisibility(false);
 			}
-
+			//this->m_2DimageViewer[i2]->SetInputData(NULL);
 			this->m_2DimageViewer[i2]->GetRenderWindow()->Modified();
 			this->m_2DimageViewer[i2]->GetRenderWindow()->Render();
 			this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();

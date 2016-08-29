@@ -496,11 +496,37 @@ void MyImageViewer::SetLookupTable(vtkLookupTable * LookupTable)
 	//this->drawActor->SetVisibility(false);
 }
 
-void MyImageViewer::SetFocalPoint(double x, double y, double z)
+void MyImageViewer::SetFocalPointWithWorldCoordinate(double x, double y, double z)
 {
 	Cursor3D->SetFocalPoint(x, y, z);
+	cout << __func__ << endl;
+	cout << x << ' ' << y << ' ' << z << endl;
 	Cursor3D->Update();
+	const double* spacing = GetInput()->GetSpacing();
+	const double* origin = GetInput()->GetOrigin();
+	x = (x - origin[0])/spacing[0];
+	y = (y - origin[1])/spacing[1];
+	z = (z - origin[2])/spacing[2];
+	InitializeIntensityText(QString::number(
+		(GetInput()->GetScalarComponentAsDouble(x, y, z, 0))));
 	//SliceImplicitPlane->SetOrigin(x, y, z);
+}
+
+void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	const double* spacing = GetInput()->GetSpacing();
+	const double* origin = GetInput()->GetOrigin();
+	double point[3] = { i*spacing[0] + origin[0],
+		j*spacing[1] + origin[1], k*spacing[2] + origin[2] };
+	cout << __func__ << endl;
+	for (int in = 0; in < 3; in++) {
+		cout << point[in]<<' ';
+	}
+	Cursor3D->SetFocalPoint(i*spacing[0] + origin[0],
+		j*spacing[1] + origin[1], k*spacing[2] + origin[2]);
+	InitializeIntensityText(QString::number(
+		(GetInput()->GetScalarComponentAsDouble(i, j, k, 0))));
+	this->Render();
 }
 
 //void MyImageViewer::AddPolyData(vtkPolyData* polydata, vtkProperty* property)
