@@ -626,6 +626,7 @@ bool MainWindow::visualizeImage()
 	this->slotChangeSlice();
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
+
 				
 	return 0;
 }
@@ -1052,9 +1053,9 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 	if (ui->zSpinBox->value() != z) {
 		ui->zSpinBox->setValue(z);
 	}
-	cerr << __func__ << endl;
-	cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
-		' ' << m_2DimageViewer[2]->GetSlice() << endl;
+	//cerr << __func__ << endl;
+	//cerr << m_2DimageViewer[0]->GetSlice() << ' ' << m_2DimageViewer[1]->GetSlice() <<
+	//	' ' << m_2DimageViewer[2]->GetSlice() << endl;
 	this->slotChangeSlice();
 }
 
