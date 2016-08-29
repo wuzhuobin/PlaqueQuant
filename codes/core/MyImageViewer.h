@@ -151,6 +151,7 @@ protected:
 
 	virtual void InstallPipeline();
 	virtual void UnInstallPipeline();
+	virtual void UpdateOrientation();
 
 	//OrientationText
 	vtkTextActor*	OrientationTextActor[4];

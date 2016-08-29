@@ -280,6 +280,36 @@ void MyImageViewer::UnInstallPipeline()
 	}
 }
 
+void MyImageViewer::UpdateOrientation()
+{
+	// Set the camera position
+
+	vtkCamera *cam = this->Renderer ? this->Renderer->GetActiveCamera() : NULL;
+	if (cam)
+	{
+		switch (this->SliceOrientation)
+		{
+		case vtkImageViewer2::SLICE_ORIENTATION_XY:
+			cam->SetFocalPoint(0, 0, 0);
+			cam->SetPosition(0, 0, -1); // -1 if medical ?
+			cam->SetViewUp(0, -1, 0);
+			break;
+
+		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
+			cam->SetFocalPoint(0, 0, 0);
+			cam->SetPosition(0, -1, 0); // 1 if medical ?
+			cam->SetViewUp(0, 0, 1);
+			break;
+
+		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
+			cam->SetFocalPoint(0, 0, 0);
+			cam->SetPosition(1, 0, 0); // -1 if medical ?
+			cam->SetViewUp(0, 0, 1);
+			break;
+		}
+	}
+}
+
 //----------------------------------------------------------------------------
 void MyImageViewer::Render()
 {
@@ -314,15 +344,15 @@ void MyImageViewer::Render()
 			default:
 				xs = w_ext[1] - w_ext[0] + 1;
 				ys = w_ext[3] - w_ext[2] + 1;
-				this->Renderer->GetActiveCamera()->Roll(180);
-				this->Renderer->GetActiveCamera()->Azimuth(180);
+				//this->Renderer->GetActiveCamera()->Roll(180);
+				//this->Renderer->GetActiveCamera()->Azimuth(180);
 				break;
 
 			case MyImageViewer::SLICE_ORIENTATION_XZ:
 				xs = w_ext[1] - w_ext[0] + 1;
 				ys = w_ext[5] - w_ext[4] + 1;
-				this->Renderer->GetActiveCamera()->Azimuth(180);
-				this->Renderer->GetActiveCamera()->Elevation(180);
+				//this->Renderer->GetActiveCamera()->Azimuth(180);
+				//this->Renderer->GetActiveCamera()->Elevation(180);
 				break;
 
 			case MyImageViewer::SLICE_ORIENTATION_YZ:
@@ -351,6 +381,7 @@ void MyImageViewer::Render()
 			}
 			this->FirstRender = 0;
 		}
+
 	}
 	if (this->AnnotationRenderer) {
 		this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
@@ -487,8 +518,8 @@ void MyImageViewer::SetLookupTable(vtkLookupTable * LookupTable)
 void MyImageViewer::SetFocalPointWithWorldCoordinate(double x, double y, double z)
 {
 	Cursor3D->SetFocalPoint(x, y, z);
-	cout << __func__ << endl;
-	cout << x << ' ' << y << ' ' << z << endl;
+	//cout << __func__ << endl;
+	//cout << x << ' ' << y << ' ' << z << endl;
 	Cursor3D->Update();
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
@@ -506,10 +537,10 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 	const double* origin = GetInput()->GetOrigin();
 	double point[3] = { i*spacing[0] + origin[0],
 		j*spacing[1] + origin[1], k*spacing[2] + origin[2] };
-	cout << __func__ << endl;
-	for (int in = 0; in < 3; in++) {
-		cout << point[in]<<' ';
-	}
+	//cout << __func__ << endl;
+	//for (int in = 0; in < 3; in++) {
+	//	cout << point[in]<<' ';
+	//}
 	Cursor3D->SetFocalPoint(i*spacing[0] + origin[0],
 		j*spacing[1] + origin[1], k*spacing[2] + origin[2]);
 	InitializeIntensityText(QString::number(
