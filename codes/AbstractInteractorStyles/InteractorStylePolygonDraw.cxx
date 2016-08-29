@@ -330,6 +330,8 @@ void InteractorStylePolygonDraw::FillPolygon()
 {
 	//Get Main window
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	mainWnd->GetOverlay()->GetVTKImageData()->GetExtent(this->extent);
+
 	vtkContourWidget* contourWidget[2] = 
 		{m_vesselWallContourWidget, m_lumenWallContourWidget};
 	vtkContourRepresentation* contourRepresentation[2] =
@@ -397,12 +399,20 @@ void InteractorStylePolygonDraw::FillPolygon()
 
 		polygon->GetPoints()->GetBounds(bounds);
 
-		bounds_int[0] = ceil(bounds[0]);
-		bounds_int[1] = floor(bounds[1]);
-		bounds_int[2] = ceil(bounds[2]);
-		bounds_int[3] = floor(bounds[3]);
-		bounds_int[4] = ceil(bounds[4]);
-		bounds_int[5] = floor(bounds[5]);
+		bounds_int[0] = floor(bounds[0]) - 3;
+		bounds_int[1] = ceil(bounds[1]) + 3;
+		bounds_int[2] = floor(bounds[2]) - 3;
+		bounds_int[3] = ceil(bounds[3]) + 3;
+		bounds_int[4] = floor(bounds[4]) - 3;
+		bounds_int[5] = ceil(bounds[5]) + 3;
+
+		// Clamp values to within extent specified 
+		bounds_int[0] = { bounds_int[0] < this->extent[0] ? this->extent[0] : bounds_int[0] };
+		bounds_int[1] = { bounds_int[1] > this->extent[1] ? this->extent[1] : bounds_int[1] };
+		bounds_int[2] = { bounds_int[2] < this->extent[2] ? this->extent[2] : bounds_int[2] };
+		bounds_int[3] = { bounds_int[3] > this->extent[3] ? this->extent[3] : bounds_int[3] };
+		bounds_int[4] = { bounds_int[4] < this->extent[4] ? this->extent[4] : bounds_int[4] };
+		bounds_int[5] = { bounds_int[5] > this->extent[5] ? this->extent[5] : bounds_int[5] };
 
 
 		double p[3];

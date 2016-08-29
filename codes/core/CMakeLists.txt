@@ -125,16 +125,13 @@ add_executable(
 	${RCC_RSRS}
 	${RC_FILE}
 )
+qt5_use_modules(Core Core Gui Widgets PrintSupport Xml)
 
 #Link all libraries
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 target_link_libraries(
 	Core
-	Qt5::Core
-	Qt5::Gui
-	Qt5::Widgets 
-	Qt5::PrintSupport
 	${VTK_LIBRARIES} 
 	${VMTK_LIBRARIES} 
 	${ITK_LIBRARIES} 

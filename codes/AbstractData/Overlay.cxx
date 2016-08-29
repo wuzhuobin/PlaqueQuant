@@ -23,7 +23,7 @@ void Overlay::SetInputImageData(FloatImageType::Pointer imageData)
 	OrienterType::Pointer orienter = OrienterType::New();
 	orienter->UseImageDirectionOn();
 	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-	orienter->SetInput(imageData);
+	orienter->SetInput(imageData); 
 	orienter->Update();
 
 	ConnectorType::Pointer connector = ConnectorType::New();
@@ -58,6 +58,7 @@ void Overlay::SetInputImageData(const char* fileName)
 	ReaderType::Pointer reader = ReaderType::New();
 	reader->SetFileName(fileName);
 	reader->Update();
+	
 	SetInputImageData(reader->GetOutput());
 
 }
@@ -254,9 +255,10 @@ ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 	m_duplicator = DuplicatorType::New();
 	m_duplicator->SetInputImage(castImageFilter->GetOutput());
 	m_duplicator->Update();
-	m_duplicator->GetOutput()->SetDirection(orienter->GetOutput()->GetDirection());
 
-	m_itkOverlay->Graft(m_duplicator->GetOutput());
+	m_itkOverlay = m_duplicator->GetOutput();
+	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
+	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
 	//cout << __FUNCSIG__ << endl;
 	//cout << "m_vtkOverlay" << endl;
 	//m_vtkOverlay->Print(cerr);

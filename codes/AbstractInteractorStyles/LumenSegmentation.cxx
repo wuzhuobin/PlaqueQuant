@@ -115,7 +115,9 @@ void LumenSegmentaiton::Update()
 	const double* spacing = input->GetSpacing();
 	const double* origin = input->GetOrigin();
 	const double* bounds = vesselWallPolygon->GetPoints()->GetBounds();
-	const int* extent = input->GetExtent();
+	int extent[6];
+	input->GetExtent(extent);
+
 	int newVOI[4] = {0};
 	 //using the vesselWallPolygon to find a smaller VOI to extract
 	newVOI[0] = (bounds[0] - origin[0]) / spacing[0] - 1;
@@ -235,6 +237,26 @@ void LumenSegmentaiton::Update()
 
 				this->m_contour = lumenWallPolyData;
 				LumenSegmentaiton::ResequenceLumenWallPolyData(lumenWallPolyData);
+
+				// Down sample points
+				vtkSmartPointer<vtkPolyData> temp = vtkSmartPointer<vtkPolyData>::New();
+				vtkSmartPointer<vtkPoints> tempPts = vtkSmartPointer<vtkPoints>::New();
+				vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+				for (int k = 0; k < lumenWallPolyData->GetNumberOfPoints()/5;k++)
+				{
+					tempPts->InsertNextPoint(lumenWallPolyData->GetPoint(k * 5));
+					cells->InsertNextCell(2);
+					cells->InsertCellPoint(k);
+					if (k + 1 > lumenWallPolyData->GetNumberOfPoints() / 5) {
+						cells->InsertCellPoint(0);
+					}
+					else {
+						cells->InsertCellPoint(k + 1);
+					}
+				}
+				temp->SetPoints(tempPts);
+				temp->SetLines(cells);
+				lumenWallPolyData->DeepCopy(temp);
 			}
 		}
 		

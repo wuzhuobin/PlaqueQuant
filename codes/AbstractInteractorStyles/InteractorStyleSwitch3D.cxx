@@ -31,7 +31,7 @@ InteractorStyleSwitch3D::InteractorStyleSwitch3D()
 	this->DistanceWidget = InteractorStyle3DDistanceWidget::New();
 	this->CurrentStyle = 0;
 
-	this->SetInteractorStyleTo3DNavigation();
+	this->SetInteractorStyleTo3DDistanceWidget();
 }
 
 InteractorStyleSwitch3D::~InteractorStyleSwitch3D()
@@ -46,7 +46,6 @@ InteractorStyleSwitch3D::~InteractorStyleSwitch3D()
 void InteractorStyleSwitch3D::InternalUpdate()
 {
 	// Don't render text before any text is loaded
-
 	if (this->Interactor != NULL)
 		this->Interactor->Render();
 }
@@ -108,19 +107,6 @@ void InteractorStyleSwitch3D::SetCurrentRenderer(vtkRenderer* renderer)
 
 void InteractorStyleSwitch3D::OnChar()
 {
-	switch (this->Interactor->GetKeyCode())
-	{
-	case 'q':
-	case 'Q':
-		this->SetInteractorStyleTo3DNavigation();
-		break;
-	case 'w':
-	case 'W':
-		this->SetInteractorStyleTo3DDistanceWidget();
-		break;
-	default:
-		break;
-	}
 }
 //
 //void InteractorStyleSwitch3D::Change3DInteractionMode(vtkObject *, long unsigned int, void *)
