@@ -592,12 +592,16 @@ bool MainWindow::loadImage(int n, QStringList* list )
 		}
 		catch (itk::ExceptionObject &err)
 		{
-			std::cerr << err << std::endl;
+			std::cerr << err.what() << std::endl;
 			return 1;
 		}
+		this->vtkImage[n] = vtkImageData::New();
+		this->vtkImage[n]->DeepCopy(connectorAfter->GetOutput());
 	}
-	this->vtkImage[n] = vtkImageData::New();
-	this->vtkImage[n]->DeepCopy(connector->GetOutput());
+	else {
+		this->vtkImage[n] = vtkImageData::New();
+		this->vtkImage[n]->DeepCopy(connector->GetOutput());
+	}
 	
 	return 0;
 }
