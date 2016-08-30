@@ -527,50 +527,14 @@ void MainWindow::createRecentImageActions()
 
 bool MainWindow::loadImage(int n, QStringList* list )
 {
+	ImageType::Pointer img;
 	//Load Nifti Data
-	if (list->size()==1&&list->at(0).contains(".nii"))
+	if (list->size() == 1 && list->at(0).contains(".nii"))
 	{
-		NiftiReaderType::Pointer reader= NiftiReaderType::New();
-		reader->SetFileName( list->at(0).toStdString());
+		NiftiReaderType::Pointer reader = NiftiReaderType::New();
+		reader->SetFileName(list->at(0).toStdString());
 		reader->Update();
-
-		//re-orient
-		OrienterType::Pointer orienter = OrienterType::New();
-		orienter->UseImageDirectionOn();
-		orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-		orienter->SetInput(reader->GetOutput());
-		orienter->Update();
-	
-		ConnectorType::Pointer connector = ConnectorType::New();
-		ConnectorType::Pointer connectorAfter = ConnectorType::New();
-		connector->SetInput(orienter->GetOutput());
-		try
-		{
-			connector->Update();
-		}
-		catch(itk::ExceptionObject &err)
-		{
-			std::cerr<<err<<std::endl;
-			return 1;
-		}	
-
-		this->itkImage[n]->Graft(orienter->GetOutput());
-		this->itkImage[n]->Update();
-		if (n > 0) {
-			connectorAfter->SetInput(ImageAlignment(itkImage[n]));
-			try
-			{
-				connectorAfter->Update();
-			}
-			catch (itk::ExceptionObject &err)
-			{
-				std::cerr << err << std::endl;
-				return 1;
-			}
-		}
-		this->vtkImage[n] = vtkImageData::New();
-		this->vtkImage[n]->DeepCopy(connector->GetOutput());
-
+		img = reader->GetOutput();
 	}
 	else
 	{
@@ -580,12 +544,12 @@ bool MainWindow::loadImage(int n, QStringList* list )
 		typedef std::vector<std::string>    FileNamesContainer;
 		FileNamesContainer fileNames;
 
-		for (int i=0;i<list->size();i++)
+		for (int i = 0; i < list->size(); i++)
 		{
 			fileNames.push_back(list->at(i).toStdString());
 		}
 
-		reader->SetFileNames( fileNames );
+		reader->SetFileNames(fileNames);
 		try
 		{
 			reader->Update();
@@ -596,34 +560,45 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr << e << std::endl;
 			return 1;
 		}
+		img = reader->GetOutput();
+	}
+	//re-orient
+	OrienterType::Pointer orienter = OrienterType::New();
+	orienter->UseImageDirectionOn();
+	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	orienter->SetInput(img);
+	orienter->Update();
 
-		//re-orient
-		OrienterType::Pointer orienter = OrienterType::New();
-		orienter->UseImageDirectionOn();
-		orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-		orienter->SetInput(reader->GetOutput());
-		orienter->Update();
-
-		ConnectorType::Pointer connector = ConnectorType::New();
-		connector->SetInput(orienter->GetOutput());
-
-		try
-		{
-			connector->Update();
-		}
-		catch(itk::ExceptionObject &err)
-		{
-			std::cerr<<err<<std::endl;
-			return 1;
-		}	
-		//for (int i = 0; i < n; ++i) {
-			this->vtkImage[n]->DeepCopy(connector->GetOutput());
-		//}
-
+	ConnectorType::Pointer connector = ConnectorType::New();
+	ConnectorType::Pointer connectorAfter = ConnectorType::New();
+	connector->SetInput(orienter->GetOutput());
+	try
+	{
+		connector->Update();
+	}
+	catch (itk::ExceptionObject &err)
+	{
+		std::cerr << err << std::endl;
+		return 1;
 	}
 
+	this->itkImage[n]->Graft(orienter->GetOutput());
+	this->itkImage[n]->Update();
+	if (n > 0) {
+		connectorAfter->SetInput(ImageAlignment(itkImage[n]));
+		try
+		{
+			connectorAfter->Update();
+		}
+		catch (itk::ExceptionObject &err)
+		{
+			std::cerr << err << std::endl;
+			return 1;
+		}
+	}
+	this->vtkImage[n] = vtkImageData::New();
+	this->vtkImage[n]->DeepCopy(connector->GetOutput());
 	
-
 	return 0;
 }
 
