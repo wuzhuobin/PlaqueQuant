@@ -201,14 +201,15 @@ private:
 	void initializeModule();
 	void addOverlay2ImageViewer();
 
+	// UI related
+	void DisplayErrorMessage(std::string);
+	
 	//Data
 	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
 	ImageType::Pointer itkImage[5];
 	vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
 	vtkPolyData* m_centerlinePD;
-	//vtkImageData* vtkImageOverlay;
-	//vtkImageData* vtkImageOverlayOriginal;
 
     //Orientation
 	int m_orientation;

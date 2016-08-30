@@ -369,6 +369,19 @@ void MainWindow::addOverlay2ImageViewer()
 	this->slotOverlayVisibilty(true);
 
 }
+
+void MainWindow::DisplayErrorMessage(std::string str)
+{
+	QMessageBox msgBox;
+	msgBox.setWindowTitle("Error");
+	msgBox.setIcon(QMessageBox::Critical);
+	msgBox.setText(QString::fromStdString(str));
+	//msgBox.setStyleSheet("QMessageBox{background-color:rgb(22,22,22);}\n QLabel {color:rgb(255,255,255);}\n QPushButton {background-color: rgb(22,22,22); color:white; border-color:rgb(63,63,70); border-style: outset; border-width: 1px; min-width: 8em; padding: 3px;} QPushButton::hover{background-color: rgb(0,102,204);}");
+
+	msgBox.addButton(QMessageBox::Ok);
+	msgBox.exec();
+}
+
 void MainWindow::setActionsEnable( bool b )
 {	
 	//switch after open the image
@@ -979,7 +992,25 @@ void MainWindow::slot3DUpdate()
 		cl->Update();
 	}
 	catch (Centerline::ERROR_CODE e) {
-		cerr << "Error during centerline creation!";
+		// #DisplayErrorMsgHere
+		this->DisplayErrorMessage("Please select an ROI with cylindrical structures. (Branches are allowed)");
+
+		///Volume Render
+		GPUVolumeRenderingFilter* volumeRenderingFilter =
+			GPUVolumeRenderingFilter::New();
+
+		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
+		volumeRenderingFilter->GetVolume()->SetPickable(1);
+		volumeRenderingFilter->Update();
+
+		this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
+
+		this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3, 0.3, 0.3);
+		this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
+		this->ui->image4View->GetRenderWindow()->Render();
+		this->m_style3D->SetInteractorStyleTo3DDistanceWidget();
+
 		return;
 	}
 
