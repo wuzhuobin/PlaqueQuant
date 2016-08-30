@@ -1548,7 +1548,7 @@ void MainWindow::slotSegmentationView()
 				++i2;
 			}
 		}
-		if(i1 >= 5) {
+		if(i1 >= 5 && i2 <3) {
 			// disable view props
 			vtkPropCollection* props = this->m_2DimageViewer[i2]->GetRenderer()->GetViewProps();
 			props->InitTraversal();
