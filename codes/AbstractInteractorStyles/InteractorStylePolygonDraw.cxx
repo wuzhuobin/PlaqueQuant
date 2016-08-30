@@ -251,7 +251,13 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 {
 	if (m_vesselWallContourRepresentation == NULL || m_vesselWallContourWidget == NULL)
 		return;
+	
+	// if there are not points to close #Issue7
+	if (this->m_vesselWallContourRepresentation->GetNumberOfNodes() < 1)
+		return;
+
 	this->m_vesselWallContourWidget->CloseLoop();
+
 	if (m_lumenWallContourWidget) {
 		m_lumenWallContourWidget->Off();
 		m_lumenWallContourWidget->SetRepresentation(NULL);
