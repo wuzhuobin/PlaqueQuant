@@ -560,7 +560,41 @@ bool MainWindow::loadImage(int n, QStringList* list )
 			std::cerr << e << std::endl;
 			return 1;
 		}
-		img = reader->GetOutput();
+		//img = reader->GetOutput();
+		//QString s1 = "/";
+		//QString s2 = "/";
+		//const itk::MetaDataDictionary& dict = reader->GetOutput()->GetMetaDataDictionary();
+
+		//std::string patientNameTag = "0010|0010";
+		//typedef itk::MetaDataDictionary   DictionaryType;
+		//typedef itk::MetaDataObject< std::string > MetaDataStringType;
+
+		//MetaDataDictionary::ConstIterator patientNameTagItr = dict.Find(patientNameTag);
+		//itk::MetaDataObject< std::string >::ConstPointer patientNameEntryvalue =
+		//	dynamic_cast<const itk::MetaDataObject< std::string > *>(patientNameTagItr->second.GetPointer());
+		//if (patientNameEntryvalue != NULL) {
+		//	s1 = QString::fromStdString(patientNameEntryvalue->GetMetaDataObjectValue());
+		//}
+		//std::string modlaityTag = "0008|0060";
+		//MetaDataDictionary::ConstIterator modalityTagItr = dict.Find(modlaityTag);
+		//itk::MetaDataObject< std::string >::ConstPointer modalityEntryvalue =
+		//	dynamic_cast<const itk::MetaDataObject< std::string > *>(modalityTagItr->second.GetPointer());
+		//if (modalityEntryvalue != NULL) {
+		//	s2 = QString::fromStdString(modalityEntryvalue->GetMetaDataObjectValue());
+		//}
+		//itk::MetaDataObject<std::string>* metaDataObject1 = dynamic_cast<itk::MetaDataObject<std::string>*>(
+		//	const_cast<itk::MetaDataObjectBase*>(dict.Get("0010|0010")));
+		//if (metaDataObject1 != NULL) {
+		//	s1 = QString::fromStdString(metaDataObject1->GetMetaDataObjectValue());
+		//}
+		//itk::MetaDataObject<std::string>* metaDataObject2 = dynamic_cast<itk::MetaDataObject<std::string>*>(
+		//	const_cast<itk::MetaDataObjectBase*>(dict.Get("0008|0060")));
+		//if (metaDataObject1 != NULL) {
+		//	s2 = QString::fromStdString(metaDataObject1->GetMetaDataObjectValue());
+		//}
+		qDebug() << s1;
+		qDebug() << s2;
+		
 	}
 	//re-orient
 	OrienterType::Pointer orienter = OrienterType::New();
