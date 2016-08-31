@@ -66,7 +66,6 @@ void InteractorStyleSwitch3D::SetAutoAdjustCameraClippingRange(int value)
 
 	this->AutoAdjustCameraClippingRange = value;
 	this->Navigation->SetAutoAdjustCameraClippingRange(value);
-	this->Navigation->SetAutoAdjustCameraClippingRange(value);
 	this->Modified();
 }
 //
