@@ -11,6 +11,7 @@ SurfaceCreator::SurfaceCreator(QObject* parent) : QObject(parent)
 	m_input		= NULL;
 	m_output	= NULL;
 	m_factor	= 0.4;
+	m_smoothFactor = 15;
 	m_value		= -140; 
 	m_discrete	= false;
 	m_largest	= false;
@@ -27,6 +28,11 @@ SurfaceCreator::~SurfaceCreator(void)
 void SurfaceCreator::SetDiscrete(bool b)
 {
 	m_discrete = b;
+}
+
+void SurfaceCreator::SetSmoothIteration(int val)
+{
+	this->m_smoothFactor = val;
 }
 
 void SurfaceCreator::SetResamplingFactor(double factor)
@@ -102,7 +108,7 @@ bool SurfaceCreator::Update()
 	
 	m_smoother = vtkWindowedSincPolyDataFilter::New();
 	m_smoother->SetInputData(tempPolyData);
-	m_smoother->SetNumberOfIterations(15);
+	m_smoother->SetNumberOfIterations(this->m_smoothFactor);
 	//m_smoother->SetNumberOfIterations(0);
 	m_smoother->BoundarySmoothingOff();
 	m_smoother->FeatureEdgeSmoothingOff();

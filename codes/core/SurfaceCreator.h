@@ -24,6 +24,7 @@ public:
     void SetInput(vtkImageData*input);
     void SetValue(int value); 
 	void SetDiscrete(bool b);
+	void SetSmoothIteration(int);
 	void SetLargestConnected(bool b);
     bool Update();
     vtkPolyData* GetOutput();
@@ -32,6 +33,7 @@ private:
 	//Parameter
 	double	m_factor; 
     int		m_value;
+	int		m_smoothFactor;
 	bool	m_discrete;
 	bool	m_largest;
 
