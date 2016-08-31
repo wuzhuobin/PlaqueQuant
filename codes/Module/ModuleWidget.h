@@ -59,6 +59,7 @@ public slots:
 	void slotResetROI();
 	void slotChangeOpacity(int opactiy);
 	void slotChangeROI(int* bound);
+	void slotEnableMWTCalculation(int);
 	//void slotAddLumen();
 	//void slotAddVesselWall();
 	void GenerateReportPushButtonVisible();
