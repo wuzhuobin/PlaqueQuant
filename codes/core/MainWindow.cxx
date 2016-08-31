@@ -592,8 +592,8 @@ bool MainWindow::loadImage(int n, QStringList* list )
 		//if (metaDataObject1 != NULL) {
 		//	s2 = QString::fromStdString(metaDataObject1->GetMetaDataObjectValue());
 		//}
-		qDebug() << s1;
-		qDebug() << s2;
+		//qDebug() << s1;
+		//qDebug() << s2;
 		
 	}
 	//re-orient

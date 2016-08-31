@@ -8,4 +8,4 @@ add_subdirectory(Core)
 add_subdirectory(Measurements)
 add_subdirectory(MaximumWallThickness)
 add_subdirectory(CenterlineBranching)
-
+add_subdirectory(MyImageReader)
