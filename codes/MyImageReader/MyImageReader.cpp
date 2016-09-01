@@ -29,7 +29,6 @@ bool MyImageReader::loadImages()
 	for(QList<QStringList>::const_iterator cit = listOfFileNames.constBegin(); 
 		cit!=listOfFileNames.constEnd();++cit){
 		QStringList fileNames = *cit;
-		qDebug() << *cit;
 		ImageType::Pointer _image;
 		// load Nifti Data
 		if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
@@ -93,7 +92,9 @@ bool MyImageReader::loadImages()
 		this->mapOfVtkImages.insert(fileNames[0], connector->GetOutput());
 
 	}
-
+	qDebug() << listOfItkImages[0];
+	qDebug() << mapOfItkImages.first();
+	qDebug() << mapOfDICOMHeader.firstKey();
 	return true;
 }
 
