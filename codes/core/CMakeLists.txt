@@ -139,6 +139,7 @@ target_link_libraries(
 	Widgets 
 	GPURenderWithLUT
 	Measurements
+	Managers
 	MaximumWallThickness
 	CenterlineBranching
 	MyImageReader
