@@ -1,5 +1,5 @@
-#ifndef __MYIMAGEREADER_H__
-#define __MYIMAGEREADER_H__
+#ifndef __MYIMAGEMANAGER_H__
+#define __MYIMAGEMANAGER_H__
 
 #include <qobject.h>
 #include <qstringlist.h>
@@ -13,13 +13,13 @@
 using namespace itk;
 
 
-class MyImageReader : public QObject
+class MyImageManager : public QObject
 {
 	Q_OBJECT
 public:
-	MyImageReader(QList<QStringList> listOfFileNames = QList<QStringList>(),
+	MyImageManager(QList<QStringList> listOfFileNames = QList<QStringList>(),
 		bool registrationFlag = false, QObject* parent = NULL);
-	~MyImageReader();
+	~MyImageManager();
 
 	/**
 	 * load Images whose path are listOfFileNames
@@ -52,4 +52,4 @@ private:
 	ImageRegistration registration;
 };
 
-#endif // !__MYIMAGEREADER_H__
+#endif // !__MYIMAGEMANAGER_H__

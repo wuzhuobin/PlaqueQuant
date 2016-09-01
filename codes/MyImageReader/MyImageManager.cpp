@@ -1,4 +1,4 @@
-#include "MyImageReader.h"
+#include "MyImageManager.h"
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>
@@ -12,14 +12,14 @@
 #include <vector>
 
 using namespace itk;
-MyImageReader::MyImageReader(QList<QStringList> listOfFileNames,
+MyImageManager::MyImageManager(QList<QStringList> listOfFileNames,
 	bool registrationFlag, QObject* parent)
 	:listOfFileNames(listOfFileNames), registrationFlag(registrationFlag),
 	registration(parent), QObject(parent)
 {
 }
 
-MyImageReader::~MyImageReader()
+MyImageManager::~MyImageManager()
 {
 	for (QMap<Image<float, 3>::Pointer, QMap<QString, QString>>::iterator it;
 		it != this->mapOfDICOMHeader.end(); ++it) {
@@ -27,7 +27,7 @@ MyImageReader::~MyImageReader()
 	}
 	this->mapOfDICOMHeader.clear();
 }
-bool MyImageReader::loadImages()
+bool MyImageManager::loadImages()
 {
 	//for (int i = 0; i < this->listOfFileNames.size(); ++i) {
 	for(QList<QStringList>::const_iterator cit = listOfFileNames.constBegin(); 
@@ -101,56 +101,56 @@ bool MyImageReader::loadImages()
 }
 
 
-void MyImageReader::enableRegistration(bool flag)
+void MyImageManager::enableRegistration(bool flag)
 {
 	this->registrationFlag = flag;
 }
 
-void MyImageReader::addFileNames(QStringList fileNames)
+void MyImageManager::addFileNames(QStringList fileNames)
 {
 	this->listOfFileNames.append(fileNames);
 }
 
-QList<QStringList> MyImageReader::getListOfFileNames()
+QList<QStringList> MyImageManager::getListOfFileNames()
 {
 	return this->listOfFileNames;
 }
 
-ImageType::Pointer MyImageReader::imageAlignment(ImageType::Pointer alignedTo, ImageType::Pointer toBeAligned)
+ImageType::Pointer MyImageManager::imageAlignment(ImageType::Pointer alignedTo, ImageType::Pointer toBeAligned)
 {
-	MyImageReader::registration.SetFixedImage(alignedTo);
-	MyImageReader::registration.SetMovingImage(toBeAligned);
-	MyImageReader::registration.Update();
+	MyImageManager::registration.SetFixedImage(alignedTo);
+	MyImageManager::registration.SetMovingImage(toBeAligned);
+	MyImageManager::registration.Update();
 
 	return registration.GetOutput();
 }
 
-int MyImageReader::getNumberOfImages()
+int MyImageManager::getNumberOfImages()
 {
 	return this->listOfItkImages.size();
 }
 
-const QList<vtkSmartPointer<vtkImageData>> MyImageReader::getListOfVtkImages()
+const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
 {
 	return this->listOfVtkImages;
 }
 
-const QList<Image<float, 3>::Pointer> MyImageReader::getListOfItkImages()
+const QList<Image<float, 3>::Pointer> MyImageManager::getListOfItkImages()
 {
 	return this->listOfItkImages;
 }
 
-const QMap<QString, Image<float, 3>::Pointer> MyImageReader::getMapOfItkImages()
+const QMap<QString, Image<float, 3>::Pointer> MyImageManager::getMapOfItkImages()
 {
 	return this->mapOfItkImages;
 }
 
-const QMap<QString, vtkSmartPointer<vtkImageData>> MyImageReader::getMapOfVtkImages()
+const QMap<QString, vtkSmartPointer<vtkImageData>> MyImageManager::getMapOfVtkImages()
 {
 	return this->mapOfVtkImages;
 }
 
-const QMap<QString, QString> MyImageReader::getDICOMHeader(Image<float, 3>::Pointer itkImage)
+const QMap<QString, QString> MyImageManager::getDICOMHeader(Image<float, 3>::Pointer itkImage)
 {
 	return this->mapOfDICOMHeader[itkImage];
 }
