@@ -1,3 +1,5 @@
+#include <QTextBrowser>
+
 #include <vtkLine.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -100,7 +102,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	ui->sizeSpinBox3->setMaximum(9999);
 
 	//connect
-	connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
+	//connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
 	connect(ui->generateReportPushButton,		SIGNAL(clicked()), 					this,		SLOT(slotReportGetInput()));
 	connect(ui->labelComboBox,					SIGNAL(currentIndexChanged(int)),	this,		SLOT(slotChangeLayerNo()), Qt::UniqueConnection);
 	connect(ui->NextBtn,						SIGNAL(clicked()),					this,		SLOT(NextPage()));
@@ -110,11 +112,10 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
 	//connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity(int)));
-	connect(ui->maximumWallThicknessBtn,		SIGNAL(clicked()),					this,		SLOT(slotCalculateMaximumWallThickness()));
+	connect(ui->maximumWallThicknessChkBox,		SIGNAL(stateChanged(int)),			this,		SLOT(slotEnableMWTCalculation(int)));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
-	connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), 
-		mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
+	//connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 
 	this->GenerateReportPushButtonVisible();
@@ -215,6 +216,37 @@ void ModuleWidget::slotChangeROI(int * bound)
 	ui->sizeSpinBox3->setValue(bound[5] - bound[4]);
 
 }
+
+void ModuleWidget::slotEnableMWTCalculation(int checked)
+{
+	MainWindow* mainwnd = MainWindow::GetMainWindow();
+	Ui_MainWindow* main_ui = mainwnd->GetUI();
+
+	switch (checked)
+	{
+	case Qt::Unchecked:
+		// disconnect zSpinBox with MWT calculation
+		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotCalculateMaximumWallThickness()));
+		// remove line and label actors
+		for (int i = 0; i < 3; i++)
+		{
+			if (mainwnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
+				mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
+				mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
+			}
+		}
+		mainwnd->RenderAll2DViewers();
+		break;
+	case Qt::Checked:
+		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotCalculateMaximumWallThickness()), Qt::QueuedConnection);
+		// connect zSpinBox 
+		this->slotCalculateMaximumWallThickness();
+		break;
+	default:
+		break;
+	}
+}
+
 void ModuleWidget::slotSelectROI()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
@@ -271,7 +303,6 @@ void ModuleWidget::slotUpdate2DMeasurements()
 		mwt->Update();
 	}
 	catch (MaximumWallThickness::ERROR_CODE e) {
-		// #DisplayErrorMsgHere
 		cerr << "MaximumWallThickness error: " << e << endl;
 		//return;
 	}
@@ -283,9 +314,7 @@ void ModuleWidget::slotUpdate2DMeasurements()
 		m2d->Update();
 	}
 	catch (MeasurementFor2D::ERROR_CODE e) {
-		// #DisplayErrorMsgHere
 		cerr << "MeasurementFor2D error: " << e << endl;
-		//return;
 	}
 
 	/// Write measurements to table
@@ -310,10 +339,10 @@ void ModuleWidget::slotUpdate2DMeasurements()
 
 	// Write to table
 	try {
-		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).LumenArea)));
-		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).VesselWallArea)));
-		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance)));
-		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(NMI)));
+		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).LumenArea, 'f', 2)));
+		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).VesselWallArea, 'f', 2)));
+		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance, 'f', 2)));
+		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(NMI, 'f', 4)));
 	}
 	catch (...) {
 		// #DisplayErrorMsgHere
@@ -336,6 +365,37 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	} 
 	catch (MaximumWallThickness::ERROR_CODE e) {
 		// #DisplayErrorMsgHere
+		switch (e) {
+		case MaximumWallThickness::ERROR_EXTRACT_LOOP:
+			this->ui->MWTTextBrowser->setText("Extract loop failed!");
+			break;
+		case MaximumWallThickness::ERROR_EXTRACT_SLICE:
+			this->ui->MWTTextBrowser->setText("Extract slice failed!");
+			break;
+		case MaximumWallThickness::ERROR_INPUT_NOT_A_SLICE:
+			this->ui->MWTTextBrowser->setText("Input is not a slice!");
+			break;
+		case MaximumWallThickness::ERROR_THICKNESS_CAL:
+			this->ui->MWTTextBrowser->setText("");
+			break;
+		case MaximumWallThickness::ERROR_UNDEFINED_BRANCH:
+			this->ui->MWTTextBrowser->setText("Cannot pair up vessel wall and lumen!");
+			break;
+		case MaximumWallThickness::ERROR_VALUE_TRANSFORM:
+			this->ui->MWTTextBrowser->setText("Type casting failed!");
+			break;
+		default:
+			break;
+		}
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (mainwnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
+				mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
+				mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
+			}
+		}
+		mainwnd->RenderAll2DViewers();
 		return;
 	}
 	
@@ -352,6 +412,15 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 		double p1[3], p2[3];
 		if (l_lp.LoopPair.first->GetNumberOfPoints() == 0) {
 			// #DisplayErrorMsgHere
+			this->ui->MWTTextBrowser->setText("Loop pair extraction incorrect!");
+			for (int j = 0; j < 3; i++)
+			{
+				if (mainwnd->GetMyImageViewer(j)->GetSliceOrientation() == 2) {
+					mainwnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
+					mainwnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
+				}
+			}
+			mainwnd->RenderAll2DViewers();
 			return;
 		}
 
@@ -395,8 +464,16 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	this->m_lineActor->SetMapper(mapper);
 
 	// #MyViewerHardCode
-	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
-	mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
+	for (int i = 0; i < 3;i++)
+	{
+		if (mainwnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
+			mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
+			mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
+		}
+	}
+
+	// reset error message
+	this->ui->MWTTextBrowser->setText("Normal.");
 	mainwnd->RenderAll2DViewers();
 }
 

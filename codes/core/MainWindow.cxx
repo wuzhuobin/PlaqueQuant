@@ -11,6 +11,8 @@
 #include "GPUVolumeRenderingFilter.h"
 #include "MeasurementFor3D.h"
 
+#include <algorithm>
+#include <array>
 
 
 #include <QUrl>
@@ -22,6 +24,7 @@
 #include <QMimeData>
 #include <QSignalMapper>
 
+#include <vtkClipPolyData.h>
 #include <vtkAxesActor.h>
 #include <vtkProp.h>
 #include <vtkPolyDataMapper.h>
@@ -996,18 +999,40 @@ void MainWindow::slot3DUpdate()
 	SurfaceCreator* surfaceCreator = new SurfaceCreator();
 	surfaceCreator->SetInput(thres->GetOutput());
 	surfaceCreator->SetValue(10);
+	surfaceCreator->SetSmoothIteration(15);
 	surfaceCreator->SetDiscrete(false);
 	surfaceCreator->SetResamplingFactor(1.0);
 	surfaceCreator->Update();
 
+	// Clip at the end of the boundaries
+	vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
+	surface->DeepCopy(surfaceCreator->GetOutput());
+	vtkSmartPointer<vtkPlane> plane[2];
+	plane[0] = vtkSmartPointer<vtkPlane>::New();
+	plane[1] = vtkSmartPointer<vtkPlane>::New();
+	plane[0]->SetNormal(0, 0, -1);
+	plane[1]->SetNormal(0, 0, 1);
+	double zCoord1 = (this->SegmentationOverlay->GetDisplayExtent()[5] - 1)* this->vtkImage[0]->GetSpacing()[2] + this->vtkImage[0]->GetOrigin()[2];
+	double zCoord2 = (this->SegmentationOverlay->GetDisplayExtent()[4] + 1) * this->vtkImage[0]->GetSpacing()[2] + this->vtkImage[0]->GetOrigin()[2];
+	plane[0]->SetOrigin(0, 0, zCoord1);
+	plane[1]->SetOrigin(0, 0, zCoord2);
+	for (int i = 0; i < 2;i++)
+	{
+		vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
+		clipper->SetClipFunction(plane[i]);
+		clipper->SetInputData(surface);
+		clipper->Update();
+		surface->DeepCopy(clipper->GetOutput());
+	}
+
+
 	Centerline* cl = new Centerline;
 	try {
-		cl->SetSurface(surfaceCreator->GetOutput());
+		cl->SetSurface(surface);
 		cl->Update();
 	}
 	catch (Centerline::ERROR_CODE e) {
-		// #DisplayErrorMsgHere
-		this->DisplayErrorMessage("Please select an ROI with cylindrical structures. (Branches are allowed)");
+		this->DisplayErrorMessage("Centerline calculations failed. Some functions might not be available. Please select an ROI with cylindrical structures. (Branches are allowed)");
 
 		///Volume Render
 		GPUVolumeRenderingFilter* volumeRenderingFilter =
@@ -1051,6 +1076,18 @@ void MainWindow::slot3DUpdate()
 	Actor->SetPickable(1);
 	this->m_3DDataRenderer->AddActor(Actor);
 
+	//vtkSmartPointer<vtkPolyDataMapper> mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//mapper2->SetInputData(surface);
+	//mapper2->SetLookupTable(this->LookupTable);
+	//mapper2->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	//mapper2->Update();
+	//vtkSmartPointer<vtkActor> Actor2 = vtkSmartPointer<vtkActor>::New();
+	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	//Actor2->SetMapper(mapper2);
+	//Actor2->GetProperty()->SetRepresentationToWireframe();
+	//Actor2->SetPickable(1);
+	//this->m_3DDataRenderer->AddActor(Actor2);
+
 	///Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
 		GPUVolumeRenderingFilter::New();
@@ -1058,10 +1095,10 @@ void MainWindow::slot3DUpdate()
 	volumeRenderingFilter->SetInputData(voi->GetOutput());
 	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
 	volumeRenderingFilter->GetVolume()->SetPickable(1);
+	//volumeRenderingFilter->GetVolumeProperty()->SetInterpolationTypeToLinear();
 	volumeRenderingFilter->Update();
 
 	this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
-
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3,0.3,0.3);
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 	this->ui->image4View->GetRenderWindow()->Render();
@@ -1100,10 +1137,10 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 
-	// Update the display extent
+	// Update the display extent1
 	this->SegmentationOverlay->GetDisplayExtent(this->m_boundingExtent);
 
-	// Clamp the index to within the extent
+	// Clamp the index to within the extent1
 	for (int i = 0; i < 3; i++)
 	{
 		switch (i)
@@ -1639,8 +1676,18 @@ void MainWindow::slotAddExternalOverlay()
 
 	if (Path == "")
 		return;
+
 	this->SegmentationOverlay->SetInputImageData(Path);
+	int *extent1 = this->SegmentationOverlay->GetVTKImageData()->GetExtent();
+	int *extent2 = this->vtkImage[0]->GetExtent();
 	//this->vtkImageOverlay = SegmentationOverlay->GetOutput();
+
+
+
+	if (!std::equal(extent1, extent1 + 6, extent2)) {
+		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
+		return;
+	}
 
 	if (m_2DimageViewer[0]->GetInput() != NULL) {
 		addOverlay2ImageViewer();
