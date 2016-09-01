@@ -1,5 +1,21 @@
 #include "ImageRegistration.h"
 
+#include <itkCenteredTransformInitializer.h>
+#include "itkVersorRigid3DTransformOptimizer.h"
+#include "itkMattesMutualInformationImageToImageMetric.h"
+#include "itkLinearInterpolateImageFunction.h"
+#include "itkImageRegistrationMethod.h"
+#include "itkResampleImageFilter.h"
+
+typedef itk::VersorRigid3DTransformOptimizer									OptimizerType; 		//Optimizer
+typedef OptimizerType::ScalesType												OptimizerScalesType;
+typedef itk::MattesMutualInformationImageToImageMetric<ImageType, ImageType>	MetricType;			//Metric
+typedef itk::LinearInterpolateImageFunction <ImageType, double>					InterpolatorType;	//interpolation
+typedef itk::CenteredTransformInitializer<TransformType, ImageType, ImageType >	InitializerType;    //initializer
+typedef itk::ImageRegistrationMethod <ImageType, ImageType>						RegistrationType;	//registration method
+typedef itk::ResampleImageFilter <ImageType, ImageType>							ResampleFilterType;	//Resampler
+
+
 ImageRegistration::ImageRegistration(QObject* parent) : QObject(parent)
 {
 	m_fixedImage	 = NULL;

@@ -84,14 +84,12 @@ SET(
 SET(
 	CORE_SRC
 	${PROJECT_SOURCE_DIR}/MyImageViewer.cxx
-	# ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.cxx
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
 )
 
 SET(
 	CORE_INC
 	${PROJECT_SOURCE_DIR}/MyImageViewer.h
-	  # ${CMAKE_SOURCE_DIR}/codes/core/MyVtkInteractorStyleImage.h
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
 	# ${CMAKE_SOURCE_DIR}/include/Define.h
 
@@ -143,6 +141,7 @@ target_link_libraries(
 	Measurements
 	MaximumWallThickness
 	CenterlineBranching
+	MyImageReader
 )
 
 

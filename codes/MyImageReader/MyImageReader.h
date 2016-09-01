@@ -28,15 +28,19 @@ public:
 	 */
 	bool loadImages();
 	void enableRegistration(bool flag);
-	QList<QStringList> getListOfFileNames();
 	ImageType::Pointer imageAlignment(ImageType::Pointer alignedTo, 
 		ImageType::Pointer toBeAligned);
+	int getNumberOfImages();
 
-	QList<vtkSmartPointer<vtkImageData>> getListOfVtkImages();
-	QList<Image<float, 3>::Pointer> getListOfItkImages();
+	void addFileNames(QStringList fileNames);
+	QList<QStringList> getListOfFileNames();
+	const QList<vtkSmartPointer<vtkImageData>> getListOfVtkImages();
+	const QList<Image<float, 3>::Pointer> getListOfItkImages();
+	const QMap<QString, Image<float, 3>::Pointer> getMapOfItkImages();
+	const QMap<QString, vtkSmartPointer<vtkImageData>> getMapOfVtkImages();
+	const QMap<QString, QString> getDICOMHeader(Image<float, 3>::Pointer itkImage);
 
-
-//private:
+private:
 	QList<QStringList> listOfFileNames;
 	QList<Image<float, 3>::Pointer> listOfItkImages;
 	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages;

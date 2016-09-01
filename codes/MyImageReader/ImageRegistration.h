@@ -1,26 +1,15 @@
 #ifndef IMAGEREGISTRATION_H
 #define IMAGEREGISTRATION_H
 
-#include "Define.h"
 #include <QObject>
 
-#include "itkVersorRigid3DTransform.h"
-#include "itkVersorRigid3DTransformOptimizer.h"
-#include "itkMattesMutualInformationImageToImageMetric.h"
-#include "itkLinearInterpolateImageFunction.h"
-#include "itkImageRegistrationMethod.h"
-#include "itkResampleImageFilter.h"
-#include "itkCenteredTransformInitializer.h"
+#include <itkImage.h>
+#include <itkVersorRigid3DTransform.h>
 
 //Registration
-typedef itk::VersorRigid3DTransform <double>									TransformType;		//TransformType
-typedef itk::VersorRigid3DTransformOptimizer									OptimizerType; 		//Optimizer
-typedef OptimizerType::ScalesType												OptimizerScalesType;
-typedef itk::MattesMutualInformationImageToImageMetric<ImageType, ImageType>	MetricType;			//Metric
-typedef itk::LinearInterpolateImageFunction <ImageType, double>					InterpolatorType;	//interpolation
-typedef itk::CenteredTransformInitializer<TransformType, ImageType, ImageType >	InitializerType;    //initializer
-typedef itk::ImageRegistrationMethod <ImageType, ImageType>						RegistrationType;	//registration method
-typedef itk::ResampleImageFilter <ImageType, ImageType>							ResampleFilterType;	//Resampler
+using namespace itk;
+typedef Image< float, 3 >		ImageType;
+typedef VersorRigid3DTransform <double>									TransformType;		//TransformType
 
 
 class ImageRegistration : public QObject

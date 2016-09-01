@@ -63,8 +63,9 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
 	${PROJECT_BINARY_DIR}/codes/Measurements 
 	# Source for maximum wall thickness
-	${PROJECT_BINAR_DIR}/codes/MaximumWallThickness
-	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
+	${PROJECT_BINARY_DIR}/codes/MaximumWallThickness
+	${PROJECT_BINARY_DIR}/codes/CenterlineBranching
+	${PROJECT_BINARY_DIR}/codes/MyImageReader
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
@@ -81,7 +82,8 @@ SET(
 	# Source for maxmimum wall thickness
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
-)
+	${PROJECT_SOURCE_DIR}/codes/MyImageReader
+	)
 
 SET(
 	LIBRARY_OUTPUT_PATH

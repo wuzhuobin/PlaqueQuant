@@ -3,7 +3,7 @@
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageSeriesReader.h>
-//#include <itkImageToVTKImageFilter.h>
+#include <itkImageToVTKImageFilter.h>
 #include <itkOrientImageFilter.h>
 #include <itkMetaDataDictionary.h>
 #include <itkGDCMImageIO.h>
@@ -21,8 +21,12 @@ MyImageReader::MyImageReader(QList<QStringList> listOfFileNames,
 
 MyImageReader::~MyImageReader()
 {
+	for (QMap<Image<float, 3>::Pointer, QMap<QString, QString>>::iterator it;
+		it != this->mapOfDICOMHeader.end(); ++it) {
+		delete &it.value();
+	}
+	this->mapOfDICOMHeader.clear();
 }
-#include <qdebug.h>
 bool MyImageReader::loadImages()
 {
 	//for (int i = 0; i < this->listOfFileNames.size(); ++i) {
@@ -30,6 +34,8 @@ bool MyImageReader::loadImages()
 		cit!=listOfFileNames.constEnd();++cit){
 		QStringList fileNames = *cit;
 		ImageType::Pointer _image;
+		// QMAP saving DICOM imformation
+		QMap<QString, QString>* DICOMHeader = new QMap<QString, QString>;
 		// load Nifti Data
 		if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
 			ImageFileReader<Image<float, 3>>::Pointer reader = 
@@ -55,7 +61,6 @@ bool MyImageReader::loadImages()
 			_image = reader->GetOutput();
 
 			const  MetaDataDictionary& dictionary = dicomIO->GetMetaDataDictionary();
-			QMap<QString, QString>* DICOMHeader = new QMap<QString, QString>;
 			for (MetaDataDictionary::ConstIterator cit = dictionary.Begin();
 				cit != dictionary.End(); ++cit) {
 				MetaDataObjectBase::Pointer  entry = cit->second;
@@ -67,7 +72,6 @@ bool MyImageReader::loadImages()
 						QString::fromStdString(entryvalue->GetMetaDataObjectValue()));
 				}
 			}
-			mapOfDICOMHeader.insert(_image, *DICOMHeader);
 		}
 		// using the same orientation ITK_COORDINATE_ORIENTATION_RAI
 		OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
@@ -78,6 +82,7 @@ bool MyImageReader::loadImages()
 		orienter->SetInput(_image);
 		orienter->Update();
 		_image = orienter->GetOutput();
+		mapOfDICOMHeader.insert(_image, *DICOMHeader);
 		// Image Registration
 		if (cit != listOfFileNames.constBegin() && this-registrationFlag) {
 			_image = imageAlignment(this->mapOfItkImages[0], _image);
@@ -92,9 +97,6 @@ bool MyImageReader::loadImages()
 		this->mapOfVtkImages.insert(fileNames[0], connector->GetOutput());
 
 	}
-	qDebug() << listOfItkImages[0];
-	qDebug() << mapOfItkImages.first();
-	qDebug() << mapOfDICOMHeader.firstKey();
 	return true;
 }
 
@@ -102,6 +104,11 @@ bool MyImageReader::loadImages()
 void MyImageReader::enableRegistration(bool flag)
 {
 	this->registrationFlag = flag;
+}
+
+void MyImageReader::addFileNames(QStringList fileNames)
+{
+	this->listOfFileNames.append(fileNames);
 }
 
 QList<QStringList> MyImageReader::getListOfFileNames()
@@ -118,12 +125,32 @@ ImageType::Pointer MyImageReader::imageAlignment(ImageType::Pointer alignedTo, I
 	return registration.GetOutput();
 }
 
-QList<vtkSmartPointer<vtkImageData>> MyImageReader::getListOfVtkImages()
+int MyImageReader::getNumberOfImages()
+{
+	return this->listOfItkImages.size();
+}
+
+const QList<vtkSmartPointer<vtkImageData>> MyImageReader::getListOfVtkImages()
 {
 	return this->listOfVtkImages;
 }
 
-QList<Image<float, 3>::Pointer> MyImageReader::getListOfItkImages()
+const QList<Image<float, 3>::Pointer> MyImageReader::getListOfItkImages()
 {
 	return this->listOfItkImages;
+}
+
+const QMap<QString, Image<float, 3>::Pointer> MyImageReader::getMapOfItkImages()
+{
+	return this->mapOfItkImages;
+}
+
+const QMap<QString, vtkSmartPointer<vtkImageData>> MyImageReader::getMapOfVtkImages()
+{
+	return this->mapOfVtkImages;
+}
+
+const QMap<QString, QString> MyImageReader::getDICOMHeader(Image<float, 3>::Pointer itkImage)
+{
+	return this->mapOfDICOMHeader[itkImage];
 }
