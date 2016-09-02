@@ -17,8 +17,7 @@ class MyImageManager : public QObject
 {
 	Q_OBJECT
 public:
-	MyImageManager(QList<QStringList> listOfFileNames = QList<QStringList>(),
-		bool registrationFlag = false, QObject* parent = NULL);
+	MyImageManager(QObject* parent = NULL);
 	~MyImageManager();
 
 	/**
@@ -26,7 +25,6 @@ public:
 	 * @return	true load images successfully
 	 *			false load images fail
 	 */
-	bool loadImages();
 	void enableRegistration(bool flag);
 	ImageType::Pointer imageAlignment(ImageType::Pointer alignedTo, 
 		ImageType::Pointer toBeAligned);
@@ -47,6 +45,8 @@ private:
 	QMap<QString, Image<float, 3>::Pointer> mapOfItkImages;
 	QMap<QString, vtkSmartPointer<vtkImageData>> mapOfVtkImages;
 	QMap<Image<float, 3>::Pointer, QMap<QString, QString>> mapOfDICOMHeader;
+
+	friend class IOManager;
 
 	bool registrationFlag = false;
 	ImageRegistration registration;

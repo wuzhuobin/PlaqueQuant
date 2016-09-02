@@ -32,11 +32,13 @@ SET(
 SET(
 	MYIMAGEREADER_SRC
 	${PROJECT_SOURCE_DIR}/MyImageManager.cpp
+	${PROJECT_SOURCE_DIR}/IOManager.cpp
 	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
 	)
 SET(
 	MYIMAGEREADER_INC
 	${PROJECT_SOURCE_DIR}/MyImageManager.h
+	${PROJECT_SOURCE_DIR}/IOManager.h
 	${PROJECT_SOURCE_DIR}/ImageRegistration.H
 	)
 set(
