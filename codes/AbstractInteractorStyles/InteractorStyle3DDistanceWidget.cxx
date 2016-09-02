@@ -62,7 +62,7 @@ void InteractorStyle3DDistanceWidget::OnKeyPress()
 			int* pos = this->Interactor->GetEventPosition();
 
 			vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
-			picker->SetVolumeOpacityIsovalue(0.2); // #LookupTable
+			picker->SetVolumeOpacityIsovalue(mainwnd->GetLookupTable()->GetOpacity(MainWindow::LABEL_LUMEN)); // #LookupTable
 			picker->SetTolerance(0.0005);
 			picker->Pick(pos[0], pos[1], 0, this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
 
