@@ -99,6 +99,7 @@ void InteractorStylePolygonDraw::OnLeftButtonDown()
 
 void InteractorStylePolygonDraw::OnRightButtonDown()
 {
+	this->m_vesselWallContourWidget->CloseLoop();
 	if (CONTOUR_IS_ON_FLAG && AUTO_LUMEN_SEGMENTATION_ENABLE_FLAG) {
 		this->GenerateLumenWallContourWidget();
 	}
@@ -256,7 +257,6 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 	if (this->m_vesselWallContourRepresentation->GetNumberOfNodes() < 1)
 		return;
 
-	this->m_vesselWallContourWidget->CloseLoop();
 
 	if (m_lumenWallContourWidget) {
 		m_lumenWallContourWidget->Off();
