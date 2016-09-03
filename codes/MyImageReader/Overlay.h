@@ -1,12 +1,13 @@
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
-#include <vtkExtractVOI.h>
 #include <vtkImageData.h>
-//#include <vtkVersion.h>
+#include <vtkSmartPointer.h>
 #include <QObject>
-#include "Define.h"
-typedef itk::Image<float, 3> FloatImageType;
+
+#include <itkImage.h>
+typedef itk::Image<float, 3> ImageType;
+
 
 class Overlay : public QObject
 {
@@ -34,14 +35,13 @@ public:
 	 * convert itk::image to vtkImage 
 	 * @param	imageData the new input image
 	 */
-	void SetInputImageData(FloatImageType::Pointer imageData);
+	void SetInputImageData(ImageType::Pointer imageData);
 	void SetInputImageData(vtkImageData* imageData);
 	void SetInputImageData(QString fileName);
 	void SetInputImageData(const char* fileName);
 
 	void SetPixel(int pos[3], double value);
 	void SetPixel(int pos[3], unsigned char value);
-	void SetVisibleImageNo(int);
 
 	vtkImageData* GetOutput();
 	/**
@@ -54,16 +54,12 @@ public:
 	 * @param	format set the output image direction the same as the format image
 	 * @return	m_itkOverlay
 	 */
-	FloatImageType::Pointer GetITKOutput(ImageType::Pointer format);
+	ImageType::Pointer GetITKOutput(ImageType::Pointer format);
 
 private:
 
-	vtkImageData* m_vtkOverlay;
-	vtkImageData* m_vtkOverlayHolder;
+	vtkSmartPointer<vtkImageData> m_vtkOverlay;
 	ImageType::Pointer m_itkOverlay;
-	DuplicatorType::Pointer m_duplicator;
-	//itk::VTKImageToImageFilter<FloatImageType>::Pointer vtkImageToImageFilter;
-	//vtkSmartPointer<vtkImageCast> imageCastFilter;
 	int m_visible_image_no;
 
 	int DisplayExtent[6];

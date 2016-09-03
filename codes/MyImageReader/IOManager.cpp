@@ -2,7 +2,7 @@
 
 #include "MyImageManager.h"
 #include "ImageRegistration.h"
-#include "Define.h"
+//#include "Define.h"
 
 #include <itkImageFileReader.h>
 #include <itkMetaDataDictionary.h>
@@ -38,10 +38,10 @@ const QList<QStringList> IOManager::getListOfFileNames()
 
 bool IOManager::LoadImageData(QStringList fileNames)
 {
-	ImageType::Pointer _itkImage;
-	vtkSmartPointer<vtkImageData> _vtkImage;
+	ImageType::Pointer _itkImage = NULL;
+	vtkSmartPointer<vtkImageData> _vtkImage = NULL;
 	// QMAP saving DICOM imformation
-	QMap<QString, QString>* DICOMHeader;
+	QMap<QString, QString>* DICOMHeader = NULL;
 	if (fileNames.isEmpty()) {
 		_itkImage = NULL;
 		_vtkImage = NULL;
@@ -151,4 +151,34 @@ void IOManager::slotOpenMultiImages()
 void IOManager::slotOpenOneImage(QStringList fileNames)
 {
 	this->LoadImageData(fileNames);
+}
+
+void IOManager::slotOpenSegmentation(QString fileName)
+{
+	ImageType::Pointer _itkImage;
+	vtkSmartPointer<vtkImageData> _vtkImage;
+	
+	ImageFileReader<Image<float, 3>>::Pointer reader =
+		ImageFileReader<Image<float, 3>>::New();
+	reader->SetFileName(fileName.toStdString());
+	reader->Update();
+	_itkImage = reader->GetOutput();
+	this->myImageManager->overlay.SetInputImageData(_itkImage);
+
+	//if (_itkImage.IsNotNull()) {
+	//	// using the same orientation ITK_COORDINATE_ORIENTATION_RAI
+	//	OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
+	//		OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();
+	//	orienter->UseImageDirectionOn();
+	//	orienter->SetDesiredCoordinateOrientation(
+	//		itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	//	orienter->SetInput(_itkImage);
+	//	orienter->Update();
+	//	_itkImage = orienter->GetOutput();
+	//	ImageToVTKImageFilter<Image<float, 3>>::Pointer connector =
+	//		ImageToVTKImageFilter<Image<float, 3>>::New();
+	//	connector->SetInput(_itkImage);
+	//	connector->Update();
+	//	_vtkImage = connector->GetOutput();
+	//}
 }

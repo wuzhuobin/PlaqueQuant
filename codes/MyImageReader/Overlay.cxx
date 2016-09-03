@@ -2,22 +2,33 @@
 
 #include <itkVTKImageToImageFilter.h>
 #include <itkCastImageFilter.h>
+#include <itkOrientImageFilter.h>
+#include <itkImageToVTKImageFilter.h>
+#include <itkImageSeriesReader.h>
+#include <itkImageDuplicator.h>
 
 #include <vtkImageMagnitude.h>
 #include <vtkImageCast.h>
 #include <vtkSimpleImageToImageFilter.h>
+#include <vtkExtractVOI.h>
+
+typedef itk::OrientImageFilter<ImageType, ImageType> OrienterType;
+typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
+typedef itk::ImageSeriesReader< ImageType >			ReaderType;
+typedef itk::ImageDuplicator<ImageType>				DuplicatorType;
+
 
 Overlay::Overlay(QObject* parent) : QObject(parent)
 {
-	m_itkOverlay = ImageType::New();
-	m_vtkOverlay = vtkImageData::New();
+	m_itkOverlay = NULL;
+	m_vtkOverlay = NULL;
 }
 
 Overlay::~Overlay()
 {
 }
 
-void Overlay::SetInputImageData(FloatImageType::Pointer imageData)
+void Overlay::SetInputImageData(ImageType::Pointer imageData)
 {
 	//re-orient
 	OrienterType::Pointer orienter = OrienterType::New();
@@ -44,7 +55,7 @@ void Overlay::SetInputImageData(vtkImageData* imageData)
 	imageCast->SetOutputScalarTypeToDouble();
 	imageCast->SetInputData(imageData);
 	imageCast->Update();
-	m_vtkOverlay->DeepCopy(imageCast->GetOutput());
+	m_vtkOverlay = imageCast->GetOutput();
 }
 
 
@@ -60,11 +71,6 @@ void Overlay::SetInputImageData(const char* fileName)
 	reader->Update();
 	SetInputImageData(reader->GetOutput());
 
-}
-
-void Overlay::SetVisibleImageNo(int n)
-{
-	m_visible_image_no = n;
 }
 
 void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double spacing[3], double origin[3], int type)
@@ -176,6 +182,7 @@ bool Overlay::Update()
 
 void Overlay::Initialize(vtkImageData * img)
 {
+	m_vtkOverlay = vtkSmartPointer<vtkImageData>::New();
 	m_vtkOverlay->DeepCopy(img);
 	
 	vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
@@ -183,21 +190,20 @@ void Overlay::Initialize(vtkImageData * img)
 	castfilter->SetOutputScalarTypeToDouble();
 	castfilter->Update();
 
-	m_vtkOverlay->DeepCopy(castfilter->GetOutput());
+	m_vtkOverlay = castfilter->GetOutput();
 	//m_vtkOverlay->SetDimensions(img->GetDimensions());
 	//m_vtkOverlay->SetSpacing(img->GetSpacing());
 	//m_vtkOverlay->SetOrigin(img->GetOrigin());
 	////cout << img->GetScalarTypeAsString() << endl;
 	//m_vtkOverlay->AllocateScalars(VTK_DOUBLE, img->GetNumberOfScalarComponents());
-	int dim[3];
-	m_vtkOverlay->GetDimensions(dim);
+	const int* extent = m_vtkOverlay->GetExtent();
 
 
-	for (int i = 0; i < dim[0]; i++)
+	for (int i = extent[0]; i <= extent[1]; i++)
 	{
-		for (int j = 0; j < dim[1]; j++)
+		for (int j = extent[2]; j <= extent[3]; j++)
 		{
-			for (int k = 0; k < dim[2]; k++)
+			for (int k = extent[4]; k <= extent[5]; k++)
 			{
 				double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
 				*pixel = 0;
@@ -225,9 +231,9 @@ vtkImageData * Overlay::GetVTKImageData()
 		return this->m_vtkOverlay;
 }
 
-//FloatImageType::Pointer Overlay::GetITKOutput(ImageType format)
+//ImageType::Pointer Overlay::GetITKOutput(ImageType format)
 //{
-//	return FloatImageType::Pointer();
+//	return ImageType::Pointer();
 //}
 
 ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
@@ -253,18 +259,7 @@ ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 	orienter->SetInput(format);
 	orienter->Update();
 
-	m_duplicator = DuplicatorType::New();
-	m_duplicator->SetInputImage(castImageFilter->GetOutput());
-	m_duplicator->Update();
-	m_duplicator->GetOutput()->SetDirection(orienter->GetOutput()->GetDirection());
-
-	m_itkOverlay->Graft(m_duplicator->GetOutput());
-	//cout << __FUNCSIG__ << endl;
-	//cout << "m_vtkOverlay" << endl;
-	//m_vtkOverlay->Print(cerr);
-	//cout << "m_itkOverlay" << endl;
-	//cout << m_itkOverlay << endl;
-
+	m_itkOverlay = orienter->GetOutput();
 	//}
 	return m_itkOverlay;
 

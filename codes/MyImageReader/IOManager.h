@@ -37,7 +37,7 @@ public:
 	virtual void slotOpenOneImage(QStringList fileNames);
 
 	//virtual void slotOpenSegmentation();
-	//virtual void slotOpenSegmentation(QString);
+	virtual void slotOpenSegmentation(QString fileName);
 
 	//virtual void slotSaveImage(QString uniqueName, QString path);
 	//virtual void slotSaveImage(int index, QString path);

@@ -135,11 +135,11 @@ target_link_libraries(
 	${ITK_LIBRARIES} 
 	Module
 	InteractorStyles
-	AbstractData
+	# AbstractData
 	Widgets 
 	GPURenderWithLUT
 	Measurements
-	Managers
+	# Managers
 	MaximumWallThickness
 	CenterlineBranching
 	MyImageReader

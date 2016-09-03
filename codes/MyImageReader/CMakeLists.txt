@@ -34,12 +34,14 @@ SET(
 	${PROJECT_SOURCE_DIR}/MyImageManager.cpp
 	${PROJECT_SOURCE_DIR}/IOManager.cpp
 	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
+	${PROJECT_SOURCE_DIR}/Overlay.cxx
 	)
 SET(
 	MYIMAGEREADER_INC
 	${PROJECT_SOURCE_DIR}/MyImageManager.h
 	${PROJECT_SOURCE_DIR}/IOManager.h
-	${PROJECT_SOURCE_DIR}/ImageRegistration.H
+	${PROJECT_SOURCE_DIR}/ImageRegistration.h
+	${PROJECT_SOURCE_DIR}/Overlay.h
 	)
 set(
 	MAIN_SRC

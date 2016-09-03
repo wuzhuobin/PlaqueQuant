@@ -735,7 +735,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
-				if (*val > 0 || true) {
+				if (*val > 0) {
 					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
 							double rgba[4];

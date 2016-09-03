@@ -2,7 +2,7 @@
 
 using namespace itk;
 MyImageManager::MyImageManager(QObject* parent)
-	:QObject(parent)
+	:overlay(parent), QObject(parent)
 {
 }
 
@@ -53,4 +53,9 @@ const QMap<QString, vtkSmartPointer<vtkImageData>> MyImageManager::getMapOfVtkIm
 const QMap<QString, QString>* MyImageManager::getDICOMHeader(Image<float, 3>::Pointer itkImage)
 {
 	return this->mapOfDICOMHeader[itkImage];
+}
+
+const Overlay& MyImageManager::getOverlay()
+{
+	return this->overlay;
 }

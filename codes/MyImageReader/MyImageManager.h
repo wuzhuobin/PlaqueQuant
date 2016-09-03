@@ -10,6 +10,8 @@
 #include <vtkSmartPointer.h>
 
 #include <itkImage.h>
+
+#include "Overlay.h"
 using namespace itk;
 
 
@@ -33,9 +35,12 @@ public:
 	const QMap<QString, Image<float, 3>::Pointer> getMapOfItkImages();
 	const QMap<QString, vtkSmartPointer<vtkImageData>> getMapOfVtkImages();
 	const QMap<QString, QString>* getDICOMHeader(Image<float, 3>::Pointer itkImage);
+	const Overlay& getOverlay();
 
 private:
 	friend class IOManager;
+	
+	Overlay overlay;
 	
 	// QList
 	QList<Image<float, 3>::Pointer> listOfItkImages;
