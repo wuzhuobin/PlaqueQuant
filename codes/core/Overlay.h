@@ -3,7 +3,7 @@
 
 #include <vtkExtractVOI.h>
 #include <vtkImageData.h>
-#include <vtkVersion.h>
+//#include <vtkVersion.h>
 #include <QObject>
 #include "Define.h"
 typedef itk::Image<float, 3> FloatImageType;

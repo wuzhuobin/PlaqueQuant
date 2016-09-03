@@ -1,23 +1,27 @@
 #include "IOManager.h"
 
-
 #include "MyImageManager.h"
+#include "ImageRegistration.h"
+#include "Define.h"
 
 #include <itkImageFileReader.h>
+#include <itkMetaDataDictionary.h>
+#include <itkOrientImageFilter.h>
+#include <itkGDCMImageIO.h>
 #include <itkImageSeriesReader.h>
 #include <itkImageToVTKImageFilter.h>
-#include <itkOrientImageFilter.h>
-#include <itkMetaDataDictionary.h>
-#include <itkGDCMImageIO.h>
 
 using namespace itk;
 IOManager::IOManager(QObject* parent) 
 	:registration(parent), QObject(parent)
 {
-
 }
 
-void IOManager::slotEnableRegistration(bool flag)
+IOManager::~IOManager()
+{
+}
+
+void IOManager::enableRegistration(bool flag)
 {
 	this->registrationFlag = flag;
 }
@@ -34,16 +38,23 @@ const QList<QStringList> IOManager::getListOfFileNames()
 
 bool IOManager::LoadImageData(QStringList fileNames)
 {
-	ImageType::Pointer _image;
+	ImageType::Pointer _itkImage;
+	vtkSmartPointer<vtkImageData> _vtkImage;
 	// QMAP saving DICOM imformation
-	QMap<QString, QString>* DICOMHeader = new QMap<QString, QString>;
+	QMap<QString, QString>* DICOMHeader;
+	if (fileNames.isEmpty()) {
+		_itkImage = NULL;
+		_vtkImage = NULL;
+		DICOMHeader = NULL;
+	}
 	// load Nifti Data
-	if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
+	else if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
 		ImageFileReader<Image<float, 3>>::Pointer reader =
 			ImageFileReader<Image<float, 3>>::New();
 		reader->SetFileName(fileNames[0].toStdString());
 		reader->Update();
-		_image = reader->GetOutput();
+		_itkImage = reader->GetOutput();
+		DICOMHeader = NULL;
 	}
 	// Load Dicom Data
 	else {
@@ -59,8 +70,9 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		reader->SetFileNames(_fileNames);
 		reader->SetImageIO(dicomIO);
 		reader->Update();
-		_image = reader->GetOutput();
+		_itkImage = reader->GetOutput();
 
+		DICOMHeader = new QMap<QString, QString>;
 		const  MetaDataDictionary& dictionary = dicomIO->GetMetaDataDictionary();
 		for (MetaDataDictionary::ConstIterator cit = dictionary.Begin();
 			cit != dictionary.End(); ++cit) {
@@ -74,28 +86,30 @@ bool IOManager::LoadImageData(QStringList fileNames)
 			}
 		}
 	}
-	// using the same orientation ITK_COORDINATE_ORIENTATION_RAI
-	OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
-		OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();
-	orienter->UseImageDirectionOn();
-	orienter->SetDesiredCoordinateOrientation(
-		itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-	orienter->SetInput(_image);
-	orienter->Update();
-	_image = orienter->GetOutput();
-	this->myImageManager->mapOfDICOMHeader.insert(_image, *DICOMHeader);
-	// Image Registration
-	if (this->registrationFlag) {
-		_image = imageAlignment(this->myImageManager->mapOfItkImages[0], _image);
-	}
-	this->myImageManager->listOfItkImages.append(_image);
-	this->myImageManager->mapOfItkImages.insert(fileNames[0], _image);
+	if (_itkImage.IsNotNull()) {
+		// using the same orientation ITK_COORDINATE_ORIENTATION_RAI
+		OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
+			OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();
+		orienter->UseImageDirectionOn();
+		orienter->SetDesiredCoordinateOrientation(
+			itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+		orienter->SetInput(_itkImage);
+		orienter->Update();
+		_itkImage = orienter->GetOutput();
+		// Image Registration
+		if (this->registrationFlag) {
+			_itkImage = imageAlignment(this->myImageManager->listOfItkImages[0], _itkImage);
+		}
 
-	ImageToVTKImageFilter<Image<float, 3>>::Pointer connector =
-		ImageToVTKImageFilter<Image<float, 3>>::New();
-	connector->SetInput(_image);
-	this->myImageManager->listOfVtkImages.append(connector->GetOutput());
-	this->myImageManager->mapOfVtkImages.insert(fileNames[0], connector->GetOutput());
+		ImageToVTKImageFilter<Image<float, 3>>::Pointer connector =
+			ImageToVTKImageFilter<Image<float, 3>>::New();
+		connector->SetInput(_itkImage);
+		connector->Update();
+		_vtkImage = connector->GetOutput();
+	}
+	this->myImageManager->listOfItkImages.append(_itkImage);
+	this->myImageManager->listOfVtkImages.append(_vtkImage);
+	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 	return true;
 }
 
@@ -111,6 +125,11 @@ ImageType::Pointer IOManager::imageAlignment(ImageType::Pointer alignedTo, Image
 void IOManager::setMyImageManager(MyImageManager * myImageManager)
 {
 	this->myImageManager = myImageManager;
+}
+
+void IOManager::setUniqueKeys(QStringList keys)
+{
+	this->uniqueKeys = keys;
 }
 
 void IOManager::slotOpenMultiImages()
