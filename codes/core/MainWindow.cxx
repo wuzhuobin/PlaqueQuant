@@ -49,7 +49,8 @@
 //#include <itkImageFileWriter.h>
 
 MainWindow::MainWindow() 
-	:widgetGroup(this), viewerGroup(this), viewGroup(this)
+	:widgetGroup(this), viewerGroup(this), viewGroup(this),
+	imageManager(this),ioManager(this)
 {
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
@@ -145,7 +146,6 @@ MainWindow::MainWindow()
 	ui->windowlevelwidget->setHidden(true);
 
 	//Recent Image
-	m_maxRecentImage = 10;
 	createRecentImageActions();
 
 	//Overlay
@@ -517,7 +517,7 @@ void MainWindow::slotSaveSegmentation()
 void MainWindow::createRecentImageActions()
 {
 	QAction* recentFileAction = 0;
-	for(int i = 0; i < m_maxRecentImage; i++){
+	for(int i = 0; i < MAX_RECENT_IMAGE; i++){
 		recentFileAction = new QAction(this);
 		recentFileAction->setVisible(false);
 		connect(recentFileAction, SIGNAL(triggered()),this, SLOT(slotOpenRecentImage()));
@@ -703,7 +703,7 @@ void MainWindow::adjustForCurrentFile(const QString &filePath)
 	
 	recentFilePaths.removeAll(filePath);
 	recentFilePaths.prepend(filePath);
-	while (recentFilePaths.size() > m_maxRecentImage)
+	while (recentFilePaths.size() > MAX_RECENT_IMAGE)
 		recentFilePaths.removeLast();
 	settings.setValue("recentFiles", recentFilePaths);
 
@@ -718,10 +718,10 @@ void MainWindow::updateRecentActionList()
 		settings.value("recentFiles").toStringList();
 
 	int itEnd = 0;
-	if(recentFilePaths.size() <= m_maxRecentImage)
+	if(recentFilePaths.size() <= MAX_RECENT_IMAGE)
 		itEnd = recentFilePaths.size();
 	else
-		itEnd = m_maxRecentImage;
+		itEnd = MAX_RECENT_IMAGE;
     
 	for (int i = 0; i < itEnd; i++) 
 	{
@@ -730,7 +730,7 @@ void MainWindow::updateRecentActionList()
 		recentFileActionList.at(i)->setVisible(true);
 	}
 
-	for (int i = itEnd; i < m_maxRecentImage; i++)
+	for (int i = itEnd; i < MAX_RECENT_IMAGE; i++)
 		recentFileActionList.at(i)->setVisible(false);
 }
 

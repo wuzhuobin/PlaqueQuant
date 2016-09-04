@@ -2,7 +2,6 @@
 
 #include "MyImageManager.h"
 #include "ImageRegistration.h"
-//#include "Define.h"
 
 #include <itkImageFileReader.h>
 #include <itkMetaDataDictionary.h>
@@ -10,6 +9,8 @@
 #include <itkGDCMImageIO.h>
 #include <itkImageSeriesReader.h>
 #include <itkImageToVTKImageFilter.h>
+
+#include "RegistrationWizard.h"
 
 using namespace itk;
 IOManager::IOManager(QObject* parent) 
@@ -29,6 +30,11 @@ void IOManager::enableRegistration(bool flag)
 void IOManager::setListOfFileNames(QList<QStringList> listOfFileNames)
 {
 	this->listOfFileNames = listOfFileNames;
+}
+
+void IOManager::addToListOfFileNames(QStringList fileNames)
+{
+	this->listOfFileNames.append(fileNames);
 }
 
 const QList<QStringList> IOManager::getListOfFileNames()
@@ -132,6 +138,20 @@ void IOManager::setUniqueKeys(QStringList keys)
 	this->uniqueKeys = keys;
 }
 
+void IOManager::slotOpenWithWizard(QString dir)
+{
+	RegistrationWizard wizard(dir);
+	if (wizard.exec() == QWizard::Rejected)
+		return;
+	QStringList* wizardFileNames[5] = {
+		wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
+		wizard.getFileNames4(), wizard.getFileNames5() };
+	for (int i = 0; i < 5; ++i) {
+		this->addToListOfFileNames(*wizardFileNames[i]);
+	}
+	slotOpenMultiImages();
+}
+
 void IOManager::slotOpenMultiImages()
 {
 	bool _flag = this->registrationFlag;
@@ -146,11 +166,13 @@ void IOManager::slotOpenMultiImages()
 		}
 		slotOpenOneImage(*cit);
 	}
+	emit finishOpenMultiImages();
 }
 
 void IOManager::slotOpenOneImage(QStringList fileNames)
 {
 	this->LoadImageData(fileNames);
+	emit finishOpenOneImage();
 }
 
 void IOManager::slotOpenSegmentation(QString fileName)

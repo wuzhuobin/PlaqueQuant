@@ -24,6 +24,8 @@
 #include "InfoDialog.h"
 #include "Overlay.h"
 #include "Distance3DWidget.h"
+#include "MyImageManager.h"
+#include "IOManager.h"
 
 class ModuleWidget;
 class MainWindow: public QMainWindow
@@ -190,7 +192,7 @@ private:
 	//3D ruler
 	Distance3DWidget* m_distance3DWidget;
 	//Recent File
-	int m_maxRecentImage;
+	const static int MAX_RECENT_IMAGE = 10;
 	QList<QAction*> recentFileActionList;
 	void createRecentImageActions();
 	void adjustForCurrentFile(const QString& filePath);
@@ -206,10 +208,14 @@ private:
 	
 	//Data
 	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
-	ImageType::Pointer itkImage[5];
-	vtkImageData* vtkImage[5];
+	//ImageType::Pointer itkImage[5];
+	//vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
 	vtkPolyData* m_centerlinePD;
+	MyImageManager imageManager;
+	IOManager ioManager;
+
+
 
     //Orientation
 	int m_orientation;

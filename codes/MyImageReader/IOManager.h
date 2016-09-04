@@ -28,8 +28,11 @@ public:
 	virtual void setUniqueKeys(QStringList keys);
 
 	void setListOfFileNames(QList<QStringList> listOfFileNames);
+	void addToListOfFileNames(QStringList fineNames);
 	const QList<QStringList> getListOfFileNames();
 //public slots:
+
+	virtual void slotOpenWithWizard(QString dir);
 
 	virtual void slotOpenMultiImages();
 
@@ -48,6 +51,9 @@ public:
 
 	//void addFileNames(QStringList fileNames);
 
+signals:
+	void finishOpenMultiImages();
+	void finishOpenOneImage();
 
 protected:
 	virtual bool LoadImageData(QStringList fileNames);

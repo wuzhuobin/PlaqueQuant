@@ -35,6 +35,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/IOManager.cpp
 	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
 	${PROJECT_SOURCE_DIR}/Overlay.cxx
+	${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
 	)
 SET(
 	MYIMAGEREADER_INC
@@ -42,6 +43,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/IOManager.h
 	${PROJECT_SOURCE_DIR}/ImageRegistration.h
 	${PROJECT_SOURCE_DIR}/Overlay.h
+	${PROJECT_SOURCE_DIR}/RegistrationWizard.h
 	)
 set(
 	MAIN_SRC

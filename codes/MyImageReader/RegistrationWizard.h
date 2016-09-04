@@ -166,7 +166,7 @@ class RegistrationWizard : public QWizard
 public:
 	enum { Page_Directory, Page_Image, Page_Conclusion };
 
-    RegistrationWizard(QWidget *parent = 0,QString dir=NULL);
+    RegistrationWizard(QString dir = "", QWidget *parent = 0);
 
 	QList<QStringList*> *fileNameList;
     

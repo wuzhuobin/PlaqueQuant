@@ -1,7 +1,5 @@
 #include "RegistrationWizard.h"
 #include <QWidget>
-//#include <QPrinter>
-//#include <QPrintDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QHBoxLayout>
@@ -28,7 +26,7 @@
 #include "Define.h"
 
 
-RegistrationWizard::RegistrationWizard(QWidget *parent,QString dir) : QWizard(parent)
+RegistrationWizard::RegistrationWizard(QString dir, QWidget *parent) : QWizard(parent)
 {
 	directoryPage	= new DirectoryPage;
 	imagePage		= new ImagePage;

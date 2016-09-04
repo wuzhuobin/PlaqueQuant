@@ -53,7 +53,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/InfoDialog.cxx
 	${PROJECT_SOURCE_DIR}/MainWindow.cxx
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
-	${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
+	# ${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
 	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
@@ -68,7 +68,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/InfoDialog.h
 	${PROJECT_SOURCE_DIR}/MainWindow.h
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.h
-	${PROJECT_SOURCE_DIR}/RegistrationWizard.h
+	# ${PROJECT_SOURCE_DIR}/RegistrationWizard.h
 	${PROJECT_SOURCE_DIR}/ReportGenerator.h
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
