@@ -152,12 +152,23 @@ void IOManager::slotOpenWithWizard(QString dir)
 	RegistrationWizard wizard(dir);
 	if (wizard.exec() == QWizard::Rejected)
 		return;
-	QStringList* wizardFileNames[5] = {
-		wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
-		wizard.getFileNames4(), wizard.getFileNames5() };
 	for (int i = 0; i < 5; ++i) {
-		this->addToListOfFileNames(*wizardFileNames[i]);
+		if (wizard.getFileNamesN(i + 1) == NULL) {
+			addToListOfFileNames(QStringList());
+		}
+		else {
+			this->addToListOfFileNames(*wizard.getFileNamesN(i + 1));
+		}
 	}
+	//QStringList* wizardFileNames[5] = {
+	//	wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
+	//	wizard.getFileNames4(), wizard.getFileNames5() };
+	//for (int i = 0; i < 5; ++i) {
+	//	if (wizardFileNames[i] == NULL) {
+	//		wizardFileNames[i];
+	//	}
+	//	this->addToListOfFileNames(*wizardFileNames[i]);
+	//}
 	slotOpenMultiImages();
 }
 
@@ -175,6 +186,8 @@ void IOManager::slotOpenMultiImages()
 		}
 		slotOpenOneImage(*cit);
 	}
+	this->myImageManager->overlay.Initialize(
+		this->myImageManager->listOfVtkImages[0]);
 	emit finishOpenMultiImages();
 }
 

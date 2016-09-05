@@ -17,6 +17,13 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
+#VMTK
+find_package(VMTK REQUIRED)
+if (NOT VMTK_FOUND)
+	message(FATAL_ERROR "error: VMTK is not found")
+endif()
+include(${VMTK_USE_FILE})
+
 if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
   # Instruct CMake to run moc automatically when needed.
   # set(CMAKE_AUTOMOC ON)
@@ -30,7 +37,7 @@ endif()
 
 #link other libraries
 link_directories(
-	${PROJECT_SOURCE_DIR}/lib
+	${CMAKE_SOURCE_DIR}/lib
 	)
 
 include_directories(
@@ -43,7 +50,7 @@ SET(
 	${CMAKE_SOURCE_DIR}/lib
 )
 
-SET(MODULE_QT_INC 
+SET(UI_QT_INC 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.h
 	${PROJECT_SOURCE_DIR}/MyThread.h
 	${PROJECT_SOURCE_DIR}/InfoDialog.h
@@ -51,7 +58,7 @@ SET(MODULE_QT_INC
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.h
 )
 
-SET(MODULE_QT_SRC 
+SET(UI_QT_SRC 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.cxx
 	${PROJECT_SOURCE_DIR}/MyThread.cxx
 	${PROJECT_SOURCE_DIR}/InfoDialog.cxx
@@ -59,32 +66,54 @@ SET(MODULE_QT_SRC
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
 )
 
-SET(MODULE_QT_UI 
+SET(UI_QT_UI 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.ui
 	${PROJECT_SOURCE_DIR}/InfoDialog.ui
 	${PROJECT_SOURCE_DIR}/MainWindow.ui
 )
+Set(
+	QT_RSRS 
+	${CMAKE_SOURCE_DIR}/resources/Project.qrc
+)
 
+Set(
+	RC_FILE
+	${CMAKE_SOURCE_DIR}/resources/Project.rc
+)
 #Generate moc and ui file
-QT5_WRAP_UI(UISrcs ${MODULE_QT_UI})
-QT5_WRAP_CPP(MOCSrcs ${MODULE_QT_INC})
+QT5_WRAP_UI(UISrcs ${UI_QT_UI})
+QT5_WRAP_CPP(MOCSrcs ${UI_QT_INC})
+QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
 
 add_library(
-	Module 
+	UI 
 	${UISrcs}
 	${MOCSrcs} 
-	${MODULE_QT_SRC} 
-	${MODULE_QT_INC}
-	${MODULE_QT_UI}
+	${UI_QT_SRC} 
+	${UI_QT_INC}
+	${UI_QT_UI}
+	${RCC_RSRS}
+	${QT_RSRS}
+	${RC_FILE}
 	)
 
 #link libraries
 target_link_libraries(
-	Module
+	UI
 	${ITK_LIBRARIES}  
 	${VTK_LIBRARIES}
+	${VMTK_LIBRARIES} 
 	Qt5::Widgets 
 	Qt5::PrintSupport
+	InteractorStyles
+	# AbstractData
+	Widgets 
+	GPURenderWithLUT
+	Measurements
+	# Managers
+	MaximumWallThickness
+	CenterlineBranching
+	MyImageReader
 	)
 
 #Grouping in MSVC
@@ -93,6 +122,7 @@ SOURCE_GROUP(
 	FILES 
 	${UISrcs}
 	${MOCSrcs}
+	${RCC_RSRS}
 	)
 SOURCE_GROUP(
 	"UI FILES" 	

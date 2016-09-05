@@ -84,7 +84,7 @@ private:
 	vtkSmartPointer<vtkImageData> m_image;
 	vtkSmartPointer<vtkImageData> m_sliceImage;
 	vtkSmartPointer<vtkImageData> m_edgeImage[EDGENUM];
-	vtkSmartPointer<vtkContourFilter> m_contourFilter;
+	//vtkSmartPointer<vtkContourFilter> m_contourFilter;
 
 	std::vector<LoopPair> m_loopPairVect;
 	std::vector<DistanceLoopPair> m_distanceVect;

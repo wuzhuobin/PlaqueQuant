@@ -133,7 +133,7 @@ target_link_libraries(
 	${VTK_LIBRARIES} 
 	${VMTK_LIBRARIES} 
 	${ITK_LIBRARIES} 
-	Module
+	UI
 	InteractorStyles
 	# AbstractData
 	Widgets 

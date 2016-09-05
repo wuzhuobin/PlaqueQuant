@@ -9,6 +9,8 @@
 #include "ModuleWidget.h"
 #include "GPUVolumeRenderingFilter.h"
 #include "MeasurementFor3D.h"
+#include "Centerline.h"
+#include "Define.h"
 
 #include <algorithm>
 #include <array>
@@ -30,10 +32,10 @@
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkImageActor.h>
-#include <vtkDistanceRepresentation3D.h>
-#include <vtkDistanceRepresentation2D.h>
+//#include <vtkDistanceRepresentation3D.h>
+//#include <vtkDistanceRepresentation2D.h>
 #include <vtkDistanceWidget.h>
-#include <vtkPointHandleRepresentation3D.h>
+//#include <vtkPointHandleRepresentation3D.h>
 #include <vtkLookupTable.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
@@ -43,7 +45,6 @@
 #include <vtkImageCast.h>
 #include <vtkImageThreshold.h>
 
-#include "Centerline.h"
 
 //#include <itkImageFileWriter.h>
 
@@ -101,7 +102,7 @@ MainWindow::MainWindow()
 	connect(ui->actionImage3, SIGNAL(triggered()), viewerMapper, SLOT(map()));
 	connect(ui->actionImage4, SIGNAL(triggered()), viewerMapper, SLOT(map()));
 	connect(ui->actionFourViews, SIGNAL(triggered()), viewerMapper, SLOT(map()));
-	connect(ui->actionSave, SIGNAL(triggered()), &ioManager, SLOT(slotSaveSegmentationWithDiaglog()));
+	connect(ui->actionSave, SIGNAL(triggered()), &ioManager, SLOT(slotSaveSegmentaitonWithDiaglog()));
 	connect(viewerMapper, SIGNAL(mapped(int)), this, SLOT(slotImage(int)));
 	connect(ui->ULBtn, SIGNAL(clicked()), ui->actionImage1, SLOT(trigger()));
 	connect(ui->URBtn, SIGNAL(clicked()), ui->actionImage2, SLOT(trigger()));
@@ -160,7 +161,8 @@ MainWindow::MainWindow()
 	//Initial Visible image number
 	visibleImageNum = 0;
     
-
+	// IOManager, ImageManager
+	this->ioManager.setMyImageManager(&this->imageManager);
     
     
 	//Parameter
@@ -197,7 +199,7 @@ MainWindow::MainWindow()
 
 	ui->image4View->SetRenderWindow(this->m_3DimageViewer);
 
-	ImageAlignment(NULL) = NULL;
+	//ImageAlignment(NULL) = NULL;
 	this->m_centerlinePD = NULL;
 	//for (int i = 0; i < 5; ++i) {
 	//	itkImage[i] = ImageType::New();
@@ -412,19 +414,14 @@ void MainWindow::slotExit()
 	qApp->exit();
 }
 
-void MainWindow::slotOpenImage(QString dir)
-{
-
-	//adjustForCurrentFile(wizard.getDirectory());
-	slotVisualizeImage();
-
-
-}
-
-void MainWindow::slotOpenImage()
-{
-	slotOpenImage("");
-}
+//void MainWindow::slotOpenImage(QString dir)
+//{
+//
+//	//adjustForCurrentFile(wizard.getDirectory());
+//	slotVisualizeImage();
+//
+//
+//}
 
 
 void MainWindow::slotOpenRecentImage()
@@ -434,7 +431,7 @@ void MainWindow::slotOpenRecentImage()
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (action)
 	{
-		slotOpenImage(action->data().toString());
+		ioManager.slotOpenWithWizard(action->data().toString());
 	}
 }
 
@@ -745,7 +742,7 @@ void MainWindow::slotSelectROI()
 
 	int newExtent[6];
 	m_style[0]->GetROI()->SelectROI(newExtent);
-	m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
+	//m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
 	// Extract VOI of the overlay Image data
 
 	// Extract VOI of the vtkImage data
@@ -756,11 +753,11 @@ void MainWindow::slotSelectROI()
 			extractVOIFilter->SetInputData(imageManager.getListOfVtkImages()[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			imageManager.getListOfVtkImages()[i] = extractVOIFilter->GetOutput();
+			imageManager.getListOfVtkImages()[i]->DeepCopy(extractVOIFilter->GetOutput());
 		}
 	}
 
-	this->imageManager.getOverlay().SetDisplayExtent(newExtent);
+	//this->imageManager.getOverlay().SetDisplayExtent(newExtent);
 	
 	for (int i = 0; i < 3; i++)
 	{
@@ -1178,30 +1175,30 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *ev)
 	ev->accept();
 }
 
-//void MainWindow::dropEvent( QDropEvent *ev )
-//{
-//    const QMimeData *mimeData = ev->mimeData();
-//	QList<QUrl> urls = mimeData->urls();
-//	foreach(QUrl url, urls)
-//	{
-//		QString folder = url.toLocalFile();
-//		folder.replace("\\","/");
-//		
-//		RegistrationWizard wizard(this,folder);
-//		int isFinished = wizard.exec();
-//
-//		if (isFinished == QWizard::Rejected )
-//			return;
-//
-//		if (wizard.getFileNames1()!=NULL) loadImage(1,wizard.getFileNames1());
-//		if (wizard.getFileNames2()!=NULL) loadImage(2,wizard.getFileNames2());
-//		if (wizard.getFileNames3()!=NULL) loadImage(3,wizard.getFileNames3());
-//        if (wizard.getFileNames4()!=NULL) loadImage(4,wizard.getFileNames4());
-//		if (wizard.getFileNames5()!=NULL) loadImage(5,wizard.getFileNames5());
-//		slotVisualizeImage();
-//		adjustForCurrentFile(wizard.getDirectory());
-//	}
-//}
+void MainWindow::dropEvent( QDropEvent *ev )
+{
+    const QMimeData *mimeData = ev->mimeData();
+	QList<QUrl> urls = mimeData->urls();
+	foreach(QUrl url, urls)
+	{
+		QString folder = url.toLocalFile();
+		folder.replace("\\","/");
+		
+		//RegistrationWizard wizard(this,folder);
+		//int isFinished = wizard.exec();
+
+		//if (isFinished == QWizard::Rejected )
+		//	return;
+
+		//if (wizard.getFileNames1()!=NULL) loadImage(1,wizard.getFileNames1());
+		//if (wizard.getFileNames2()!=NULL) loadImage(2,wizard.getFileNames2());
+		//if (wizard.getFileNames3()!=NULL) loadImage(3,wizard.getFileNames3());
+  //      if (wizard.getFileNames4()!=NULL) loadImage(4,wizard.getFileNames4());
+		//if (wizard.getFileNames5()!=NULL) loadImage(5,wizard.getFileNames5());
+		//slotVisualizeImage();
+		//adjustForCurrentFile(wizard.getDirectory());
+	}
+}
 
 
 void MainWindow::slotShowProgressDialog( int value, QString text )
@@ -1241,19 +1238,19 @@ QString MainWindow::GetFileName(int i)
 {
     
     QString FileName;
-	QString path;
-    int j = 0, start, end;
-	path = FileNameList[i].at(0);
-	if (!path.isEmpty())
-	{
-		start = path.lastIndexOf("/");
-		end = path.length();
-		for (int k = start + 1; k < end; k++) {
-			FileName[j] = path[k];
-			j++;
-		}
-		FileName.remove(".nii");
-	}
+	//QString path;
+ //   int j = 0, start, end;
+	//path = FileNameList[i].at(0);
+	//if (!path.isEmpty())
+	//{
+	//	start = path.lastIndexOf("/");
+	//	end = path.length();
+	//	for (int k = start + 1; k < end; k++) {
+	//		FileName[j] = path[k];
+	//		j++;
+	//	}
+	//	FileName.remove(".nii");
+	//}
     return FileName;
     
 }
@@ -1265,39 +1262,41 @@ int MainWindow::GetVisibleImageNo()
 
 
 //Segmentation Window
-//void MainWindow::slotChangeImageSeq(int image_no, int window_no)
-//{
-//	if (segmentationView)
-//	{
-//		m_2DimageViewer[window_no]->SetInputData(vtkImage[image_no]);
-//        m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
-//        m_2DimageViewer[window_no]->Render();
-//    }
-//	else
-//	{
-//		for (int i = 0 ; i < 3 ; i++)
-//		{
-//			m_2DimageViewer[i]->SetInputData(vtkImage[image_no]);
-//			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
-//			m_2DimageViewer[i]->Render();
-//		}
-//		
-//	}
-//				
-//}
-//
-//
-//void MainWindow::slotSelectImageSeq(QAction* act)
-//{
-//	//0-5 is for UL, 10-15 is for UR, 20-25 is for LL
-//	if (act->data().toInt() < 10 && act->data().toInt() >= 0)
-//		slotChangeImageSeq(act->data().toInt(),0);
-//	else if (act->data().toInt() < 20 && act->data().toInt() >= 10)
-//		slotChangeImageSeq(act->data().toInt()-10,1);
-//	else if (act->data().toInt() < 30 && act->data().toInt() >= 20)
-//		slotChangeImageSeq(act->data().toInt()-20,2);
-//
-//}
+void MainWindow::slotChangeImageSeq(int image_no, int window_no)
+{
+	if (segmentationView)
+	{
+		m_2DimageViewer[window_no]->SetInputData(
+			this->imageManager.getListOfVtkImages()[image_no]);
+        m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
+        m_2DimageViewer[window_no]->Render();
+    }
+	else
+	{
+		for (int i = 0 ; i < 3 ; i++)
+		{
+			m_2DimageViewer[i]->SetInputData(
+				this->imageManager.getListOfVtkImages()[image_no]);
+			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
+			m_2DimageViewer[i]->Render();
+		}
+		
+	}
+				
+}
+
+
+void MainWindow::slotSelectImageSeq(QAction* act)
+{
+	//0-5 is for UL, 10-15 is for UR, 20-25 is for LL
+	if (act->data().toInt() < 10 && act->data().toInt() >= 0)
+		slotChangeImageSeq(act->data().toInt(),0);
+	else if (act->data().toInt() < 20 && act->data().toInt() >= 10)
+		slotChangeImageSeq(act->data().toInt()-10,1);
+	else if (act->data().toInt() < 30 && act->data().toInt() >= 20)
+		slotChangeImageSeq(act->data().toInt()-20,2);
+
+}
 void MainWindow::slotChangeBaseImageUL()
 {
 	ChangeBaseImageULMenu.show();
@@ -1325,12 +1324,12 @@ void MainWindow::slotMultiPlanarView()
 			imageViews[i]->SetRenderWindow(m_2DimageViewer[i]->GetRenderWindow());
 		}
 		// Change input to same image, default 0
-		m_2DimageViewer[i]->SetInputData(this->imageManager.getListOfVtkImages[0]);
+		m_2DimageViewer[i]->SetInputData(this->imageManager.getListOfVtkImages()[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
 		m_2DimageViewer[i]->Render();
 		// initialize stuff
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-		m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
+		//m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
 
 		// setup interactorStyle
 		m_style[i]->SetViewers(m_2DimageViewer[i]);
@@ -1609,15 +1608,14 @@ Ui_MainWindow * MainWindow::GetUI()
 }
 
 
-void MainWindow::Set3DRulerEnabled(bool b)
-{
-	MyVtkDistanceRepresentation3D* rep = MyVtkDistanceRepresentation3D::New();
-	rep->SetDistanceWidget(this->m_distance3DWidget);
-	this->m_distance3DWidget->SetInteractor(ui->image4View->GetRenderWindow()->GetInteractor());
-	this->m_distance3DWidget->SetRepresentation(rep);
-	this->m_distance3DWidget->On();
-}
-#include <itkImageFileWriter.h>
+//void MainWindow::Set3DRulerEnabled(bool b)
+//{
+//	MyVtkDistanceRepresentation3D* rep = MyVtkDistanceRepresentation3D::New();
+//	rep->SetDistanceWidget(this->m_distance3DWidget);
+//	this->m_distance3DWidget->SetInteractor(ui->image4View->GetRenderWindow()->GetInteractor());
+//	this->m_distance3DWidget->SetRepresentation(rep);
+//	this->m_distance3DWidget->On();
+//}
 
 void MainWindow::slotCenterline()
 {

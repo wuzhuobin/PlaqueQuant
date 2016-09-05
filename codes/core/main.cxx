@@ -2,8 +2,8 @@
 #include "MainWindow.h"
 
 ////Hide the cmd
-//#pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
  
 int main( int argc, char** argv )
 {
@@ -16,7 +16,7 @@ int main( int argc, char** argv )
   {
 	  QString folder = argv[1];
 	  folder.replace("\\","/");
-	  mainWnd.slotOpenImage(folder);
+	  //mainWnd.slotOpenImage(folder);
   }
 
   return app.exec();

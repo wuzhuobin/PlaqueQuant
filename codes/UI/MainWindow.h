@@ -92,10 +92,10 @@ public slots:
 
 	//Action
 	virtual void slotExit();
-	virtual void slotOpenImage(QString dir);
-	virtual void slotOpenImage();
+	//virtual void slotOpenImage(QString dir);
+	//virtual void slotOpenImage();
 	virtual void slotOpenRecentImage();
-	virtual void slotSaveSegmentation();
+	//virtual void slotSaveSegmentation();
 	virtual void slotAbout();
 	virtual void slotHelp();
 	virtual void slot3DUpdate();
@@ -144,12 +144,13 @@ public slots:
 	virtual void slotShowProgressDialog(int value, QString text);
 
 	//Visualization
-	bool loadImage(int, QStringList*list);
+	//bool loadImage(int, QStringList*list);
 	bool slotVisualizeImage();
 
 	//Alogrithm
 	void slotMeasureCurrentVolumeOfEveryLabel();
 
+	virtual void addOverlay2ImageViewer();
 
 
 private:
@@ -182,8 +183,8 @@ private:
 	InteractorStyleSwitch3D*	m_style3D;
 
 
-    //File Name
-	QStringList FileNameList[5];
+ //   //File Name
+	//QStringList FileNameList[5];
     
 	//3D ruler
 	Distance3DWidget* m_distance3DWidget;
@@ -197,13 +198,12 @@ private:
 	//Initialization
 	void initializeViewers();
 	void initializeModule();
-	void addOverlay2ImageViewer();
 
 	// UI related
 	void DisplayErrorMessage(std::string);
 	
 	//Data
-	ImageType::Pointer  ImageAlignment(ImageType::Pointer);
+	//ImageType::Pointer  ImageAlignment(ImageType::Pointer);
 	//ImageType::Pointer itkImage[5];
 	//vtkImageData* vtkImage[5];
 	vtkImageData* vtkImageOriginal[5];
@@ -217,6 +217,7 @@ private:
 	int m_orientation;
     
 	//Dock Widget
+	friend class ModuleWidget;
 	ModuleWidget* m_moduleWidget;
 
 	//Navigation

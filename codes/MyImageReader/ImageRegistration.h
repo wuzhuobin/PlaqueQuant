@@ -8,9 +8,8 @@
 
 //#include "Define.h"
 //Registration
-using namespace itk;
-typedef Image< float, 3 >		ImageType;
-typedef VersorRigid3DTransform <double>									TransformType;		//TransformType
+typedef itk::Image< float, 3 >		ImageType;
+typedef itk::VersorRigid3DTransform <double>									TransformType;		//TransformType
 
 
 class ImageRegistration : public QObject

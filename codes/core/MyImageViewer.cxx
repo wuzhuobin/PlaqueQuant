@@ -318,71 +318,8 @@ void MyImageViewer::Render()
 		this->InitializeOrientationText();
 		this->InitializeIntensityText("");
 		this->InitializeHeader("");
-
-		// Initialize the size if not set yet
-#if VTK_MAJOR_VERSION <= 5
-		vtkImageData *input = this->GetInput();
-#else
-		vtkAlgorithm *input = this->GetInputAlgorithm();
-#endif
-		if (input)
-		{
-			input->UpdateInformation();
-#if VTK_MAJOR_VERSION <= 5
-			int *w_ext = input->GetWholeExtent();
-#else
-			int *w_ext = this->GetInputInformation()->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
-#endif
-			int xs = 0, ys = 0;
-			double d = 0;
-
-			switch (this->SliceOrientation)
-			{
-
-				//
-			case MyImageViewer::SLICE_ORIENTATION_XY:
-			default:
-				xs = w_ext[1] - w_ext[0] + 1;
-				ys = w_ext[3] - w_ext[2] + 1;
-				//this->Renderer->GetActiveCamera()->Roll(180);
-				//this->Renderer->GetActiveCamera()->Azimuth(180);
-				break;
-
-			case MyImageViewer::SLICE_ORIENTATION_XZ:
-				xs = w_ext[1] - w_ext[0] + 1;
-				ys = w_ext[5] - w_ext[4] + 1;
-				//this->Renderer->GetActiveCamera()->Azimuth(180);
-				//this->Renderer->GetActiveCamera()->Elevation(180);
-				break;
-
-			case MyImageViewer::SLICE_ORIENTATION_YZ:
-				xs = w_ext[3] - w_ext[2] + 1;
-				ys = w_ext[5] - w_ext[4] + 1;
-				//this->Renderer->GetActiveCamera()->Azimuth(180);
-				break;
-			}
-
-			// if it would be smaller than 150 by 100 then limit to 150 by 100
-			if (this->RenderWindow->GetSize()[0] == 0)
-			{
-				this->RenderWindow->SetSize(
-					xs < 150 ? 150 : xs, ys < 100 ? 100 : ys);
-			}
-
-			if (this->Renderer)
-			{
-				this->Renderer->ResetCamera();
-
-				this->Renderer->GetActiveCamera()->SetParallelScale(
-					xs < 150 ? 75 : (xs - 1) / 3);
-				d = this->Renderer->GetActiveCamera()->GetDistance();
-
-				//this->Renderer->GetActiveCamera()->SetParallelProjection(true);
-			}
-			this->FirstRender = 0;
-		}
-
 	}
+	vtkImageViewer2::Render();
 	if (this->AnnotationRenderer) {
 		this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
 	}

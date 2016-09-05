@@ -18,7 +18,6 @@ Copyright (C) 2016
 */
 
 #include "InteractorStylePaintBrush.h"
-#include "MainWindow.h"
 
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkImageProperty.h>
@@ -106,11 +105,10 @@ void InteractorStylePaintBrush::SetDrawIsotropicCheckBox(QCheckBox * checkBox)
 
 void InteractorStylePaintBrush::OnLeftButtonUp()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (!m_isDraw)
 	{
 		this->Write2ImageData();
-		mainWnd->slotOverlayVisibilty(true, orientation);
+		imageViewer->GetdrawActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -123,7 +121,6 @@ void InteractorStylePaintBrush::OnLeftButtonUp()
 
 void InteractorStylePaintBrush::OnLeftButtonDown()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	m_leftFunctioning = true;
 	m_isDraw = false;
 	this->GetInteractor()->GetPicker()->Pick(
@@ -163,19 +160,18 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 		this->ReadfromImageData();
 		this->Render();
 	}
-	mainWnd->slotOverlayVisibilty(false, orientation);
+	imageViewer->GetdrawActor()->SetVisibility(false);
 	Draw(true);
 	this->Render();
 }
 
 void InteractorStylePaintBrush::OnRightButtonUp()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	m_rightFunctioning = false;
 	if (!m_isDraw)
 	{
 		this->Write2ImageData();
-		mainWnd->slotOverlayVisibilty(true, orientation);
+		imageViewer->GetdrawActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -187,7 +183,7 @@ void InteractorStylePaintBrush::OnRightButtonUp()
 
 void InteractorStylePaintBrush::OnRightButtonDown()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
+
 	m_isDraw = false;
 
 	// return if label image is not found
@@ -231,8 +227,7 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 		this->Render();
 	}
 
-
-	mainWnd->slotOverlayVisibilty(false, orientation);
+	imageViewer->GetdrawActor()->SetVisibility(false);
 	this->Draw(false);
 	this->Render();
 	m_rightFunctioning = true;
@@ -269,7 +264,6 @@ void InteractorStylePaintBrush::OnMouseMove()
 
 void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	/// Delete stuff if the mode is disabled to save memory
 	if (m_borderWidget != NULL)
 	{
@@ -335,7 +329,6 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 			break;
 		}
 		}
-		Ui_MainWindow* ui = mainWnd->GetUI();
 		
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -377,7 +370,6 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 
 void InteractorStylePaintBrush::Draw(bool b)
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (b) {
 		m_brush->SetDrawColor(color_r, color_g, color_b, opacity);
 	}
@@ -580,7 +572,6 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 		return;
 
 	// Update Brush propertyies
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	double size = m_drawBrushSizeSpinBox->value();
 	double color[3] = { (double)color_r / 255.0,(double)color_g / 255.0,(double)color_b / 255.0 };
 	
@@ -657,10 +648,6 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 
 void InteractorStylePaintBrush::ReadfromImageData()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-
-	mainWnd->GetOverlay()->GetDisplayExtent(this->extent);
-	
 	switch (this->orientation)
 	{
 	case 0:
@@ -700,7 +687,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = m_sliceSplinBox[orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
-				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
+				double* val = static_cast<double *>(imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
@@ -732,7 +719,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = x;
 				pos[1] = m_sliceSplinBox[orientation]->value();
 				pos[2] = z;
-				double* val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
+				double* val = static_cast<double *>(imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
@@ -765,7 +752,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = m_sliceSplinBox[orientation]->value();
-				double * val = static_cast<double *>(mainWnd->GetOverlay()->GetVTKImageData()->GetScalarPointer(pos));
+				double* val = static_cast<double *>(imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
@@ -791,7 +778,6 @@ void InteractorStylePaintBrush::ReadfromImageData()
 void InteractorStylePaintBrush::Write2ImageData()
 {
 	//Update Layer
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	int pos[3];
 	double pixelval;
 	switch (orientation)
@@ -821,9 +807,15 @@ void InteractorStylePaintBrush::Write2ImageData()
 						}
 					}
 				}
-				else
+				else {
 					pixelval = 0;
-				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
+				}
+				double * pixel = static_cast<double *>(
+					imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				if (pixel == nullptr) {
+					return;
+				}
+				*pixel = pixelval;
 			}
 		}
 		break;
@@ -849,9 +841,15 @@ void InteractorStylePaintBrush::Write2ImageData()
 							break;
 						}
 					}
-				else
+				else {
 					pixelval = 0;
-				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
+				}
+				double * pixel = static_cast<double *>(
+					imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				if (pixel == nullptr) {
+					return;
+				}
+				*pixel = pixelval;
 			}
 		}
 		break;
@@ -877,29 +875,33 @@ void InteractorStylePaintBrush::Write2ImageData()
 							break;
 						}
 					}
-				else
+				else {
 					pixelval = 0;
-				mainWnd->GetOverlay()->SetPixel(pos, pixelval);
+				}
+				double * pixel = static_cast<double *>(
+					imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				if (pixel == nullptr) {
+					return;
+				}
+				*pixel = pixelval;
 
 			}
 		}
 		break;
 	}
-
-	mainWnd->GetOverlay()->Update();
-	mainWnd->GetOverlay()->GetOutput()->Modified();
+	imageViewer->GetInputLayer()->Modified();
 
 }
 
 
 void InteractorStylePaintBrush::Render()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	if (m_brush == NULL)
-		return;
+	//MainWindow* mainWnd = MainWindow::GetMainWindow();
+	//if (m_brush == NULL)
+	//	return;
 
-	mainWnd->RenderAll2DViewers();
-
+	//mainWnd->RenderAll2DViewers();
+	imageViewer->Render();
 	m_brush->Update();
 	m_brush->GetOutput()->SetOrigin(origin);
 	m_brush->GetOutput()->SetSpacing(spacing);

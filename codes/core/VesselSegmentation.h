@@ -9,7 +9,6 @@
 #include <SurfaceCreator.h>
 #include <Define.h>
 using namespace std;
-using namespace itk;
 
 
 

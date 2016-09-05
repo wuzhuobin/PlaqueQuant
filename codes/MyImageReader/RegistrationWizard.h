@@ -171,6 +171,7 @@ public:
 	QList<QStringList*> *fileNameList;
     
 	QString		 getDirectory();
+	QStringList* getFileNamesN(int n);
 	QStringList* getFileNames1();
 	QStringList* getFileNames2();
 	QStringList* getFileNames3();

@@ -12,7 +12,6 @@
 #include <itkImage.h>
 
 #include "Overlay.h"
-using namespace itk;
 
 
 class MyImageManager : public QObject
@@ -30,13 +29,13 @@ public:
 	int getNumberOfImages();
 	QList<vtkSmartPointer<vtkImageData>> getListOfVtkImages();
 	const QList<vtkSmartPointer<vtkImageData>> getListOfVtkOriginalImages();
-	const QList<Image<float, 3>::Pointer> getListOfItkImages();
+	const QList<itk::Image<float, 3>::Pointer> getListOfItkImages();
 	const QList<QMap<QString, QString>*> getListOfDICOMHeader();
 	
 
-	const QMap<QString, Image<float, 3>::Pointer> getMapOfItkImages();
+	const QMap<QString, itk::Image<float, 3>::Pointer> getMapOfItkImages();
 	const QMap<QString, vtkSmartPointer<vtkImageData>> getMapOfVtkImages();
-	const QMap<QString, QString>* getDICOMHeader(Image<float, 3>::Pointer itkImage);
+	const QMap<QString, QString>* getDICOMHeader(itk::Image<float, 3>::Pointer itkImage);
 	Overlay& getOverlay();
 
 private:
@@ -45,15 +44,15 @@ private:
 	Overlay overlay;
 	
 	// QList
-	QList<Image<float, 3>::Pointer> listOfItkImages;
+	QList<itk::Image<float, 3>::Pointer> listOfItkImages;
 	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages;
 	QList<vtkSmartPointer<vtkImageData>> listOfVtkOriginalImages;
 	QList<QMap<QString, QString>*> listOfDICOMHeader;
 
 	// QMap
-	QMap<QString, Image<float, 3>::Pointer> mapOfItkImages;
+	QMap<QString, itk::Image<float, 3>::Pointer> mapOfItkImages;
 	QMap<QString, vtkSmartPointer<vtkImageData>> mapOfVtkImages;
-	QMap<Image<float, 3>::Pointer, QMap<QString, QString>*> mapOfDICOMHeader;
+	QMap<itk::Image<float, 3>::Pointer, QMap<QString, QString>*> mapOfDICOMHeader;
 
 };
 

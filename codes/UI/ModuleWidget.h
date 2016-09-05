@@ -31,7 +31,7 @@
 
 
 namespace Ui {
-class ModuleWidget;
+	class ModuleWidget;
 }
 class MainWindow;
 class ModuleWidget: public QWidget

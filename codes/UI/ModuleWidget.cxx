@@ -284,9 +284,9 @@ void ModuleWidget::slotUpdate2DMeasurements()
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = mainwnd->GetOverlay()->GetVTKImageData();
+	vtkImageData* overlayImage = mainwnd->imageManager.getOverlay().GetOutput();
 	int extent[6];
-	mainwnd->GetOverlay()->GetDisplayExtent(extent);
+	mainwnd->imageManager.getOverlay().GetDisplayExtent(extent);
 	extent[4] = currentSlice;
 	extent[5] = currentSlice;
 
@@ -355,7 +355,7 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = mainwnd->GetOverlay()->GetVTKImageData();
+	vtkImageData* overlayImage = mainwnd->imageManager.getOverlay().GetOutput();
 
 	vtkSmartPointer<MaximumWallThickness> calculator = vtkSmartPointer<MaximumWallThickness>::New();
 	calculator->SetImage(overlayImage);

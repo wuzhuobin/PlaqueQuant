@@ -151,6 +151,17 @@ QString RegistrationWizard::getDirectory()
 	return field("directory.path").toString();
 }
 
+QStringList * RegistrationWizard::getFileNamesN(int n)
+{
+	if (n < 1 || n>5)
+		return NULL;
+	int pos = field("image.list" + QString::number(n)).toInt();
+	if (pos == -1)
+		return NULL;
+	else
+		return fileNameList->at(pos);
+}
+
 DirectoryPage::DirectoryPage(QWidget *parent)
     : QWizardPage(parent)
 {

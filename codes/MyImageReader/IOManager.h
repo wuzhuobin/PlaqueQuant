@@ -31,7 +31,7 @@ public:
 	void setListOfFileNames(QList<QStringList> listOfFileNames);
 	void addToListOfFileNames(QStringList fineNames);
 	const QList<QStringList> getListOfFileNames();
-//public slots:
+public slots:
 
 	virtual void slotOpenWithWizard();
 

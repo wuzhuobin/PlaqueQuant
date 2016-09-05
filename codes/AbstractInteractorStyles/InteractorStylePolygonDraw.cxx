@@ -29,11 +29,11 @@ Copyright (C) 2016
 #include <vtkMath.h>
 #include <vtkLinearContourLineInterpolator.h>
 #include <vtkBezierContourLineInterpolator.h>
+#include <vtkProperty.h>
 
 #include "InteractorStylePolygonDraw.h"
 #include "LumenSegmentation.h"
 #include "MyImageViewer.h"
-#include "MainWindow.h"
 
 vtkStandardNewMacro(InteractorStylePolygonDraw);
 
@@ -146,7 +146,6 @@ bool InteractorStylePolygonDraw::CheckDoubleClicked()
 
 void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
 	if (m_vesselWallContourWidget) {
 		m_vesselWallContourWidget->Off();
@@ -242,7 +241,6 @@ void InteractorStylePolygonDraw::SetContourFilterGenerateValues(int generateValu
 
 void InteractorStylePolygonDraw::DisplayPolygon(vtkObject* caller, long unsigned vtkNotUsed(eventId), void* vtkNotUsed(clientData))
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
 	imageViewer->Render();
 }
@@ -334,9 +332,6 @@ void InteractorStylePolygonDraw::SetLineInterpolator(int i)
 
 void InteractorStylePolygonDraw::FillPolygon()
 {
-	//Get Main window
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->GetOverlay()->GetVTKImageData()->GetExtent(this->extent);
 
 	vtkContourWidget* contourWidget[2] = 
 		{m_vesselWallContourWidget, m_lumenWallContourWidget};
@@ -346,9 +341,6 @@ void InteractorStylePolygonDraw::FillPolygon()
 	for (int i = 0; i < 2; ++i) {
 		if (contourWidget[i] == NULL) continue;
 		if (contourRepresentation[i] == NULL) continue;
-
-		//Get most updated current value
-		//mainWnd->GetCursorPosition(m_currentPos);
 
 		contourWidget[i]->CloseLoop();
 
@@ -436,7 +428,12 @@ void InteractorStylePolygonDraw::FillPolygon()
 					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						// fill the contour
-						mainWnd->GetOverlay()->SetPixel(p2, (double)label[i]);
+						double * pixel = static_cast<double *>(
+							imageViewer->GetInputLayer()->GetScalarPointer(p2));
+						if (pixel == nullptr) {
+							return;
+						}
+						*pixel = label[i];
 					}
 				}
 			}
@@ -454,7 +451,12 @@ void InteractorStylePolygonDraw::FillPolygon()
 					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						// fill the contour
-						mainWnd->GetOverlay()->SetPixel(p2, (double)label[i]);
+						double * pixel = static_cast<double *>(
+							imageViewer->GetInputLayer()->GetScalarPointer(p2));
+						if (pixel == nullptr) {
+							return;
+						}
+						*pixel = label[i];
 					}
 				}
 			}
@@ -472,7 +474,12 @@ void InteractorStylePolygonDraw::FillPolygon()
 					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						// fill the contour
-						mainWnd->GetOverlay()->SetPixel(p2, (double)label[i]);
+						double * pixel = static_cast<double *>(
+							imageViewer->GetInputLayer()->GetScalarPointer(p2));
+						if (pixel == nullptr) {
+							return;
+						}
+						*pixel = label[i];
 					}
 
 				}
@@ -483,7 +490,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 
 	SetPolygonModeEnabled(false);
 	SetPolygonModeEnabled(true);
-	mainWnd->GetOverlay()->GetOutput()->Modified();
+	imageViewer->GetInputLayer()->Modified();
 
 
 

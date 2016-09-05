@@ -1,7 +1,7 @@
 #include <VesselSegmentation.h>
 
 //#include "itkImageFileWriter.h"
-
+using namespace itk;
 VesselSegmentation::VesselSegmentation(void)
 {
 	m_wallSurface = vtkSmartPointer<vtkPolyData>::New();

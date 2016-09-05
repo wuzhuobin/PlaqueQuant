@@ -16,7 +16,7 @@ MaximumWallThickness::MaximumWallThickness()
 {
 	this->m_image = NULL;
 	
-	this->m_contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+	//this->m_contourFilter = vtkSmartPointer<vtkContourFilter>::New();
 	this->m_sliceImage = NULL;
 	
 }
@@ -114,10 +114,12 @@ int MaximumWallThickness::CheckNumberOfBranches()
 	thres->ReplaceInOn();
 	thres->Update();
 
-	this->m_contourFilter->SetInputData(thres->GetOutput());
-	this->m_contourFilter->SetValue(0, 0.1);
-	this->m_contourFilter->SetNumberOfContours(1);
-	this->m_contourFilter->Update();
+	vtkSmartPointer<vtkContourFilter> contourFilter =
+		vtkSmartPointer<vtkContourFilter>::New();
+	contourFilter->SetInputData(thres->GetOutput());
+	contourFilter->SetValue(0, 0.1);
+	contourFilter->SetNumberOfContours(1);
+	contourFilter->Update();
 
 	//// Debug
 	//cout << "Range: " << this->m_sliceImage->GetScalarTypeAsString() << " " << this->m_sliceImage->GetScalarRange()[0] << " " << this->m_sliceImage->GetScalarRange()[1];
@@ -130,8 +132,9 @@ int MaximumWallThickness::CheckNumberOfBranches()
 	////ren->Render();
 
 
-	vtkSmartPointer<vtkConnectivityFilter> connectivity = vtkSmartPointer<vtkConnectivityFilter>::New();
-	connectivity->SetInputConnection(this->m_contourFilter->GetOutputPort());
+	vtkSmartPointer<vtkConnectivityFilter> connectivity = 
+		vtkSmartPointer<vtkConnectivityFilter>::New();
+	connectivity->SetInputConnection(contourFilter->GetOutputPort());
 	connectivity->SetExtractionModeToAllRegions();
 	connectivity->Update();
 
@@ -170,8 +173,8 @@ bool MaximumWallThickness::ExtractSlice()
 		return true;
 	}
 
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	mainwnd->GetOverlay()->GetDisplayExtent(m_extent); // Extent is obtained from distplayed extent of overlay
+	//MainWindow* mainwnd = MainWindow::GetMainWindow();
+	//mainwnd->GetOverlay()->GetDisplayExtent(m_extent); // Extent is obtained from distplayed extent of overlay
 
 	// Set the extent to the slice being handled only
 	this->m_extent[4] = this->m_sliceNumber;
@@ -202,26 +205,26 @@ bool MaximumWallThickness::ExtractLoops()
 	thres->Update();
 
 	/// Setup contour filter 
-	this->m_contourFilter->SetInputData(thres->GetOutput());
-	this->m_contourFilter->SetNumberOfContours(1);
-	this->m_contourFilter->SetValue(0, 0.1);
-	this->m_contourFilter->ComputeScalarsOn();
-	this->m_contourFilter->ComputeNormalsOn();
-	this->m_contourFilter->Update();
+	vtkSmartPointer<vtkContourFilter> contourFilter =
+		vtkSmartPointer<vtkContourFilter>::New();
+	contourFilter->SetInputData(thres->GetOutput());
+	contourFilter->SetNumberOfContours(1);
+	contourFilter->SetValue(0, 0.1);
+	contourFilter->ComputeScalarsOn();
+	contourFilter->ComputeNormalsOn();
+	contourFilter->Update();
 
 	/// Extract loops
 	// extract loops representing vessel wall
-	vtkSmartPointer<vtkPolyData> vesselWallLoops = vtkSmartPointer<vtkPolyData>::New();
-	vesselWallLoops->DeepCopy(m_contourFilter->GetOutput());
+	vtkSmartPointer<vtkPolyData> vesselWallLoops = contourFilter->GetOutput();
 
 	// extract loops representing lumen
 	thres->ThresholdByLower(0.1);
 	thres->Update();
-	this->m_contourFilter->SetInputData(thres->GetOutput());
-	this->m_contourFilter->Update();
+	contourFilter->SetInputData(thres->GetOutput());
+	contourFilter->Update();
 
-	vtkSmartPointer<vtkPolyData> lumenWallLoops = vtkSmartPointer<vtkPolyData>::New();
-	lumenWallLoops->DeepCopy(this->m_contourFilter->GetOutput());
+	vtkSmartPointer<vtkPolyData> lumenWallLoops = contourFilter->GetOutput();
 
 	/// Pair loops
 	// push each loops into the vector
