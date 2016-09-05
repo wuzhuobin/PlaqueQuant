@@ -184,17 +184,14 @@ private:
 	InteractorStyleSwitch3D*	m_style3D;
 
 
-    //File Name
+    //File 
 	QStringList FileNameList[5];
-    
-	//3D ruler
-	Distance3DWidget* m_distance3DWidget;
-	//Recent File
 	int m_maxRecentImage;
 	QList<QAction*> recentFileActionList;
 	void createRecentImageActions();
 	void adjustForCurrentFile(const QString& filePath);
 	void updateRecentActionList();
+    
 
 	//Initialization
 	void initializeViewers();
@@ -212,9 +209,9 @@ private:
 	vtkPolyData* m_centerlinePD;
 
     //Orientation
-	int m_orientation;
     
-	//Dock Widget
+	//Widgets
+	Distance3DWidget* m_distance3DWidget;
 	ModuleWidget* m_moduleWidget;
 
 	//Navigation
@@ -237,6 +234,7 @@ private:
 
 	const int* overlayColor[6];
 
+	int m_orientation;
 	const int lumen[3] = { 255, 0, 0 };
 	const int vesselWall[3] = { 0, 0, 255 };
 	const int calcification[3] = { 0,255,0 };

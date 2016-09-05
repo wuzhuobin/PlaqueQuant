@@ -42,5 +42,6 @@
     <file>icons/magicdraw.ico</file>
     <file>icons/ellipse.png</file>
     <file>icons/close.png</file>
+    <file>icons/PlaqueQuant_logo.png</file>
   </qresource>
 </RCC>
