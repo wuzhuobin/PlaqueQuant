@@ -327,7 +327,7 @@ void MainWindow::initializeViewers()
 	    m_2DimageViewer[i]->SetInputData(vtkImage[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
 		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
-        m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
+        m_2DimageViewer[i]->InitializeHeader(this->modalityNames[0]);
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 
 		//Update style
@@ -452,13 +452,13 @@ void MainWindow::slotOpenImage(QString dir)
 	for (int i = 0; i < 5; i++)
 	{
 		if (vtkImage[i] != NULL) {
-			QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
+			QAction* act1 = ChangeBaseImageULMenu.addAction(this->modalityNames[i]);
 			act1->setData(i);
 
-			QAction* act2 = ChangeBaseImageURMenu.addAction(this->GetFileName(i));
+			QAction* act2 = ChangeBaseImageURMenu.addAction(this->modalityNames[i]);
 			act2->setData(i + 10);
 
-			QAction* act3 = ChangeBaseImageLLMenu.addAction(this->GetFileName(i));
+			QAction* act3 = ChangeBaseImageLLMenu.addAction(this->modalityNames[i]);
 			act3->setData(i + 20);
 		}
 	}
@@ -1420,7 +1420,7 @@ void MainWindow::slotChangeImageSeq(int image_no, int window_no)
 	if (segmentationView)
 	{
 		m_2DimageViewer[window_no]->SetInputData(vtkImage[image_no]);
-        m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
+        m_2DimageViewer[window_no]->InitializeHeader(this->modalityNames[image_no]);
         m_2DimageViewer[window_no]->Render();
     }
 	else
@@ -1428,7 +1428,7 @@ void MainWindow::slotChangeImageSeq(int image_no, int window_no)
 		for (int i = 0 ; i < 3 ; i++)
 		{
 			m_2DimageViewer[i]->SetInputData(vtkImage[image_no]);
-			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
+			m_2DimageViewer[i]->InitializeHeader(this->modalityNames[image_no]);
 			m_2DimageViewer[i]->Render();
 		}
 		
@@ -1480,7 +1480,8 @@ void MainWindow::slotMultiPlanarView()
 		m_2DimageViewer[i]->Render();
 		// initialize stuff
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-		m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
+		this->m_2DimageViewer[i]->ResizeOrientationText();
+		this->m_2DimageViewer[i]->InitializeHeader(modalityNames[0]);;
 
 		// setup interactorStyle
 		m_style[i]->SetViewers(m_2DimageViewer[i]);
@@ -1591,6 +1592,8 @@ void MainWindow::slotSegmentationView()
 				this->m_2DimageViewer[i2]->SetInputData(vtkImage[i1]);
 				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
 				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+				this->m_2DimageViewer[i2]->ResizeOrientationText();
+				this->m_2DimageViewer[i2]->InitializeHeader(modalityNames[i2]);
 				this->m_style[i2]->SetOrientation(2);
 				++i2;
 			}

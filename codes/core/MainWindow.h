@@ -244,6 +244,14 @@ private:
 	const int lrnc[3] = { 0, 255, 255 };
 	const int lm[3] = { 255, 0, 255 };
 
+	const QString modalityNames[5] = {
+		"CUBE T1",
+		"CUBE T2",
+		"CUBE T1+C",
+		"2D DIR/QIR",
+		"MPRAGE"
+	};
+
 	vtkLookupTable* LookupTable;
 /*
 
