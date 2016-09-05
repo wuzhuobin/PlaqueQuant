@@ -191,6 +191,10 @@ bool MaximumWallThickness::ExtractSlice()
 bool MaximumWallThickness::ExtractLoops()
 {
 	int numOfLoops = this->CheckNumberOfBranches();
+	if (numOfLoops == 0) {
+		throw ERROR_NO_SEGMENTATION_FOUND;
+	}
+
 	int vesselWallLabel = MainWindow::LABEL_CALCIFICATION;
 
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();

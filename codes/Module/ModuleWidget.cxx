@@ -384,6 +384,9 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 		case MaximumWallThickness::ERROR_VALUE_TRANSFORM:
 			this->ui->MWTTextBrowser->setText("Type casting failed!");
 			break;
+		case MaximumWallThickness::ERROR_NO_SEGMENTATION_FOUND:
+			this->ui->MWTTextBrowser->setText("No segmentation found on this slice");
+			break;
 		default:
 			break;
 		}
