@@ -5,19 +5,23 @@
 //#pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
  
-int main( int argc, char** argv )
+#define PLAQUE_QUANT_VERSION "1.0"
+
+int main(int argc, char** argv)
 {
-  QApplication app( argc, argv );
+	QApplication app(argc, argv);
 
-  MainWindow mainWnd;
-  mainWnd.show();
-  
-  if (argc==2)
-  {
-	  QString folder = argv[1];
-	  folder.replace("\\","/");
-	  mainWnd.slotOpenImage(folder);
-  }
+	MainWindow mainWnd;
+	mainWnd.setWindowTitle("Plaque Quant - v" + QString::fromStdString(PLAQUE_QUANT_VERSION));
+	mainWnd.SetVersion(PLAQUE_QUANT_VERSION);
+	mainWnd.show();
 
-  return app.exec();
+	if (argc == 2)
+	{
+		QString folder = argv[1];
+		folder.replace("\\", "/");
+		mainWnd.slotOpenImage(folder);
+	}
+
+	return app.exec();
 }

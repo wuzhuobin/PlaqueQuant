@@ -52,6 +52,7 @@ public:
 	// Set functions
 	void Set3DRulerEnabled(bool b);
 	void SetImageLayerNo(int);
+	void SetVersion(QString);
 
 	// Ui Updates
 	void RenderAllViewer();
@@ -199,6 +200,7 @@ private:
 	void addOverlay2ImageViewer();
 
 	// UI related
+	QString m_version;
 	void DisplayErrorMessage(std::string);
 	
 	//Data

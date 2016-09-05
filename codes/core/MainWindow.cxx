@@ -702,8 +702,8 @@ void MainWindow::slotAbout()
 {
 	QMessageBox msgBox;
 	msgBox.setIconPixmap(QPixmap(":/icons/PlaqueQuant_logo.png"));
-	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", "3.0") +
-		QString("<br>This software is a analytical tool designed to evaluate the condition of brain arteries"));
+	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", this->m_version) +
+		QString("<br>This software is a analytical tool designed to diagnose the condition of plaque and blood vessels."));
 	msgBox.setWindowTitle("About");
 	msgBox.exec();
 }
@@ -876,7 +876,6 @@ void MainWindow::slotChangeROI()
 
 void MainWindow::slotSelectROI()
 {
-
 	int newExtent[6];
 	m_style[0]->GetROI()->SelectROI(newExtent);
 	m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
@@ -916,10 +915,10 @@ void MainWindow::slotSelectROI()
 	this->slotChangeSlice(0, 0, 0);
 }
 void MainWindow::slotResetROI()
-{
+ {
 	for (int i = 0; i < 5; ++i) 
 	{
-		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL) {
+		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL && vtkImageOriginal[i] != NULL) {
 			vtkImageData* temp = vtkImage[i];
 			vtkImage[i] = this->vtkImageOriginal[i];
 			temp->Delete();
@@ -933,7 +932,10 @@ void MainWindow::slotResetROI()
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
 
-	this->slotChangeSlice(0, 0, 0);
+	int extent[6];
+	this->SegmentationOverlay->GetDisplayExtent(extent);
+
+	this->slotChangeSlice(extent[1]/2, extent[3]/2, extent[5]/2);
 }
 
 void MainWindow::slot3DUpdate()
@@ -1751,6 +1753,11 @@ void MainWindow::SetImageLayerNo(int layer)
 			m_style[i]->GetPolygonDraw()->SetVesselWallLabel(m_layer_no);
 		}
 	}
+}
+
+void MainWindow::SetVersion(QString ver)
+{
+	this->m_version = ver;
 }
 
 int MainWindow::GetImageLayerNo()
