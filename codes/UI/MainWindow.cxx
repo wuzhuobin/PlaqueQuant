@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include "RegistrationWizard.h"
 #include "MyProgressDialog.h"
 #include "ImageRegistration.h"
 #include "SurfaceCreator.h"
@@ -62,7 +61,8 @@ MainWindow::MainWindow()
 	this->setWindowTitle("PlaqueQuant");
 	
 	// Set up action signals and slots
-	connect(ui->actionOpenImage,				SIGNAL(triggered()), this, SLOT(slotOpenImage()));
+	connect(ui->actionOpenImage,				SIGNAL(triggered()), &ioManager, SLOT(slotOpenWithWizard()));
+	connect(&ioManager, SIGNAL(finishOpenMultiImages()), this, SLOT(slotVisualizeImage()));
 	connect(ui->actionExit,						SIGNAL(triggered()), this, SLOT(slotExit()));
 	connect(ui->actionAbout,					SIGNAL(triggered()), this, SLOT(slotAbout()));
 	connect(ui->actionHelp,						SIGNAL(triggered()), this, SLOT(slotHelp()));
@@ -101,7 +101,7 @@ MainWindow::MainWindow()
 	connect(ui->actionImage3, SIGNAL(triggered()), viewerMapper, SLOT(map()));
 	connect(ui->actionImage4, SIGNAL(triggered()), viewerMapper, SLOT(map()));
 	connect(ui->actionFourViews, SIGNAL(triggered()), viewerMapper, SLOT(map()));
-	connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveSegmentation()));
+	connect(ui->actionSave, SIGNAL(triggered()), &ioManager, SLOT(slotSaveSegmentationWithDiaglog()));
 	connect(viewerMapper, SIGNAL(mapped(int)), this, SLOT(slotImage(int)));
 	connect(ui->ULBtn, SIGNAL(clicked()), ui->actionImage1, SLOT(trigger()));
 	connect(ui->URBtn, SIGNAL(clicked()), ui->actionImage2, SLOT(trigger()));
@@ -127,7 +127,10 @@ MainWindow::MainWindow()
 	connect(ui->actionCenterlineAlgorithm, SIGNAL(triggered()), this, SLOT(slotCenterline()));
 
 	//Tools
-	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), this, SLOT(slotAddExternalOverlay()));
+	// Open Segmentation
+	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), &this->ioManager, 
+		SLOT(slotOpenSegmentationWithDiaglog()));
+	connect(&this->ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(addOverlay2ImageViewer()));
 
 	//3D view
 	connect(ui->updateBtn, SIGNAL(clicked()), this, SLOT(slot3DUpdate()));
@@ -196,18 +199,15 @@ MainWindow::MainWindow()
 
 	ImageAlignment(NULL) = NULL;
 	this->m_centerlinePD = NULL;
-	for (int i = 0; i < 5; ++i) {
-		itkImage[i] = ImageType::New();
-		//vtkImage[i] = vtkImageData::New();
-		vtkImage[i] = NULL;
-		vtkImageOriginal[i] = NULL;
-	}
+	//for (int i = 0; i < 5; ++i) {
+	//	itkImage[i] = ImageType::New();
+	//	//vtkImage[i] = vtkImageData::New();
+	//	vtkImage[i] = NULL;
+	//	vtkImageOriginal[i] = NULL;
+	//}
 	//vtkImageOverlay = vtkImageData::New();
 
 	m_InfoDialog = NULL;
-
-	//Segmentation
-	SegmentationOverlay = NULL;
 	
 	overlayColor[0] = lumen;
 	overlayColor[1] = vesselWall;
@@ -275,21 +275,21 @@ MainWindow::~MainWindow()
 	}
 
 
-	for (int i = 0; i < 5; ++i) {
-		if (vtkImage[i] != NULL) {
-			if (vtkImageOriginal[i] != vtkImage[i]) {
-				vtkImage[i]->Delete();
-				vtkImage[i] = NULL;
-			}
-			if (vtkImageOriginal[i] != NULL) {
-				vtkImageOriginal[i]->Delete();
-				vtkImageOriginal[i] = NULL;
-			}
-			vtkImage[i] = NULL;
-		}
+	//for (int i = 0; i < 5; ++i) {
+	//	if (vtkImage[i] != NULL) {
+	//		if (vtkImageOriginal[i] != vtkImage[i]) {
+	//			vtkImage[i]->Delete();
+	//			vtkImage[i] = NULL;
+	//		}
+	//		if (vtkImageOriginal[i] != NULL) {
+	//			vtkImageOriginal[i]->Delete();
+	//			vtkImageOriginal[i] = NULL;
+	//		}
+	//		vtkImage[i] = NULL;
+	//	}
 
 
-	}
+	//}
 	if (m_moduleWidget != NULL) {
 		delete m_moduleWidget;
 		m_moduleWidget = NULL;
@@ -297,9 +297,6 @@ MainWindow::~MainWindow()
 	if (m_InfoDialog != NULL) {
 		delete m_InfoDialog;
 		m_InfoDialog = NULL;
-	}
-	if (SegmentationOverlay != NULL) {
-		delete SegmentationOverlay;
 	}
 
 	if (m_distance3DWidget != NULL) {
@@ -319,59 +316,52 @@ void MainWindow::initializeModule()
 }
 
 
-void MainWindow::initializeViewers()
-{
-	segmentationView = false;
-
-	for (int i = 0 ; i < 3 ; i++)
-	{
-	    m_2DimageViewer[i]->SetInputData(vtkImage[0]);
-		m_2DimageViewer[i]->SetSliceOrientation(i);
-		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
-        m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
-		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-
-		//Update style
-		m_style[i]->SetViewers(m_2DimageViewer[i]);
-		m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox, 
-			ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
-			m_moduleWidget->GetBrushSizeSpinBox(), 
-			m_moduleWidget->GetBrushShapeComBox(),
-			NULL, NULL);
-
-		m_interactor[i]->SetInteractorStyle(m_style[i]);
-		
-	}
-	this->addOverlay2ImageViewer();
-}
+//void MainWindow::initializeViewers()
+//{
+//	segmentationView = false;
+//
+//	for (int i = 0 ; i < 3 ; i++)
+//	{
+//	    m_2DimageViewer[i]->SetInputData(vtkImage[0]);
+//		m_2DimageViewer[i]->SetSliceOrientation(i);
+//		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
+//        m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
+//		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
+//
+//		//Update style
+//		m_style[i]->SetViewers(m_2DimageViewer[i]);
+//		m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox, 
+//			ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
+//			m_moduleWidget->GetBrushSizeSpinBox(), 
+//			m_moduleWidget->GetBrushShapeComBox(),
+//			NULL, NULL);
+//
+//		m_interactor[i]->SetInteractorStyle(m_style[i]);
+//		
+//	}
+//	this->addOverlay2ImageViewer();
+//}
 
 void MainWindow::addOverlay2ImageViewer()
 {
-	if (SegmentationOverlay == NULL) 
-	{
-		//Overlay
-		SegmentationOverlay = new Overlay;
-		SegmentationOverlay->Initialize(vtkImage[0]);
-		//SegmentationOverlay->Initialize(itkImage[0], vtkImage[0]->GetDimensions(),
-			//vtkImage[0]->GetSpacing(), vtkImage[0]->GetOrigin(), VTK_DOUBLE);
-		//vtkImageOverlay = SegmentationOverlay->GetOutput();
+	int *extent1 = this->imageManager.getOverlay().GetOutput()->GetExtent();
+	int *extent2 = this->imageManager.getListOfVtkImages()[0]->GetExtent();
 
-		//Add Overlay
+	if (!std::equal(extent1, extent1 + 6, extent2)) {
+		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
+		return;
+	}
 		for (int i = 0; i < 3; i++)
 		{
 			if (segmentationView && i >= visibleImageNum)
 				break;
 			m_2DimageViewer[i]->SetLookupTable(this->LookupTable);
-			m_2DimageViewer[i]->SetInputDataLayer(SegmentationOverlay->GetOutput());
+			m_2DimageViewer[i]->SetInputDataLayer(
+				this->imageManager.getOverlay().GetOutput());
 			m_2DimageViewer[i]->GetAnnotationRenderer()->AddViewProp(this->m_2DimageViewer[i]->GetdrawActor());
 		}
-
-	}
-
-
-	this->SegmentationOverlay->GetOutput()->Modified();
+	this->imageManager.getOverlay().GetOutput()->Modified();
 	this->slotOverlayVisibilty(true);
-
 }
 
 void MainWindow::DisplayErrorMessage(std::string str)
@@ -424,35 +414,90 @@ void MainWindow::slotExit()
 
 void MainWindow::slotOpenImage(QString dir)
 {
-	RegistrationWizard wizard(this,dir);
 
-	if (wizard.exec() == QWizard::Rejected )
-		return;
+	//adjustForCurrentFile(wizard.getDirectory());
+	slotVisualizeImage();
 
-	//Update Recent Image
-    visibleImageNum=wizard.getTotalFileNo();
-	QStringList* wizardFileNames[5] = {
-		wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
-		wizard.getFileNames4(), wizard.getFileNames5()	};
-	// load image into vairalbes
-	for (int i = 0; i < 5; ++i) {
-		if (wizardFileNames[i] != NULL) {
-			FileNameList[i] = *wizardFileNames[i];
-			this->loadImage(i, wizardFileNames[i]);
-			this->vtkImage[0]->GetExtent(this->m_boundingExtent);
-		}
+
+}
+
+void MainWindow::slotOpenImage()
+{
+	slotOpenImage("");
+}
+
+
+void MainWindow::slotOpenRecentImage()
+{
+	QCoreApplication::processEvents();
+
+	QAction *action = qobject_cast<QAction *>(sender());
+	if (action)
+	{
+		slotOpenImage(action->data().toString());
+	}
+}
+
+
+void MainWindow::createRecentImageActions()
+{
+	QAction* recentFileAction = 0;
+	for(int i = 0; i < MAX_RECENT_IMAGE; i++){
+		recentFileAction = new QAction(this);
+		recentFileAction->setVisible(false);
+		connect(recentFileAction, SIGNAL(triggered()),this, SLOT(slotOpenRecentImage()));
+
+		recentFileActionList.append(recentFileAction);
+		ui->menuRecentImage->addAction(recentFileAction);
 	}
 
-	adjustForCurrentFile(wizard.getDirectory());
-	visualizeImage();
+	updateRecentActionList();
+}
+
+bool MainWindow::slotVisualizeImage()
+{	
+
+	//Enable Actions 
+	setActionsEnable(true);
+	//connected to slotMultiPlanarView
+	ui->actionMultiPlanarView->trigger();
+
+
+	//for (int i = 0; i < 3; ++i) {
+	//	m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
+	//}
+	//Update UI stuff
+    //Assume the four images have equal number of slices
+	QSpinBox* spinBoxes[3] = {ui->xSpinBox, ui->ySpinBox, ui->zSpinBox};
+	const int* extent = imageManager.getListOfVtkImages()[0]->GetExtent();
+	for (int i = 0; i < 3; ++i) {
+		spinBoxes[i]->setMinimum(extent[i * 2]);
+		spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
+		spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
+	}
+	ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
+	ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
+
+	connect(ui->windowDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
+	connect(ui->levelDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
+
+	connect(this->ui->xSpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
+	connect(this->ui->ySpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
+	connect(this->ui->zSpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
+	
+	//Update Cursor
+	this->slotChangeSlice();
+	//connected to slotNavigationMode()
+	ui->actionNavigation->trigger();
+				
 
 	// initialize image select function 
 	ChangeBaseImageULMenu.clear();
 	ChangeBaseImageURMenu.clear();
 	ChangeBaseImageLLMenu.clear();
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < this->imageManager.getListOfVtkImages().size(); i++)
 	{
-		if (vtkImage[i] != NULL) {
+		if (this->imageManager.getListOfVtkImages()[i] != NULL) {
 			QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
 			act1->setData(i);
 
@@ -474,219 +519,13 @@ void MainWindow::slotOpenImage(QString dir)
 
 
 	this->addOverlay2ImageViewer();
-}
-
-void MainWindow::slotOpenImage()
-{
-	slotOpenImage("");
-}
-
-
-void MainWindow::slotOpenRecentImage()
-{
-	QCoreApplication::processEvents();
-
-	QAction *action = qobject_cast<QAction *>(sender());
-	if (action)
-	{
-		slotOpenImage(action->data().toString());
-	}
-}
-
-void MainWindow::slotSaveSegmentation()
-{
-	if (SegmentationOverlay == NULL)
-		return;
-
-	QDir dir = ".";
-	QString Path = QFileDialog::getSaveFileName(this, QString(tr("NIfTI")), dir.absolutePath(), tr("NlFTI Images (*nii)"));
-	if (Path == "")
-		return;
-
-	ImageType::Pointer output = ImageType::New();
-	output->Graft(this->SegmentationOverlay->GetITKOutput(this->itkImage[0]));
-
-	WriterType::Pointer writer = WriterType::New();
-	writer->SetInput(output);
-	writer->SetFileName(Path.toStdString().c_str());
-	writer->Update();
-	writer->Write();
-}
-
-
-void MainWindow::createRecentImageActions()
-{
-	QAction* recentFileAction = 0;
-	for(int i = 0; i < MAX_RECENT_IMAGE; i++){
-		recentFileAction = new QAction(this);
-		recentFileAction->setVisible(false);
-		connect(recentFileAction, SIGNAL(triggered()),this, SLOT(slotOpenRecentImage()));
-
-		recentFileActionList.append(recentFileAction);
-		ui->menuRecentImage->addAction(recentFileAction);
-	}
-
-	updateRecentActionList();
-}
-
-bool MainWindow::loadImage(int n, QStringList* list )
-{
-	ImageType::Pointer img;
-	//Load Nifti Data
-	if (list->size() == 1 && list->at(0).contains(".nii"))
-	{
-		NiftiReaderType::Pointer reader = NiftiReaderType::New();
-		reader->SetFileName(list->at(0).toStdString());
-		reader->Update();
-		img = reader->GetOutput();
-	}
-	else
-	{
-		//Load DICOM data
-		ReaderType::Pointer reader = ReaderType::New();
-
-		typedef std::vector<std::string>    FileNamesContainer;
-		FileNamesContainer fileNames;
-
-		for (int i = 0; i < list->size(); i++)
-		{
-			fileNames.push_back(list->at(i).toStdString());
-		}
-
-		reader->SetFileNames(fileNames);
-		try
-		{
-			reader->Update();
-		}
-		catch (itk::ExceptionObject & e)
-		{
-			std::cerr << "exception in file reader " << std::endl;
-			std::cerr << e << std::endl;
-			return 1;
-		}
-		//img = reader->GetOutput();
-		//QString s1 = "/";
-		//QString s2 = "/";
-		//const itk::MetaDataDictionary& dict = reader->GetOutput()->GetMetaDataDictionary();
-
-		//std::string patientNameTag = "0010|0010";
-		//typedef itk::MetaDataDictionary   DictionaryType;
-		//typedef itk::MetaDataObject< std::string > MetaDataStringType;
-
-		//MetaDataDictionary::ConstIterator patientNameTagItr = dict.Find(patientNameTag);
-		//itk::MetaDataObject< std::string >::ConstPointer patientNameEntryvalue =
-		//	dynamic_cast<const itk::MetaDataObject< std::string > *>(patientNameTagItr->second.GetPointer());
-		//if (patientNameEntryvalue != NULL) {
-		//	s1 = QString::fromStdString(patientNameEntryvalue->GetMetaDataObjectValue());
-		//}
-		//std::string modlaityTag = "0008|0060";
-		//MetaDataDictionary::ConstIterator modalityTagItr = dict.Find(modlaityTag);
-		//itk::MetaDataObject< std::string >::ConstPointer modalityEntryvalue =
-		//	dynamic_cast<const itk::MetaDataObject< std::string > *>(modalityTagItr->second.GetPointer());
-		//if (modalityEntryvalue != NULL) {
-		//	s2 = QString::fromStdString(modalityEntryvalue->GetMetaDataObjectValue());
-		//}
-		//itk::MetaDataObject<std::string>* metaDataObject1 = dynamic_cast<itk::MetaDataObject<std::string>*>(
-		//	const_cast<itk::MetaDataObjectBase*>(dict.Get("0010|0010")));
-		//if (metaDataObject1 != NULL) {
-		//	s1 = QString::fromStdString(metaDataObject1->GetMetaDataObjectValue());
-		//}
-		//itk::MetaDataObject<std::string>* metaDataObject2 = dynamic_cast<itk::MetaDataObject<std::string>*>(
-		//	const_cast<itk::MetaDataObjectBase*>(dict.Get("0008|0060")));
-		//if (metaDataObject1 != NULL) {
-		//	s2 = QString::fromStdString(metaDataObject1->GetMetaDataObjectValue());
-		//}
-		//qDebug() << s1;
-		//qDebug() << s2;
-		
-	}
-	//re-orient
-	OrienterType::Pointer orienter = OrienterType::New();
-	orienter->UseImageDirectionOn();
-	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-	orienter->SetInput(img);
-	orienter->Update();
-
-	ConnectorType::Pointer connector = ConnectorType::New();
-	ConnectorType::Pointer connectorAfter = ConnectorType::New();
-	connector->SetInput(orienter->GetOutput());
-	try
-	{
-		connector->Update();
-	}
-	catch (itk::ExceptionObject &err)
-	{
-		std::cerr << err << std::endl;
-		return 1;
-	}
-
-	this->itkImage[n]->Graft(orienter->GetOutput());
-	this->itkImage[n]->Update();
-	if (n > 0) {
-		connectorAfter->SetInput(ImageAlignment(itkImage[n]));
-		try
-		{
-			connectorAfter->Update();
-		}
-		catch (itk::ExceptionObject &err)
-		{
-			std::cerr << err.what() << std::endl;
-			return 1;
-		}
-		this->vtkImage[n] = vtkImageData::New();
-		this->vtkImage[n]->DeepCopy(connectorAfter->GetOutput());
-	}
-	else {
-		this->vtkImage[n] = vtkImageData::New();
-		this->vtkImage[n]->DeepCopy(connector->GetOutput());
-	}
-	
-	return 0;
-}
-
-bool MainWindow::visualizeImage()
-{	
-
-	//Enable Actions 
-	setActionsEnable(true);
-	//connected to slotMultiPlanarView
-	ui->actionMultiPlanarView->trigger();
-
-
-	//for (int i = 0; i < 3; ++i) {
-	//	m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
-	//}
-	//Update UI stuff
-    //Assume the four images have equal number of slices
-	QSpinBox* spinBoxes[3] = {ui->xSpinBox, ui->ySpinBox, ui->zSpinBox};
-	const int* extent = vtkImage[0]->GetExtent();
-	for (int i = 0; i < 3; ++i) {
-		spinBoxes[i]->setMinimum(extent[i * 2]);
-		spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
-		spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
-	}
-	ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
-	ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
-
-	connect(ui->windowDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-	connect(ui->levelDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-
-	connect(this->ui->xSpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
-	connect(this->ui->ySpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
-	connect(this->ui->zSpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
-	
-	//Update Cursor
-	this->slotChangeSlice();
-	//connected to slotNavigationMode()
-	ui->actionNavigation->trigger();
-				
 	return 0;
 }
 
 void MainWindow::slotMeasureCurrentVolumeOfEveryLabel()
 {
 	MeasurementFor3D measure;
-	measure.SetInputData(SegmentationOverlay->GetOutput());
+	measure.SetInputData(this->imageManager.getOverlay().GetOutput());
 	measure.SetLookupTable(m_2DimageViewer[0]->getLookupTable());
 	measure.Update();
 	double* volumes = measure.GetVolumes();
@@ -910,26 +749,18 @@ void MainWindow::slotSelectROI()
 	// Extract VOI of the overlay Image data
 
 	// Extract VOI of the vtkImage data
-	for (int i = 0; i < 5; ++i) {
-		if (vtkImage[i] != NULL) {
-			vtkImageOriginal[i] = vtkImage[i];
-
+	for (int i = 0; i < this->imageManager.getListOfVtkImages().size(); ++i) {
+		if (imageManager.getListOfVtkImages()[i] != NULL) {
 			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
 				vtkSmartPointer<vtkExtractVOI>::New();
-			extractVOIFilter->SetInputData(vtkImage[i]);
+			extractVOIFilter->SetInputData(imageManager.getListOfVtkImages()[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-
-			//vtkImageOriginal[i] = vtkImageData::SafeDownCast(extractVOIFilter->GetInput());
-
-			vtkImage[i] = vtkImageData::New();
-			vtkImage[i]->DeepCopy(extractVOIFilter->GetOutput());
+			imageManager.getListOfVtkImages()[i] = extractVOIFilter->GetOutput();
 		}
 	}
 
-	if (this->SegmentationOverlay) {
-		this->SegmentationOverlay->SetDisplayExtent(newExtent);
-	}
+	this->imageManager.getOverlay().SetDisplayExtent(newExtent);
 	
 	for (int i = 0; i < 3; i++)
 	{
@@ -946,16 +777,11 @@ void MainWindow::slotResetROI()
 {
 	for (int i = 0; i < 5; ++i) 
 	{
-		if (vtkImage[i] != vtkImageOriginal[i] && vtkImage[i] != NULL) {
-			vtkImageData* temp = vtkImage[i];
-			vtkImage[i] = this->vtkImageOriginal[i];
-			temp->Delete();
-		}
+		this->imageManager.getListOfVtkImages()[i] =
+			this->imageManager.getListOfVtkOriginalImages()[i];
 	}
 
-	if (this->SegmentationOverlay) {
-		this->SegmentationOverlay->DisplayExtentOff();
-	}
+	this->imageManager.getOverlay().DisplayExtentOff();
 
 	ui->actionMultiPlanarView->trigger();
 	ui->actionNavigation->trigger();
@@ -966,8 +792,6 @@ void MainWindow::slotResetROI()
 void MainWindow::slot3DUpdate()
 {
 
-	if (SegmentationOverlay == NULL)
-		return;
 	/*vtkNIFTIImageReader* reader = vtkNIFTIImageReader::New();
 	reader->SetFileName("C:/Users/lwong/Source/datacenter/segmentation_right.nii");
 	reader->SetDataScalarTypeToDouble();
@@ -983,8 +807,8 @@ void MainWindow::slot3DUpdate()
 	
 	// Extract VOI
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	voi->SetInputData(this->SegmentationOverlay->GetVTKImageData());
-	voi->SetVOI(this->SegmentationOverlay->GetDisplayExtent());
+	voi->SetInputData(imageManager.getOverlay().GetVTKImageData());
+	voi->SetVOI(imageManager.getOverlay().GetDisplayExtent());
 	voi->Update();
 
 	// Threshold the iamge
@@ -1012,8 +836,12 @@ void MainWindow::slot3DUpdate()
 	plane[1] = vtkSmartPointer<vtkPlane>::New();
 	plane[0]->SetNormal(0, 0, -1);
 	plane[1]->SetNormal(0, 0, 1);
-	double zCoord1 = (this->SegmentationOverlay->GetDisplayExtent()[5] - 1)* this->vtkImage[0]->GetSpacing()[2] + this->vtkImage[0]->GetOrigin()[2];
-	double zCoord2 = (this->SegmentationOverlay->GetDisplayExtent()[4] + 1) * this->vtkImage[0]->GetSpacing()[2] + this->vtkImage[0]->GetOrigin()[2];
+	double zCoord1 = (imageManager.getOverlay().GetDisplayExtent()[5] - 1) * 
+		this->imageManager.getListOfVtkImages()[0]->GetSpacing()[2] + 
+		this->imageManager.getListOfVtkImages()[0]->GetOrigin()[2];
+	double zCoord2 = (imageManager.getOverlay().GetDisplayExtent()[4] + 1) * 
+		this->imageManager.getListOfVtkImages()[0]->GetSpacing()[2] + 
+		this->imageManager.getListOfVtkImages()[0]->GetOrigin()[2];
 	plane[0]->SetOrigin(0, 0, zCoord1);
 	plane[1]->SetOrigin(0, 0, zCoord2);
 	for (int i = 0; i < 2;i++)
@@ -1138,7 +966,7 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
 
 	// Update the display extent1
-	this->SegmentationOverlay->GetDisplayExtent(this->m_boundingExtent);
+	this->imageManager.getOverlay().GetDisplayExtent(this->m_boundingExtent);
 
 	// Clamp the index to within the extent1
 	for (int i = 0; i < 3; i++)
@@ -1350,30 +1178,30 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *ev)
 	ev->accept();
 }
 
-void MainWindow::dropEvent( QDropEvent *ev )
-{
-    const QMimeData *mimeData = ev->mimeData();
-	QList<QUrl> urls = mimeData->urls();
-	foreach(QUrl url, urls)
-	{
-		QString folder = url.toLocalFile();
-		folder.replace("\\","/");
-		
-		RegistrationWizard wizard(this,folder);
-		int isFinished = wizard.exec();
-
-		if (isFinished == QWizard::Rejected )
-			return;
-
-		if (wizard.getFileNames1()!=NULL) loadImage(1,wizard.getFileNames1());
-		if (wizard.getFileNames2()!=NULL) loadImage(2,wizard.getFileNames2());
-		if (wizard.getFileNames3()!=NULL) loadImage(3,wizard.getFileNames3());
-        if (wizard.getFileNames4()!=NULL) loadImage(4,wizard.getFileNames4());
-		if (wizard.getFileNames5()!=NULL) loadImage(5,wizard.getFileNames5());
-		visualizeImage();
-		adjustForCurrentFile(wizard.getDirectory());
-	}
-}
+//void MainWindow::dropEvent( QDropEvent *ev )
+//{
+//    const QMimeData *mimeData = ev->mimeData();
+//	QList<QUrl> urls = mimeData->urls();
+//	foreach(QUrl url, urls)
+//	{
+//		QString folder = url.toLocalFile();
+//		folder.replace("\\","/");
+//		
+//		RegistrationWizard wizard(this,folder);
+//		int isFinished = wizard.exec();
+//
+//		if (isFinished == QWizard::Rejected )
+//			return;
+//
+//		if (wizard.getFileNames1()!=NULL) loadImage(1,wizard.getFileNames1());
+//		if (wizard.getFileNames2()!=NULL) loadImage(2,wizard.getFileNames2());
+//		if (wizard.getFileNames3()!=NULL) loadImage(3,wizard.getFileNames3());
+//        if (wizard.getFileNames4()!=NULL) loadImage(4,wizard.getFileNames4());
+//		if (wizard.getFileNames5()!=NULL) loadImage(5,wizard.getFileNames5());
+//		slotVisualizeImage();
+//		adjustForCurrentFile(wizard.getDirectory());
+//	}
+//}
 
 
 void MainWindow::slotShowProgressDialog( int value, QString text )
@@ -1430,19 +1258,6 @@ QString MainWindow::GetFileName(int i)
     
 }
 
-ImageType::Pointer MainWindow::ImageAlignment(ImageType::Pointer inputImage)
-{
-
-	 ImageRegistration* imageReg = new ImageRegistration(); 
-	 ImageType::Pointer outputImage;
-	 imageReg->SetFixedImage(itkImage[0]);		//Use image 1 as the reference image
-	 imageReg->SetMovingImage(inputImage);
-	 imageReg->Update();
-
-	 outputImage = imageReg->GetOutput();
-	 return outputImage;
-}
-
 int MainWindow::GetVisibleImageNo()
 {
 	return visibleImageNum;
@@ -1450,39 +1265,39 @@ int MainWindow::GetVisibleImageNo()
 
 
 //Segmentation Window
-void MainWindow::slotChangeImageSeq(int image_no, int window_no)
-{
-	if (segmentationView)
-	{
-		m_2DimageViewer[window_no]->SetInputData(vtkImage[image_no]);
-        m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
-        m_2DimageViewer[window_no]->Render();
-    }
-	else
-	{
-		for (int i = 0 ; i < 3 ; i++)
-		{
-			m_2DimageViewer[i]->SetInputData(vtkImage[image_no]);
-			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
-			m_2DimageViewer[i]->Render();
-		}
-		
-	}
-				
-}
-
-
-void MainWindow::slotSelectImageSeq(QAction* act)
-{
-	//0-5 is for UL, 10-15 is for UR, 20-25 is for LL
-	if (act->data().toInt() < 10 && act->data().toInt() >= 0)
-		slotChangeImageSeq(act->data().toInt(),0);
-	else if (act->data().toInt() < 20 && act->data().toInt() >= 10)
-		slotChangeImageSeq(act->data().toInt()-10,1);
-	else if (act->data().toInt() < 30 && act->data().toInt() >= 20)
-		slotChangeImageSeq(act->data().toInt()-20,2);
-
-}
+//void MainWindow::slotChangeImageSeq(int image_no, int window_no)
+//{
+//	if (segmentationView)
+//	{
+//		m_2DimageViewer[window_no]->SetInputData(vtkImage[image_no]);
+//        m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
+//        m_2DimageViewer[window_no]->Render();
+//    }
+//	else
+//	{
+//		for (int i = 0 ; i < 3 ; i++)
+//		{
+//			m_2DimageViewer[i]->SetInputData(vtkImage[image_no]);
+//			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
+//			m_2DimageViewer[i]->Render();
+//		}
+//		
+//	}
+//				
+//}
+//
+//
+//void MainWindow::slotSelectImageSeq(QAction* act)
+//{
+//	//0-5 is for UL, 10-15 is for UR, 20-25 is for LL
+//	if (act->data().toInt() < 10 && act->data().toInt() >= 0)
+//		slotChangeImageSeq(act->data().toInt(),0);
+//	else if (act->data().toInt() < 20 && act->data().toInt() >= 10)
+//		slotChangeImageSeq(act->data().toInt()-10,1);
+//	else if (act->data().toInt() < 30 && act->data().toInt() >= 20)
+//		slotChangeImageSeq(act->data().toInt()-20,2);
+//
+//}
 void MainWindow::slotChangeBaseImageUL()
 {
 	ChangeBaseImageULMenu.show();
@@ -1503,14 +1318,14 @@ void MainWindow::slotMultiPlanarView()
 {
 	segmentationView = false;
 
-	std::vector<QVTKWidget*> imageViews({ ui->image1View, ui->image2View, ui->image3View });
+	QVTKWidget* imageViews[3] = { ui->image1View, ui->image2View, ui->image3View };
 
 	for (int i = 0; i < 3; ++i) {
 		if (!this->INITIALIZED_FLAG) {
 			imageViews[i]->SetRenderWindow(m_2DimageViewer[i]->GetRenderWindow());
 		}
 		// Change input to same image, default 0
-		m_2DimageViewer[i]->SetInputData(vtkImage[0]);
+		m_2DimageViewer[i]->SetInputData(this->imageManager.getListOfVtkImages[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
 		m_2DimageViewer[i]->Render();
 		// initialize stuff
@@ -1622,8 +1437,9 @@ void MainWindow::slotSegmentationView()
 	for (int i1 = 0, i2 = 0; i2 < 3; ++i2)
 	{
 		for (; i1 < 5 && i2 < 3; ++i1) {
-			if (this->vtkImage[i1] != NULL) {
-				this->m_2DimageViewer[i2]->SetInputData(vtkImage[i1]);
+			if (this->imageManager.getListOfVtkImages()[i1] != NULL) {
+				this->m_2DimageViewer[i2]->SetInputData(
+					this->imageManager.getListOfVtkImages()[i1]);
 				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
 				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
 				this->m_style[i2]->SetOrientation(2);
@@ -1668,21 +1484,8 @@ void MainWindow::slotSegmentationView()
 
 void MainWindow::slotAddExternalOverlay()
 {
-	if (SegmentationOverlay== NULL) {
-		SegmentationOverlay = new Overlay;
-	}
-	QDir dir;
-	QString Path = QFileDialog::getOpenFileName(this, QString(tr("DICOM")), dir.absolutePath());
-
-	if (Path == "")
-		return;
-
-	this->SegmentationOverlay->SetInputImageData(Path);
-	int *extent1 = this->SegmentationOverlay->GetVTKImageData()->GetExtent();
-	int *extent2 = this->vtkImage[0]->GetExtent();
-	//this->vtkImageOverlay = SegmentationOverlay->GetOutput();
-
-
+	int *extent1 = this->imageManager.getOverlay().GetOutput()->GetExtent();
+	int *extent2 = this->imageManager.getListOfVtkImages()[0]->GetExtent();
 
 	if (!std::equal(extent1, extent1 + 6, extent2)) {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
@@ -1693,8 +1496,6 @@ void MainWindow::slotAddExternalOverlay()
 		addOverlay2ImageViewer();
 		viewerGroup.checkedAction()->trigger();
 	}
-
-
 }
 
 
@@ -1782,11 +1583,6 @@ int MainWindow::GetImageLayerNo()
 	return m_layer_no;
 }
 
-vtkImageData ** MainWindow::GetImageData()
-{
-	return this->vtkImage;
-}
-
 InteractorStyleSwitch * MainWindow::GetInteractorStyleImageSwitch(int i)
 {
 	return m_style[i];
@@ -1800,15 +1596,6 @@ vtkRenderWindowInteractor * MainWindow::GetVtkRenderWindowInteractor(int i)
 vtkLookupTable * MainWindow::GetLookupTable()
 {
 	return this->LookupTable;
-}
-
-
-Overlay* MainWindow::GetOverlay()
-{
-	if (SegmentationOverlay)
-		return SegmentationOverlay;
-	else
-		return NULL;
 }
 
 vtkPolyData * MainWindow::GetCenterlinePD()
@@ -1836,18 +1623,18 @@ void MainWindow::slotCenterline()
 {
 	cout << "slotCenterLine" << endl;
 	// segmentation
-	VesselSegmentation* vesselSegmentation = new VesselSegmentation();
-	vesselSegmentation->SetT1(itkImage[0]);
-	vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput(itkImage[0]));
-	vesselSegmentation->SetMPRAGE(itkImage[1]);
-	vesselSegmentation->Update();
+	//VesselSegmentation* vesselSegmentation = new VesselSegmentation();
+	//vesselSegmentation->SetT1(this->imageManager.getListOfITKImage()[0]);
+	//vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput(itkImage[0]));
+	//vesselSegmentation->SetMPRAGE(itkImage[1]);
+	//vesselSegmentation->Update();
 
-	FloatImageType::Pointer outputSegmentation = FloatImageType::New();
-	vesselSegmentation->GetOutputSegmentationImage(outputSegmentation);
-	itk::ImageFileWriter<FloatImageType>::Pointer imageFileWriter =
-		itk::ImageFileWriter<FloatImageType>::New();
-	imageFileWriter->SetFileName("C:\\Users\\user\\Desktop\\seg.nii");
-	imageFileWriter->Update();
+	//FloatImageType::Pointer outputSegmentation = FloatImageType::New();
+	//vesselSegmentation->GetOutputSegmentationImage(outputSegmentation);
+	//itk::ImageFileWriter<FloatImageType>::Pointer imageFileWriter =
+	//	itk::ImageFileWriter<FloatImageType>::New();
+	//imageFileWriter->SetFileName("C:\\Users\\user\\Desktop\\seg.nii");
+	//imageFileWriter->Update();
 
 
 	//this->SegmentationOverlay->SetInputImageData(outputSegmentation);

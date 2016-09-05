@@ -1,5 +1,5 @@
 
-project(Module)
+project(UI)
 SET(
   CMAKE_PREFIX_PATH
   "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
@@ -41,30 +41,28 @@ include_directories(
 SET(
 	LIBRARY_OUTPUT_PATH
 	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
-)
-
-# SET(
-	# MODULE_INC_LIST
-	# ${CMAKE_SOURCE_DIR}/include/Define.h
- # )
-
-SET(
-	MODULE_SRC_LIST
 )
 
 SET(MODULE_QT_INC 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.h
 	${PROJECT_SOURCE_DIR}/MyThread.h
+	${PROJECT_SOURCE_DIR}/InfoDialog.h
+	${PROJECT_SOURCE_DIR}/MainWindow.h
+	${PROJECT_SOURCE_DIR}/MyProgressDialog.h
 )
 
 SET(MODULE_QT_SRC 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.cxx
 	${PROJECT_SOURCE_DIR}/MyThread.cxx
+	${PROJECT_SOURCE_DIR}/InfoDialog.cxx
+	${PROJECT_SOURCE_DIR}/MainWindow.cxx
+	${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
 )
 
 SET(MODULE_QT_UI 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.ui
+	${PROJECT_SOURCE_DIR}/InfoDialog.ui
+	${PROJECT_SOURCE_DIR}/MainWindow.ui
 )
 
 #Generate moc and ui file
@@ -73,12 +71,11 @@ QT5_WRAP_CPP(MOCSrcs ${MODULE_QT_INC})
 
 add_library(
 	Module 
-	${MODULE_SRC_LIST}
-	${MODULE_INC_LIST}
 	${UISrcs}
 	${MOCSrcs} 
 	${MODULE_QT_SRC} 
 	${MODULE_QT_INC}
+	${MODULE_QT_UI}
 	)
 
 #link libraries
@@ -106,12 +103,10 @@ SOURCE_GROUP(
 	"Header Files" 
 	FILES 
 	${MODULE_QT_INC}
-	${MODULE_INC_LIST}
 	)
 SOURCE_GROUP(
 	"Source Files" 
 	FILES 
 	${MODULE_QT_SRC}
-	${MODULE_SRC_LIST}
 	)
 

@@ -1,7 +1,7 @@
 #ifndef IO_MANAGER_H
 #define IO_MANAGER_H
 
-#include <QObject>
+#include <QWidget>
 #include <QString>
 #include <QList>
 #include <QStringList>
@@ -16,11 +16,12 @@ class MyImageManager;
 
 typedef itk::Image<float, 3> ImageType;
 
-class IOManager:public QObject
+class IOManager:public QWidget
 {
 	Q_OBJECT
 public:
-	IOManager(QObject* parent = NULL);
+
+	IOManager(QWidget* parent = NULL);
 	~IOManager();
 
 	void enableRegistration(bool flag);
@@ -32,6 +33,8 @@ public:
 	const QList<QStringList> getListOfFileNames();
 //public slots:
 
+	virtual void slotOpenWithWizard();
+
 	virtual void slotOpenWithWizard(QString dir);
 
 	virtual void slotOpenMultiImages();
@@ -40,8 +43,13 @@ public:
 	virtual void slotOpenOneImage(QStringList fileNames);
 
 	//virtual void slotOpenSegmentation();
+	virtual void slotOpenSegmentationWithDiaglog();
+
 	virtual void slotOpenSegmentation(QString fileName);
 
+	virtual void slotSaveSegmentaitonWithDiaglog();
+
+	virtual void slotSaveSegmentation(QString path);
 	//virtual void slotSaveImage(QString uniqueName, QString path);
 	//virtual void slotSaveImage(int index, QString path);
 
@@ -54,6 +62,7 @@ public:
 signals:
 	void finishOpenMultiImages();
 	void finishOpenOneImage();
+	void finishOpenSegmentation();
 
 protected:
 	virtual bool LoadImageData(QStringList fileNames);

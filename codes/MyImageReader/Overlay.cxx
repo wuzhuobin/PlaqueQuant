@@ -151,7 +151,7 @@ void Overlay::DisplayExtentOn()
 
 void Overlay::DisplayExtentOff()
 {
-	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
+
 }
 
 void Overlay::SetPixel(int pos[3], double value)

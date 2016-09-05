@@ -13,16 +13,13 @@
 #include "ui_MainWindow.h"
 
 #include <vtkActor.h>
-#include <vtkImageData.h>
 #include <vtkPolyData.h>
 
 //Own Class
-#include "Define.h"
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
 #include "InteractorStyleSwitch3D.h"
 #include "InfoDialog.h"
-#include "Overlay.h"
 #include "Distance3DWidget.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
@@ -43,7 +40,6 @@ public:
 	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i);
 	vtkLookupTable* GetLookupTable();
 
-	Overlay*			GetOverlay();
 	QString				GetFileName(int);
 	int					GetVisibleImageNo();
 	int					GetImageLayerNo();
@@ -149,7 +145,7 @@ public slots:
 
 	//Visualization
 	bool loadImage(int, QStringList*list);
-	bool visualizeImage();
+	bool slotVisualizeImage();
 
 	//Alogrithm
 	void slotMeasureCurrentVolumeOfEveryLabel();
@@ -237,7 +233,7 @@ private:
 
 
 	//Overlay
-	Overlay* SegmentationOverlay;
+	//Overlay* SegmentationOverlay;
 	int m_layer_no;		//Main Image
 	int m_boundingExtent[6];
 

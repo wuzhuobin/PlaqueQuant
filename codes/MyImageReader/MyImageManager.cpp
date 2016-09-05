@@ -25,9 +25,14 @@ int MyImageManager::getNumberOfImages()
 	return this->listOfItkImages.size();
 }
 
-const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
+QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
 {
 	return this->listOfVtkImages;
+}
+
+const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkOriginalImages()
+{
+	return this->listOfVtkOriginalImages;
 }
 
 const QList<Image<float, 3>::Pointer> MyImageManager::getListOfItkImages()
@@ -55,7 +60,7 @@ const QMap<QString, QString>* MyImageManager::getDICOMHeader(Image<float, 3>::Po
 	return this->mapOfDICOMHeader[itkImage];
 }
 
-const Overlay& MyImageManager::getOverlay()
+Overlay& MyImageManager::getOverlay()
 {
 	return this->overlay;
 }

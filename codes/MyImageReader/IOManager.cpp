@@ -3,18 +3,21 @@
 #include "MyImageManager.h"
 #include "ImageRegistration.h"
 
+#include <QFileDialog>
+
 #include <itkImageFileReader.h>
 #include <itkMetaDataDictionary.h>
 #include <itkOrientImageFilter.h>
 #include <itkGDCMImageIO.h>
 #include <itkImageSeriesReader.h>
 #include <itkImageToVTKImageFilter.h>
+#include <itkImageFileWriter.h>
 
 #include "RegistrationWizard.h"
 
 using namespace itk;
-IOManager::IOManager(QObject* parent) 
-	:registration(parent), QObject(parent)
+IOManager::IOManager(QWidget* parent) 
+	:registration(parent), QWidget(parent)
 {
 }
 
@@ -115,6 +118,7 @@ bool IOManager::LoadImageData(QStringList fileNames)
 	}
 	this->myImageManager->listOfItkImages.append(_itkImage);
 	this->myImageManager->listOfVtkImages.append(_vtkImage);
+	this->myImageManager->listOfVtkOriginalImages.append(_vtkImage);
 	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 	return true;
 }
@@ -136,6 +140,11 @@ void IOManager::setMyImageManager(MyImageManager * myImageManager)
 void IOManager::setUniqueKeys(QStringList keys)
 {
 	this->uniqueKeys = keys;
+}
+
+void IOManager::slotOpenWithWizard()
+{
+	this->slotOpenWithWizard("");
 }
 
 void IOManager::slotOpenWithWizard(QString dir)
@@ -175,10 +184,19 @@ void IOManager::slotOpenOneImage(QStringList fileNames)
 	emit finishOpenOneImage();
 }
 
+void IOManager::slotOpenSegmentationWithDiaglog()
+{
+	QString path = QFileDialog::getOpenFileName(this, QString(tr("Open Segmentation")), 
+		".", tr("NlFTI Images (*.nii)"));
+	if (path.isEmpty()) return;
+	this->slotOpenSegmentation(path);
+	emit finishOpenSegmentation();
+}
+
 void IOManager::slotOpenSegmentation(QString fileName)
 {
 	ImageType::Pointer _itkImage;
-	vtkSmartPointer<vtkImageData> _vtkImage;
+	//vtkSmartPointer<vtkImageData> _vtkImage;
 	
 	ImageFileReader<Image<float, 3>>::Pointer reader =
 		ImageFileReader<Image<float, 3>>::New();
@@ -203,4 +221,23 @@ void IOManager::slotOpenSegmentation(QString fileName)
 	//	connector->Update();
 	//	_vtkImage = connector->GetOutput();
 	//}
+}
+
+void IOManager::slotSaveSegmentaitonWithDiaglog()
+{
+	QString path = QFileDialog::getSaveFileName(this, QString(tr("Save Segmentation")),
+		".", tr("NlFTI Images (*.nii)"));
+	if (path.isEmpty())	return;
+	slotSaveSegmentation(path);
+	
+}
+
+void IOManager::slotSaveSegmentation(QString path)
+{
+	ImageFileWriter<Image<float, 3>>::Pointer writer =
+		ImageFileWriter<Image<float, 3>>::New();
+	writer->SetInput(this->myImageManager->overlay.GetITKOutput(
+		this->myImageManager->listOfItkImages[0]));
+	writer->SetFileName(path.toStdString().c_str());
+	writer->Write();
 }
