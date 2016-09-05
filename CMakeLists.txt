@@ -51,7 +51,7 @@ SET(
 	### Directories for MOC Sources ###
 	${PROJECT_BINARY_DIR}
 	${PROJECT_BINARY_DIR}/include
-	${PROJECT_BINARY_DIR}/codes/Module
+	${PROJECT_BINARY_DIR}/codes/UI
 	${PROJECT_BINARY_DIR}/codes/Core
 	# AbstractInteractorStyles
 	${PROJECT_BINARY_DIR}/codes/AbstractInteractorStyles
@@ -69,7 +69,7 @@ SET(
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/codes/Module
+	${PROJECT_SOURCE_DIR}/codes/UI
 	${PROJECT_SOURCE_DIR}/codes/Core
 	# AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
