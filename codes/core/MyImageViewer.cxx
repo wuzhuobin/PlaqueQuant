@@ -328,7 +328,6 @@ void MyImageViewer::Render()
 	{
 		this->RenderWindow->Render();
 	}
-
 }
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)
@@ -351,11 +350,13 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 {
 	this->AnnotationWindowLevel->SetInputData(in);
-	this->AnnotationWindowLevel->Update();
+	// in case when LookupTable has not been set
+	if (this->LookupTable != NULL) {
+		int num = this->LookupTable->GetNumberOfTableValues();
+		AnnotationWindowLevel->SetWindow(num - 1 );
+		AnnotationWindowLevel->SetLevel((num - 1)*0.5);
+	}
 	this->UpdateDisplayExtent();
-	this->drawActor->SetInputData(this->AnnotationWindowLevel->GetOutput());
-	this->drawActor->Update();
-
 
 }
 //----------------------------------------------------------------------------
@@ -446,9 +447,9 @@ void MyImageViewer::SetLookupTable(vtkLookupTable * LookupTable)
 	this->drawActor->GetProperty()->SetInterpolationTypeToNearest();
 	this->drawActor->GetProperty()->SetLookupTable(LookupTable);
 
-	const double* range = LookupTable->GetRange();
-	AnnotationWindowLevel->SetWindow(range[1] - range[0]);
-	AnnotationWindowLevel->SetLevel((range[1] + range[0])*0.5);
+	int num = LookupTable->GetNumberOfTableValues();
+	AnnotationWindowLevel->SetWindow(num - 1);
+	AnnotationWindowLevel->SetLevel((num - 1) * 0.5);
 	//this->drawActor->SetVisibility(false);
 }
 

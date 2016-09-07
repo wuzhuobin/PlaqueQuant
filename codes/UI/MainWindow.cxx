@@ -222,7 +222,7 @@ MainWindow::MainWindow()
 	this->LookupTable = vtkLookupTable::New();
 	this->LookupTable->SetNumberOfTableValues(7);
 	this->LookupTable->SetTableRange(0.0, 6);
-	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
+	this->LookupTable->SetTableValue(0, 0, 0, 0, 0.0);
 	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.2);
 	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.05);
 	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.4);
@@ -348,7 +348,6 @@ void MainWindow::addOverlay2ImageViewer()
 {
 	int *extent1 = this->imageManager.getOverlay().GetOutput()->GetExtent();
 	int *extent2 = this->imageManager.getListOfVtkImages()[0]->GetExtent();
-
 	if (!std::equal(extent1, extent1 + 6, extent2)) {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
 		return;
@@ -357,10 +356,12 @@ void MainWindow::addOverlay2ImageViewer()
 		{
 			if (segmentationView && i >= visibleImageNum)
 				break;
+			// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
+			// Very strange
+ 			this->LookupTable->SetTableRange(0, 6);
 			m_2DimageViewer[i]->SetLookupTable(this->LookupTable);
 			m_2DimageViewer[i]->SetInputDataLayer(
 				this->imageManager.getOverlay().GetOutput());
-			m_2DimageViewer[i]->GetAnnotationRenderer()->AddViewProp(this->m_2DimageViewer[i]->GetdrawActor());
 		}
 	this->imageManager.getOverlay().GetOutput()->Modified();
 	this->slotOverlayVisibilty(true);
@@ -608,7 +609,6 @@ void MainWindow::slotWindowLevelMode()
 			break;
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
-
 	this->slotRuler(false);
 }	
 
@@ -714,6 +714,7 @@ void MainWindow::slotRuler(bool b)
 	{
 		m_2DimageViewer[i]->SetRulerEnabled(b);
 	}
+
 }
 
 void MainWindow::slotROIMode()
@@ -753,7 +754,8 @@ void MainWindow::slotSelectROI()
 			extractVOIFilter->SetInputData(imageManager.getListOfVtkImages()[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			imageManager.getListOfVtkImages()[i]->DeepCopy(extractVOIFilter->GetOutput());
+			vtkSmartPointer<vtkImageData> _image = extractVOIFilter->GetOutput();
+			imageManager.getListOfVtkImages()[i] = _image;
 		}
 	}
 
@@ -774,8 +776,10 @@ void MainWindow::slotResetROI()
 {
 	for (int i = 0; i < 5; ++i) 
 	{
-		this->imageManager.getListOfVtkImages()[i] =
-			this->imageManager.getListOfVtkOriginalImages()[i];
+		if (imageManager.getListOfVtkImages()[i] != NULL) {
+			imageManager.getListOfVtkImages()[i]->DeepCopy(
+				imageManager.getListOfVtkOriginalImages()[i]);
+		}
 	}
 
 	this->imageManager.getOverlay().DisplayExtentOff();
@@ -1326,7 +1330,7 @@ void MainWindow::slotMultiPlanarView()
 		// Change input to same image, default 0
 		m_2DimageViewer[i]->SetInputData(this->imageManager.getListOfVtkImages()[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
-		m_2DimageViewer[i]->Render();
+		//m_2DimageViewer[i]->Render();
 		// initialize stuff
 		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 		//m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
