@@ -196,7 +196,6 @@ private:
 	void updateRecentActionList();
 
 	//Initialization
-	void initializeViewers();
 	void initializeModule();
 
 	// UI related

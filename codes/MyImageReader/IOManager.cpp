@@ -49,6 +49,7 @@ bool IOManager::LoadImageData(QStringList fileNames)
 {
 	ImageType::Pointer _itkImage = NULL;
 	vtkSmartPointer<vtkImageData> _vtkImage = NULL;
+	vtkSmartPointer<vtkImageData> _vtkImageOriginal = NULL;
 	// QMAP saving DICOM imformation
 	QMap<QString, QString>* DICOMHeader = NULL;
 	if (fileNames.isEmpty()) {
@@ -115,10 +116,13 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		connector->SetInput(_itkImage);
 		connector->Update();
 		_vtkImage = connector->GetOutput();
+		_vtkImageOriginal = vtkSmartPointer<vtkImageData>::New();
+		_vtkImageOriginal->DeepCopy(_vtkImage);
 	}
+
 	this->myImageManager->listOfItkImages.append(_itkImage);
 	this->myImageManager->listOfVtkImages.append(_vtkImage);
-	this->myImageManager->listOfVtkOriginalImages.append(_vtkImage);
+	this->myImageManager->listOfVtkOriginalImages.append(_vtkImageOriginal);
 	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 	return true;
 }

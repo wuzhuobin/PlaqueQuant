@@ -317,33 +317,6 @@ void MainWindow::initializeModule()
 	ui->dockWidget->setWidget(m_moduleWidget);
 }
 
-
-//void MainWindow::initializeViewers()
-//{
-//	segmentationView = false;
-//
-//	for (int i = 0 ; i < 3 ; i++)
-//	{
-//	    m_2DimageViewer[i]->SetInputData(vtkImage[0]);
-//		m_2DimageViewer[i]->SetSliceOrientation(i);
-//		m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
-//        m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
-//		m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-//
-//		//Update style
-//		m_style[i]->SetViewers(m_2DimageViewer[i]);
-//		m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox, 
-//			ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
-//			m_moduleWidget->GetBrushSizeSpinBox(), 
-//			m_moduleWidget->GetBrushShapeComBox(),
-//			NULL, NULL);
-//
-//		m_interactor[i]->SetInteractorStyle(m_style[i]);
-//		
-//	}
-//	this->addOverlay2ImageViewer();
-//}
-
 void MainWindow::addOverlay2ImageViewer()
 {
 	int *extent1 = this->imageManager.getOverlay().GetOutput()->GetExtent();
@@ -754,8 +727,8 @@ void MainWindow::slotSelectROI()
 			extractVOIFilter->SetInputData(imageManager.getListOfVtkImages()[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			vtkSmartPointer<vtkImageData> _image = extractVOIFilter->GetOutput();
-			imageManager.getListOfVtkImages()[i] = _image;
+			this->imageManager.getListOfVtkImages()[i]->DeepCopy(
+				extractVOIFilter->GetOutput());
 		}
 	}
 
@@ -792,17 +765,6 @@ void MainWindow::slotResetROI()
 
 void MainWindow::slot3DUpdate()
 {
-
-	/*vtkNIFTIImageReader* reader = vtkNIFTIImageReader::New();
-	reader->SetFileName("C:/Users/lwong/Source/datacenter/segmentation_right.nii");
-	reader->SetDataScalarTypeToDouble();
-	reader->Update();
-
-	vtkSmartPointer<vtkImageCast> imcast = vtkSmartPointer<vtkImageCast>::New();
-	imcast->SetInputConnection(reader->GetOutputPort());
-	imcast->SetOutputScalarTypeToDouble();
-	imcast->Update();
-*/
 
 	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
 	
