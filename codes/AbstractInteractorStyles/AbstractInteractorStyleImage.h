@@ -18,11 +18,13 @@ Copyright (C) 2016
 #ifndef ABSTRACT_INTERACTOR_STYLE_IMAGE_H
 #define ABSTRACT_INTERACTOR_STYLE_IMAGE_H
 
-#include <QSpinBox>
+//#include <QSpinBox>
 
 /// VTK
 #include <vtkInteractorStyleImage.h>
 #include <vtkObjectFactory.h>
+
+#include <list>
 
 #include "MyImageViewer.h"
 
@@ -32,12 +34,12 @@ public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
 	static AbstractInteractorStyleImage *New();
 	
-	virtual void SetImageViewer(MyImageViewer* imageViewer);
-	virtual void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
-	virtual void SetOrientation(int orientation);
-	virtual int GetOrientation();
+	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
+	//virtual void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
+	//virtual void SetOrientation(int m_orientation);
+	//virtual int GetOrientation();
 	virtual vtkActor* PickActor(int x, int y);
-	void SetCurrentSlice(int slice);
+	//void SetCurrentSlice(int slice);
 
 
 protected:
@@ -61,14 +63,14 @@ protected:
 
 	QSpinBox* m_sliceSplinBox[3];
 
-	MyImageViewer* imageViewer;
+	MyImageViewer* m_imageViewer;
 
 	int m_slice;
 	int m_minSlice;
 	int m_maxSlice;
-	int orientation;
-	double origin[3];
-	double spacing[3];
+	int m_orientation;
+	double m_origin[3];
+	double m_spacing[3];
 	int extent[6];
 
 	bool m_rightFunctioning;

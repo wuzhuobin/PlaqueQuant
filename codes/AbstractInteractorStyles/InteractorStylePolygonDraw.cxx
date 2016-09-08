@@ -178,13 +178,13 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 	{
 		m_vesselWallContourRepresentation = vtkOrientedGlyphContourRepresentation::New();
 
-		MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(imageViewer);
+		MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
 		if (viewer != NULL) {
 			cout << "viewer" << endl;
 			m_vesselWallContourRepresentation->SetRenderer(viewer->GetAnnotationRenderer());
 		}
 		else {
-			m_vesselWallContourRepresentation->SetRenderer(imageViewer->GetRenderer());
+			m_vesselWallContourRepresentation->SetRenderer(m_imageViewer->GetRenderer());
 		}
 
 		m_vesselWallContourRepresentation->SetNeedToRender(true);
@@ -202,7 +202,7 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 			m_vesselWallContourWidget->SetDefaultRenderer(viewer->GetAnnotationRenderer());
 		}
 		else {
-			m_vesselWallContourWidget->SetDefaultRenderer(imageViewer->GetRenderer());
+			m_vesselWallContourWidget->SetDefaultRenderer(m_imageViewer->GetRenderer());
 		}
 		m_vesselWallContourWidget->FollowCursorOn();
 		m_vesselWallContourWidget->ContinuousDrawOn();
@@ -211,7 +211,7 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 
 
 
-		this->imageViewer->Render();
+		this->m_imageViewer->Render();
 		this->CONTOUR_IS_ON_FLAG = true;
 	}
 	else {
@@ -242,7 +242,7 @@ void InteractorStylePolygonDraw::SetContourFilterGenerateValues(int generateValu
 void InteractorStylePolygonDraw::DisplayPolygon(vtkObject* caller, long unsigned vtkNotUsed(eventId), void* vtkNotUsed(clientData))
 {
 
-	imageViewer->Render();
+	m_imageViewer->Render();
 }
 
 void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
@@ -271,12 +271,12 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 	}
 	if (this->CONTOUR_IS_ON_FLAG) {
 		m_lumenWallContourRepresentation = vtkOrientedGlyphContourRepresentation::New();
-		MyImageViewer* viewer2 = dynamic_cast<MyImageViewer*>(imageViewer);
+		MyImageViewer* viewer2 = dynamic_cast<MyImageViewer*>(m_imageViewer);
 		if (viewer2 != NULL) {
 			m_lumenWallContourRepresentation->SetRenderer(viewer2->GetAnnotationRenderer());
 		}
 		else {
-			m_lumenWallContourRepresentation->SetRenderer(imageViewer->GetRenderer());
+			m_lumenWallContourRepresentation->SetRenderer(m_imageViewer->GetRenderer());
 		}
 		m_lumenWallContourRepresentation->SetNeedToRender(true);
 		m_lumenWallContourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
@@ -291,7 +291,7 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 			m_lumenWallContourWidget->SetDefaultRenderer(viewer2->GetAnnotationRenderer());
 		}
 		else {
-			m_lumenWallContourWidget->SetDefaultRenderer(imageViewer->GetRenderer());
+			m_lumenWallContourWidget->SetDefaultRenderer(m_imageViewer->GetRenderer());
 		}
 		m_lumenWallContourWidget->FollowCursorOn();
 		m_lumenWallContourWidget->ContinuousDrawOn();
@@ -300,14 +300,14 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 
 		vtkSmartPointer<LumenSegmentaiton> ls =
 			vtkSmartPointer<LumenSegmentaiton>::New();
-		ls->SetInputData(imageViewer->GetInput());
+		ls->SetInputData(m_imageViewer->GetInput());
 		ls->SetSlice(m_slice);
 		ls->SetGenerateValues(1, m_generateValue, m_generateValue);
 		ls->SetVesselWallContourRepresentation(this->m_vesselWallContourRepresentation);
 		ls->Update();
 		m_lumenWallContourWidget->Initialize(ls->GetOutput());
 		m_lumenWallContourWidget->CloseLoop();
-		imageViewer->Render();
+		m_imageViewer->Render();
 	}
 }
 
@@ -363,9 +363,9 @@ void InteractorStylePolygonDraw::FillPolygon()
 			polydata->GetPoint(i, worldCoordinate);
 
 			//Take one image data 1 to be reference
-			displayCoordinate[0] = (worldCoordinate[0] - origin[0]) / spacing[0];
-			displayCoordinate[1] = (worldCoordinate[1] - origin[1]) / spacing[1];
-			displayCoordinate[2] = (worldCoordinate[2] - origin[2]) / spacing[2];
+			displayCoordinate[0] = (worldCoordinate[0] - m_origin[0]) / m_spacing[0];
+			displayCoordinate[1] = (worldCoordinate[1] - m_origin[1]) / m_spacing[1];
+			displayCoordinate[2] = (worldCoordinate[2] - m_origin[2]) / m_spacing[2];
 			//cout << s[0] << " " << s[1] << " " << s[2] << endl;
 			//Test whether the points are inside the polygon or not
 			// if the points is too close to the previous point, skip it to avoid error in PointInPolygon algorithm
@@ -373,7 +373,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 			if (d < 1E-5)
 				continue;
 			memcpy(lastPoint, displayCoordinate, sizeof(double) * 3);
-			switch (orientation)
+			switch (m_orientation)
 			{
 			case 0:
 				polygon->GetPoints()->InsertNextPoint(0.0, displayCoordinate[1], displayCoordinate[2]);
@@ -415,21 +415,21 @@ void InteractorStylePolygonDraw::FillPolygon()
 
 		double p[3];
 		int p2[3];
-		if (orientation == 0)
+		if (m_orientation == 0)
 		{
 			for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
 				for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
 					p[0] = 0.0;
 					p[1] = (double)y;
 					p[2] = (double)z;
-					p2[0] = imageViewer->GetSlice();
+					p2[0] = m_imageViewer->GetSlice();
 					p2[1] = y;
 					p2[2] = z;
 					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						// fill the contour
 						double * pixel = static_cast<double *>(
-							imageViewer->GetInputLayer()->GetScalarPointer(p2));
+							m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
 						if (pixel == nullptr) {
 							return;
 						}
@@ -438,7 +438,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 				}
 			}
 		}
-		else if (orientation == 1)
+		else if (m_orientation == 1)
 		{
 			for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
 				for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
@@ -446,13 +446,13 @@ void InteractorStylePolygonDraw::FillPolygon()
 					p[1] = 0.0;
 					p[2] = (double)z;
 					p2[0] = x;
-					p2[1] = imageViewer->GetSlice();
+					p2[1] = m_imageViewer->GetSlice();
 					p2[2] = z;
 					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						// fill the contour
 						double * pixel = static_cast<double *>(
-							imageViewer->GetInputLayer()->GetScalarPointer(p2));
+							m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
 						if (pixel == nullptr) {
 							return;
 						}
@@ -461,7 +461,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 				}
 			}
 		}
-		else if (orientation == 2)
+		else if (m_orientation == 2)
 		{
 			for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
 				for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
@@ -470,12 +470,12 @@ void InteractorStylePolygonDraw::FillPolygon()
 					p[2] = 0.0;
 					p2[0] = x;
 					p2[1] = y;
-					p2[2] = imageViewer->GetSlice();
+					p2[2] = m_imageViewer->GetSlice();
 					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						// fill the contour
 						double * pixel = static_cast<double *>(
-							imageViewer->GetInputLayer()->GetScalarPointer(p2));
+							m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
 						if (pixel == nullptr) {
 							return;
 						}
@@ -490,7 +490,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 
 	SetPolygonModeEnabled(false);
 	SetPolygonModeEnabled(true);
-	imageViewer->GetInputLayer()->Modified();
+	m_imageViewer->GetInputLayer()->Modified();
 
 
 

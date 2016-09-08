@@ -43,12 +43,10 @@ public:
 	QString				GetFileName(int);
 	int					GetVisibleImageNo();
 	int					GetImageLayerNo();
-	vtkImageData**		GetImageData();
 	vtkPolyData*		GetCenterlinePD();
 	Ui_MainWindow* GetUI();
 
 	// Set functions
-	void Set3DRulerEnabled(bool b);
 	void SetImageLayerNo(int);
 
 	// Ui Updates
@@ -117,9 +115,6 @@ public slots:
 
 	//Overlay
 	virtual void slotAddExternalOverlay();
-	//virtual void slotRemoveOverlay();
-	virtual void slotOverlayVisibilty(bool b);
-	virtual void slotOverlayVisibilty(bool b, int);
     virtual void slotOverlayOpacity(int opacity);
   
 	//Centerline
@@ -183,8 +178,7 @@ private:
 	InteractorStyleSwitch3D*	m_style3D;
 
 
- //   //File Name
-	//QStringList FileNameList[5];
+
     
 	//3D ruler
 	Distance3DWidget* m_distance3DWidget;
@@ -195,17 +189,10 @@ private:
 	void adjustForCurrentFile(const QString& filePath);
 	void updateRecentActionList();
 
-	//Initialization
-	void initializeModule();
-
 	// UI related
 	void DisplayErrorMessage(std::string);
 	
 	//Data
-	//ImageType::Pointer  ImageAlignment(ImageType::Pointer);
-	//ImageType::Pointer itkImage[5];
-	//vtkImageData* vtkImage[5];
-	vtkImageData* vtkImageOriginal[5];
 	vtkPolyData* m_centerlinePD;
 	MyImageManager imageManager;
 	IOManager ioManager;

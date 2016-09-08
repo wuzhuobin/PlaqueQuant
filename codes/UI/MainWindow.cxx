@@ -32,17 +32,11 @@
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkImageActor.h>
-//#include <vtkDistanceRepresentation3D.h>
-//#include <vtkDistanceRepresentation2D.h>
 #include <vtkDistanceWidget.h>
-//#include <vtkPointHandleRepresentation3D.h>
 #include <vtkLookupTable.h>
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
 #include <vtkExtractVOI.h>
-#include <vtkImageIterator.h>
 #include <vtkCamera.h>
-#include <vtkImageCast.h>
 #include <vtkImageThreshold.h>
 
 
@@ -56,7 +50,8 @@ MainWindow::MainWindow()
 	this->ui->setupUi(this);
 	
 	//Initialize
-	initializeModule();
+	m_moduleWidget = new ModuleWidget(this);
+	ui->dockWidget->setWidget(m_moduleWidget);
 	setActionsEnable(false);
 
 	this->setWindowTitle("PlaqueQuant");
@@ -276,22 +271,6 @@ MainWindow::~MainWindow()
 		m_3Dinteractor = NULL;
 	}
 
-
-	//for (int i = 0; i < 5; ++i) {
-	//	if (vtkImage[i] != NULL) {
-	//		if (vtkImageOriginal[i] != vtkImage[i]) {
-	//			vtkImage[i]->Delete();
-	//			vtkImage[i] = NULL;
-	//		}
-	//		if (vtkImageOriginal[i] != NULL) {
-	//			vtkImageOriginal[i]->Delete();
-	//			vtkImageOriginal[i] = NULL;
-	//		}
-	//		vtkImage[i] = NULL;
-	//	}
-
-
-	//}
 	if (m_moduleWidget != NULL) {
 		delete m_moduleWidget;
 		m_moduleWidget = NULL;
@@ -311,16 +290,10 @@ MainWindow::~MainWindow()
 	}
 }
 
-void MainWindow::initializeModule()
-{
-	m_moduleWidget = new ModuleWidget(this);
-	ui->dockWidget->setWidget(m_moduleWidget);
-}
-
 void MainWindow::addOverlay2ImageViewer()
 {
 	int *extent1 = this->imageManager.getOverlay().GetOutput()->GetExtent();
-	int *extent2 = this->imageManager.getListOfVtkImages()[0]->GetExtent();
+	int *extent2 = this->imageManager.getListOfViewerInputImages()[0]->GetExtent();
 	if (!std::equal(extent1, extent1 + 6, extent2)) {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
 		return;
@@ -331,13 +304,13 @@ void MainWindow::addOverlay2ImageViewer()
 				break;
 			// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
 			// Very strange
- 			this->LookupTable->SetTableRange(0, 6);
+ 			//this->LookupTable->SetTableRange(0, 6);
 			m_2DimageViewer[i]->SetLookupTable(this->LookupTable);
 			m_2DimageViewer[i]->SetInputDataLayer(
 				this->imageManager.getOverlay().GetOutput());
+			m_2DimageViewer[i]->GetdrawActor()->SetVisibility(true);
 		}
 	this->imageManager.getOverlay().GetOutput()->Modified();
-	this->slotOverlayVisibilty(true);
 }
 
 void MainWindow::DisplayErrorMessage(std::string str)
@@ -433,14 +406,10 @@ bool MainWindow::slotVisualizeImage()
 	//connected to slotMultiPlanarView
 	ui->actionMultiPlanarView->trigger();
 
-
-	//for (int i = 0; i < 3; ++i) {
-	//	m_2DimageViewer[i]->SetSlice(m_2DimageViewer[i]->GetSliceMax() / 2);
-	//}
 	//Update UI stuff
     //Assume the four images have equal number of slices
 	QSpinBox* spinBoxes[3] = {ui->xSpinBox, ui->ySpinBox, ui->zSpinBox};
-	const int* extent = imageManager.getListOfVtkImages()[0]->GetExtent();
+	const int* extent = imageManager.getListOfViewerInputImages()[0]->GetExtent();
 	for (int i = 0; i < 3; ++i) {
 		spinBoxes[i]->setMinimum(extent[i * 2]);
 		spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
@@ -466,9 +435,9 @@ bool MainWindow::slotVisualizeImage()
 	ChangeBaseImageULMenu.clear();
 	ChangeBaseImageURMenu.clear();
 	ChangeBaseImageLLMenu.clear();
-	for (int i = 0; i < this->imageManager.getListOfVtkImages().size(); i++)
+	for (int i = 0; i < this->imageManager.getListOfViewerInputImages().size(); i++)
 	{
-		if (this->imageManager.getListOfVtkImages()[i] != NULL) {
+		if (this->imageManager.getListOfViewerInputImages()[i] != NULL) {
 			QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
 			act1->setData(i);
 
@@ -720,14 +689,14 @@ void MainWindow::slotSelectROI()
 	// Extract VOI of the overlay Image data
 
 	// Extract VOI of the vtkImage data
-	for (int i = 0; i < this->imageManager.getListOfVtkImages().size(); ++i) {
-		if (imageManager.getListOfVtkImages()[i] != NULL) {
+	for (int i = 0; i < this->imageManager.getListOfViewerInputImages().size(); ++i) {
+		if (imageManager.getListOfViewerInputImages()[i] != NULL) {
 			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
 				vtkSmartPointer<vtkExtractVOI>::New();
-			extractVOIFilter->SetInputData(imageManager.getListOfVtkImages()[i]);
+			extractVOIFilter->SetInputData(imageManager.getListOfViewerInputImages()[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			this->imageManager.getListOfVtkImages()[i]->DeepCopy(
+			this->imageManager.getListOfViewerInputImages()[i]->DeepCopy(
 				extractVOIFilter->GetOutput());
 		}
 	}
@@ -749,9 +718,9 @@ void MainWindow::slotResetROI()
 {
 	for (int i = 0; i < 5; ++i) 
 	{
-		if (imageManager.getListOfVtkImages()[i] != NULL) {
-			imageManager.getListOfVtkImages()[i]->DeepCopy(
-				imageManager.getListOfVtkOriginalImages()[i]);
+		if (imageManager.getListOfViewerInputImages()[i] != NULL) {
+			imageManager.getListOfViewerInputImages()[i]->DeepCopy(
+				imageManager.getListOfVtkImages()[i]);
 		}
 	}
 
@@ -800,11 +769,11 @@ void MainWindow::slot3DUpdate()
 	plane[0]->SetNormal(0, 0, -1);
 	plane[1]->SetNormal(0, 0, 1);
 	double zCoord1 = (imageManager.getOverlay().GetDisplayExtent()[5] - 1) * 
-		this->imageManager.getListOfVtkImages()[0]->GetSpacing()[2] + 
-		this->imageManager.getListOfVtkImages()[0]->GetOrigin()[2];
+		this->imageManager.getListOfViewerInputImages()[0]->GetSpacing()[2] + 
+		this->imageManager.getListOfViewerInputImages()[0]->GetOrigin()[2];
 	double zCoord2 = (imageManager.getOverlay().GetDisplayExtent()[4] + 1) * 
-		this->imageManager.getListOfVtkImages()[0]->GetSpacing()[2] + 
-		this->imageManager.getListOfVtkImages()[0]->GetOrigin()[2];
+		this->imageManager.getListOfViewerInputImages()[0]->GetSpacing()[2] + 
+		this->imageManager.getListOfViewerInputImages()[0]->GetOrigin()[2];
 	plane[0]->SetOrigin(0, 0, zCoord1);
 	plane[1]->SetOrigin(0, 0, zCoord2);
 	for (int i = 0; i < 2;i++)
@@ -1233,7 +1202,7 @@ void MainWindow::slotChangeImageSeq(int image_no, int window_no)
 	if (segmentationView)
 	{
 		m_2DimageViewer[window_no]->SetInputData(
-			this->imageManager.getListOfVtkImages()[image_no]);
+			this->imageManager.getListOfViewerInputImages()[image_no]);
         m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
         m_2DimageViewer[window_no]->Render();
     }
@@ -1242,7 +1211,7 @@ void MainWindow::slotChangeImageSeq(int image_no, int window_no)
 		for (int i = 0 ; i < 3 ; i++)
 		{
 			m_2DimageViewer[i]->SetInputData(
-				this->imageManager.getListOfVtkImages()[image_no]);
+				this->imageManager.getListOfViewerInputImages()[image_no]);
 			m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
 			m_2DimageViewer[i]->Render();
 		}
@@ -1290,7 +1259,7 @@ void MainWindow::slotMultiPlanarView()
 			imageViews[i]->SetRenderWindow(m_2DimageViewer[i]->GetRenderWindow());
 		}
 		// Change input to same image, default 0
-		m_2DimageViewer[i]->SetInputData(this->imageManager.getListOfVtkImages()[0]);
+		m_2DimageViewer[i]->SetInputData(this->imageManager.getListOfViewerInputImages()[0]);
 		m_2DimageViewer[i]->SetSliceOrientation(i);
 		//m_2DimageViewer[i]->Render();
 		// initialize stuff
@@ -1310,7 +1279,7 @@ void MainWindow::slotMultiPlanarView()
 
 
 		if(this->INITIALIZED_FLAG){
-			// else only change input and viewer orientation
+			// else only change input and viewer m_orientation
 			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
 			// Show view props for overlay
 			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
@@ -1402,9 +1371,9 @@ void MainWindow::slotSegmentationView()
 	for (int i1 = 0, i2 = 0; i2 < 3; ++i2)
 	{
 		for (; i1 < 5 && i2 < 3; ++i1) {
-			if (this->imageManager.getListOfVtkImages()[i1] != NULL) {
+			if (this->imageManager.getListOfViewerInputImages()[i1] != NULL) {
 				this->m_2DimageViewer[i2]->SetInputData(
-					this->imageManager.getListOfVtkImages()[i1]);
+					this->imageManager.getListOfViewerInputImages()[i1]);
 				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
 				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
 				this->m_style[i2]->SetOrientation(2);
@@ -1450,7 +1419,7 @@ void MainWindow::slotSegmentationView()
 void MainWindow::slotAddExternalOverlay()
 {
 	int *extent1 = this->imageManager.getOverlay().GetOutput()->GetExtent();
-	int *extent2 = this->imageManager.getListOfVtkImages()[0]->GetExtent();
+	int *extent2 = this->imageManager.getListOfViewerInputImages()[0]->GetExtent();
 
 	if (!std::equal(extent1, extent1 + 6, extent2)) {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
@@ -1460,32 +1429,6 @@ void MainWindow::slotAddExternalOverlay()
 	if (m_2DimageViewer[0]->GetInput() != NULL) {
 		addOverlay2ImageViewer();
 		viewerGroup.checkedAction()->trigger();
-	}
-}
-
-
-void MainWindow::slotOverlayVisibilty(bool b, int orientation)
-{
-	for (int i = 0; i < 3; i++)
-	{
-		// Render only if the interactor is not disabled
-		if (this->m_2DimageViewer[i]->GetSliceOrientation() == orientation
-			&& this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->GetEnabled()) 
-		{
-			this->m_2DimageViewer[i]->GetdrawActor()->SetVisibility(b);
-			this->m_2DimageViewer[i]->Render();
-		}
-	}
-}
-
-void MainWindow::slotOverlayVisibilty(bool b)
-{
-	for (int i = 0; i < 3; ++i)
-	{
-		if (m_2DimageViewer[i] != NULL) {
-			m_2DimageViewer[i]->GetdrawActor()->SetVisibility(b);
-			m_2DimageViewer[i]->Render();
-		}
 	}
 }
 

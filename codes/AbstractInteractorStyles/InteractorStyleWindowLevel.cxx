@@ -60,9 +60,9 @@ void InteractorStyleWindowLevel::WindowLevel()
 	int *size = this->GetCurrentRenderer()->GetSize();
 
 	double window = 0.0, level = 0.0;
-	if (imageViewer->GetInput() != NULL) {
-		window = imageViewer->GetDefaultWindowLevel()[0];
-		level = imageViewer->GetDefaultWindowLevel()[1];
+	if (m_imageViewer->GetInput() != NULL) {
+		window = m_imageViewer->GetDefaultWindowLevel()[0];
+		level = m_imageViewer->GetDefaultWindowLevel()[1];
 	}
 
 	// Compute normalized delta

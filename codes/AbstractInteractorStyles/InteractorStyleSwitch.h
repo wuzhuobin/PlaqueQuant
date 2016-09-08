@@ -63,7 +63,7 @@ public:
 
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
-	virtual void SetViewers(MyImageViewer* imageViewer);
+	virtual void SetViewers(MyImageViewer* m_imageViewer);
 	virtual void initializeQWidget(QSpinBox* sliceX, QSpinBox* sliceY, QSpinBox* sliceZ,
 		QDoubleSpinBox* window, QDoubleSpinBox* level,
 		QSpinBox* drawBrushSize,

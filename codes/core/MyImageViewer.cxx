@@ -177,11 +177,11 @@ MyImageViewer::~MyImageViewer()
 
 
 //----------------------------------------------------------------------------
-void MyImageViewer::SetSliceOrientation(int orientation)
+void MyImageViewer::SetSliceOrientation(int m_orientation)
 {
-	vtkImageViewer2::SetSliceOrientation(orientation);
+	vtkImageViewer2::SetSliceOrientation(m_orientation);
 
-	//switch (orientation)
+	//switch (m_orientation)
 	//{
 	//case 0:
 	//	SliceImplicitPlane->SetNormal(1, 0, 0);

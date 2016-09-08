@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(Core)
+project(Main)
 include_directories(
 	${PROJECT_BINARY_DIR}
 	${MAIN_INCLUDE_DIRS})
@@ -57,7 +57,6 @@ SET(
 	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
-	${PROJECT_SOURCE_DIR}/Core.cxx
 
 )
 
@@ -73,7 +72,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/ReportGenerator.h
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
-	${PROJECT_SOURCE_DIR}/Core.h
+
 )
 
 SET(

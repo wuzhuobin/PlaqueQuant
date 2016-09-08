@@ -53,8 +53,8 @@ InteractorStylePaintBrush::~InteractorStylePaintBrush()
 	//this->SetPaintBrushModeEnabled(false);
 
 	// Clean again if the upper dosen't clean
-	if (m_brushActor != NULL && imageViewer != NULL) {
-		//this->imageViewer->GetAnnotationRenderer()->RemoveActor(m_brushActor);
+	if (m_brushActor != NULL && m_imageViewer != NULL) {
+		//this->m_imageViewer->GetAnnotationRenderer()->RemoveActor(m_brushActor);
 		this->m_brushActor->Delete();
 		this->m_brushActor = NULL;
 		this->m_brush->Delete();
@@ -108,7 +108,7 @@ void InteractorStylePaintBrush::OnLeftButtonUp()
 	if (!m_isDraw)
 	{
 		this->Write2ImageData();
-		imageViewer->GetdrawActor()->SetVisibility(true);
+		m_imageViewer->GetdrawActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -127,7 +127,7 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 		this->GetInteractor()->GetEventPosition()[0],
 		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		imageViewer->GetRenderer());
+		m_imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -140,11 +140,11 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 
 	// Project picked world point to plane and obtain ijk index
 	double index[3];
-	if (imageViewer->GetInput() != NULL) {
-		picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
+	if (m_imageViewer->GetInput() != NULL) {
+		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - origin[i]) / spacing[i];
+			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
 		}
 	}
 	draw_index_old[0] = (int)(index[0] + 0.5);
@@ -160,7 +160,7 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 		this->ReadfromImageData();
 		this->Render();
 	}
-	imageViewer->GetdrawActor()->SetVisibility(false);
+	m_imageViewer->GetdrawActor()->SetVisibility(false);
 	Draw(true);
 	this->Render();
 }
@@ -171,7 +171,7 @@ void InteractorStylePaintBrush::OnRightButtonUp()
 	if (!m_isDraw)
 	{
 		this->Write2ImageData();
-		imageViewer->GetdrawActor()->SetVisibility(true);
+		m_imageViewer->GetdrawActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -192,7 +192,7 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 		this->GetInteractor()->GetEventPosition()[0],
 		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		imageViewer->GetRenderer());
+		m_imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -206,11 +206,11 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 
 	// Project picked world point to plane and obtain ijk index
 	double index[3];
-	if (imageViewer->GetInput() != NULL) {
-		picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
+	if (m_imageViewer->GetInput() != NULL) {
+		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - origin[i]) / spacing[i];
+			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
 		}
 	}
 	draw_index_old[0] = (int)(index[0] + 0.5);
@@ -227,7 +227,7 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 		this->Render();
 	}
 
-	imageViewer->GetdrawActor()->SetVisibility(false);
+	m_imageViewer->GetdrawActor()->SetVisibility(false);
 	this->Draw(false);
 	this->Render();
 	m_rightFunctioning = true;
@@ -275,8 +275,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 
 	if (m_brush != NULL)
 	{
-		if (m_brushActor != NULL && imageViewer != NULL) {
-			this->imageViewer->GetAnnotationRenderer()->RemoveActor(m_brushActor);
+		if (m_brushActor != NULL && m_imageViewer != NULL) {
+			this->m_imageViewer->GetAnnotationRenderer()->RemoveActor(m_brushActor);
 		}
 
 		m_brush->Delete();
@@ -292,7 +292,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());
-		m_borderWidget->SetCurrentRenderer(imageViewer->GetAnnotationRenderer());
+		m_borderWidget->SetCurrentRenderer(m_imageViewer->GetAnnotationRenderer());
 		m_borderWidget->SetRepresentation(m_retangleRep);
 		m_borderWidget->SetManagesCursor(false);
 		m_borderWidget->GetBorderRepresentation()->SetMoving(false);
@@ -311,7 +311,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_brush = vtkImageCanvasSource2D::New();
 		m_brush->SetScalarTypeToUnsignedChar();
 		m_brush->SetNumberOfScalarComponents(4);
-		switch (orientation)
+		switch (m_orientation)
 		{
 		case 0:
 		{
@@ -333,8 +333,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
 		m_brush->Update();
-		m_brush->GetOutput()->SetOrigin(origin);
-		m_brush->GetOutput()->SetSpacing(spacing);
+		m_brush->GetOutput()->SetOrigin(m_origin);
+		m_brush->GetOutput()->SetSpacing(m_spacing);
 
 		m_brushActor = vtkImageActor::New();
 		m_brushActor->SetInputData(m_brush->GetOutput());
@@ -342,7 +342,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_brushActor->SetPickable(false);
 		// Set the image actor
 
-		switch (this->orientation)
+		switch (this->m_orientation)
 		{
 		case 0:
 			m_brushActor->SetDisplayExtent(
@@ -359,8 +359,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 				extent[0], extent[1], extent[2], extent[3], 0, 0);
 			break;
 		}
-		imageViewer->GetAnnotationRenderer()->AddActor(m_brushActor);
-		imageViewer->GetAnnotationRenderer()->Render();
+		m_imageViewer->GetAnnotationRenderer()->AddActor(m_brushActor);
+		m_imageViewer->GetAnnotationRenderer()->Render();
 	}
 
 	this->PAINT_BRUSH_MODE_ENABLED = b;
@@ -381,7 +381,7 @@ void InteractorStylePaintBrush::Draw(bool b)
 		this->GetInteractor()->GetEventPosition()[0],
 		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		imageViewer->GetRenderer());
+		m_imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -392,11 +392,11 @@ void InteractorStylePaintBrush::Draw(bool b)
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
 	double index[3];
-	if (imageViewer->GetInput() != NULL) {
-		picked[orientation] = origin[orientation] + m_slice * spacing[orientation];
+	if (m_imageViewer->GetInput() != NULL) {
+		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - origin[i]) / spacing[i];
+			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
 		}
 	}
 	int draw_index[3];
@@ -406,7 +406,7 @@ void InteractorStylePaintBrush::Draw(bool b)
 	draw_index[2] = (int)(index[2] + 0.5);
 
 	int x2Dindex, y2Dindex;
-	switch (orientation)
+	switch (m_orientation)
 	{
 	case 0:
 		x2Dindex = 1;
@@ -433,10 +433,10 @@ void InteractorStylePaintBrush::Draw(bool b)
 	//Default:Square
 	else
 	{
-		int loopLowerBoundX = ceil(-m_drawBrushSizeSpinBox->value() / spacing[x2Dindex] / 2.);
-		int loopUpperBoundX = ceil(m_drawBrushSizeSpinBox->value() / spacing[x2Dindex] / 2.);
-		int loopLowerBoundY = ceil(-m_drawBrushSizeSpinBox->value() / spacing[y2Dindex] / 2.);
-		int loopUpperBoundY = ceil(m_drawBrushSizeSpinBox->value() / spacing[y2Dindex] / 2.);
+		int loopLowerBoundX = ceil(-m_drawBrushSizeSpinBox->value() / m_spacing[x2Dindex] / 2.);
+		int loopUpperBoundX = ceil(m_drawBrushSizeSpinBox->value() / m_spacing[x2Dindex] / 2.);
+		int loopLowerBoundY = ceil(-m_drawBrushSizeSpinBox->value() / m_spacing[y2Dindex] / 2.);
+		int loopUpperBoundY = ceil(m_drawBrushSizeSpinBox->value() / m_spacing[y2Dindex] / 2.);
 
 		for (int x = loopLowerBoundX; x < loopUpperBoundX; x++)
 		{
@@ -458,7 +458,7 @@ void InteractorStylePaintBrush::Draw(bool b)
 
 void InteractorStylePaintBrush::FillBox3D()
 {
-	switch (this->orientation)
+	switch (this->m_orientation)
 	{
 	case 2:
 		m_brush->FillBox(extent[0], extent[1], extent[2], extent[3]);
@@ -485,7 +485,7 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 	this->m_brush->GetUpdateExtent(brushExtent);
 
 	int index[6];
-	switch (orientation)
+	switch (m_orientation)
 	{
 	case 0:
 		if (x0 < extent[2] || x0 > extent[3] || y0 < extent[4] || y0 > extent[5] || x1 < extent[2] || x1 > extent[3] || y1 < extent[4] || y1 > extent[5])
@@ -527,7 +527,7 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 void InteractorStylePaintBrush::DrawCircle(int x0, int y0, int x1, int y1, double radius)
 {
 	int x2Dindex, y2Dindex;
-	switch (orientation)
+	switch (m_orientation)
 	{
 	case 0:
 		x2Dindex = 1;
@@ -543,10 +543,10 @@ void InteractorStylePaintBrush::DrawCircle(int x0, int y0, int x1, int y1, doubl
 		break;
 	}
 
-	int loopLowerBoundX = floor(-radius / (this->spacing[x2Dindex]));
-	int loopUpperBoundX = ceil(radius / (this->spacing[x2Dindex]));
-	int loopLowerBoundY = floor(-radius / (this->spacing[y2Dindex]));
-	int loopUpperBoundY = ceil(radius / (this->spacing[y2Dindex]));
+	int loopLowerBoundX = floor(-radius / (this->m_spacing[x2Dindex]));
+	int loopUpperBoundX = ceil(radius / (this->m_spacing[x2Dindex]));
+	int loopLowerBoundY = floor(-radius / (this->m_spacing[y2Dindex]));
+	int loopUpperBoundY = ceil(radius / (this->m_spacing[y2Dindex]));
 
 
 	// check bound
@@ -559,7 +559,7 @@ void InteractorStylePaintBrush::DrawCircle(int x0, int y0, int x1, int y1, doubl
 	{
 		for (int j = loopLowerBoundY; j < loopUpperBoundY; j++)
 		{
-			double d = pow(i * spacing[x2Dindex], 2) + pow(j * spacing[y2Dindex], 2.);
+			double d = pow(i * m_spacing[x2Dindex], 2) + pow(j * m_spacing[y2Dindex], 2.);
 			if (sqrt(d) < radius)
 				this->DrawLine3D(x0 + i, y0 + j, x1 + i, y1 + j);
 		}
@@ -580,7 +580,7 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 		this->GetInteractor()->GetEventPosition()[0],
 		this->GetInteractor()->GetEventPosition()[1],
 		0,  // always zero.
-		imageViewer->GetRenderer());
+		m_imageViewer->GetRenderer());
 
 	double* picked = this->GetInteractor()->GetPicker()->GetPickPosition();
 
@@ -595,8 +595,8 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 
 	int x = this->GetInteractor()->GetEventPosition()[0];
 	int y = this->GetInteractor()->GetEventPosition()[1];
-	//int x = (int)(index[0] + 0.5)*spacing[0] + origin[0];
-	//int y = (int)(index[1] + 0.5)*spacing[1] + origin[1];
+	//int x = (int)(index[0] + 0.5)*m_spacing[0] + m_origin[0];
+	//int y = (int)(index[1] + 0.5)*m_spacing[1] + m_origin[1];
 
 
 	double X1 = x;
@@ -604,26 +604,26 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 	double display_origin[3];
 	double display_size[3];
 
-	imageViewer->GetRenderer()->SetWorldPoint(0, 0, 0, 1);
-	imageViewer->GetRenderer()->WorldToDisplay();
-	imageViewer->GetRenderer()->GetDisplayPoint(display_origin);
+	m_imageViewer->GetRenderer()->SetWorldPoint(0, 0, 0, 1);
+	m_imageViewer->GetRenderer()->WorldToDisplay();
+	m_imageViewer->GetRenderer()->GetDisplayPoint(display_origin);
 	//cout << "World->Display vtkRenderer 00: " << "(" << x << "," << y << ")" << " --> " << "(" << result2[0] << "," << result2[1] << ")\n";
 
-	imageViewer->GetRenderer()->SetWorldPoint(size, size, size, 1);
-	imageViewer->GetRenderer()->WorldToDisplay();
-	imageViewer->GetRenderer()->GetDisplayPoint(display_size);
+	m_imageViewer->GetRenderer()->SetWorldPoint(size, size, size, 1);
+	m_imageViewer->GetRenderer()->WorldToDisplay();
+	m_imageViewer->GetRenderer()->GetDisplayPoint(display_size);
 	//cout << "World->Display vtkRenderer: "	<< "(" << x << "," << y << ")" << " --> " << "(" << result[0] << "," << result[1] << ")\n";
 
 	double X3 = display_size[0] - display_origin[0];
 	double Y3 = display_size[1] - display_origin[1];
 
-	imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X1, Y1);
-	imageViewer->GetRenderer()->NormalizedDisplayToViewport(X1, Y1);
-	imageViewer->GetRenderer()->ViewportToNormalizedViewport(X1, Y1);
+	m_imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X1, Y1);
+	m_imageViewer->GetRenderer()->NormalizedDisplayToViewport(X1, Y1);
+	m_imageViewer->GetRenderer()->ViewportToNormalizedViewport(X1, Y1);
 
-	imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X3, Y3);
-	imageViewer->GetRenderer()->NormalizedDisplayToViewport(X3, Y3);
-	imageViewer->GetRenderer()->ViewportToNormalizedViewport(X3, Y3);
+	m_imageViewer->GetRenderer()->DisplayToNormalizedDisplay(X3, Y3);
+	m_imageViewer->GetRenderer()->NormalizedDisplayToViewport(X3, Y3);
+	m_imageViewer->GetRenderer()->ViewportToNormalizedViewport(X3, Y3);
 
 	//if (m_drawBrushShapeComboBox->currentText() == "Square") //Square
 	//{
@@ -648,7 +648,7 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 
 void InteractorStylePaintBrush::ReadfromImageData()
 {
-	switch (this->orientation)
+	switch (this->m_orientation)
 	{
 	case 0:
 		m_brush->SetExtent(0, 0, extent[2], extent[3], extent[4], extent[5]);
@@ -677,26 +677,26 @@ void InteractorStylePaintBrush::ReadfromImageData()
 
 
 	int pos[3];
-	switch (orientation)
+	switch (m_orientation)
 	{
 	case 0:
 		for (int y = extent[2]; y < extent[3]; y++)
 		{
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
-				pos[0] = m_sliceSplinBox[orientation]->value();
+				pos[0] = m_sliceSplinBox[m_orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
-				double* val = static_cast<double *>(imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				double* val = static_cast<double *>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
-					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
 							double rgba[4];
 							uchar rgbaUCHAR[4];
-							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+							m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 							try {
 								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 								m_brush->DrawSegment3D(0, y, z, 0, y, z);
@@ -717,18 +717,18 @@ void InteractorStylePaintBrush::ReadfromImageData()
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
 				pos[0] = x;
-				pos[1] = m_sliceSplinBox[orientation]->value();
+				pos[1] = m_sliceSplinBox[m_orientation]->value();
 				pos[2] = z;
-				double* val = static_cast<double *>(imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				double* val = static_cast<double *>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
-					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
 							double rgba[4];
 							uchar rgbaUCHAR[4];
-							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+							m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 							try {
 								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 								//m_brush->SetDrawColor(255, 0, 0, 1);
@@ -751,17 +751,17 @@ void InteractorStylePaintBrush::ReadfromImageData()
 			{
 				pos[0] = x;
 				pos[1] = y;
-				pos[2] = m_sliceSplinBox[orientation]->value();
-				double* val = static_cast<double *>(imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				pos[2] = m_sliceSplinBox[m_orientation]->value();
+				double* val = static_cast<double *>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
-					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
 							double rgba[4];
 							uchar rgbaUCHAR[4];
-							imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-							imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+							m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 							m_brush->DrawPoint(x, y);
 							break;
@@ -780,7 +780,7 @@ void InteractorStylePaintBrush::Write2ImageData()
 	//Update Layer
 	int pos[3];
 	double pixelval;
-	switch (orientation)
+	switch (m_orientation)
 	{
 	case 0:
 		;
@@ -788,18 +788,18 @@ void InteractorStylePaintBrush::Write2ImageData()
 		{
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
-				pos[0] = m_sliceSplinBox[orientation]->value();
+				pos[0] = m_sliceSplinBox[m_orientation]->value();
 				pos[1] = y;
 				pos[2] = z;
 				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(0, y, z));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0) {
 					// Check if color of the lookup table matches the color drawn on canvas
-					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
 					{
 						double rgba[4];
 						uchar rgbaUCHAR[4];
-						imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-						imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 							pixelval = i;
@@ -811,7 +811,7 @@ void InteractorStylePaintBrush::Write2ImageData()
 					pixelval = 0;
 				}
 				double * pixel = static_cast<double *>(
-					imageViewer->GetInputLayer()->GetScalarPointer(pos));
+					m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (pixel == nullptr) {
 					return;
 				}
@@ -825,16 +825,16 @@ void InteractorStylePaintBrush::Write2ImageData()
 			for (int z = extent[4]; z < extent[5]; z++)
 			{
 				pos[0] = x;
-				pos[1] = m_sliceSplinBox[orientation]->value();
+				pos[1] = m_sliceSplinBox[m_orientation]->value();
 				pos[2] = z;
 				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, 0, z));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
 					{
 						double rgba[4];
 						uchar rgbaUCHAR[4];
-						imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-						imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 							pixelval = i;
@@ -845,7 +845,7 @@ void InteractorStylePaintBrush::Write2ImageData()
 					pixelval = 0;
 				}
 				double * pixel = static_cast<double *>(
-					imageViewer->GetInputLayer()->GetScalarPointer(pos));
+					m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (pixel == nullptr) {
 					return;
 				}
@@ -860,15 +860,15 @@ void InteractorStylePaintBrush::Write2ImageData()
 			{
 				pos[0] = x;
 				pos[1] = y;
-				pos[2] = m_sliceSplinBox[orientation]->value();
+				pos[2] = m_sliceSplinBox[m_orientation]->value();
 				uchar * val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, y, 0));
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-					for (int i = 0; i < imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
 					{
 						double rgba[4];
 						uchar rgbaUCHAR[4];
-						imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-						imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
+						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 							pixelval = i;
@@ -879,7 +879,7 @@ void InteractorStylePaintBrush::Write2ImageData()
 					pixelval = 0;
 				}
 				double * pixel = static_cast<double *>(
-					imageViewer->GetInputLayer()->GetScalarPointer(pos));
+					m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (pixel == nullptr) {
 					return;
 				}
@@ -889,7 +889,7 @@ void InteractorStylePaintBrush::Write2ImageData()
 		}
 		break;
 	}
-	imageViewer->GetInputLayer()->Modified();
+	m_imageViewer->GetInputLayer()->Modified();
 
 }
 
@@ -901,10 +901,10 @@ void InteractorStylePaintBrush::Render()
 	//	return;
 
 	//mainWnd->RenderAll2DViewers();
-	imageViewer->Render();
+	m_imageViewer->Render();
 	m_brush->Update();
-	m_brush->GetOutput()->SetOrigin(origin);
-	m_brush->GetOutput()->SetSpacing(spacing);
+	m_brush->GetOutput()->SetOrigin(m_origin);
+	m_brush->GetOutput()->SetSpacing(m_spacing);
 
 }
 
@@ -928,7 +928,7 @@ bool InteractorStylePaintBrush::CheckValidPick(double *picked)
 	//
 	//// obtain ijk index of the clicked point
 	//int ijk[3];
-	//labelMap->GetReslicer()->GetITKIndexFromVTKImageActorPoint(picked, ijk, this->orientation);
+	//labelMap->GetReslicer()->GetITKIndexFromVTKImageActorPoint(picked, ijk, this->m_orientation);
 
 	//// index has to be within extent
 	//for (int i = 0; i < 3; i++)

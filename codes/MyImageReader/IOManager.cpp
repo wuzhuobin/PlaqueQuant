@@ -97,7 +97,7 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		}
 	}
 	if (_itkImage.IsNotNull()) {
-		// using the same orientation ITK_COORDINATE_ORIENTATION_RAI
+		// using the same m_orientation ITK_COORDINATE_ORIENTATION_RAI
 		OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
 			OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();
 		orienter->UseImageDirectionOn();
@@ -120,10 +120,15 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		_vtkImageOriginal->DeepCopy(_vtkImage);
 	}
 
-	this->myImageManager->listOfItkImages.append(_itkImage);
-	this->myImageManager->listOfVtkImages.append(_vtkImage);
-	this->myImageManager->listOfVtkOriginalImages.append(_vtkImageOriginal);
-	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
+	this->myImageManager->listOfItkImages += _itkImage;
+	this->myImageManager->listOfVtkViewerInputImages += _vtkImage;
+	this->myImageManager->listOfVtkImages += _vtkImageOriginal;
+	this->myImageManager->listOfDICOMHeader += DICOMHeader;
+	this->myImageManager->listOfModalityNames += "CUBE T1";
+	this->myImageManager->listOfModalityNames += "CUBE T2";
+	this->myImageManager->listOfModalityNames += "CUBE T1+C";
+	this->myImageManager->listOfModalityNames += "2D DIR/QIR";
+	this->myImageManager->listOfModalityNames += "MPRAGE";
 	return true;
 }
 
@@ -191,7 +196,7 @@ void IOManager::slotOpenMultiImages()
 		slotOpenOneImage(*cit);
 	}
 	this->myImageManager->overlay.Initialize(
-		this->myImageManager->listOfVtkImages[0]);
+		this->myImageManager->listOfVtkViewerInputImages[0]);
 	emit finishOpenMultiImages();
 }
 
@@ -223,7 +228,7 @@ void IOManager::slotOpenSegmentation(QString fileName)
 	this->myImageManager->overlay.SetInputImageData(_itkImage);
 
 	//if (_itkImage.IsNotNull()) {
-	//	// using the same orientation ITK_COORDINATE_ORIENTATION_RAI
+	//	// using the same m_orientation ITK_COORDINATE_ORIENTATION_RAI
 	//	OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
 	//		OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();
 	//	orienter->UseImageDirectionOn();

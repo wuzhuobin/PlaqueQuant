@@ -106,7 +106,7 @@ public:
 	virtual double* GetDefaultWindowLevel();
 	
 	//ETX
-	virtual void SetSliceOrientation(int orientation);
+	virtual void SetSliceOrientation(int m_orientation);
 
 	// Description:
 	// Get the internal render window, renderer, image actor, and
@@ -134,7 +134,7 @@ public:
 
 	// Description:
 	// Update the display extent manually so that the proper slice for the
-	// given orientation is displayed. It will also try to set a
+	// given m_orientation is displayed. It will also try to set a
 	// reasonable camera clipping range.
 	// This method is called automatically when the Input is changed, but
 	// most of the time the input of this class is likely to remain the same,

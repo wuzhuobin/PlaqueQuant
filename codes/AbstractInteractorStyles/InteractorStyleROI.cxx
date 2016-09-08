@@ -9,16 +9,16 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 
 	if (flag) {
 		planeWidget->initializeCustomFunction();
-		planeWidget->SetInputData(imageViewer->GetInput());
-		planeWidget->SetImageViewer(imageViewer);
-		planeWidget->SetDefaultBound(imageViewer->GetBound());
-		planeWidget->SetInteractor(mainWnd->GetVtkRenderWindowInteractor(orientation));
+		planeWidget->SetInputData(m_imageViewer->GetInput());
+		planeWidget->SetImageViewer(m_imageViewer);
+		planeWidget->SetDefaultBound(m_imageViewer->GetBound());
+		planeWidget->SetInteractor(mainWnd->GetVtkRenderWindowInteractor(m_orientation));
 		//qDebug() << "planeWidget:" << planeWidget;
 		//qDebug() << "planeWidgetCallback" << planeWidgetCallback;
 		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
 		planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
 
-		switch (orientation)
+		switch (m_orientation)
 		{
 		case 0:
 			planeWidgetCallback->SetPlaneWidget(
@@ -44,7 +44,7 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		default:
 			break;
 		}
-		double* bound = imageViewer->GetBound();
+		double* bound = m_imageViewer->GetBound();
 		//double displayBound[6];
 		double	m_currentBound[6];
 		double* m_focalPoint = planeWidget->GetImageViewer()->GetFocalPoint();
@@ -62,24 +62,24 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 			displayBound[j * 2 + 1] = m_focalPoint[j] + roiHalfSize[j] < bound[j * 2 + 1] ? m_focalPoint[j] + roiHalfSize[j] : bound[j * 2 + 1];
 
 			//Restrict display bound on the plane
-			if (orientation == j)
+			if (m_orientation == j)
 			{
 				displayBound[j * 2] = m_focalPoint[j];
 				displayBound[j * 2 + 1] = m_focalPoint[j];
 			}
 		}
-		//qDebug() << "orientation: " << orientation;
+		//qDebug() << "m_orientation: " << m_orientation;
 		//qDebug() << m_currentBound[0] << '\t' << m_currentBound[1] << '\t' << m_currentBound[2];
 		//qDebug() << m_currentBound[3] << '\t' << m_currentBound[4] << '\t' << m_currentBound[5];
 		planeWidget->SetCurrentBound(m_currentBound);
 		planeWidget->ReplaceWidget(displayBound);
 		planeWidget->On();
-		imageViewer->Render();
+		m_imageViewer->Render();
 	}
 	else {
-		if (imageViewer) {
+		if (m_imageViewer) {
 			planeWidget->Off();
-			imageViewer->Render();
+			m_imageViewer->Render();
 		}
 	}
 }
@@ -109,12 +109,12 @@ void InteractorStyleROI::SelectROI(int* newExtent)
 {
 	const double* bound = planeWidget->GetCurrentBound();
 	
-	newExtent[0] = (bound[0] - origin[0]) / spacing[0];
-	newExtent[1] = (bound[1] - origin[0]) / spacing[0];
-	newExtent[2] = (bound[2] - origin[1]) / spacing[1];
-	newExtent[3] = (bound[3] - origin[1]) / spacing[1];
-	newExtent[4] = (bound[4] - origin[2]) / spacing[2];
-	newExtent[5] = (bound[5] - origin[2]) / spacing[2];
+	newExtent[0] = (bound[0] - m_origin[0]) / m_spacing[0];
+	newExtent[1] = (bound[1] - m_origin[0]) / m_spacing[0];
+	newExtent[2] = (bound[2] - m_origin[1]) / m_spacing[1];
+	newExtent[3] = (bound[3] - m_origin[1]) / m_spacing[1];
+	newExtent[4] = (bound[4] - m_origin[2]) / m_spacing[2];
+	newExtent[5] = (bound[5] - m_origin[2]) / m_spacing[2];
 	
 
 
@@ -123,9 +123,9 @@ void InteractorStyleROI::SelectROI(int* newExtent)
 	//for (int i = 0; i < 3; ++i) {
 	//	qDebug() << i;
 	//	qDebug() << "extent:" << extent[i * 2] << '\t' << extent[i * 2 + 1];
-	//	qDebug() << "spacing:" << spacing[i];
+	//	qDebug() << "m_spacing:" << m_spacing[i];
 	//	qDebug() << "bound:" << bound[i * 2] << '\t' << bound[i * 2 + 1];
-	//	qDebug() << "origin:" << origin[i];
+	//	qDebug() << "m_origin:" << m_origin[i];
 	//	qDebug() << "newExtent:" << newExtent[i * 2] << newExtent[2 * i + 1];
 	//}
 }
@@ -189,7 +189,7 @@ MyPlaneWidget * InteractorStyleROI::GetPlaneWidget()
 InteractorStyleROI::InteractorStyleROI()
 	:InteractorStyleNavigation()
 {
-	this->imageViewer = NULL;
+	this->m_imageViewer = NULL;
 
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();

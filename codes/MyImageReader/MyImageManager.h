@@ -27,11 +27,12 @@ public:
 	 *			false load images fail
 	 */
 	int getNumberOfImages();
-	QList<vtkSmartPointer<vtkImageData>> getListOfVtkImages();
-	const QList<vtkSmartPointer<vtkImageData>> getListOfVtkOriginalImages();
+	QList<vtkSmartPointer<vtkImageData>> getListOfViewerInputImages();
+	const QList<vtkSmartPointer<vtkImageData>> getListOfVtkImages();
 	const QList<itk::Image<float, 3>::Pointer> getListOfItkImages();
 	const QList<QMap<QString, QString>*> getListOfDICOMHeader();
-	
+	const QList<QString> getListOfModalityNames();
+	QString getModalityName(int i);
 
 	const QMap<QString, itk::Image<float, 3>::Pointer> getMapOfItkImages();
 	const QMap<QString, vtkSmartPointer<vtkImageData>> getMapOfVtkImages();
@@ -45,8 +46,9 @@ private:
 	
 	// QList
 	QList<itk::Image<float, 3>::Pointer> listOfItkImages;
+	QList<vtkSmartPointer<vtkImageData>> listOfVtkViewerInputImages;
 	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages;
-	QList<vtkSmartPointer<vtkImageData>> listOfVtkOriginalImages;
+	QList<QString> listOfModalityNames;
 	QList<QMap<QString, QString>*> listOfDICOMHeader;
 
 	// QMap

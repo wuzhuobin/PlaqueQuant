@@ -22,17 +22,22 @@ MyImageManager::~MyImageManager()
 
 int MyImageManager::getNumberOfImages()
 {
-	return this->listOfItkImages.size();
+	int num = 0;
+	for (int i = 0; i < this->listOfItkImages.size(); ++i) {
+		if (this->listOfItkImages[i].IsNotNull())
+			++num;
+	}
+	return num;
 }
 
-QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
+QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfViewerInputImages()
+{
+	return this->listOfVtkViewerInputImages;
+}
+
+const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
 {
 	return this->listOfVtkImages;
-}
-
-const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkOriginalImages()
-{
-	return this->listOfVtkOriginalImages;
 }
 
 const QList<Image<float, 3>::Pointer> MyImageManager::getListOfItkImages()
@@ -43,6 +48,16 @@ const QList<Image<float, 3>::Pointer> MyImageManager::getListOfItkImages()
 const QList<QMap<QString, QString>*> MyImageManager::getListOfDICOMHeader()
 {
 	return this->listOfDICOMHeader;
+}
+
+const QList<QString> MyImageManager::getListOfModalityNames()
+{
+	return this->listOfModalityNames;
+}
+
+QString MyImageManager::getModalityName(int i)
+{
+	return this->listOfModalityNames[i];
 }
 
 const QMap<QString, Image<float, 3>::Pointer> MyImageManager::getMapOfItkImages()

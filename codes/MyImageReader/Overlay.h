@@ -39,13 +39,19 @@ public:
 	void SetInputImageData(vtkImageData* imageData);
 	void SetInputImageData(QString fileName);
 	void SetInputImageData(const char* fileName);
-
+	/**
+	 * @deprecated
+	 */
 	void SetPixel(int pos[3], double value);
+	/**
+	 * @deprecated
+	 */
 	void SetPixel(int pos[3], unsigned char value);
 
 	vtkImageData* GetOutput();
 	/**
 	 * @deprecated
+	 * the same as GetOutput()
 	 */
 	vtkImageData* GetVTKImageData();
 	/**
@@ -60,7 +66,6 @@ private:
 
 	vtkSmartPointer<vtkImageData> m_vtkOverlay;
 	ImageType::Pointer m_itkOverlay;
-	int m_visible_image_no;
 
 	int DisplayExtent[6];
 };

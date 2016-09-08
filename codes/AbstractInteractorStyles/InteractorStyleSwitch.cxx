@@ -72,8 +72,8 @@ void InteractorStyleSwitch::InternalUpdate()
 	//if (this->CurrentStyle != this->PolygonDraw) 
 	this->PolygonDraw->SetPolygonModeEnabled(false);
 
-	//if (this->imageViewer->GetRenderWindow()) {
-	//	this->imageViewer->Render();
+	//if (this->m_imageViewer->GetRenderWindow()) {
+	//	this->m_imageViewer->Render();
 	//}
 
 	//if (this->CurrentStyle != this->PaintBrush)
@@ -132,14 +132,14 @@ void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
 	this->ROI->SetCurrentRenderer(renderer);
 }
 
-void InteractorStyleSwitch::SetViewers(MyImageViewer* imageViewer)
+void InteractorStyleSwitch::SetViewers(MyImageViewer* m_imageViewer)
 {
-	//this->imageViewer = imageViewer;
-	this->Navigation->SetImageViewer(imageViewer);
-	this->WindowLevel->SetImageViewer(imageViewer);
-	this->PolygonDraw->SetImageViewer(imageViewer);
-	this->PaintBrush->SetImageViewer(imageViewer);
-	this->ROI->SetImageViewer(imageViewer);
+	//this->m_imageViewer = m_imageViewer;
+	this->Navigation->SetImageViewer(m_imageViewer);
+	this->WindowLevel->SetImageViewer(m_imageViewer);
+	this->PolygonDraw->SetImageViewer(m_imageViewer);
+	this->PaintBrush->SetImageViewer(m_imageViewer);
+	this->ROI->SetImageViewer(m_imageViewer);
 }
 
 void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * sliceY, QSpinBox * sliceZ,

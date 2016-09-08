@@ -11,7 +11,7 @@ Occupation:	Chinese University of Hong Kong,
 Department of Imaging and Inteventional Radiology,
 M.Phil Student
 
-This class allows interaction related to reslice position and orientation on images.
+This class allows interaction related to reslice position and m_orientation on images.
 
 Wong Matthew Lun, Lok Ka Hei
 Copyright (C) 2016

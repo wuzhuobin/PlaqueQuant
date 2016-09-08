@@ -34,17 +34,17 @@ AbstractInteractorStyleImage::~AbstractInteractorStyleImage()
 {
 }
 
-void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
+void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * m_imageViewer)
 {
-	this->imageViewer = imageViewer;
-	m_minSlice = imageViewer->GetSliceMin();
-	m_maxSlice = imageViewer->GetSliceMax();
-	m_slice = imageViewer->GetSlice();
-	orientation = imageViewer->GetSliceOrientation();
+	this->m_imageViewer = m_imageViewer;
+	m_minSlice = m_imageViewer->GetSliceMin();
+	m_maxSlice = m_imageViewer->GetSliceMax();
+	m_slice = m_imageViewer->GetSlice();
+	m_orientation = m_imageViewer->GetSliceOrientation();
 
-	imageViewer->GetInput()->GetExtent(extent);
-	imageViewer->GetInput()->GetSpacing(spacing);
-	imageViewer->GetInput()->GetOrigin(origin);
+	m_imageViewer->GetInput()->GetExtent(extent);
+	m_imageViewer->GetInput()->GetSpacing(m_spacing);
+	m_imageViewer->GetInput()->GetOrigin(m_origin);
 
 }
 
@@ -55,22 +55,22 @@ void AbstractInteractorStyleImage::SetSliceSpinBox(QSpinBox * x, QSpinBox * y, Q
 	m_sliceSplinBox[2] = z;
 }
 
-void AbstractInteractorStyleImage::SetOrientation(int orientation)
-{
-	this->orientation = orientation;
-	this->imageViewer->SetSliceOrientation(orientation);
-}
+//void AbstractInteractorStyleImage::SetOrientation(int m_orientation)
+//{
+//	this->m_orientation = m_orientation;
+//	this->m_imageViewer->SetSliceOrientation(m_orientation);
+//}
 
-int AbstractInteractorStyleImage::GetOrientation()
-{
-	return orientation;
-}
+//int AbstractInteractorStyleImage::GetOrientation()
+//{
+//	return m_orientation;
+//}
 
 vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
 {
 	vtkSmartPointer<vtkPropPicker> picker = vtkSmartPointer<vtkPropPicker>::New();
-	if (this->imageViewer->GetRenderer()) {
-		picker->Pick(x, y, 0, this->imageViewer->GetRenderer());
+	if (this->m_imageViewer->GetRenderer()) {
+		picker->Pick(x, y, 0, this->m_imageViewer->GetRenderer());
 	}
 	if (picker->GetActor()) {
 		return picker->GetActor();
@@ -154,9 +154,9 @@ void AbstractInteractorStyleImage::MoveSliceForward()
 	if (m_slice < m_maxSlice)
 	{
 		m_slice += 1;
-		//this->imageViewer->SetSlice(m_slice);
+		//this->m_imageViewer->SetSlice(m_slice);
 		//mainWnd->slotUpdateSlice();
-		switch (orientation)
+		switch (m_orientation)
 		{
 		case 0:
 			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
@@ -178,9 +178,9 @@ void AbstractInteractorStyleImage::MoveSliceBackward()
 	if (m_slice > m_minSlice)
 	{
 		m_slice -= 1;
-		//this->imageViewer->SetSlice(m_slice);
+		//this->m_imageViewer->SetSlice(m_slice);
 		//mainWnd->slotUpdateSlice();
-		switch (orientation)
+		switch (m_orientation)
 		{
 		case 0:
 			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
