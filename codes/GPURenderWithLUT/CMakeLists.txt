@@ -7,11 +7,6 @@ endif()
 include(${VTK_USE_FILE})
 
 SET(
-	LIBRARY_OUTPUT_PATH
-	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
-)
-SET(
 	GPURENDER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/GPUVolumeRenderingFilter.cpp
 	)

@@ -21,14 +21,9 @@ link_directories(
 	)
 
 include_directories(
-	${PROJECT_BINARY_DIR}
 	${MAIN_INCLUDE_DIRS}
 	)
-SET(
-	LIBRARY_OUTPUT_PATH
-	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
-)
+
 SET(
 	MYIMAGEREADER_SRC
 	${PROJECT_SOURCE_DIR}/MyImageManager.cpp

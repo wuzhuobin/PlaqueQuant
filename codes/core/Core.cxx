@@ -90,22 +90,22 @@ void Core::slotVisualizeViewer()
 
 	//Update UI stuff
 	//Assume the four images have equal number of slices
-	QSpinBox* spinBoxes[3] = { ui->xSpinBox, ui->ySpinBox, ui->zSpinBox };
-	const int* extent = imageManager.getListOfViewerInputImages()[0]->GetExtent();
-	for (int i = 0; i < 3; ++i) {
-		spinBoxes[i]->setMinimum(extent[i * 2]);
-		spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
-		spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
-	}
-	ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
-	ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
+	//QSpinBox* spinBoxes[3] = { ui->xSpinBox, ui->ySpinBox, ui->zSpinBox };
+	//const int* extent = m_imageManager.getListOfViewerInputImages()[0]->GetExtent();
+	//for (int i = 0; i < 3; ++i) {
+	//	spinBoxes[i]->setMinimum(extent[i * 2]);
+	//	spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
+	//	spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
+	//}
+	//ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
+	//ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
 
-	connect(ui->windowDoubleSpinBoxUL, SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-	connect(ui->levelDoubleSpinBoxUL, SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
+	//connect(ui->windowDoubleSpinBoxUL, SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
+	//connect(ui->levelDoubleSpinBoxUL, SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
 
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 
 }
 
@@ -123,8 +123,12 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 					this->m_2DimageViewer[i2]->SetInputData(
 						this->m_imageManager.getListOfViewerInputImages()[i1]);
 					this->m_2DimageViewer[i2]->SetSliceOrientation(2);
+					m_2DimageViewer[i2]->SetupInteractor(m_interactor[i2]);
+					m_style[i2]->SetViewers(m_2DimageViewer[i2]);
+					m_interactor[i2]->SetInteractorStyle(m_style[i2]);
+
 					//this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-					this->m_style[i2]->SetOrientation(2);
+					//this->m_style[i2]->SetOrientation(2);
 					++i2;
 				}
 			}
@@ -176,7 +180,7 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 			//	m_moduleWidget->GetBrushSizeSpinBox(),
 			//	m_moduleWidget->GetBrushShapeComBox(),
 			//	NULL, NULL);
-			m_style[i]->SetOrientation(i);
+			//m_style[i]->SetOrientation(i);
 
 			m_interactor[i]->SetInteractorStyle(m_style[i]);
 

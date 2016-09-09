@@ -135,6 +135,9 @@ public:
 	virtual void SetRulerEnabled(bool b);
 	virtual void SetProtractorEnabled(bool b);
 
+	// Slice
+	virtual void SetSlice(int s);
+
 	// Description:
 	// Update the display extent manually so that the proper slice for the
 	// given m_orientation is displayed. It will also try to set a

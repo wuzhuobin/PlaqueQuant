@@ -142,24 +142,24 @@ void InteractorStyleSwitch::SetViewers(MyImageViewer* m_imageViewer)
 	this->ROI->SetImageViewer(m_imageViewer);
 }
 
-void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * sliceY, QSpinBox * sliceZ,
-	QDoubleSpinBox * window, QDoubleSpinBox * level,
-	QSpinBox * drawBrushSize,
-	QComboBox * drawShape,
-	QCheckBox * drawVolumetric,
-	QCheckBox * drawIsotropic)
-{
-	this->Navigation->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-	this->WindowLevel->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-	this->PolygonDraw->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-	this->PaintBrush->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-	this->WindowLevel->SetWindowLevelSpinBox(window, level);
-	this->PaintBrush->SetDrawBrushSizeSpinBox(drawBrushSize);
-	this->PaintBrush->SetDrawBrushShapeComBox(drawShape);
-	this->PaintBrush->SetDrawVolumetricCheckBox(drawVolumetric);
-	this->PaintBrush->SetDrawIsotropicCheckBox(drawIsotropic);
-	this->ROI->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-}
+//void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * sliceY, QSpinBox * sliceZ,
+//	QDoubleSpinBox * window, QDoubleSpinBox * level,
+//	QSpinBox * drawBrushSize,
+//	QComboBox * drawShape,
+//	QCheckBox * drawVolumetric,
+//	QCheckBox * drawIsotropic)
+//{
+//	this->Navigation->SetSliceSpinBox(sliceX, sliceY, sliceZ);
+//	this->WindowLevel->SetSliceSpinBox(sliceX, sliceY, sliceZ);
+//	this->PolygonDraw->SetSliceSpinBox(sliceX, sliceY, sliceZ);
+//	this->PaintBrush->SetSliceSpinBox(sliceX, sliceY, sliceZ);
+//	this->WindowLevel->SetWindowLevelSpinBox(window, level);
+//	this->PaintBrush->SetDrawBrushSizeSpinBox(drawBrushSize);
+//	this->PaintBrush->SetDrawBrushShapeComBox(drawShape);
+//	this->PaintBrush->SetDrawVolumetricCheckBox(drawVolumetric);
+//	this->PaintBrush->SetDrawIsotropicCheckBox(drawIsotropic);
+//	this->ROI->SetSliceSpinBox(sliceX, sliceY, sliceZ);
+//}
 
 void InteractorStyleSwitch::SetCurrentSlice(int slice)
 {
@@ -170,14 +170,14 @@ void InteractorStyleSwitch::SetCurrentSlice(int slice)
 	this->ROI->SetCurrentSlice(slice);
 }
 
-void InteractorStyleSwitch::SetOrientation(int index)
-{
-	this->Navigation->SetOrientation(index);
-	this->PaintBrush->SetOrientation(index);
-	this->PolygonDraw->SetOrientation(index);
-	this->ROI->SetOrientation(index);
-	this->WindowLevel->SetOrientation(index);
-}
+//void InteractorStyleSwitch::SetOrientation(int index)
+//{
+//	this->Navigation->SetOrientation(index);
+//	this->PaintBrush->SetOrientation(index);
+//	this->PolygonDraw->SetOrientation(index);
+//	this->ROI->SetOrientation(index);
+//	this->WindowLevel->SetOrientation(index);
+//}
 
 void InteractorStyleSwitch::SetEnabled(int i)
 {

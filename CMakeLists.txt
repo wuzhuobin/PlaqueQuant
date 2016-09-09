@@ -51,10 +51,12 @@ SET(
 	### Directories for MOC Sources ###
 	${PROJECT_BINARY_DIR}
 	${PROJECT_BINARY_DIR}/include
+	${PROJECT_BINARY_DIR}/resources
 	${PROJECT_BINARY_DIR}/codes/UI
 	${PROJECT_BINARY_DIR}/codes/Core
+	${PROJECT_BINARY_DIR}/codes/Main
 	# AbstractInteractorStyles
-	${PROJECT_BINARY_DIR}/codes/AbstractInteractorStyles
+	${PROJECT_BINARY_DIR}/codes/InteractorStyles
 	# Abstract Data structure
 	${PROJECT_BINARY_DIR}/codes/AbstractData
 	# Source for Widgets
@@ -66,35 +68,64 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/MaximumWallThickness
 	${PROJECT_BINARY_DIR}/codes/CenterlineBranching
 	${PROJECT_BINARY_DIR}/codes/MyImageReader
+	${PROJECT_BINARY_DIR}/codes/Managers
 
 	### Directories for headers ###
+	${PROJECT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/resources
 	${PROJECT_SOURCE_DIR}/codes/UI
 	${PROJECT_SOURCE_DIR}/codes/Core
+	${PROJECT_SOURCE_DIR}/codes/Main
 	# AbstractInteractorStyles
-	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
+	${PROJECT_SOURCE_DIR}/codes/InteractorStyles
+	# Abstract Data structure
 	${PROJECT_SOURCE_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
 	${PROJECT_SOURCE_DIR}/codes/Measurements 
-	# Source for maxmimum wall thickness
+	# Source for maximum wall thickness
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
 	${PROJECT_SOURCE_DIR}/codes/MyImageReader
+	${PROJECT_SOURCE_DIR}/codes/Managers
 	)
 
 SET(
 	LIBRARY_OUTPUT_PATH
 	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
+)
+SET(
+	EXECUTABLE_OUTPUT_PATH 
+	${CMAKE_SOURCE_DIR}/bin
+)
+
+set(
+	LINK_LIBRARIE
+	${ITK_LIBRARIES}  
+	${VTK_LIBRARIES}
+	${VMTK_LIBRARIES} 
+	Qt5::Widgets 
+	Qt5::PrintSupport
+	UI
+	Core
+	# Managers
+	Widgets
+	InteractorStyles
+	# AbstractData
+	Widgets 
+	GPURenderWithLUT
+	Measurements
+	MaximumWallThickness
+	CenterlineBranching
+	MyImageReader
 )
 
 include_directories(
 	${MAIN_INCLUDE_DIRS}
 )
-
 
 Add_subdirectory(codes)
 

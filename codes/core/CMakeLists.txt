@@ -43,6 +43,8 @@ else()
   include(${QT_USE_FILE})
 endif()
 
+#Link all libraries
+link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 SET(
 	QT_SRC
@@ -76,11 +78,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/Core.h
 )
 
-SET(
-	QT_UI
-	# ${PROJECT_SOURCE_DIR}/MainWindow.ui
-	# ${PROJECT_SOURCE_DIR}/InfoDialog.ui
-)
+
 
 SET(
 	CORE_SRC
@@ -96,24 +94,14 @@ SET(
 
 )
 
-Set(
-	QT_RSRS 
-	${CMAKE_SOURCE_DIR}/resources/Project.qrc
-)
-
-Set(
-	RC_FILE
-	${CMAKE_SOURCE_DIR}/resources/Project.rc
-)
 #Generate moc and ui file
 
 QT5_WRAP_UI(UISrcs ${QT_UI})
 QT5_WRAP_CPP(MOCSrcs ${QT_INC})
 QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
 
-add_executable(
+add_library(
 	Core
-	MACOSX_BUNDLE 
 	${QT_WRAP} 
 	${UISrcs} 
 	${MOCSrcs}
@@ -126,8 +114,7 @@ add_executable(
 )
 qt5_use_modules(Core Core Gui Widgets PrintSupport Xml)
 
-#Link all libraries
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+
 
 target_link_libraries(
 	Core

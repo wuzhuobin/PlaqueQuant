@@ -1,7 +1,8 @@
 #Add module to the project
 add_subdirectory(UI)
 add_subdirectory(Widgets)
-add_subdirectory(AbstractInteractorStyles)
+add_subdirectory(Main)
+add_subdirectory(InteractorStyles)
 add_subdirectory(AbstractData)
 add_subdirectory(GPURenderWithLUT)
 add_subdirectory(Core)
@@ -10,3 +11,4 @@ add_subdirectory(MaximumWallThickness)
 add_subdirectory(Managers)
 add_subdirectory(CenterlineBranching)
 add_subdirectory(MyImageReader)
+

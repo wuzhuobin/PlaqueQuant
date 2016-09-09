@@ -4,8 +4,6 @@ SET(
   CMAKE_PREFIX_PATH
   "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
   )
-
-
 #ITK
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
@@ -41,14 +39,9 @@ link_directories(
 	)
 
 include_directories(
-	${PROJECT_BINARY_DIR}
 	${MAIN_INCLUDE_DIRS}
 	)
 
-SET(
-	LIBRARY_OUTPUT_PATH
-	${CMAKE_SOURCE_DIR}/lib
-)
 
 SET(UI_QT_INC 
 	${PROJECT_SOURCE_DIR}/ModuleWidget.h
@@ -89,10 +82,10 @@ add_library(
 	UI 
 	${UISrcs}
 	${MOCSrcs} 
+	${RCC_RSRS}
 	${UI_QT_SRC} 
 	${UI_QT_INC}
 	${UI_QT_UI}
-	${RCC_RSRS}
 	${QT_RSRS}
 	${RC_FILE}
 	)
@@ -100,20 +93,21 @@ add_library(
 #link libraries
 target_link_libraries(
 	UI
+	# ${LINK_LIBRARIE}
 	${ITK_LIBRARIES}  
 	${VTK_LIBRARIES}
 	${VMTK_LIBRARIES} 
 	Qt5::Widgets 
 	Qt5::PrintSupport
-	InteractorStyles
+	# InteractorStyles
 	# AbstractData
-	Widgets 
-	GPURenderWithLUT
-	Measurements
+	# Widgets 
+	# GPURenderWithLUT
+	# Measurements
 	# Managers
-	MaximumWallThickness
-	CenterlineBranching
-	MyImageReader
+	# MaximumWallThickness
+	# CenterlineBranching
+	# MyImageReader
 	)
 
 #Grouping in MSVC

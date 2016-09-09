@@ -644,7 +644,7 @@ void MainWindow::slotImage(int image)
 			break;
 		if (m_2DimageViewer[i] != NULL)
 		{
-			m_2DimageViewer[i]->ResizeOrientationText();
+			//m_2DimageViewer[i]->ResizeOrientationText();
 			m_2DimageViewer[i]->Render();
 		}
 	}
@@ -1098,11 +1098,11 @@ void MainWindow::slotChangeWindowLevelLR()
 void MainWindow::resizeEvent( QResizeEvent * event )
 {
 	QMainWindow::resizeEvent(event);
-		for (int i = 0; i < 3; i++)
-		{
-			if (m_2DimageViewer[i] != NULL)
-				m_2DimageViewer[i]->ResizeOrientationText();
-		}
+		//for (int i = 0; i < 3; i++)
+		//{
+		//	if (m_2DimageViewer[i] != NULL)
+		//		m_2DimageViewer[i]->ResizeOrientationText();
+		//}
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *ev)
@@ -1268,12 +1268,12 @@ void MainWindow::slotMultiPlanarView()
 
 		// setup interactorStyle
 		m_style[i]->SetViewers(m_2DimageViewer[i]);
-		m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
-			ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
-			m_moduleWidget->GetBrushSizeSpinBox(),
-			m_moduleWidget->GetBrushShapeComBox(),
-			NULL, NULL);
-		m_style[i]->SetOrientation(i);
+		//m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
+		//	ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
+		//	m_moduleWidget->GetBrushSizeSpinBox(),
+		//	m_moduleWidget->GetBrushShapeComBox(),
+		//	NULL, NULL);
+		//m_style[i]->SetOrientation(i);
 
 		m_interactor[i]->SetInteractorStyle(m_style[i]);
 
@@ -1376,7 +1376,7 @@ void MainWindow::slotSegmentationView()
 					this->imageManager.getListOfViewerInputImages()[i1]);
 				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
 				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-				this->m_style[i2]->SetOrientation(2);
+				//this->m_style[i2]->SetOrientation(2);
 				++i2;
 			}
 		}

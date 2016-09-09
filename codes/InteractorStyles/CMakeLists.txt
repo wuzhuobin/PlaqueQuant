@@ -33,11 +33,7 @@ link_directories(
 include_directories(
 	${MAIN_INCLUDE_DIRS}
 )
-SET(
-	LIBRARY_OUTPUT_PATH
-	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
-)
+
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_SRC 
@@ -55,6 +51,7 @@ file(
 	INTERACTORS_SRC  
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.cxx 
 	${PROJECT_SOURCE_DIR}/LumenSegmentation.cxx
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
 	PARENT_SCOPE
 	)
 file(
@@ -63,6 +60,7 @@ file(
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.h 
 	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h 
 	${PROJECT_SOURCE_DIR}/LumenSegmentation.h
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
 	PARENT_SCOPE
 	)
 add_library(

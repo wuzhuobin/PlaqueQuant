@@ -1,46 +1,52 @@
 <RCC>
-  <qresource prefix="/">
-    <file>icons/dl_axial copy.png</file>
+  <qresource>
+    <file>icons/177503-200.png</file>
+    <file>icons/bluebox.png</file>
+    <file>icons/Capture.png</file>
+    <file>icons/Close.png</file>
     <file>icons/contour.png</file>
-    <file>icons/roi.png</file>
-    <file>icons/plaqueQuant.png</file>
-    <file>icons/lightbluebox.png</file>
-    <file>icons/purplebox.png</file>
-    <file>icons/yellowbox.png</file>
-    <file>icons/LayoutMultiPlanar.png</file>
-    <file>icons/open_22.png</file>
-    <file>icons/thresh_both.png</file>
+    <file>icons/dl_axial copy.png</file>
     <file>icons/dl_axial.png</file>
     <file>icons/dl_coronal.png</file>
     <file>icons/dl_fourviews.png</file>
     <file>icons/dl_sagittal.png</file>
-    <file>icons/Infop0.png</file>
+    <file>icons/downarrow.png</file>
+    <file>icons/Draw.png</file>
+    <file>icons/ellipse.png</file>
     <file>icons/expandwin.png</file>
+    <file>icons/greenbox.png</file>
+    <file>icons/Infop0.png</file>
     <file>icons/Infop1.png</file>
     <file>icons/Infop2.png</file>
     <file>icons/Infop3.png</file>
     <file>icons/Infop4.png</file>
     <file>icons/Infop5.png</file>
-    <file>icons/magicdrawdelete.png</file>
-    <file>icons/bluebox.png</file>
-    <file>icons/greenbox.png</file>
-    <file>icons/redbox.png</file>
-    <file>icons/downarrow.png</file>
-    <file>icons/Draw.png</file>
-    <file>icons/Capture.png</file>
-    <file>icons/Navigation.png</file>
-    <file>icons/WindowLevel.png</file>
-    <file>icons/LowerRightView.png</file>
-    <file>icons/LowerLeftView.png</file>
-    <file>icons/UpperRightView.png</file>
-    <file>icons/UpperLeftView.png</file>
+    <file>icons/LayoutAxialView.png</file>
+    <file>icons/LayoutCoronalView.png</file>
     <file>icons/LayoutFourViews.png</file>
+    <file>icons/LayoutMultiPlanar.png</file>
+    <file>icons/LayoutSagittalView.png</file>
+    <file>icons/lightbluebox.png</file>
+    <file>icons/LowerLeftView.png</file>
+    <file>icons/LowerRightView.png</file>
+    <file>icons/magicdraw.ico</file>
+    <file>icons/magicdrawdelete.png</file>
+    <file>icons/Navigation.png</file>
+    <file>icons/open_22.png</file>
     <file>icons/OpenImage.png</file>
+    <file>icons/Pen.ico</file>
+    <file>icons/plaqueQuant.ico</file>
+    <file>icons/plaqueQuant.png</file>
+    <file>icons/purplebox.png</file>
+    <file>icons/redbox.png</file>
+    <file>icons/roi.png</file>
     <file>icons/Ruler.png</file>
     <file>icons/Save.png</file>
-    <file>icons/Pen.ico</file>
-    <file>icons/magicdraw.ico</file>
-    <file>icons/ellipse.png</file>
-    <file>icons/close.png</file>
+    <file>icons/thresh_both.png</file>
+    <file>icons/Thumbs.db</file>
+    <file>icons/UpperLeftView.png</file>
+    <file>icons/UpperRightView.png</file>
+    <file>icons/WindowLevel.png</file>
+    <file>icons/yellowbox.png</file>
   </qresource>
 </RCC>

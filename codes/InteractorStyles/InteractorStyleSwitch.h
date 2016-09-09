@@ -64,14 +64,14 @@ public:
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetViewers(MyImageViewer* m_imageViewer);
-	virtual void initializeQWidget(QSpinBox* sliceX, QSpinBox* sliceY, QSpinBox* sliceZ,
-		QDoubleSpinBox* window, QDoubleSpinBox* level,
-		QSpinBox* drawBrushSize,
-		QComboBox* drawShape,
-		QCheckBox* drawVolumetric,
-		QCheckBox* drawIsotropic);
+	//virtual void initializeQWidget(QSpinBox* sliceX, QSpinBox* sliceY, QSpinBox* sliceZ,
+	//	QDoubleSpinBox* window, QDoubleSpinBox* level,
+	//	QSpinBox* drawBrushSize,
+	//	QComboBox* drawShape,
+	//	QCheckBox* drawVolumetric,
+	//	QCheckBox* drawIsotropic);
 	virtual void SetCurrentSlice(int slice);
-	virtual void SetOrientation(int);
+	//virtual void SetOrientation(int);
 	virtual void SetEnabled(int);
 	virtual void SetEnabledOn();
 	virtual void SetEnabledOff();

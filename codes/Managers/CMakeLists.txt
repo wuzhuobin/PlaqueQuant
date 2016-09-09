@@ -38,12 +38,6 @@ include_directories(
 	${MAIN_INCLUDE_DIRS}
 	)
 
-SET(
-	LIBRARY_OUTPUT_PATH
-	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
-)
-
 # SET(
 	# MODULE_INC_LIST
 	# ${CMAKE_SOURCE_DIR}/include/Define.h

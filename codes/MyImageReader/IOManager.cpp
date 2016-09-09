@@ -49,13 +49,14 @@ bool IOManager::LoadImageData(QStringList fileNames)
 {
 	ImageType::Pointer _itkImage = NULL;
 	vtkSmartPointer<vtkImageData> _vtkImage = NULL;
-	vtkSmartPointer<vtkImageData> _vtkImageOriginal = NULL;
+	vtkSmartPointer<vtkImageData> _vtkImageCopy = NULL;
 	// QMAP saving DICOM imformation
 	QMap<QString, QString>* DICOMHeader = NULL;
 	if (fileNames.isEmpty()) {
 		_itkImage = NULL;
 		_vtkImage = NULL;
 		DICOMHeader = NULL;
+		_vtkImageCopy = NULL;
 	}
 	// load Nifti Data
 	else if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
@@ -116,14 +117,14 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		connector->SetInput(_itkImage);
 		connector->Update();
 		_vtkImage = connector->GetOutput();
-		_vtkImageOriginal = vtkSmartPointer<vtkImageData>::New();
-		_vtkImageOriginal->DeepCopy(_vtkImage);
+		_vtkImageCopy = vtkSmartPointer<vtkImageData>::New();
+		_vtkImageCopy->DeepCopy(_vtkImage);
 	}
 
-	this->myImageManager->listOfItkImages += _itkImage;
-	this->myImageManager->listOfVtkViewerInputImages += _vtkImage;
-	this->myImageManager->listOfVtkImages += _vtkImageOriginal;
-	this->myImageManager->listOfDICOMHeader += DICOMHeader;
+	this->myImageManager->listOfItkImages.append( _itkImage);
+	this->myImageManager->listOfVtkViewerInputImages.append(_vtkImageCopy);
+	this->myImageManager->listOfVtkImages.append(_vtkImage);
+	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 	this->myImageManager->listOfModalityNames += "CUBE T1";
 	this->myImageManager->listOfModalityNames += "CUBE T2";
 	this->myImageManager->listOfModalityNames += "CUBE T1+C";
