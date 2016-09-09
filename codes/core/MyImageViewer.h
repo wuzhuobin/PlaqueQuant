@@ -69,6 +69,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <QString>
 
+#include "Overlay.h"
 
 class MyImageViewer : public vtkImageViewer2
 {
@@ -81,13 +82,15 @@ public:
 	virtual void InitializeIntensityText(QString IntText);
 	// Orientation Text
 	virtual void InitializeOrientationText();
-	virtual void ResizeOrientationText();
 
 	// Cursor methods
 	virtual void SetBound(double* b);
 	virtual double* GetBound();
 	virtual void SetFocalPointWithWorldCoordinate(double x, double y, double z);
 	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
+	virtual void GetFocalPointWithImageCoordinate(int* coordinate);
+	virtual void GetFocalPointWithWorldCoordinate(double* coordinate);
+	virtual double* GetFocalPointWithWorldCoordinate();
 	virtual double* GetFocalPoint();
 
 	// Description:
@@ -100,14 +103,14 @@ public:
 	// Set/Get Input Layer
 	virtual void SetInputDataLayer(vtkImageData *in);
 	virtual vtkImageData *GetInputLayer();
+	// Set/Get Overlay
+	virtual void SetOverlay(Overlay* overlay);
+	virtual Overlay* GetOverlay();
 
 	// Description:
 	// return DefaultWindowLevel
 	virtual double* GetDefaultWindowLevel();
 	
-	//ETX
-	virtual void SetSliceOrientation(int m_orientation);
-
 	// Description:
 	// Get the internal render window, renderer, image actor, and
 	// image map instances.
@@ -149,6 +152,8 @@ protected:
 	MyImageViewer();
 	~MyImageViewer();
 
+	virtual void ResizeOrientationText();
+
 	virtual void InstallPipeline();
 	virtual void UnInstallPipeline();
 	virtual void UpdateOrientation();
@@ -161,6 +166,9 @@ protected:
 
 	// IntensityText
 	vtkTextActor* IntTextActor;
+
+	// Overlay
+	Overlay* SegmentationOverlay;
 
 	//Cursor
 	vtkCursor3D*		 Cursor3D;

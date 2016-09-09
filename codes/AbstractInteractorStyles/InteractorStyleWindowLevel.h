@@ -29,18 +29,23 @@ class InteractorStyleWindowLevel : public AbstractInteractorStyleImage
 public:
 	vtkTypeMacro(InteractorStyleWindowLevel, AbstractInteractorStyleImage);
 	static InteractorStyleWindowLevel* New();
-	void SetWindowLevelSpinBox(QDoubleSpinBox* w, QDoubleSpinBox* l);
+	//void SetWindowLevelSpinBox(QDoubleSpinBox* w, QDoubleSpinBox* l);
 
+	virtual void SetWindow(double window);
+	virtual void SetLevel(double level);
 
 protected:
 	InteractorStyleWindowLevel();
 	~InteractorStyleWindowLevel();
 
 	virtual void OnMouseMove();
+	virtual void OnKeyPress();
 
 private:
 	void WindowLevel();
-	QDoubleSpinBox* m_wlDoubleSpinBox[2];
+	double m_window;
+	double m_level;
+	//QDoubleSpinBox* m_wlDoubleSpinBox[2];
 
 
 };

@@ -18,7 +18,6 @@ Copyright (C) 2016
 */
 
 #include "InteractorStyleNavigation.h"
-#include "MainWindow.h"
 
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCamera.h>
@@ -63,24 +62,18 @@ void InteractorStyleNavigation::OnLeftButtonUp()
 
 void InteractorStyleNavigation::SynchronizedZooming()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	MyImageViewer* viewer = NULL;
 	double scale = m_imageViewer->GetRenderer()->GetActiveCamera()->GetParallelScale();
 	
-	for (int i = 0; i < 3; ++i) {
-		viewer = mainWnd->GetMyImageViewer(i);
-		if (viewer != NULL) {
-			viewer->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
-			viewer->Render();
-		}
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+			(*it)->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
+			(*it)->Render();
 	}
-
 
 }
 
 void InteractorStyleNavigation::CalculateIndex()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	//Pick
 	this->GetInteractor()->GetPicker()->Pick(
 		this->GetInteractor()->GetEventPosition()[0],
@@ -100,9 +93,12 @@ void InteractorStyleNavigation::CalculateIndex()
 		{
 			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
 		}
-		//m_imageViewer->SetFocalPointWithWorldCoordinate(picked[0], picked[1], picked[2]);
-		//m_imageViewer->SetFocalPointWithImageCoordinate((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
-		mainWnd->slotChangeSlice((int)(index[0] + 0.5), (int)(index[1] + 0.5), (int)(index[2] + 0.5));
+		for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+			it != m_synchronalViewers.end(); ++it) {
+			(*it)->SetSlice(index[(*it)->GetSliceOrientation()]);
+		}
+		m_imageViewer->SetFocalPointWithImageCoordinate(index[0] + 0.5, 
+			index[1] + 0.5, index[2] + 0.5);
 	}
 
 }

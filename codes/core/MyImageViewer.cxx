@@ -62,32 +62,6 @@ MyImageViewer::MyImageViewer()
 		this->OrientationTextActor[i] = vtkTextActor::New();
 	}
 
-
-	//this->SliceImplicitPlane = vtkPlane::New();
-	//this->SliceImplicitPlane->SetOrigin(0, 0, 0);
-	//this->SliceImplicitPlane->SetNormal(0, 0, 1);
-
-	//Disable the warning
-	//this->WindowLevel->SetGlobalWarningDisplay(false);
-	//this->imageMapToWindowLevelColors->SetGlobalWarningDisplay(false);
-
-
-	// right
-	//this->LookupTable = vtkLookupTable::New();
-	//this->LookupTable->SetNumberOfTableValues(7);
-	//this->LookupTable->SetTableRange(0.0, 6);
-	//this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
-	//this->LookupTable->SetTableValue(1, 1, 0, 0, 0.8);
-	//this->LookupTable->SetTableValue(2, 0, 0, 1, 0.3);
-	//this->LookupTable->SetTableValue(3, 0, 1, 0, 0.5);
-	//this->LookupTable->SetTableValue(4, 1, 1, 0, 0.8);
-	//this->LookupTable->SetTableValue(5, 0, 1, 1, 0.9);
-	//this->LookupTable->SetTableValue(6, 1, 0, 1, 1);
-	//this->LookupTable->Build();
-
-
-
-
 	//Cursor
 	Cursor3D = vtkCursor3D::New();
 	Cursor3D->AllOff();
@@ -175,31 +149,6 @@ MyImageViewer::~MyImageViewer()
 
 }
 
-
-//----------------------------------------------------------------------------
-void MyImageViewer::SetSliceOrientation(int m_orientation)
-{
-	vtkImageViewer2::SetSliceOrientation(m_orientation);
-
-	//switch (m_orientation)
-	//{
-	//case 0:
-	//	SliceImplicitPlane->SetNormal(1, 0, 0);
-	//	SliceImplicitPlane->SetOrigin(0, 0, 0);
-	//	break;
-
-	//case 1:
-	//	SliceImplicitPlane->SetNormal(0, 1, 0);
-	//	SliceImplicitPlane->SetOrigin(0, 0, 0);
-	//	break;
-
-	//case 2:
-	//	SliceImplicitPlane->SetNormal(0, 0, 1);
-	//	SliceImplicitPlane->SetOrigin(0, 0, 0);
-	//	break;
-	//}
-}
-
 //----------------------------------------------------------------------------
 void MyImageViewer::UpdateDisplayExtent()
 {
@@ -280,6 +229,7 @@ void MyImageViewer::UnInstallPipeline()
 	}
 }
 
+//----------------------------------------------------------------------------
 void MyImageViewer::UpdateOrientation()
 {
 	// Set the camera position
@@ -328,6 +278,9 @@ void MyImageViewer::Render()
 	{
 		this->RenderWindow->Render();
 	}
+
+	ResizeOrientationText();
+
 }
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)
@@ -363,6 +316,16 @@ void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 vtkImageData* MyImageViewer::GetInputLayer()
 {
 	return vtkImageData::SafeDownCast(this->AnnotationWindowLevel->GetInput());
+}
+//----------------------------------------------------------------------------
+void MyImageViewer::SetOverlay(Overlay * overlay)
+{
+	SegmentationOverlay = overlay;
+	SetInputDataLayer(overlay->GetOutput());
+}
+Overlay * MyImageViewer::GetOverlay()
+{
+	return this->SegmentationOverlay;
 }
 //----------------------------------------------------------------------------
 
@@ -486,26 +449,27 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 	this->Render();
 }
 
-//void MyImageViewer::AddPolyData(vtkPolyData* polydata, vtkProperty* property)
-//{
-//	ClipActor = vtkActor::New();
-//	//vtkCutter* cutter = vtkCutter::New();
-//	//cutter->SetInputData (dataset);
-//	//cutter->SetCutFunction (this->SliceImplicitPlane);
-//	vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-//	//mapper->SetInputData(cutter->GetOutput());
-//	mapper->SetInputData(polydata);
-//	mapper->Update();
-//	ClipActor = vtkActor::New();
-//	ClipActor->SetMapper(mapper);
-//	if (property)
-//		ClipActor->SetProperty(property);
-//	ClipActor->SetDragable(false);
-//	this->Renderer->AddActor(ClipActor);
-//	//cutter->Delete();
-//	mapper->Delete();
-//	//actor->Delete();
-//}
+void MyImageViewer::GetFocalPointWithImageCoordinate(int * coordinate)
+{
+	const double* spacing = GetInput()->GetSpacing();
+	const double* origin = GetInput()->GetOrigin();
+	const double* point = Cursor3D->GetFocalPoint();
+	for (int i = 0; i < 3; ++i) {
+		coordinate[i] = (point[i] - origin[i]) / spacing[i];
+	}
+
+	return;
+}
+
+void MyImageViewer::GetFocalPointWithWorldCoordinate(double * coordinate)
+{
+	memcpy(coordinate, Cursor3D->GetFocalPoint(), sizeof(double) * 3);
+}
+
+double * MyImageViewer::GetFocalPointWithWorldCoordinate()
+{
+	return Cursor3D->GetFocalPoint();
+}
 
 void MyImageViewer::SetBound(double* b)
 {
@@ -541,9 +505,6 @@ void MyImageViewer::InitializeHeader(QString File)
 		HeaderActor->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
 		Renderer->AddActor2D(HeaderActor);
 	}
-	//if (HeaderActor != NULL) {
-	//	Renderer->RemoveActor2D(HeaderActor);
-	//}
 
 	if (GetInput() != NULL)
 		HeaderActor->SetInput(File.toStdString().c_str());
@@ -551,30 +512,6 @@ void MyImageViewer::InitializeHeader(QString File)
 		HeaderActor->SetInput("");
 		cout << "Error in setting text, file not found" << endl;
 	}
-
-	//int* size = Renderer->GetSize();
-	//double margin = 15;
-	//int coord[2] = { 5,size[1] - (int)margin };
-
-	//if (HeaderActor != NULL) {
-	//	Renderer->RemoveActor2D(HeaderActor);
-	//	//HeaderActor->Delete();
-	//}
-	//HeaderActor->GetTextProperty()->SetFontSize(15);
-	//HeaderActor->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
-	//Renderer->AddActor2D(HeaderActor);
-
-	//HeaderActor->SetDisplayPosition(coord[0], coord[1]);
-
-
-	//QByteArray Fileba = File.toLatin1();
-	//const char *Filestr = Fileba.data();
-
-
-	//if (GetInput() != NULL)
-	//	HeaderActor->SetInput(Filestr);
-	//else
-	//	cout << "Error in setting text, file not found" << endl;
 }
 
 void MyImageViewer::InitializeIntensityText(QString IntText)
@@ -596,26 +533,6 @@ void MyImageViewer::InitializeIntensityText(QString IntText)
 		cout << "Error in setting text, file not found" << endl;
 	}
 
-	//int* size = Renderer->GetSize();
-	////double margin = 15;
-	//int coord[2] = { 5,5 };
-
-	//if (this->FirstRender) {
-	//	IntTextActor->GetTextProperty()->SetFontSize(15);
-	//	IntTextActor->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
-	//	Renderer->AddActor2D(IntTextActor);
-	//	IntTextActor->SetDisplayPosition(coord[0], coord[1]);
-	//	return;
-	//}
-
-	//QByteArray IntTextba = IntText.toLatin1();
-	//const char *IntTextstr = IntTextba.data();
-
-
-	//if (GetInput() != NULL)
-	//	IntTextActor->SetInput(IntTextstr);
-	//else
-	//	cout << "Error in setting text, file not found" << endl;
 }
 
 void MyImageViewer::InitializeOrientationText()
@@ -661,69 +578,10 @@ void MyImageViewer::InitializeOrientationText()
 		break;
 	}
 
-	//int* size = Renderer->GetSize();
-	//double margin = 15;
-
-	//int down[2] = { size[0] / 2	,5 };
-	//int up[2] = { size[0] / 2	,size[1] - (int)margin };
-	//int left[2] = { 5			,size[1] / 2 };
-	//int right[2] = { size[0] - (int)margin	,size[1] / 2 };
-
-	//for (int i = 0; i<4; i++)
-	//{
-	//	if (OrientationTextActor[i] != NULL) {
-	//		OrientationTextActor[i]->GetTextProperty()->SetFontSize(15);
-	//		OrientationTextActor[i]->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
-	//		Renderer->AddActor2D(OrientationTextActor[i]);
-	//	}
-	//	
-	//}
-
-	//OrientationTextActor[0]->SetDisplayPosition(up[0], up[1]);
-	//OrientationTextActor[1]->SetDisplayPosition(down[0], down[1]);
-	//OrientationTextActor[2]->SetDisplayPosition(left[0], left[1]);
-	//OrientationTextActor[3]->SetDisplayPosition(right[0], right[1]);
-
-	//switch (SliceOrientation)
-	//{
-	//case 0:
-	//	OrientationTextActor[0]->SetInput("S");
-	//	OrientationTextActor[1]->SetInput("I");
-	//	OrientationTextActor[2]->SetInput("A");
-	//	OrientationTextActor[3]->SetInput("P");
-	//	break;
-	//case 1:
-	//	OrientationTextActor[0]->SetInput("S");
-	//	OrientationTextActor[1]->SetInput("I");
-	//	OrientationTextActor[2]->SetInput("R");
-	//	OrientationTextActor[3]->SetInput("L");
-	//	break;
-	//case 2:
-	//	OrientationTextActor[0]->SetInput("A");
-	//	OrientationTextActor[1]->SetInput("P");
-	//	OrientationTextActor[2]->SetInput("R");
-	//	OrientationTextActor[3]->SetInput("L");
-	//	break;
-	//}
 }
 
 void MyImageViewer::ResizeOrientationText()
 {
-	//int* size = Renderer->GetSize();
-
-	//double margin = 15;
-	//int coord[2] = { 5,size[1] - (int)margin };
-	//int down[2] = { size[0] / 2	,5 };
-	//int up[2] = { size[0] / 2	,size[1] - (int)margin };
-	//int left[2] = { 5			,size[1] / 2 };
-	//int right[2] = { size[0] - (int)margin	,size[1] / 2 };
-
-	//OrientationTextActor[0]->SetDisplayPosition(up[0], up[1]);
-	//OrientationTextActor[1]->SetDisplayPosition(down[0], down[1]);
-	//OrientationTextActor[2]->SetDisplayPosition(left[0], left[1]);
-	//OrientationTextActor[3]->SetDisplayPosition(right[0], right[1]);
-	//HeaderActor->SetDisplayPosition(coord[0], coord[1]);
-
 	int* size = Renderer->GetSize();
 	int margin = 15;
 	int coord[2] = { 5,size[1] - margin };
@@ -801,6 +659,15 @@ void MyImageViewer::SetProtractorEnabled(bool b)
 	}
 
 	RenderWindow->Render();
+}
+
+void MyImageViewer::SetSlice(int s)
+{
+	vtkImageViewer2::SetSlice(s);
+	int ijk[3];
+	GetFocalPointWithImageCoordinate(ijk);
+	ijk[SliceOrientation] = Slice;
+	SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 }
 
 void MyImageViewer::SetupInteractor(vtkRenderWindowInteractor * arg)

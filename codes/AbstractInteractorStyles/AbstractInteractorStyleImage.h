@@ -34,12 +34,14 @@ public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
 	static AbstractInteractorStyleImage *New();
 	
-	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
+	virtual void SetImageViewer(MyImageViewer* imageViewer);
+	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
+	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	//virtual void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
 	//virtual void SetOrientation(int m_orientation);
 	//virtual int GetOrientation();
 	virtual vtkActor* PickActor(int x, int y);
-	//void SetCurrentSlice(int slice);
+	void SetCurrentSlice(int slice);
 
 
 protected:
@@ -61,9 +63,8 @@ protected:
 	void MoveSliceForward();
 	void MoveSliceBackward();
 
-	QSpinBox* m_sliceSplinBox[3];
-
 	MyImageViewer* m_imageViewer;
+	std::list<MyImageViewer*> m_synchronalViewers;
 
 	int m_slice;
 	int m_minSlice;
@@ -71,7 +72,7 @@ protected:
 	int m_orientation;
 	double m_origin[3];
 	double m_spacing[3];
-	int extent[6];
+	int m_extent[6];
 
 	bool m_rightFunctioning;
 	bool m_leftFunctioning;

@@ -19,15 +19,45 @@ Copyright (C) 2016
 */
 
 #include "InteractorStyleWindowLevel.h"
-#include "MainWindow.h"
-#include "ui_MainWindow.h"
+
+#include <vtkRenderWindowInteractor.h>
 
 vtkStandardNewMacro(InteractorStyleWindowLevel);
 
-void InteractorStyleWindowLevel::SetWindowLevelSpinBox(QDoubleSpinBox * w, QDoubleSpinBox * l)
+//void InteractorStyleWindowLevel::SetWindowLevelSpinBox(QDoubleSpinBox * w, QDoubleSpinBox * l)
+//{
+//	m_wlDoubleSpinBox[0] = w;
+//	m_wlDoubleSpinBox[1] = l;
+//}
+
+void InteractorStyleWindowLevel::SetWindow(double window)
 {
-	m_wlDoubleSpinBox[0] = w;
-	m_wlDoubleSpinBox[1] = l;
+	m_window = window;
+	m_imageViewer->SetColorWindow(window);
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		// using the input address to figure out whether they are the same image
+		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
+			(*it)->SetColorWindow(m_window);
+			(*it)->SetColorLevel(m_level);
+		}
+
+	}
+}
+
+void InteractorStyleWindowLevel::SetLevel(double level)
+{
+	m_level = level;
+	m_imageViewer->SetColorLevel(m_level);
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		// using the input address to figure out whether they are the same image
+		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
+			(*it)->SetColorWindow(m_window);
+			(*it)->SetColorLevel(m_level);
+		}
+
+	}
 }
 
 InteractorStyleWindowLevel::InteractorStyleWindowLevel()
@@ -48,8 +78,16 @@ void InteractorStyleWindowLevel::OnMouseMove()
 	}
 	//AbstractInteractorStyleImage::OnMouseMove();
 }
-	
 
+void InteractorStyleWindowLevel::OnKeyPress()
+{
+	std::string key = this->Interactor->GetKeySym();
+	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+	if (key == "r") {
+		SetWindow(windowLevel[0]);
+		SetLevel(windowLevel[1]);
+	}
+}
 
 
 void InteractorStyleWindowLevel::WindowLevel()
@@ -112,6 +150,8 @@ void InteractorStyleWindowLevel::WindowLevel()
 		newWindow = 0.01;
 	}
 
-	m_wlDoubleSpinBox[0]->setValue(newWindow);
-	m_wlDoubleSpinBox[1]->setValue(newLevel);
+	SetWindow(newWindow);
+	SetLevel(newLevel);
+
+	
 }

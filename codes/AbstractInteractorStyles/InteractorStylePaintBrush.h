@@ -39,17 +39,25 @@ Copyright (C) 2016
 class InteractorStylePaintBrush : public AbstractInteractorStyleImage
 {
 public:
+	enum BRUSH_SHAPE
+	{
+		SQUARE = 0,
+		CIRCLE = 1
+	};
 	vtkTypeMacro(InteractorStylePaintBrush, AbstractInteractorStyleImage);
 	static InteractorStylePaintBrush* New();
 	void SetPaintBrushModeEnabled(bool b);
 	void SetDrawColor(int r, int g, int b);
 	void SetDrawColor(const int* rgb);
 	void SetDrawOpacity(int opacity);
+
+	void SetBrushShape(BRUSH_SHAPE brushShape);
+	void SetBrushSize(int size);
 	
-	void SetDrawBrushSizeSpinBox(QSpinBox* s);
-	void SetDrawBrushShapeComBox(QComboBox* comboBox);
-	void SetDrawVolumetricCheckBox(QCheckBox* checkBox);
-	void SetDrawIsotropicCheckBox(QCheckBox* checkBox);
+	//void SetDrawBrushSizeSpinBox(QSpinBox* s);
+	//void SetDrawBrushShapeComBox(QComboBox* comboBox);
+	//void SetDrawVolumetricCheckBox(QCheckBox* checkBox);
+	//void SetDrawIsotropicCheckBox(QCheckBox* checkBox);
 
 protected:
 	InteractorStylePaintBrush();
@@ -75,9 +83,8 @@ private:
 
 	bool CheckValidPick(double*);
 
-	//ImageType::Pointer m_overlay;
-	vtkImageData* m_imageData;
-	vtkImageActor* m_imageActor;
+	
+
 
 	vtkBorderWidget*				m_borderWidget;
 	vtkBorderRepresentation*		m_retangleRep;
@@ -85,16 +92,18 @@ private:
 	vtkImageActor* m_brushActor;
 
 	int draw_index_old[3];
-	int color_r, color_g, color_b;
-	int opacity;
+	int m_colorRed, m_colorGreen, m_colorBule;
+	int m_opacity;
+	int m_brushSize;
 	bool m_isDraw;
-	bool PAINT_BRUSH_MODE_ENABLED;
+	bool m_paintBrushEnabled;
+	BRUSH_SHAPE m_brushShape = SQUARE;
 
-	//PaintBrush
-	QComboBox*  m_drawBrushShapeComboBox;
-	QSpinBox*	m_drawBrushSizeSpinBox;
-	QCheckBox*	m_drawVolumetricCheckBox;
-	QCheckBox*	m_drawIsotropicCheckBox;
+	////PaintBrush
+	//QComboBox*  m_drawBrushShapeComboBox;
+	//QSpinBox*	m_drawBrushSizeSpinBox;
+	//QCheckBox*	m_drawVolumetricCheckBox;
+	//QCheckBox*	m_drawIsotropicCheckBox;
 };
 
 

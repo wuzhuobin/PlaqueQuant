@@ -16,10 +16,8 @@ Copyright (C) 2016
 */
 
 #include "AbstractInteractorStyleImage.h"
-#include "MainWindow.h"
 
 #include <vtkPropPicker.h>
-
 
 vtkStandardNewMacro(AbstractInteractorStyleImage);
 
@@ -42,18 +40,28 @@ void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * m_imageViewer)
 	m_slice = m_imageViewer->GetSlice();
 	m_orientation = m_imageViewer->GetSliceOrientation();
 
-	m_imageViewer->GetInput()->GetExtent(extent);
+	m_imageViewer->GetInput()->GetExtent(m_extent);
 	m_imageViewer->GetInput()->GetSpacing(m_spacing);
 	m_imageViewer->GetInput()->GetOrigin(m_origin);
 
 }
 
-void AbstractInteractorStyleImage::SetSliceSpinBox(QSpinBox * x, QSpinBox * y, QSpinBox * z)
+void AbstractInteractorStyleImage::AddSynchronalViewer(MyImageViewer * imageViewer)
 {
-	m_sliceSplinBox[0] = x;
-	m_sliceSplinBox[1] = y;
-	m_sliceSplinBox[2] = z;
+	m_synchronalViewers.push_back( imageViewer);
 }
+
+void AbstractInteractorStyleImage::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)
+{
+	m_synchronalViewers = synchronalViewers;
+}
+
+//void AbstractInteractorStyleImage::SetSliceSpinBox(QSpinBox * x, QSpinBox * y, QSpinBox * z)
+//{
+//	m_sliceSplinBox[0] = x;
+//	m_sliceSplinBox[1] = y;
+//	m_sliceSplinBox[2] = z;
+//}
 
 //void AbstractInteractorStyleImage::SetOrientation(int m_orientation)
 //{
@@ -82,7 +90,20 @@ vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
 
 void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
 {
-	this->m_slice = slice;
+	m_slice = slice;
+	this->m_imageViewer->SetSlice(m_slice);
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		if ((*it)->GetSliceOrientation() == m_orientation) {
+			(*it)->SetSlice(m_slice);
+		}
+		else {
+			int ijk[3];
+			m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
+			ijk[m_orientation] = m_slice;
+			m_imageViewer->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+		}
+	}
 }
 
 void AbstractInteractorStyleImage::OnMouseWheelForward()
@@ -150,49 +171,19 @@ void AbstractInteractorStyleImage::OnKeyPressed()
 
 void AbstractInteractorStyleImage::MoveSliceForward()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (m_slice < m_maxSlice)
 	{
 		m_slice += 1;
-		//this->m_imageViewer->SetSlice(m_slice);
-		//mainWnd->slotUpdateSlice();
-		switch (m_orientation)
-		{
-		case 0:
-			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
-			break;
-		case 1:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_slice, m_sliceSplinBox[2]->value());
-			break;
-		case 2:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_sliceSplinBox[1]->value(), m_slice);
-			break;
-		}
-
+		SetCurrentSlice(m_slice);
 	}
 }
 
 void AbstractInteractorStyleImage::MoveSliceBackward()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
 	if (m_slice > m_minSlice)
 	{
 		m_slice -= 1;
-		//this->m_imageViewer->SetSlice(m_slice);
-		//mainWnd->slotUpdateSlice();
-		switch (m_orientation)
-		{
-		case 0:
-			mainWnd->slotChangeSlice(m_slice, m_sliceSplinBox[1]->value(), m_sliceSplinBox[2]->value());
-			break;
-		case 1:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_slice, m_sliceSplinBox[2]->value());
-			break;
-		case 2:
-			mainWnd->slotChangeSlice(m_sliceSplinBox[0]->value(), m_sliceSplinBox[1]->value(), m_slice);
-			break;
-		}
-
+		SetCurrentSlice(m_slice);
 	}
 }
 
