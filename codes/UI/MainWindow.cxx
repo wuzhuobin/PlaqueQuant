@@ -58,7 +58,7 @@ MainWindow::MainWindow()
 	
 	// Open Image
 	connect(ui->actionOpenImage, SIGNAL(triggered()), &ioManager, SLOT(slotOpenWithWizard()));
-	connect(&ioManager, SIGNAL(finishOpenMultiImages()), &m_core, SLOT(slotVisualizeViewer()));
+	connect(&ioManager, SIGNAL(finishOpenMultiImages()), this, SLOT(slotVisualizeImage()));
 
 	// UI
 	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
@@ -73,7 +73,7 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
 	widgetGroup.setExclusive(true);
-	connect(ui->actionNavigation, SIGNAL(triggered()), &m_core, SLOT(slotNavigationMode()));
+	connect(ui->actionNavigation, SIGNAL(triggered()), this, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel, SIGNAL(triggered()), this, SLOT(slotWindowLevelMode()));
 	connect(ui->actionContour, SIGNAL(triggered()), this, SLOT(slotContourMode()));
 	connect(ui->actionBrush, SIGNAL(triggered()), this, SLOT(slotBrushMode()));
@@ -407,7 +407,12 @@ bool MainWindow::slotVisualizeImage()
 	setActionsEnable(true);
 	//connected to slotMultiPlanarView
 	ui->actionMultiPlanarView->trigger();
+	for (int i = 0; i < 3; ++i) {
+		m_style[i]->AddSynchronalViewer(m_2DimageViewer[0]);
+		m_style[i]->AddSynchronalViewer(m_2DimageViewer[1]);
+		m_style[i]->AddSynchronalViewer(m_2DimageViewer[2]);
 
+	}
 	//Update UI stuff
     //Assume the four images have equal number of slices
 	QSpinBox* spinBoxes[3] = {ui->xSpinBox, ui->ySpinBox, ui->zSpinBox};
@@ -1269,7 +1274,7 @@ void MainWindow::slotMultiPlanarView()
 		//m_2DimageViewer[i]->InitializeHeader(this->GetFileName(0));
 
 		// setup interactorStyle
-		m_style[i]->SetViewers(m_2DimageViewer[i]);
+		m_style[i]->SetImageViewer(m_2DimageViewer[i]);
 		//m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
 		//	ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
 		//	m_moduleWidget->GetBrushSizeSpinBox(),
@@ -1378,6 +1383,7 @@ void MainWindow::slotSegmentationView()
 					this->imageManager.getListOfViewerInputImages()[i1]);
 				this->m_2DimageViewer[i2]->SetSliceOrientationToXY();
 				this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
+				this->m_style[i2]->SetImageViewer(m_2DimageViewer[i2]);
 				//this->m_style[i2]->SetOrientation(2);
 				++i2;
 			}

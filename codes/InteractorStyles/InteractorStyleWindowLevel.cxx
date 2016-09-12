@@ -33,13 +33,13 @@ vtkStandardNewMacro(InteractorStyleWindowLevel);
 void InteractorStyleWindowLevel::SetWindow(double window)
 {
 	m_window = window;
-	m_imageViewer->SetColorWindow(window);
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
 		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
 			(*it)->SetColorWindow(m_window);
 			(*it)->SetColorLevel(m_level);
+			(*it)->Render();
 		}
 
 	}
@@ -48,16 +48,33 @@ void InteractorStyleWindowLevel::SetWindow(double window)
 void InteractorStyleWindowLevel::SetLevel(double level)
 {
 	m_level = level;
-	m_imageViewer->SetColorLevel(m_level);
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
 		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
 			(*it)->SetColorWindow(m_window);
 			(*it)->SetColorLevel(m_level);
+			(*it)->Render();
 		}
 
 	}
+}
+
+void InteractorStyleWindowLevel::SetWindowLevel(double window, double level)
+{
+	m_level = level;
+	m_window = window;
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		// using the input address to figure out whether they are the same image
+		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
+			(*it)->SetColorWindow(m_window);
+			(*it)->SetColorLevel(m_level);
+			(*it)->Render();
+		}
+
+	}
+
 }
 
 InteractorStyleWindowLevel::InteractorStyleWindowLevel()
@@ -84,8 +101,7 @@ void InteractorStyleWindowLevel::OnKeyPress()
 	std::string key = this->Interactor->GetKeySym();
 	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r") {
-		SetWindow(windowLevel[0]);
-		SetLevel(windowLevel[1]);
+		SetWindowLevel(windowLevel[0], windowLevel[1]);
 	}
 }
 
@@ -101,6 +117,8 @@ void InteractorStyleWindowLevel::WindowLevel()
 	if (m_imageViewer->GetInput() != NULL) {
 		window = m_imageViewer->GetDefaultWindowLevel()[0];
 		level = m_imageViewer->GetDefaultWindowLevel()[1];
+		//window = m_window;
+		//level = m_level;
 	}
 
 	// Compute normalized delta
@@ -149,9 +167,7 @@ void InteractorStyleWindowLevel::WindowLevel()
 	{
 		newWindow = 0.01;
 	}
-
-	SetWindow(newWindow);
-	SetLevel(newLevel);
+	SetWindowLevel(newWindow, newLevel);
 
 	
 }
