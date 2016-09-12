@@ -40,6 +40,10 @@ Core::Core(QWidget* parent)
 	m_lookupTable->SetTableValue(5, 0, 1, 1, 0.5);
 	m_lookupTable->SetTableValue(6, 1, 0, 1, 0.5);
 	m_lookupTable->Build();
+
+	m_ioManager.setMyImageManager(&m_imageManager);
+
+	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()), this, SLOT(slotVisualizeViewer()));
 }
 
 Core::~Core() 
@@ -50,6 +54,19 @@ Core::~Core()
 vtkLookupTable * Core::GetLookupTable()
 {
 	return m_lookupTable;
+}
+
+vtkRenderWindow * Core::GetRenderWindow(int num)
+{
+	if (num < 0 || num > 3) {
+		return NULL;
+	}
+	else if (num == 3) {
+		return m_3DimageViewer;
+	}
+	else {
+		return m_2DimageViewer[num]->GetRenderWindow();
+	}
 }
 
 void Core::DisplayErrorMessage(std::string str)
@@ -64,13 +81,23 @@ void Core::DisplayErrorMessage(std::string str)
 	msgBox.exec();
 }
 
+IOManager * Core::GetIOManager()
+{
+	return &m_ioManager;
+}
+
+MyImageManager * Core::GetMyImageManager()
+{
+	return &m_imageManager;
+}
+
 void Core::slotAddOverlayToImageViewer() {
-	//int *extent1 = this->m_imageManager.getOverlay().GetOutput()->GetExtent();
-	//int *extent2 = this->m_imageManager.getListOfViewerInputImages()[0]->GetExtent();
-	//if (!std::equal(extent1, extent1 + 6, extent2)) {
-	//	this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
-	//	return;
-	//}
+	int *extent1 = this->m_imageManager.getOverlay().GetOutput()->GetExtent();
+	int *extent2 = this->m_imageManager.getListOfViewerInputImages()[0]->GetExtent();
+	if (!std::equal(extent1, extent1 + 6, extent2)) {
+		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
+		return;
+	}
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
 		// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
@@ -86,8 +113,14 @@ void Core::slotAddOverlayToImageViewer() {
 
 void Core::slotVisualizeViewer()
 {
-	slotChangeView(m_viewMode);
 
+	slotChangeView(m_viewMode);
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->AddSynchronalViewer(m_2DimageViewer[0]);
+		m_style[i]->AddSynchronalViewer(m_2DimageViewer[1]);
+		m_style[i]->AddSynchronalViewer(m_2DimageViewer[2]);
+	}
+	slotAddOverlayToImageViewer();
 	//Update UI stuff
 	//Assume the four images have equal number of slices
 	//QSpinBox* spinBoxes[3] = { ui->xSpinBox, ui->ySpinBox, ui->zSpinBox };
@@ -106,11 +139,14 @@ void Core::slotVisualizeViewer()
 	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-
+	emit signalVisualizeViewer();
 }
 
 void Core::slotChangeView(Core::VIEW_MODE viewMode)
 {
+	if (m_viewMode == viewMode) {
+		return;
+	}
 	m_viewMode = viewMode;
 	// SEGMENTATION_VIEW
 	if (viewMode) {

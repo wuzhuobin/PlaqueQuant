@@ -29,8 +29,13 @@ public:
 
 	vtkLookupTable* GetLookupTable();
 
+	vtkRenderWindow* GetRenderWindow(int num);
 
 	void DisplayErrorMessage(std::string str);
+
+	IOManager* GetIOManager();
+
+	MyImageManager* GetMyImageManager();
 
 public slots:
 
@@ -58,6 +63,7 @@ public slots:
 
 
 signals:
+	void signalVisualizeViewer();
 	void signalMultiPlanarView();
 	void signalSegmentationView();
 
