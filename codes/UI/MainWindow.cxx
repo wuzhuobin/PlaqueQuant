@@ -10,7 +10,7 @@
 #include "GPUVolumeRenderingFilter.h"
 #include "MeasurementFor3D.h"
 #include "Centerline.h"
-#include "Define.h"
+//#include "Define.h"
 
 #include <algorithm>
 #include <array>
@@ -44,7 +44,7 @@
 
 MainWindow::MainWindow() 
 	:widgetGroup(this), viewerGroup(this), viewGroup(this),
-	imageManager(this),ioManager(this)
+	imageManager(this), ioManager(this), m_core(this)
 {
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
@@ -56,12 +56,14 @@ MainWindow::MainWindow()
 
 	this->setWindowTitle("PlaqueQuant");
 	
-	// Set up action signals and slots
-	connect(ui->actionOpenImage,				SIGNAL(triggered()), &ioManager, SLOT(slotOpenWithWizard()));
-	connect(&ioManager, SIGNAL(finishOpenMultiImages()), this, SLOT(slotVisualizeImage()));
-	connect(ui->actionExit,						SIGNAL(triggered()), this, SLOT(slotExit()));
-	connect(ui->actionAbout,					SIGNAL(triggered()), this, SLOT(slotAbout()));
-	connect(ui->actionHelp,						SIGNAL(triggered()), this, SLOT(slotHelp()));
+	// Open Image
+	connect(ui->actionOpenImage, SIGNAL(triggered()), &ioManager, SLOT(slotOpenWithWizard()));
+	connect(&ioManager, SIGNAL(finishOpenMultiImages()), &m_core, SLOT(slotVisualizeViewer()));
+
+	// UI
+	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
+	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotAbout()));
+	connect(ui->actionHelp,	SIGNAL(triggered()), this, SLOT(slotHelp()));
 	
 	//widgets
 	widgetGroup.addAction(ui->actionNavigation);
@@ -71,7 +73,7 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
 	widgetGroup.setExclusive(true);
-	connect(ui->actionNavigation, SIGNAL(triggered()), this, SLOT(slotNavigationMode()));
+	connect(ui->actionNavigation, SIGNAL(triggered()), &m_core, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel, SIGNAL(triggered()), this, SLOT(slotWindowLevelMode()));
 	connect(ui->actionContour, SIGNAL(triggered()), this, SLOT(slotContourMode()));
 	connect(ui->actionBrush, SIGNAL(triggered()), this, SLOT(slotBrushMode()));

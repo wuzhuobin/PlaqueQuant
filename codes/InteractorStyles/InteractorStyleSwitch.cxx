@@ -132,7 +132,7 @@ void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
 	this->ROI->SetCurrentRenderer(renderer);
 }
 
-void InteractorStyleSwitch::SetViewers(MyImageViewer* m_imageViewer)
+void InteractorStyleSwitch::SetImageViewer(MyImageViewer* m_imageViewer)
 {
 	//this->m_imageViewer = m_imageViewer;
 	this->Navigation->SetImageViewer(m_imageViewer);
@@ -140,6 +140,24 @@ void InteractorStyleSwitch::SetViewers(MyImageViewer* m_imageViewer)
 	this->PolygonDraw->SetImageViewer(m_imageViewer);
 	this->PaintBrush->SetImageViewer(m_imageViewer);
 	this->ROI->SetImageViewer(m_imageViewer);
+}
+
+void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
+{
+	this->Navigation->AddSynchronalViewer(imageViewer);
+	this->WindowLevel->AddSynchronalViewer(imageViewer);
+	this->PaintBrush->AddSynchronalViewer(imageViewer);
+	this->PolygonDraw->AddSynchronalViewer(imageViewer);
+	this->ROI->AddSynchronalViewer(imageViewer);
+}
+
+void InteractorStyleSwitch::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)
+{
+	this->Navigation->SetSynchronalViewers(synchronalViewers);
+	this->WindowLevel->SetSynchronalViewers(synchronalViewers);
+	this->PaintBrush->SetSynchronalViewers(synchronalViewers);
+	this->PolygonDraw->SetSynchronalViewers(synchronalViewers);
+	this->ROI->SetSynchronalViewers(synchronalViewers);
 }
 
 //void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * sliceY, QSpinBox * sliceZ,

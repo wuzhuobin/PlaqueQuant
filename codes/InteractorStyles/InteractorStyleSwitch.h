@@ -63,7 +63,9 @@ public:
 
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
-	virtual void SetViewers(MyImageViewer* m_imageViewer);
+	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
+	virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
+	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	//virtual void initializeQWidget(QSpinBox* sliceX, QSpinBox* sliceY, QSpinBox* sliceZ,
 	//	QDoubleSpinBox* window, QDoubleSpinBox* level,
 	//	QSpinBox* drawBrushSize,

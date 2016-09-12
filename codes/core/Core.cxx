@@ -112,10 +112,10 @@ void Core::slotVisualizeViewer()
 void Core::slotChangeView(Core::VIEW_MODE viewMode)
 {
 	m_viewMode = viewMode;
-
+	// SEGMENTATION_VIEW
 	if (viewMode) {
 		// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
-		for (int i1 = 0, i2 = 0; i2 < 3; ++i2)
+		for (int i1 = 0, i2 = 0; i2 < VIEWER_NUM; ++i2)
 		{
 			for (; i1 < this->m_imageManager.getListOfViewerInputImages().size() && i2 < VIEWER_NUM;
 				++i1) {
@@ -124,7 +124,10 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 						this->m_imageManager.getListOfViewerInputImages()[i1]);
 					this->m_2DimageViewer[i2]->SetSliceOrientation(2);
 					m_2DimageViewer[i2]->SetupInteractor(m_interactor[i2]);
-					m_style[i2]->SetViewers(m_2DimageViewer[i2]);
+					m_style[i2]->SetImageViewer(m_2DimageViewer[i2]);
+					for (int j = 0; j < VIEWER_NUM; ++j) {
+						m_style[i2]->AddSynchronalViewer(m_2DimageViewer[j]);
+					}
 					m_interactor[i2]->SetInteractorStyle(m_style[i2]);
 
 					//this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
@@ -162,6 +165,7 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 		//	action->trigger();
 		//}
 	}
+	// MULTIPLANAR_VIEW
 	else {
 		for (int i = 0; i < VIEWER_NUM; ++i) {
 			// Change input to same image, default 0
@@ -174,7 +178,10 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 			m_2DimageViewer[i]->InitializeHeader(m_imageManager.getModalityName(DEFAULT_IMAGE));
 
 			// setup interactorStyle
-			m_style[i]->SetViewers(m_2DimageViewer[i]);
+			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
+			for (int j = 0; j < VIEWER_NUM; ++j) {
+				m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
+			}
 			//m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
 			//	ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
 			//	m_moduleWidget->GetBrushSizeSpinBox(),

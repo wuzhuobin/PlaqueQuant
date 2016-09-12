@@ -23,6 +23,8 @@
 #include "Distance3DWidget.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
+#include "Core.h"
+
 
 class ModuleWidget;
 class MainWindow: public QMainWindow
@@ -164,6 +166,8 @@ private:
 	QActionGroup viewerGroup;
 	//viewGroup
 	QActionGroup viewGroup;
+	// Core
+	Core m_core;
 
 
     
