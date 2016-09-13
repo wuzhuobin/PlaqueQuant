@@ -43,7 +43,7 @@ public slots:
 
 	virtual void slotVisualizeViewer();
 
-	virtual void slotSegmentationViewer();
+	virtual void slotSegmentationView();
 
 	virtual void slotMultiPlanarView();
 	
