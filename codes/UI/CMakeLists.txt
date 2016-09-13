@@ -40,6 +40,7 @@ link_directories(
 
 include_directories(
 	${MAIN_INCLUDE_DIRS}
+	${PROJECT_BINARY_DIR}
 	)
 
 
