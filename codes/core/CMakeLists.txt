@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Core)
 include_directories(
-	${PROJECT_BINARY_DIR}
-	${MAIN_INCLUDE_DIRS})
+	${MAIN_INCLUDE_DIRS}
+	)
 
  # message("${PROJECT_BINARY_DIR}")
 IF(COMMAND CMAKE_POLICY)
@@ -48,19 +48,16 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 SET(
 	QT_SRC
-	${PROJECT_SOURCE_DIR}/main.cxx
+	# ${PROJECT_SOURCE_DIR}/main.cxx
 	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
 	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
 	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
-	# # ${PROJECT_SOURCE_DIR}/InfoDialog.cxx
-	# ${PROJECT_SOURCE_DIR}/MainWindow.cxx
-	# ${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
-	# ${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
 	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
 	${PROJECT_SOURCE_DIR}/Core.cxx
-
+	${PROJECT_SOURCE_DIR}/MyImageViewer.cxx
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
 )
 
 SET(
@@ -68,94 +65,55 @@ SET(
 	${PROJECT_SOURCE_DIR}/AbstractFilter.h
 	${PROJECT_SOURCE_DIR}/ExtractCenterline.h
 	${PROJECT_SOURCE_DIR}/ImageRegistration.h
-	# ${PROJECT_SOURCE_DIR}/InfoDialog.h
-	# ${PROJECT_SOURCE_DIR}/MainWindow.h
-	# ${PROJECT_SOURCE_DIR}/MyProgressDialog.h
-	# ${PROJECT_SOURCE_DIR}/RegistrationWizard.h
 	${PROJECT_SOURCE_DIR}/ReportGenerator.h
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
 	${PROJECT_SOURCE_DIR}/Core.h
-)
-
-
-
-SET(
-	CORE_SRC
-	${PROJECT_SOURCE_DIR}/MyImageViewer.cxx
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
-)
-
-SET(
-	CORE_INC
 	${PROJECT_SOURCE_DIR}/MyImageViewer.h
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
-	# ${CMAKE_SOURCE_DIR}/include/Define.h
-
 )
 
-#Generate moc and ui file
 
-QT5_WRAP_UI(UISrcs ${QT_UI})
+#Generate moc and ui file
 QT5_WRAP_CPP(MOCSrcs ${QT_INC})
-QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
+
 
 add_library(
 	Core
-	${QT_WRAP} 
-	${UISrcs} 
 	${MOCSrcs}
 	${QT_SRC}
 	${QT_INC}
-	${CORE_INC}
-	${CORE_SRC}
-	${RCC_RSRS}
-	${RC_FILE}
 )
-qt5_use_modules(Core Core Gui Widgets PrintSupport Xml)
-
 
 
 target_link_libraries(
 	Core
-	${VTK_LIBRARIES} 
-	${VMTK_LIBRARIES} 
-	${ITK_LIBRARIES} 
-	UI
-	InteractorStyles
-	# AbstractData
-	Widgets 
-	GPURenderWithLUT
-	Measurements
-	# Managers
-	MaximumWallThickness
-	CenterlineBranching
-	MyImageReader
+	${LINK_LIBRARIE}
 )
-
+# add_executable(
+	# Core1
+	# ${MOCSrcs}
+	# ${QT_SRC}
+	# ${QT_INC}	
+# )
+# target_link_libraries(
+	# Core1
+	# ${LINK_LIBRARIE}
+# )
 
 #Grouping in MSVC
 SOURCE_GROUP(
 	"Generated FIles" 
 	FILES
-	${RCC_RSRS}
-	${UISrcs}
 	${MOCSrcs}
-)
-SOURCE_GROUP(
-	"UI FILES" 
-	FILES 
-	${QT_UI}
 )
 SOURCE_GROUP(
 	"Header Files" 
 	FILES 
 	${QT_INC}
-	${CORE_INC}
 )
 SOURCE_GROUP(
 	"Source Files" 
 	FILES 
 	${QT_SRC}
-	${CORE_SRC}
 )

@@ -42,19 +42,22 @@ else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
 endif()
-
 Set(
 	QT_RSRS 
 	${CMAKE_SOURCE_DIR}/resources/Project.qrc
-	)
+)
 
+Set(
+	RC_FILE
+	${CMAKE_SOURCE_DIR}/resources/Project.rc
+)
 QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
-
 add_executable(
 	Main
 	main.cxx
+	${RC_FILE}
 	${QT_RSRS}
-	${QT_RSRS}
+	${RCC_RSRS}
 )
 
 #Link all libraries

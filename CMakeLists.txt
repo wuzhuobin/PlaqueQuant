@@ -126,8 +126,20 @@ set(
 include_directories(
 	${MAIN_INCLUDE_DIRS}
 )
+add_subdirectory(codes/UI)
+add_subdirectory(codes/Widgets)
+add_subdirectory(codes/Main)
+add_subdirectory(codes/InteractorStyles)
+add_subdirectory(codes/AbstractData)
+add_subdirectory(codes/GPURenderWithLUT)
+add_subdirectory(codes/Core)
+add_subdirectory(codes/Measurements)
+add_subdirectory(codes/MaximumWallThickness)
+add_subdirectory(codes/Managers)
+add_subdirectory(codes/CenterlineBranching)
+add_subdirectory(codes/MyImageReader)
 
-Add_subdirectory(codes)
+# Add_subdirectory(codes)
 
 
 

@@ -23,6 +23,8 @@
 #include "Distance3DWidget.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
+#include "Core.h"
+
 
 class ModuleWidget;
 class MainWindow: public QMainWindow
@@ -164,18 +166,20 @@ private:
 	QActionGroup viewerGroup;
 	//viewGroup
 	QActionGroup viewGroup;
+	// Core
+	Core m_core;
 
 
     
 	//2D/3D view
-	MyImageViewer*				m_2DimageViewer[3];
-	vtkRenderWindow*			m_3DimageViewer;
-	vtkRenderer*				m_3DDataRenderer;
-	vtkRenderer*				m_3DAnnotationRenderer;
-	vtkRenderWindowInteractor*  m_3Dinteractor;
-	vtkRenderWindowInteractor*  m_interactor[3];
-	InteractorStyleSwitch*		m_style[3];
-	InteractorStyleSwitch3D*	m_style3D;
+	//MyImageViewer*				m_2DimageViewer[3];
+	//vtkRenderWindow*			m_3DimageViewer;
+	//vtkRenderer*				m_3DDataRenderer;
+	//vtkRenderer*				m_3DAnnotationRenderer;
+	//vtkRenderWindowInteractor*  m_3Dinteractor;
+	//vtkRenderWindowInteractor*  m_interactor[3];
+	//InteractorStyleSwitch*		m_style[3];
+	//InteractorStyleSwitch3D*	m_style3D;
 
 
 
@@ -194,8 +198,8 @@ private:
 	
 	//Data
 	vtkPolyData* m_centerlinePD;
-	MyImageManager imageManager;
-	IOManager ioManager;
+	MyImageManager* imageManager;
+	IOManager* ioManager;
 
 
 

@@ -33,6 +33,7 @@ public:
 
 	virtual void SetWindow(double window);
 	virtual void SetLevel(double level);
+	virtual void SetWindowLevel(double window, double level);
 
 protected:
 	InteractorStyleWindowLevel();

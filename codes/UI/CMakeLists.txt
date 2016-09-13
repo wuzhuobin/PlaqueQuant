@@ -65,50 +65,24 @@ SET(UI_QT_UI
 	${PROJECT_SOURCE_DIR}/InfoDialog.ui
 	${PROJECT_SOURCE_DIR}/MainWindow.ui
 )
-Set(
-	QT_RSRS 
-	${CMAKE_SOURCE_DIR}/resources/Project.qrc
-)
 
-Set(
-	RC_FILE
-	${CMAKE_SOURCE_DIR}/resources/Project.rc
-)
 #Generate moc and ui file
 QT5_WRAP_UI(UISrcs ${UI_QT_UI})
 QT5_WRAP_CPP(MOCSrcs ${UI_QT_INC})
-QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
 
 add_library(
 	UI 
 	${UISrcs}
 	${MOCSrcs} 
-	${RCC_RSRS}
 	${UI_QT_SRC} 
 	${UI_QT_INC}
 	${UI_QT_UI}
-	${QT_RSRS}
-	${RC_FILE}
 	)
 
 #link libraries
 target_link_libraries(
 	UI
-	# ${LINK_LIBRARIE}
-	${ITK_LIBRARIES}  
-	${VTK_LIBRARIES}
-	${VMTK_LIBRARIES} 
-	Qt5::Widgets 
-	Qt5::PrintSupport
-	# InteractorStyles
-	# AbstractData
-	# Widgets 
-	# GPURenderWithLUT
-	# Measurements
-	# Managers
-	# MaximumWallThickness
-	# CenterlineBranching
-	# MyImageReader
+	${LINK_LIBRARIE}
 	)
 
 #Grouping in MSVC
@@ -117,10 +91,9 @@ SOURCE_GROUP(
 	FILES 
 	${UISrcs}
 	${MOCSrcs}
-	${RCC_RSRS}
 	)
 SOURCE_GROUP(
-	"UI FILES" 	
+	"Forms FIles" 	
 	FILES 
 	${MODULE_QT_UI}
 	)

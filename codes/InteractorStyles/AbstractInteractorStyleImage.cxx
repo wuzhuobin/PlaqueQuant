@@ -32,17 +32,18 @@ AbstractInteractorStyleImage::~AbstractInteractorStyleImage()
 {
 }
 
-void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * m_imageViewer)
+void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
 {
-	this->m_imageViewer = m_imageViewer;
-	m_minSlice = m_imageViewer->GetSliceMin();
-	m_maxSlice = m_imageViewer->GetSliceMax();
-	m_slice = m_imageViewer->GetSlice();
-	m_orientation = m_imageViewer->GetSliceOrientation();
+	this->m_imageViewer = imageViewer;
+	m_minSlice = imageViewer->GetSliceMin();
+	m_maxSlice = imageViewer->GetSliceMax();
+	m_slice = imageViewer->GetSlice();
+	m_orientation = imageViewer->GetSliceOrientation();
 
-	m_imageViewer->GetInput()->GetExtent(m_extent);
-	m_imageViewer->GetInput()->GetSpacing(m_spacing);
-	m_imageViewer->GetInput()->GetOrigin(m_origin);
+	imageViewer->GetInput()->GetExtent(m_extent);
+	imageViewer->GetInput()->GetSpacing(m_spacing);
+	imageViewer->GetInput()->GetOrigin(m_origin);
+	AddSynchronalViewer(imageViewer);
 
 }
 
@@ -66,7 +67,7 @@ void AbstractInteractorStyleImage::SetSynchronalViewers(std::list<MyImageViewer*
 //void AbstractInteractorStyleImage::SetOrientation(int m_orientation)
 //{
 //	this->m_orientation = m_orientation;
-//	this->m_imageViewer->SetSliceOrientation(m_orientation);
+//	this->imageViewer->SetSliceOrientation(m_orientation);
 //}
 
 //int AbstractInteractorStyleImage::GetOrientation()
@@ -91,17 +92,14 @@ vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
 void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
 {
 	m_slice = slice;
-	this->m_imageViewer->SetSlice(m_slice);
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
+		int ijk[3];
+		(*it)->GetFocalPointWithImageCoordinate(ijk);
+		ijk[m_orientation] = m_slice;
+		(*it)->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 		if ((*it)->GetSliceOrientation() == m_orientation) {
 			(*it)->SetSlice(m_slice);
-		}
-		else {
-			int ijk[3];
-			m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
-			ijk[m_orientation] = m_slice;
-			m_imageViewer->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 		}
 	}
 }

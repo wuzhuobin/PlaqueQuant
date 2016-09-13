@@ -444,6 +444,7 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 	//}
 	Cursor3D->SetFocalPoint(i*spacing[0] + origin[0],
 		j*spacing[1] + origin[1], k*spacing[2] + origin[2]);
+	Cursor3D->Update();
 	InitializeIntensityText(QString::number(
 		(GetInput()->GetScalarComponentAsDouble(i, j, k, 0))));
 	this->Render();
@@ -664,10 +665,10 @@ void MyImageViewer::SetProtractorEnabled(bool b)
 void MyImageViewer::SetSlice(int s)
 {
 	vtkImageViewer2::SetSlice(s);
-	int ijk[3];
-	GetFocalPointWithImageCoordinate(ijk);
-	ijk[SliceOrientation] = Slice;
-	SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+	//int ijk[3];
+	//GetFocalPointWithImageCoordinate(ijk);
+	//ijk[SliceOrientation] = Slice;
+	//SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 }
 
 void MyImageViewer::SetupInteractor(vtkRenderWindowInteractor * arg)
