@@ -237,7 +237,7 @@ private:
 	const int lrnc[3] = { 0, 255, 255 };
 	const int lm[3] = { 255, 0, 255 };
 
-	vtkLookupTable* LookupTable;
+	//vtkLookupTable* LookupTable;
 /*
 
 	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);

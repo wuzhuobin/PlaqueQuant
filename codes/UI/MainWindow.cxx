@@ -212,18 +212,18 @@ MainWindow::MainWindow()
 	overlayColor[4] = lrnc;
 	overlayColor[5] = lm;
 	
-	// #LookupTable
-	this->LookupTable = vtkLookupTable::New();
-	this->LookupTable->SetNumberOfTableValues(7);
-	this->LookupTable->SetTableRange(0.0, 6);
-	this->LookupTable->SetTableValue(0, 0, 0, 0, 0.0);
-	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.2);
-	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.05);
-	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.4);
-	this->LookupTable->SetTableValue(4, 1, 1, 0, 0.5);
-	this->LookupTable->SetTableValue(5, 0, 1, 1, 0.5);
-	this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);
-	this->LookupTable->Build();
+	//// #LookupTable
+	//this->LookupTable = vtkLookupTable::New();
+	//this->LookupTable->SetNumberOfTableValues(7);
+	//this->LookupTable->SetTableRange(0.0, 6);
+	//this->LookupTable->SetTableValue(0, 0, 0, 0, 0.0);
+	//this->LookupTable->SetTableValue(1, 1, 0, 0, 0.2);
+	//this->LookupTable->SetTableValue(2, 0, 0, 1, 0.05);
+	//this->LookupTable->SetTableValue(3, 0, 1, 0, 0.4);
+	//this->LookupTable->SetTableValue(4, 1, 1, 0, 0.5);
+	//this->LookupTable->SetTableValue(5, 0, 1, 1, 0.5);
+	//this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);
+	//this->LookupTable->Build();
 
 	//distanceWidget3D
 	m_distance3DWidget = Distance3DWidget::New();
