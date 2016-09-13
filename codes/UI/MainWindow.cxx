@@ -61,12 +61,9 @@ MainWindow::MainWindow()
 	connect(&m_core, SIGNAL(signalVisualizeViewer()), this, SLOT(slotVisualizeImage()));
 	// Save Segmentaiton 
 	connect(ui->actionSave, SIGNAL(triggered()), ioManager, SLOT(slotSaveSegmentaitonWithDiaglog()));
-
-	// UI
-	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
-	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotAbout()));
-	connect(ui->actionHelp,	SIGNAL(triggered()), this, SLOT(slotHelp()));
-	
+	// Open Segmentation
+	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), ioManager,
+		SLOT(slotOpenSegmentationWithDiaglog()));
 	// different mode
 	widgetGroup.addAction(ui->actionNavigation);
 	widgetGroup.addAction(ui->actionWindowLevel);
@@ -81,6 +78,22 @@ MainWindow::MainWindow()
 	connect(ui->actionBrush, SIGNAL(triggered()), &m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler, SIGNAL(triggered(bool)), &m_core, SLOT(slotRuler(bool)));
 	connect(ui->actionROI, SIGNAL(triggered()), &m_core, SLOT(slotROIMode()));
+	// view
+	viewGroup.addAction(ui->actionMultiPlanarView);
+	viewGroup.addAction(ui->actionAllAxialView);
+	viewGroup.setExclusive(true);
+	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), &m_core, SLOT(slotMultiPlanarView()));
+	connect(ui->actionAllAxialView, SIGNAL(triggered()), &m_core, SLOT(slotSegmentationView()));
+
+	// UI
+	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
+	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotAbout()));
+	connect(ui->actionHelp,	SIGNAL(triggered()), this, SLOT(slotHelp()));
+	
+	// change modality
+	connect(ui->ULSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUL()));
+	connect(ui->URSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUR()));
+	connect(ui->LLSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageLL()));
 
 
 	//minimun, maximum
@@ -111,24 +124,13 @@ MainWindow::MainWindow()
 	connect(ui->LLBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 	connect(ui->LRBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 
-	connect(ui->ULSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUL()));
-	connect(ui->URSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUR()));
-	connect(ui->LLSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageLL()));
 
-
-	viewGroup.addAction(ui->actionMultiPlanarView);
-	viewGroup.addAction(ui->actionAllAxialView);
-	viewGroup.setExclusive(true);
-	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), &m_core, SLOT(slotMultiPlanarView()));
-	connect(ui->actionAllAxialView, SIGNAL(triggered()), &m_core, SLOT(slotSegmentationView()));
 
 	// CenterLineAlgorithm
 	connect(ui->actionCenterlineAlgorithm, SIGNAL(triggered()), this, SLOT(slotCenterline()));
 
 	//Tools
-	// Open Segmentation
-	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), ioManager, 
-		SLOT(slotOpenSegmentationWithDiaglog()));
+
 	//connect(ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(addOverlay2ImageViewer()));
 
 	//3D view
@@ -283,10 +285,10 @@ MainWindow::~MainWindow()
 		//delete distance3DWidget;
 		//distance3DWidget->Delete();
 	}
-	if (this->LookupTable != NULL) {
-		this->LookupTable->Delete();
-		this->LookupTable = NULL;
-	}
+	//if (this->LookupTable != NULL) {
+	//	this->LookupTable->Delete();
+	//	this->LookupTable = NULL;
+	//}
 }
 
 //void MainWindow::addOverlay2ImageViewer()
@@ -312,17 +314,18 @@ MainWindow::~MainWindow()
 //	this->imageManager->getOverlay().GetOutput()->Modified();
 //}
 
-//void MainWindow::DisplayErrorMessage(std::string str)
-//{
-//	QMessageBox msgBox;
-//	msgBox.setWindowTitle("Error");
-//	msgBox.setIcon(QMessageBox::Critical);
-//	msgBox.setText(QString::fromStdString(str));
-//	//msgBox.setStyleSheet("QMessageBox{background-color:rgb(22,22,22);}\n QLabel {color:rgb(255,255,255);}\n QPushButton {background-color: rgb(22,22,22); color:white; border-color:rgb(63,63,70); border-style: outset; border-width: 1px; min-width: 8em; padding: 3px;} QPushButton::hover{background-color: rgb(0,102,204);}");
-//
-//	msgBox.addButton(QMessageBox::Ok);
-//	msgBox.exec();
-//}
+void MainWindow::DisplayErrorMessage(std::string str)
+{
+	m_core.DisplayErrorMessage(str);
+	//QMessageBox msgBox;
+	//msgBox.setWindowTitle("Error");
+	//msgBox.setIcon(QMessageBox::Critical);
+	//msgBox.setText(QString::fromStdString(str));
+	////msgBox.setStyleSheet("QMessageBox{background-color:rgb(22,22,22);}\n QLabel {color:rgb(255,255,255);}\n QPushButton {background-color: rgb(22,22,22); color:white; border-color:rgb(63,63,70); border-style: outset; border-width: 1px; min-width: 8em; padding: 3px;} QPushButton::hover{background-color: rgb(0,102,204);}");
+
+	//msgBox.addButton(QMessageBox::Ok);
+	//msgBox.exec();
+}
 
 void MainWindow::setActionsEnable( bool b )
 {	
@@ -642,6 +645,7 @@ void MainWindow::slotImage(int image)
 	default:
 		break;
 	}
+	m_core.RenderAllViewer();
 	//for (int i = 0; i < 3; i++)
 	//{
 	//	if (segmentationView && i >= visibleImageNum)
@@ -829,7 +833,7 @@ void MainWindow::slot3DUpdate()
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	mapper->SetInputData(this->m_centerlinePD);
-	mapper->SetLookupTable(this->LookupTable);
+	mapper->SetLookupTable(m_core.GetLookupTable());
 	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
 	mapper->Update();
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
@@ -1099,6 +1103,7 @@ void MainWindow::slotChangeSlice(int x, int y, int z)
 void MainWindow::resizeEvent( QResizeEvent * event )
 {
 	QMainWindow::resizeEvent(event);
+	m_core.RenderAllViewer();
 		//for (int i = 0; i < 3; i++)
 		//{
 		//	if (m_2DimageViewer[i] != NULL)
@@ -1448,16 +1453,17 @@ void MainWindow::slotOverlayOpacity(int opacity)
 
 void MainWindow::RenderAllViewer()
 {
-	this->ui->image4View->GetRenderWindow()->Render();
-	//QCoreApplication::processEvents();
-	for (int i = 0; i < 3; ++i)
-	{
-		if (segmentationView && i >= visibleImageNum)
-			break;
-		//m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
-		//m_2DimageViewer[i]->GetAnnotationRenderer()->ResetCameraClippingRange();
-		m_core.m_2DimageViewer[i]->GetRenderWindow()->Render();
-	}
+	m_core.RenderAllViewer();
+	//this->ui->image4View->GetRenderWindow()->Render();
+	////QCoreApplication::processEvents();
+	//for (int i = 0; i < 3; ++i)
+	//{
+	//	if (segmentationView && i >= visibleImageNum)
+	//		break;
+	//	//m_2DimageViewer[i]->GetRenderer()->ResetCameraClippingRange();
+	//	//m_2DimageViewer[i]->GetAnnotationRenderer()->ResetCameraClippingRange();
+	//	m_core.m_2DimageViewer[i]->GetRenderWindow()->Render();
+	//}
 }
 
 void MainWindow::RenderAll2DViewers()
@@ -1505,7 +1511,7 @@ vtkRenderWindowInteractor * MainWindow::GetVtkRenderWindowInteractor(int i)
 
 vtkLookupTable * MainWindow::GetLookupTable()
 {
-	return this->LookupTable;
+	return m_core.GetLookupTable();
 }
 
 vtkPolyData * MainWindow::GetCenterlinePD()

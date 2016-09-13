@@ -44,6 +44,8 @@ InteractorStylePaintBrush::InteractorStylePaintBrush()
 	m_colorGreen = 0;
 	m_colorBule = 0;
 	m_opacity = 255;
+	m_brushShape = SQUARE;
+	m_brushSize = 10;
 	
 	this->m_paintBrushEnabled = false;
 }
@@ -85,7 +87,7 @@ void InteractorStylePaintBrush::SetDrawOpacity(int opacity)
 
 void InteractorStylePaintBrush::SetBrushShape(BRUSH_SHAPE brushShape)
 {
-
+	m_brushShape = brushShape;
 }
 
 void InteractorStylePaintBrush::SetBrushSize(int size)
@@ -151,7 +153,7 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 	// Project picked world point to plane and obtain ijk index
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
+		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
 			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
@@ -217,7 +219,7 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 	// Project picked world point to plane and obtain ijk index
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
+		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
 			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
@@ -403,7 +405,7 @@ void InteractorStylePaintBrush::Draw(bool b)
 		return;
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
+		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
 			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
@@ -686,11 +688,10 @@ void InteractorStylePaintBrush::ReadfromImageData()
 	m_brush->SetDrawColor(0, 0, 0, 0);
 	this->FillBox3D();
 
-
 	int pos[3], extent[6];
 	memcpy(extent, m_extent, sizeof(extent));
-	extent[m_orientation * 2] = m_slice;
-	extent[m_orientation * 2 + 1] = m_slice;
+	extent[m_orientation * 2] = GetSlice();
+	extent[m_orientation * 2 + 1] = GetSlice();
 	for (int x = extent[0]; x <= extent[1]; ++x) {
 		for (int y = extent[2]; y <= extent[3]; ++y) {
 			for (int z = extent[4]; z <= extent[5]; ++z) {
@@ -827,8 +828,8 @@ void InteractorStylePaintBrush::Write2ImageData()
 	//Update Layer
 	int pos[3], extent[6];
 	memcpy(extent, m_extent, sizeof(extent));
-	extent[m_orientation * 2] = m_slice;
-	extent[m_orientation * 2 + 1] = m_slice;
+	extent[m_orientation * 2] = GetSlice();
+	extent[m_orientation * 2 + 1] = GetSlice();
 	double pixelval;
 
 	for (int x = extent[0]; x <= extent[1]; ++x) {
@@ -857,6 +858,9 @@ void InteractorStylePaintBrush::Write2ImageData()
 
 					}
 				}
+				pos[0] = x;
+				pos[1] = y;
+				pos[2] = z;
 				m_imageViewer->GetOverlay()->SetPixel(pos, pixelval);
 			}
 		}

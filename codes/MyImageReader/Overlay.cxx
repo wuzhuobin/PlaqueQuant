@@ -259,7 +259,9 @@ ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 	orienter->SetInput(format);
 	orienter->Update();
 
-	m_itkOverlay = orienter->GetOutput();
+	m_itkOverlay = castImageFilter->GetOutput();
+	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
+	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
 	//}
 	return m_itkOverlay;
 

@@ -31,6 +31,8 @@ public:
 
 	vtkRenderWindow* GetRenderWindow(int num);
 
+	void RenderAllViewer();
+
 	void DisplayErrorMessage(std::string str);
 
 	IOManager* GetIOManager();
@@ -92,7 +94,7 @@ public:
 	IOManager m_ioManager;
 
 
-	bool m_firstInitializedFlag = false;
+	bool m_firstInitialize = true;
 	VIEW_MODE m_viewMode = MULTIPLANAR_VIEW;
 
 };

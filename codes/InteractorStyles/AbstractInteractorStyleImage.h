@@ -41,6 +41,7 @@ public:
 	//virtual void SetOrientation(int m_orientation);
 	//virtual int GetOrientation();
 	virtual vtkActor* PickActor(int x, int y);
+	virtual int GetSlice();
 	void SetCurrentSlice(int slice);
 
 
@@ -66,7 +67,6 @@ protected:
 	MyImageViewer* m_imageViewer;
 	std::list<MyImageViewer*> m_synchronalViewers;
 
-	int m_slice;
 	int m_minSlice;
 	int m_maxSlice;
 	int m_orientation;

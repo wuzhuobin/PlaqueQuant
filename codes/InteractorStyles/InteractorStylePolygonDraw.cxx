@@ -301,7 +301,7 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		vtkSmartPointer<LumenSegmentaiton> ls =
 			vtkSmartPointer<LumenSegmentaiton>::New();
 		ls->SetInputData(m_imageViewer->GetInput());
-		ls->SetSlice(m_slice);
+		ls->SetSlice(GetSlice());
 		ls->SetGenerateValues(1, m_generateValue, m_generateValue);
 		ls->SetVesselWallContourRepresentation(this->m_vesselWallContourRepresentation);
 		ls->Update();

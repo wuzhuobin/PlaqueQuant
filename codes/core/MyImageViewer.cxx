@@ -268,19 +268,25 @@ void MyImageViewer::Render()
 		this->InitializeOrientationText();
 		this->InitializeIntensityText("");
 		this->InitializeHeader("");
+		//SetSlice((GetSliceMax() + GetSliceMin()) * 0.5);
 	}
 	vtkImageViewer2::Render();
 	if (this->AnnotationRenderer) {
 		this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
 	}
-
+	// update cursor3d
+	double ijk[3];
+	Cursor3D->GetFocalPoint(ijk);
+	double sliceWorldCoordinate = 
+		Slice * GetInput()->GetSpacing()[SliceOrientation] + GetInput()->GetOrigin()[SliceOrientation];
+	ijk[SliceOrientation] = sliceWorldCoordinate;
+	SetFocalPointWithWorldCoordinate(ijk[0], ijk[1], ijk[2]);
+	// update orientationText
+	ResizeOrientationText();
 	if (this->GetInput())
 	{
 		this->RenderWindow->Render();
 	}
-
-	ResizeOrientationText();
-
 }
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)

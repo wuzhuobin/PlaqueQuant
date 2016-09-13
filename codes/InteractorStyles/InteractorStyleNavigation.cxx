@@ -74,8 +74,6 @@ void InteractorStyleNavigation::SynchronizedZooming()
 
 void InteractorStyleNavigation::CalculateIndex()
 {
-	// m_slice should be updated
-	m_slice = m_imageViewer->GetSlice();
 	//Pick
 	this->GetInteractor()->GetPicker()->Pick(
 		this->GetInteractor()->GetEventPosition()[0],
@@ -90,37 +88,41 @@ void InteractorStyleNavigation::CalculateIndex()
 		return;
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + m_slice * m_spacing[m_orientation];
+		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
 		for (int i = 0; i < 3; i++)
 		{
 			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
 		}
 		for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 			it != m_synchronalViewers.end(); ++it) {
-			int slice;
-			switch ((*it)->GetSliceOrientation())
-			{
-			case MyImageViewer::SLICE_ORIENTATION_YZ:
-				slice = index[0] + 0.5;
-				(*it)->SetSlice(slice);
-				(*it)->SetFocalPointWithImageCoordinate(slice,
-					index[1] + 0.5, index[2] + 0.5);
-				break;
-			case MyImageViewer::SLICE_ORIENTATION_XZ:
-				slice = index[1] + 0.5;
-				(*it)->SetSlice(slice);
-				(*it)->SetFocalPointWithImageCoordinate(index[0] + 0.5,
-					slice, index[2] + 0.5);
-				break;
-			case MyImageViewer::SLICE_ORIENTATION_XY:
-				slice = index[2] + 0.5;
-				(*it)->SetSlice(slice);
-				(*it)->SetFocalPointWithImageCoordinate(index[0] + 0.5,
-					index[1] + 0.5, slice);
-				break;
-			default:
-				break;
+			(*it)->SetFocalPointWithImageCoordinate(index[0], index[1], index[2]);
+			if ((*it)->GetSliceOrientation() != m_orientation) {
+				(*it)->SetSlice(index[(*it)->GetSliceOrientation()]);
 			}
+			//int slice;
+			//switch ((*it)->GetSliceOrientation())
+			//{
+			//case MyImageViewer::SLICE_ORIENTATION_YZ:
+			//	slice = index[0] + 0.5;
+			//	(*it)->SetSlice(slice);
+			//	(*it)->SetFocalPointWithImageCoordinate(slice,
+			//		index[1] + 0.5, index[2] + 0.5);
+			//	break;
+			//case MyImageViewer::SLICE_ORIENTATION_XZ:
+			//	slice = index[1] + 0.5;
+			//	(*it)->SetSlice(slice);
+			//	(*it)->SetFocalPointWithImageCoordinate(index[0] + 0.5,
+			//		slice, index[2] + 0.5);
+			//	break;
+			//case MyImageViewer::SLICE_ORIENTATION_XY:
+			//	slice = index[2] + 0.5;
+			//	(*it)->SetSlice(slice);
+			//	(*it)->SetFocalPointWithImageCoordinate(index[0] + 0.5,
+			//		index[1] + 0.5, slice);
+			//	break;
+			//default:
+			//	break;
+			//}
 		}
 	}
 

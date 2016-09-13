@@ -37,13 +37,14 @@ void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
 	this->m_imageViewer = imageViewer;
 	m_minSlice = imageViewer->GetSliceMin();
 	m_maxSlice = imageViewer->GetSliceMax();
-	m_slice = imageViewer->GetSlice();
 	m_orientation = imageViewer->GetSliceOrientation();
 
 	imageViewer->GetInput()->GetExtent(m_extent);
 	imageViewer->GetInput()->GetSpacing(m_spacing);
 	imageViewer->GetInput()->GetOrigin(m_origin);
 	AddSynchronalViewer(imageViewer);
+
+	//SetCurrentSlice((m_maxSlice + m_minSlice) * 0.5);
 
 }
 
@@ -59,9 +60,9 @@ void AbstractInteractorStyleImage::SetSynchronalViewers(std::list<MyImageViewer*
 
 //void AbstractInteractorStyleImage::SetSliceSpinBox(QSpinBox * x, QSpinBox * y, QSpinBox * z)
 //{
-//	m_sliceSplinBox[0] = x;
-//	m_sliceSplinBox[1] = y;
-//	m_sliceSplinBox[2] = z;
+//	GetSlice()SplinBox[0] = x;
+//	GetSlice()SplinBox[1] = y;
+//	GetSlice()SplinBox[2] = z;
 //}
 
 //void AbstractInteractorStyleImage::SetOrientation(int m_orientation)
@@ -89,18 +90,23 @@ vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
 	}
 }
 
+int AbstractInteractorStyleImage::GetSlice()
+{
+	return m_imageViewer->GetSlice();
+}
+
 void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
 {
-	m_slice = slice;
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		int ijk[3];
 		(*it)->GetFocalPointWithImageCoordinate(ijk);
-		ijk[m_orientation] = m_slice;
+		ijk[m_orientation] = slice;
 		(*it)->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 		if ((*it)->GetSliceOrientation() == m_orientation) {
-			(*it)->SetSlice(m_slice);
+			(*it)->SetSlice(slice);
 		}
+		(*it)->Render();
 	}
 }
 
@@ -169,19 +175,17 @@ void AbstractInteractorStyleImage::OnKeyPressed()
 
 void AbstractInteractorStyleImage::MoveSliceForward()
 {
-	if (m_slice < m_maxSlice)
+	if (GetSlice() < m_maxSlice)
 	{
-		m_slice += 1;
-		SetCurrentSlice(m_slice);
+		SetCurrentSlice(GetSlice() + 1);
 	}
 }
 
 void AbstractInteractorStyleImage::MoveSliceBackward()
 {
-	if (m_slice > m_minSlice)
+	if (GetSlice() > m_minSlice)
 	{
-		m_slice -= 1;
-		SetCurrentSlice(m_slice);
+		SetCurrentSlice(GetSlice() - 1);
 	}
 }
 

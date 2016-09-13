@@ -149,7 +149,7 @@ public slots:
 	//Alogrithm
 	void slotMeasureCurrentVolumeOfEveryLabel();
 
-	virtual void addOverlay2ImageViewer();
+	//virtual void addOverlay2ImageViewer();
 
 
 private:
