@@ -113,8 +113,8 @@ void Core::slotAddOverlayToImageViewer() {
 
 void Core::slotVisualizeViewer()
 {
-
-	slotChangeView(m_viewMode);
+	m_viewMode = MULTIPLANAR_VIEW;
+	slotChangeView(MULTIPLANAR_VIEW);
 	for (int i = 0; i < VIEWER_NUM; ++i) {
 		m_style[i]->AddSynchronalViewer(m_2DimageViewer[0]);
 		m_style[i]->AddSynchronalViewer(m_2DimageViewer[1]);
@@ -142,12 +142,17 @@ void Core::slotVisualizeViewer()
 	emit signalVisualizeViewer();
 }
 
+void Core::slotSegmentationView() {
+	slotChangeView(SEGMENTATION_VIEW);
+}
+
+void Core::slotMultiPlanarView() {
+	slotChangeView(MULTIPLANAR_VIEW);
+}
+
 void Core::slotChangeView(Core::VIEW_MODE viewMode)
 {
-	if (m_viewMode == viewMode) {
-		return;
-	}
-	m_viewMode = viewMode;
+
 	// SEGMENTATION_VIEW
 	if (viewMode) {
 		// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
@@ -193,8 +198,13 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 			}
 
 		}
+
+		if (m_viewMode == viewMode) {
+			return;
+		}
+		m_viewMode = viewMode;
 		emit signalSegmentationView();
-		//this->slotChangeSlice();
+			//this->slotChangeSlice();
 
 		//QAction* action = widgetGroup.checkedAction();
 		//if (action != NULL) {
@@ -248,6 +258,10 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 		}
 		m_firstInitializedFlag = true;
 		//this->slotChangeSlice();
+		if (m_viewMode == viewMode) {
+			return;
+		}
+		m_viewMode = viewMode;
 		emit signalMultiPlanarView();
 		//QAction* action = widgetGroup.checkedAction();
 		//if (action != NULL) {

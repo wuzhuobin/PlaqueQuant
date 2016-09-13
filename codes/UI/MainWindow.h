@@ -47,6 +47,8 @@ public:
 	int					GetImageLayerNo();
 	vtkPolyData*		GetCenterlinePD();
 	Ui_MainWindow* GetUI();
+	// Core
+	Core m_core;
 
 	// Set functions
 	void SetImageLayerNo(int);
@@ -81,14 +83,14 @@ public slots:
 	virtual void dragEnterEvent(QDragEnterEvent *ev);
 	virtual void dropEvent( QDropEvent *ev );
 	
-	virtual void slotChangeSlice();
+	//virtual void slotChangeSlice();
 	virtual void slotChangeSlice(int, int, int);
-	virtual void slotUpdateSlice();
-	virtual void slotChangeWindowLevel();
-	virtual void slotChangeWindowLevelUL();
-    virtual void slotChangeWindowLevelUR();
-    virtual void slotChangeWindowLevelLL();
-    virtual void slotChangeWindowLevelLR();
+	//virtual void slotUpdateSlice();
+	//virtual void slotChangeWindowLevel();
+	//virtual void slotChangeWindowLevelUL();
+    //virtual void slotChangeWindowLevelUR();
+    //virtual void slotChangeWindowLevelLL();
+    //virtual void slotChangeWindowLevelLR();
 
 	//Action
 	virtual void slotExit();
@@ -101,13 +103,13 @@ public slots:
 	virtual void slot3DUpdate();
 	//virtual void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
 
-	virtual void slotNavigationMode();
-	virtual void slotWindowLevelMode();
-	virtual void slotBrushMode();
-	virtual void slotContourMode();
-	virtual void slotROIMode();
+	//virtual void slotNavigationMode();
+	//virtual void slotWindowLevelMode();
+	//virtual void slotBrushMode();
+	//virtual void slotContourMode();
+	//virtual void slotROIMode();
 	virtual void slotImage(int image);
-	virtual void slotMultiPlanarView();
+	//virtual void slotMultiPlanarView();
 
 	// Auto Lumen Segmenation 
 	virtual void slotEnableAutoLumenSegmentation(bool flag);
@@ -116,13 +118,13 @@ public slots:
 	virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
 	//Overlay
-	virtual void slotAddExternalOverlay();
+	//virtual void slotAddExternalOverlay();
     virtual void slotOverlayOpacity(int opacity);
   
 	//Centerline
 	virtual void slotCenterline();
     //Segmentation
-	virtual void slotSegmentationView();
+	//virtual void slotSegmentationView();
 	virtual void slotChangeBaseImageUL();
 	virtual void slotChangeBaseImageUR();
 	virtual void slotChangeBaseImageLL();
@@ -132,10 +134,10 @@ public slots:
 	//virtual void slotChangeIntensity();
 
 	//Widget
-	virtual void slotRuler(bool b);
+	//virtual void slotRuler(bool b);
 	virtual void slotChangeROI();
-	virtual void slotSelectROI();
-	virtual void slotResetROI();
+	//virtual void slotSelectROI();
+	//virtual void slotResetROI();
 
 	//Widget running 
 	virtual void slotShowProgressDialog(int value, QString text);
@@ -166,8 +168,7 @@ private:
 	QActionGroup viewerGroup;
 	//viewGroup
 	QActionGroup viewGroup;
-	// Core
-	Core m_core;
+
 
 
     

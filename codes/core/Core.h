@@ -42,6 +42,10 @@ public slots:
 	virtual void slotAddOverlayToImageViewer();
 
 	virtual void slotVisualizeViewer();
+
+	virtual void slotSegmentationViewer();
+
+	virtual void slotMultiPlanarView();
 	
 	virtual void slotChangeView(Core::VIEW_MODE viewMode);
 

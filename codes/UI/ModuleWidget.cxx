@@ -1,3 +1,5 @@
+#include "ui_ModuleWidget.h"
+
 #include <QTextBrowser>
 
 #include <vtkLine.h>
@@ -13,7 +15,6 @@
 #include "MaximumWallThickness.h"
 #include "MeasurementFor2D.h"
 #include "ModuleWidget.h"
-#include "ui_ModuleWidget.h"
 
 #include <qtablewidget.h>
 
@@ -182,7 +183,7 @@ QComboBox* ModuleWidget::GetBrushShapeComBox()
 void ModuleWidget::slotSegmentationView()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotSegmentationView();
+	mainWnd->m_core.slotSegmentationView();
 }
 
 void ModuleWidget::slotChangeLayerNo()
@@ -250,13 +251,13 @@ void ModuleWidget::slotEnableMWTCalculation(int checked)
 void ModuleWidget::slotSelectROI()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotSelectROI();
+	mainWnd->m_core.slotSelectROI();
 }
 
 void ModuleWidget::slotResetROI()
 {
 	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->slotResetROI();
+	mainWnd->m_core.slotResetROI();
 }
 
 
@@ -284,9 +285,9 @@ void ModuleWidget::slotUpdate2DMeasurements()
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = mainwnd->imageManager.getOverlay().GetOutput();
+	vtkImageData* overlayImage = mainwnd->imageManager->getOverlay().GetOutput();
 	int extent[6];
-	mainwnd->imageManager.getOverlay().GetDisplayExtent(extent);
+	mainwnd->imageManager->getOverlay().GetDisplayExtent(extent);
 	extent[4] = currentSlice;
 	extent[5] = currentSlice;
 
@@ -355,7 +356,7 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = mainwnd->imageManager.getOverlay().GetOutput();
+	vtkImageData* overlayImage = mainwnd->imageManager->getOverlay().GetOutput();
 
 	vtkSmartPointer<MaximumWallThickness> calculator = vtkSmartPointer<MaximumWallThickness>::New();
 	calculator->SetImage(overlayImage);
