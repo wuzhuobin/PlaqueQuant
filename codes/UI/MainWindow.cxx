@@ -85,6 +85,14 @@ MainWindow::MainWindow()
 	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), &m_core, SLOT(slotMultiPlanarView()));
 	connect(ui->actionAllAxialView, SIGNAL(triggered()), &m_core, SLOT(slotSegmentationView()));
 
+	// slice 
+	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), &m_core, SLOT(slotChangeSliceX(int)));
+	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), &m_core, SLOT(slotChangeSliceY(int)));
+	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), &m_core, SLOT(slotChangeSliceZ(int)));
+	connect(&m_core, SIGNAL(signalChangeSliceX(int)), ui->xSpinBox, SLOT(setValue(int)));
+	connect(&m_core, SIGNAL(signalChangeSliceY(int)), ui->ySpinBox, SLOT(setValue(int)));
+	connect(&m_core, SIGNAL(signalChangeSliceZ(int)), ui->zSpinBox, SLOT(setValue(int)));
+
 	// UI
 	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
 	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotAbout()));
@@ -428,10 +436,7 @@ bool MainWindow::slotVisualizeImage()
 	//connect(ui->windowDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
 	//connect(ui->levelDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
 
-	//connect(this->ui->xSpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
-	//connect(this->ui->ySpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
-	//connect(this->ui->zSpinBox,				SIGNAL(valueChanged(int))	, this, SLOT(slotChangeSlice())		 ,Qt::QueuedConnection);
-	
+
 	//Update Cursor
 	//this->slotChangeSlice();
 	//connected to slotNavigationMode()

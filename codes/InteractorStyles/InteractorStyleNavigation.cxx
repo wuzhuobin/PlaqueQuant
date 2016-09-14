@@ -88,15 +88,16 @@ void InteractorStyleNavigation::CalculateIndex()
 		return;
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
+		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] +
+			GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
+			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
 		for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 			it != m_synchronalViewers.end(); ++it) {
 			(*it)->SetFocalPointWithImageCoordinate(index[0], index[1], index[2]);
-			if ((*it)->GetSliceOrientation() != m_orientation) {
+			if ((*it)->GetSliceOrientation() != GetSliceOrientation()) {
 				(*it)->SetSlice(index[(*it)->GetSliceOrientation()]);
 			}
 			//int slice;

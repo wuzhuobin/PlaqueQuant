@@ -67,21 +67,21 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkImageData.h>
 #include <vtkInteractorStyleImage.h>
 
+#include <QObject>
 #include <QString>
 
 #include "Overlay.h"
 
-class MyImageViewer : public vtkImageViewer2
+class MyImageViewer : public QObject, public vtkImageViewer2
 {
+	Q_OBJECT
 public:
 	static MyImageViewer *New();
 	vtkTypeMacro(MyImageViewer, vtkImageViewer2);
 	void PrintSelf(ostream& os, vtkIndent indent);
 	// Text methods
 	virtual void InitializeHeader(QString File);
-	virtual void InitializeIntensityText(QString IntText);
-	// Orientation Text
-	virtual void InitializeOrientationText();
+
 
 	// Cursor methods
 	virtual void SetBound(double* b);
@@ -91,7 +91,6 @@ public:
 	virtual void GetFocalPointWithImageCoordinate(int* coordinate);
 	virtual void GetFocalPointWithWorldCoordinate(double* coordinate);
 	virtual double* GetFocalPointWithWorldCoordinate();
-	virtual double* GetFocalPoint();
 
 	// Description:
 	// Render the resulting image.
@@ -100,7 +99,7 @@ public:
 	// Description:
 	// Set/Get the input image to the viewer.
 	virtual void SetInputData(vtkImageData * in);
-	// Set/Get Input Layer
+	// Set/Get Input Layer which is supposed to be the output of overlay
 	virtual void SetInputDataLayer(vtkImageData *in);
 	virtual vtkImageData *GetInputLayer();
 	// Set/Get Overlay
@@ -126,7 +125,6 @@ public:
 	virtual vtkLookupTable* getLookupTable();
 	virtual void SetLookupTable(vtkLookupTable* LookupTable);
 
-
 	// Description:
 	// Attach an interactor for the internal render window.
 	virtual void SetupInteractor(vtkRenderWindowInteractor* arg);
@@ -134,9 +132,6 @@ public:
 	//Ruler
 	virtual void SetRulerEnabled(bool b);
 	virtual void SetProtractorEnabled(bool b);
-
-	// Slice
-	virtual void SetSlice(int s);
 
 	// Description:
 	// Update the display extent manually so that the proper slice for the
@@ -151,11 +146,28 @@ public:
 	// extent is reset properly.
 	virtual void UpdateDisplayExtent();
 
+public slots:
+	// Slice
+	virtual void SetSlice(int s);
+
+	virtual void SetColorLevel(double level);
+
+	virtual void SetColorWindow(double window);
+
+signals:
+	
+	void SliceChanged(int);
+	void ColorLevelChanged(double);
+	void ColorWindowChanged(double);
+
 protected:
-	MyImageViewer();
+	MyImageViewer(QObject* parent = NULL);
 	~MyImageViewer();
 
+	// Text Method
 	virtual void ResizeOrientationText();
+	virtual void InitializeIntensityText(QString IntText);
+	virtual void InitializeOrientationText();
 
 	virtual void InstallPipeline();
 	virtual void UnInstallPipeline();
@@ -175,7 +187,7 @@ protected:
 
 	//Cursor
 	vtkCursor3D*		 Cursor3D;
-	vtkPolyDataMapper* Cursormapper;
+	vtkPolyDataMapper* CursorMapper;
 	vtkActor*			 CursorActor;
 	virtual void SetCursorBoundary();
 	//Bound of cursor

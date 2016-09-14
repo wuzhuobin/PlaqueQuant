@@ -47,11 +47,12 @@ public:
 	vtkTypeMacro(InteractorStylePaintBrush, AbstractInteractorStyleImage);
 	static InteractorStylePaintBrush* New();
 	void SetPaintBrushModeEnabled(bool b);
+	void SetPaintBrushLabel(int paintBrushLabel);
 	void SetDrawColor(int r, int g, int b);
 	void SetDrawColor(const int* rgb);
 	void SetDrawOpacity(int opacity);
 
-	void SetBrushShape(BRUSH_SHAPE brushShape);
+	void SetBrushShape(int brushShape);
 	void SetBrushSize(int size);
 	
 	//void SetDrawBrushSizeSpinBox(QSpinBox* s);
@@ -91,13 +92,14 @@ private:
 	vtkImageCanvasSource2D* m_brush;
 	vtkImageActor* m_brushActor;
 
+	int paintBrushLabel;
 	int draw_index_old[3];
 	int m_colorRed, m_colorGreen, m_colorBule;
 	int m_opacity;
 	int m_brushSize;
 	bool m_isDraw;
 	bool m_paintBrushEnabled;
-	BRUSH_SHAPE m_brushShape = SQUARE;
+	int m_brushShape = SQUARE;
 
 	////PaintBrush
 	//QComboBox*  m_drawBrushShapeComboBox;

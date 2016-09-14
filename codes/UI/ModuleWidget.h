@@ -51,6 +51,7 @@ public:
 	QSpinBox* GetBrushSizeSpinBox();
 	QComboBox* GetBrushShapeComBox();
 	void GenerateReport();
+	void setMainWindow(MainWindow* mainWnd);
 
 public slots:
     void slotSegmentationView();
@@ -98,6 +99,8 @@ private:
 	vtkSmartPointer<vtkPointSetToLabelHierarchy>	m_p2labelfilter;
 
 	QButtonGroup m_contourRadioButtonGroup;
+
+	MainWindow* m_mainWnd;
 	
 	//QString lumen_Path, vesselWall_Path;
 };

@@ -51,13 +51,29 @@ public slots:
 	
 	virtual void slotChangeView(Core::VIEW_MODE viewMode);
 
+	virtual void slotChangeSlice(int slice);
+
+	virtual void slotChangeSliceX(int x);
+
+	virtual void slotChangeSliceY(int y);
+
+	virtual void slotChangeSliceZ(int z);
+
+	// mode stuff
 	virtual void slotNavigationMode();
 
 	virtual void slotWindowLevelMode();
 
 	virtual void slotBrushMode();
+	virtual void slotSetBrushSize(int size);
+	virtual void slotSetBrushShape(int shape);
 
 	virtual void slotContourMode();
+	// Auto Lumen Segmenation 
+	virtual void slotEnableAutoLumenSegmentation(bool flag);
+	virtual void slotSetContourFilterGenerateValues(int generateValues);
+	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
+	virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
 	virtual void slotROIMode();
 	virtual void slotChangeROI();
@@ -65,19 +81,31 @@ public slots:
 	virtual void slotResetROI();
 
 	virtual void slotRuler(bool b);
-
-
+	// set layer color
+	virtual void slotSetImageLayerColor(int layer);
 
 signals:
 	void signalVisualizeViewer();
 	void signalMultiPlanarView();
 	void signalSegmentationView();
+	void signalChangeSliceX(int);
+	void signalChangeSliceY(int);
+	void signalChangeSliceZ(int);
 
 //private:
 public:
 
 	// viewer
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
+
+	const int* m_overlayColor[6];
+
+	const int lumen[4] = { 255, 0, 0, 255 };
+	const int vesselWall[4] = { 0, 0, 255, 255 };
+	const int calcification[4] = { 0,255,0,255 };
+	const int hemorrhage[4] = { 255, 255, 0,255 };
+	const int lrnc[4] = { 0, 255, 255 ,255 };
+	const int lm[4] = { 255, 0, 255 ,255 };
 
 	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];
 	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[VIEWER_NUM];

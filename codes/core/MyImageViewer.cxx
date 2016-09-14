@@ -35,8 +35,8 @@ PURPOSE.  See the above copyright notice for more information.
 vtkStandardNewMacro(MyImageViewer);
 
 //----------------------------------------------------------------------------
-MyImageViewer::MyImageViewer()
-	:vtkImageViewer2()
+MyImageViewer::MyImageViewer(QObject* parent)
+	:vtkImageViewer2(), QObject(parent)
 {
 	this->CursorActor = NULL;
 	this->AnnotationRenderer = NULL;
@@ -69,11 +69,11 @@ MyImageViewer::MyImageViewer()
 	Cursor3D->SetModelBounds(0, 0, 0, 0, 0, 0);
 	Cursor3D->Update();
 
-	Cursormapper = vtkPolyDataMapper::New();
-	Cursormapper->SetInputData(Cursor3D->GetOutput());
+	CursorMapper = vtkPolyDataMapper::New();
+	CursorMapper->SetInputData(Cursor3D->GetOutput());
 
 	CursorActor = vtkActor::New();
-	CursorActor->SetMapper(Cursormapper);
+	CursorActor->SetMapper(CursorMapper);
 	CursorActor->GetProperty()->SetColor(0, 0, 1);
 	CursorActor->GetProperty()->SetLineStipplePattern(0xf0f0);
 
@@ -122,9 +122,9 @@ MyImageViewer::~MyImageViewer()
 		this->Cursor3D->Delete();
 		this->Cursor3D = NULL;
 	}
-	if (this->Cursormapper != NULL) {
-		this->Cursormapper->Delete();
-		this->Cursormapper = NULL;
+	if (this->CursorMapper != NULL) {
+		this->CursorMapper->Delete();
+		this->CursorMapper = NULL;
 	}
 	if (this->CursorActor != NULL) {
 		this->CursorActor->Delete();
@@ -178,6 +178,23 @@ void MyImageViewer::UpdateDisplayExtent()
 		}
 	}
 
+}
+
+void MyImageViewer::SetColorLevel(double level)
+{
+	if (GetColorLevel() == level)
+		return;
+	vtkImageViewer2::SetColorLevel(level);
+	emit ColorLevelChanged(level);
+
+}
+
+void MyImageViewer::SetColorWindow(double window)
+{
+	if (GetColorWindow() == window)
+		return;
+	vtkImageViewer2::SetColorWindow(window);
+	emit ColorWindowChanged(window);
 }
 
 //----------------------------------------------------------------------------
@@ -495,11 +512,6 @@ double* MyImageViewer::GetDefaultWindowLevel()
 	return DefaultWindowLevel;
 }
 
-double* MyImageViewer::GetFocalPoint()
-{
-	return Cursor3D->GetFocalPoint();
-}
-
 void MyImageViewer::InitializeHeader(QString File)
 {
 
@@ -670,11 +682,10 @@ void MyImageViewer::SetProtractorEnabled(bool b)
 
 void MyImageViewer::SetSlice(int s)
 {
+	if (Slice == s)
+		return;
 	vtkImageViewer2::SetSlice(s);
-	//int ijk[3];
-	//GetFocalPointWithImageCoordinate(ijk);
-	//ijk[SliceOrientation] = Slice;
-	//SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+	emit SliceChanged(s);
 }
 
 void MyImageViewer::SetupInteractor(vtkRenderWindowInteractor * arg)

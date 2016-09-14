@@ -28,23 +28,43 @@ Core::Core(QWidget* parent)
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
 	this->m_3Dinteractor->Initialize();
 
+	// using m_overlayColor to build the lookupTable
+	m_overlayColor[0] = lumen;
+	m_overlayColor[1] = vesselWall;
+	m_overlayColor[2] = calcification;
+	m_overlayColor[3] = hemorrhage;
+	m_overlayColor[4] = lrnc;
+	m_overlayColor[5] = lm;
 
 	m_lookupTable = vtkSmartPointer<vtkLookupTable>::New();
 	m_lookupTable->SetNumberOfTableValues(7);
 	m_lookupTable->SetTableRange(0.0, 6);
 	m_lookupTable->SetTableValue(0, 0, 0, 0, 0.0);
-	m_lookupTable->SetTableValue(1, 1, 0, 0, 0.2);
-	m_lookupTable->SetTableValue(2, 0, 0, 1, 0.05);
-	m_lookupTable->SetTableValue(3, 0, 1, 0, 0.4);
-	m_lookupTable->SetTableValue(4, 1, 1, 0, 0.5);
-	m_lookupTable->SetTableValue(5, 0, 1, 1, 0.5);
-	m_lookupTable->SetTableValue(6, 1, 0, 1, 0.5);
+	for (int i = 0; i < 6; ++i) {
+		double rgba[4];
+		for (int j = 0; j < 4; ++j) {
+			rgba[j] = m_overlayColor[i][j] / 255;
+		}
+		m_lookupTable->SetTableValue(i+1, rgba);
+	}
+	//m_lookupTable->SetTableValue(1, 1, 0, 0, 0.2);
+	//m_lookupTable->SetTableValue(2, 0, 0, 1, 0.05);
+	//m_lookupTable->SetTableValue(3, 0, 1, 0, 0.4);
+	//m_lookupTable->SetTableValue(4, 1, 1, 0, 0.5);
+	//m_lookupTable->SetTableValue(5, 0, 1, 1, 0.5);
+	//m_lookupTable->SetTableValue(6, 1, 0, 1, 0.5);
 	m_lookupTable->Build();
 
 	m_ioManager.setMyImageManager(&m_imageManager);
 
-	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()), this, SLOT(slotVisualizeViewer()));
-	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(slotAddOverlayToImageViewer()));
+	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()), 
+		this, SLOT(slotVisualizeViewer()));
+	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()), 
+		this, SLOT(slotAddOverlayToImageViewer()));
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		connect(m_2DimageViewer[i], SIGNAL(SliceChanged(int)), 
+			this, SLOT(slotChangeSlice(int)));
+	}
 }
 
 Core::~Core() 
@@ -148,6 +168,25 @@ void Core::slotVisualizeViewer()
 	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
 	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
+	
+	// set initialized slice to all viewer
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		int slice = m_2DimageViewer[i]->GetSliceMax() + m_2DimageViewer[i]->GetSliceMin();
+		m_style[i]->SetCurrentSlice(slice * 0.5);
+		switch (m_2DimageViewer[i]->GetSliceOrientation()) {
+		case MyImageViewer::SLICE_ORIENTATION_XY:
+			emit signalChangeSliceZ(slice * 0.5);
+			break;
+		case MyImageViewer::SLICE_ORIENTATION_XZ:
+			emit signalChangeSliceY(slice * 0.5);
+			break;
+		case MyImageViewer::SLICE_ORIENTATION_YZ:
+			emit signalChangeSliceX(slice * 0.5);
+			break;
+		default:
+			break;
+		}
+	}
 	emit signalVisualizeViewer();
 }
 
@@ -159,10 +198,40 @@ void Core::slotMultiPlanarView() {
 	slotChangeView(MULTIPLANAR_VIEW);
 }
 
+void Core::slotChangeSlice(int slice) {
+	MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(sender());
+	if (viewer != NULL) {
+		switch (viewer->GetSliceOrientation())
+		{
+		case MyImageViewer::SLICE_ORIENTATION_YZ:
+			emit signalChangeSliceX(slice);
+			break;
+		case MyImageViewer::SLICE_ORIENTATION_XZ:
+			emit signalChangeSliceY(slice);
+			break;
+		case MyImageViewer::SLICE_ORIENTATION_XY:
+			emit signalChangeSliceZ(slice);
+		default:
+			break;
+		}
+	}
+
+}
+
 void Core::slotChangeView(Core::VIEW_MODE viewMode)
 {
 	if (m_viewMode == viewMode && !m_firstInitialize) {
 		return;
+	}
+	if (m_firstInitialize) {
+		for (int i = 0; i < VIEWER_NUM; ++i) {
+			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
+			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
+			for (int j = 0; j < VIEWER_NUM; ++j) {
+				m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
+			}
+			m_interactor[i]->SetInteractorStyle(m_style[i]);
+		}
 	}
 	m_viewMode = viewMode;
 	m_firstInitialize = false;
@@ -180,14 +249,14 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 						this->m_imageManager.getListOfViewerInputImages()[i1]);
 					this->m_2DimageViewer[i2]->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_XY);
 					this->m_2DimageViewer[i2]->Render();
-					this->m_2DimageViewer[i2]->SetupInteractor(m_interactor[i2]);
 					this->m_2DimageViewer[i2]->InitializeHeader(m_imageManager.getModalityName(i2));
+					//this->m_2DimageViewer[i2]->SetupInteractor(m_interactor[i2]);
 					// setup InteractorStyle
-					m_style[i2]->SetImageViewer(m_2DimageViewer[i2]);
-					for (int j = 0; j < VIEWER_NUM; ++j) {
-						m_style[i2]->AddSynchronalViewer(m_2DimageViewer[j]);
-					}
-					m_interactor[i2]->SetInteractorStyle(m_style[i2]);
+					//m_style[i2]->SetImageViewer(m_2DimageViewer[i2]);
+					//for (int j = 0; j < VIEWER_NUM; ++j) {
+					//	m_style[i2]->AddSynchronalViewer(m_2DimageViewer[j]);
+					//}
+					//m_interactor[i2]->SetInteractorStyle(m_style[i2]);
 
 					//this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
 					//this->m_style[i2]->SetOrientation(2);
@@ -195,6 +264,7 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 				}
 			}
 			if (i1 >= m_imageManager.getListOfVtkImages().size() && i2 < VIEWER_NUM ) {
+				this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 				// disable view props
 				vtkPropCollection* props = this->m_2DimageViewer[i2]->GetRenderer()->GetViewProps();
 				props->InitTraversal();
@@ -209,9 +279,8 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 				{
 					annProps->GetNextProp()->SetVisibility(false);
 				}
-				this->m_2DimageViewer[i2]->GetRenderWindow()->Modified();
-				this->m_2DimageViewer[i2]->GetRenderWindow()->Render();
-				this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
+				//this->m_2DimageViewer[i2]->GetRenderWindow()->Modified();
+				//this->m_2DimageViewer[i2]->GetRenderWindow()->Render();
 
 			}
 
@@ -233,20 +302,20 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 				this->m_imageManager.getListOfViewerInputImages()[DEFAULT_IMAGE]);
 			m_2DimageViewer[i]->SetSliceOrientation(i);
 			m_2DimageViewer[i]->Render();
-			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 			m_2DimageViewer[i]->InitializeHeader(m_imageManager.getModalityName(DEFAULT_IMAGE));
+			//m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 			// setup interactorStyle
-			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-			for (int j = 0; j < VIEWER_NUM; ++j) {
-				m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
-			}
+			//m_style[i]->SetImageViewer(m_2DimageViewer[i]);
+			//for (int j = 0; j < VIEWER_NUM; ++j) {
+			//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
+			//}
 			//m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
 			//	ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
 			//	m_moduleWidget->GetBrushSizeSpinBox(),
 			//	m_moduleWidget->GetBrushShapeComBox(),
 			//	NULL, NULL);
 			//m_style[i]->SetOrientation(i);
-			m_interactor[i]->SetInteractorStyle(m_style[i]);
+			//m_interactor[i]->SetInteractorStyle(m_style[i]);
 
 			//if (!m_firstInitialize) {
 				// else only change input and viewer m_orientation
@@ -275,6 +344,39 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 	}
 	RenderAllViewer();
 }
+
+void Core::slotChangeSliceX(int x) {
+
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		if (m_2DimageViewer[i]->GetSliceOrientation() == MyImageViewer::SLICE_ORIENTATION_YZ &&
+			m_2DimageViewer[i]->GetSlice() != x) {
+			// SetSlice will emit SliceChanged signal which is connected to slotChangeSlice()
+			m_style[i]->SetCurrentSlice(x);
+		}
+	}
+
+}
+
+void Core::slotChangeSliceY(int y) {
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		if (m_2DimageViewer[i]->GetSliceOrientation() == MyImageViewer::SLICE_ORIENTATION_XZ &&
+			m_2DimageViewer[i]->GetSlice() != y) {
+			// SetSlice will emit SliceChanged signal which is connected to slotChangeSlice()
+			m_style[i]->SetCurrentSlice(y);
+		}
+	}
+}
+
+void Core::slotChangeSliceZ(int z) {
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		if (m_2DimageViewer[i]->GetSliceOrientation() == MyImageViewer::SLICE_ORIENTATION_XY &&
+			m_2DimageViewer[i]->GetSlice() != z) {
+			// SetSlice will emit SliceChanged signal which is connected to slotChangeSlice()
+			m_style[i]->SetCurrentSlice(z);
+		}
+	}
+}
+
 
 void Core::slotNavigationMode()
 {
@@ -308,6 +410,36 @@ void Core::slotBrushMode()
 	this->slotRuler(false);
 }
 
+void Core::slotSetBrushSize(int size)
+{
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		if (m_style[i] != NULL) {
+			m_style[i]->GetPaintBrush()->SetBrushSize(size);
+		}
+	}
+}
+
+void Core::slotSetBrushShape(int shape)
+{
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		if (m_style[i] != NULL) {
+			m_style[i]->GetPaintBrush()->SetBrushShape(shape);
+		}
+	}
+}
+
+void Core::slotSetImageLayerColor(int layer) {
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		if (m_style[i] != NULL) {
+			m_style[i]->GetPaintBrush()->SetPaintBrushLabel(layer + 1);
+			m_style[i]->GetPolygonDraw()->SetVesselWallLabel(layer + 1);
+		}
+	}
+}
+
 void Core::slotContourMode()
 {
 	for (int i = 0; i < VIEWER_NUM; i++)
@@ -319,6 +451,46 @@ void Core::slotContourMode()
 
 	this->slotRuler(false);
 }
+
+void Core::slotEnableAutoLumenSegmentation(bool flag)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
+	}
+}
+
+void Core::slotSetContourFilterGenerateValues(int generateValues)
+{
+	for (int i = 0; i < 3; ++i) {
+		m_style[i]->GetPolygonDraw()->
+			SetContourFilterGenerateValues(generateValues);
+		m_style[i]->GetPolygonDraw()->
+			GenerateLumenWallContourWidget();
+
+	}
+}
+
+void Core::slotSetLineInterpolatorToSmoothCurve(bool flag)
+{
+	if (flag) {
+		for (int i = 0; i < 3; i++)
+		{
+			m_style[i]->GetPolygonDraw()->SetLineInterpolator(0);
+		}
+	}
+}
+
+void Core::slotSetLineInterpolatorToPolygon(bool flag)
+{
+	if (flag) {
+		for (int i = 0; i < 3; i++)
+		{
+			m_style[i]->GetPolygonDraw()->SetLineInterpolator(1);
+		}
+	}
+}
+
 void Core::slotRuler(bool b)
 {
 	for (int i = 0; i< VIEWER_NUM; i++)

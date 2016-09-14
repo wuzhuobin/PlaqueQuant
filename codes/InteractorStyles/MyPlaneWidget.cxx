@@ -216,7 +216,7 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 
 		//Display bound
 		double displayBound[6];
-		double* focalPoint = m_planeWidget[i]->GetImageViewer()->GetFocalPoint();
+		double* focalPoint = m_planeWidget[i]->GetImageViewer()->GetFocalPointWithWorldCoordinate();
 
 		for (int j=0;j<3;j++)
 		{

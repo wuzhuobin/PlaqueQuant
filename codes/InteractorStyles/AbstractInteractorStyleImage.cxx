@@ -35,13 +35,14 @@ AbstractInteractorStyleImage::~AbstractInteractorStyleImage()
 void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
 {
 	this->m_imageViewer = imageViewer;
-	m_minSlice = imageViewer->GetSliceMin();
-	m_maxSlice = imageViewer->GetSliceMax();
-	m_orientation = imageViewer->GetSliceOrientation();
+	//m_slice = imageViewer->GetSlice();
+	//m_minSlice = imageViewer->GetSliceMin();
+	//m_maxSlice = imageViewer->GetSliceMax();
+	//m_orientation = imageViewer->GetSliceOrientation();
 
-	imageViewer->GetInput()->GetExtent(m_extent);
-	imageViewer->GetInput()->GetSpacing(m_spacing);
-	imageViewer->GetInput()->GetOrigin(m_origin);
+	//imageViewer->GetInput()->GetExtent(m_extent);
+	//imageViewer->GetInput()->GetSpacing(m_spacing);
+	//imageViewer->GetInput()->GetOrigin(m_origin);
 	AddSynchronalViewer(imageViewer);
 
 	//SetCurrentSlice((m_maxSlice + m_minSlice) * 0.5);
@@ -95,16 +96,48 @@ int AbstractInteractorStyleImage::GetSlice()
 	return m_imageViewer->GetSlice();
 }
 
+int AbstractInteractorStyleImage::GetMinSlice()
+{
+	return m_imageViewer->GetSliceMin();
+}
+
+int AbstractInteractorStyleImage::GetMaxSlice()
+{
+	return m_imageViewer->GetSliceMax();
+}
+
+int AbstractInteractorStyleImage::GetSliceOrientation()
+{
+	return m_imageViewer->GetSliceOrientation();
+}
+
+double * AbstractInteractorStyleImage::GetOrigin()
+{
+	return m_imageViewer->GetInput()->GetOrigin();
+}
+
+double * AbstractInteractorStyleImage::GetSpacing()
+{
+	return m_imageViewer->GetInput()->GetSpacing();
+}
+
+int * AbstractInteractorStyleImage::GetExtent()
+{
+	return m_imageViewer->GetInput()->GetExtent();
+}
+
 void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
 {
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
-		int ijk[3];
-		(*it)->GetFocalPointWithImageCoordinate(ijk);
-		ijk[m_orientation] = slice;
-		(*it)->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-		if ((*it)->GetSliceOrientation() == m_orientation) {
+		if ((*it)->GetSliceOrientation() == GetSliceOrientation()) {
 			(*it)->SetSlice(slice);
+		}
+		else {
+			int ijk[3];
+			(*it)->GetFocalPointWithImageCoordinate(ijk);
+			ijk[GetSliceOrientation()] = slice;
+			(*it)->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 		}
 		(*it)->Render();
 	}
@@ -175,7 +208,7 @@ void AbstractInteractorStyleImage::OnKeyPressed()
 
 void AbstractInteractorStyleImage::MoveSliceForward()
 {
-	if (GetSlice() < m_maxSlice)
+	if (GetSlice() < GetMaxSlice())
 	{
 		SetCurrentSlice(GetSlice() + 1);
 	}
@@ -183,7 +216,7 @@ void AbstractInteractorStyleImage::MoveSliceForward()
 
 void AbstractInteractorStyleImage::MoveSliceBackward()
 {
-	if (GetSlice() > m_minSlice)
+	if (GetSlice() > GetMinSlice())
 	{
 		SetCurrentSlice(GetSlice() - 1);
 	}

@@ -24,7 +24,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	ui(new Ui::ModuleWidget),
 	m_contourRadioButtonGroup(this)
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	m_mainWnd = static_cast<MainWindow*>(parent);
 
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
@@ -84,13 +84,13 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		ui->autoLumenSegmentationSpinBox, SLOT(setValue(int)));
 	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), this,
 		SLOT(slotEnableAutoLumenSegmentation(bool)));
-	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), mainWnd, 
+	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), &m_mainWnd->m_core, 
 		SLOT(slotEnableAutoLumenSegmentation(bool)));
-	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), mainWnd, 
+	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), &m_mainWnd->m_core, 
 		SLOT(slotSetContourFilterGenerateValues(int)));
-	connect(ui->smoothCurveRadioButton, SIGNAL(toggled(bool)), mainWnd,
+	connect(ui->smoothCurveRadioButton, SIGNAL(toggled(bool)), &m_mainWnd->m_core,
 		SLOT(slotSetLineInterpolatorToSmoothCurve(bool)));
-	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), mainWnd,
+	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), &m_mainWnd->m_core,
 		SLOT(slotSetLineInterpolatorToPolygon(bool)));
 
 
@@ -103,12 +103,22 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	ui->sizeSpinBox3->setMaximum(9999);
 
 	//connect
-	//connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					mainWnd,	SLOT(slotCenterline()));
+	//connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					m_mainWnd,	SLOT(slotCenterline()));
 	connect(ui->generateReportPushButton,		SIGNAL(clicked()), 					this,		SLOT(slotReportGetInput()));
-	connect(ui->labelComboBox,					SIGNAL(currentIndexChanged(int)),	this,		SLOT(slotChangeLayerNo()), Qt::UniqueConnection);
+	// set labelColor
+	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
+		&m_mainWnd->m_core,SLOT(slotSetImageLayerColor(int)));
+	// set brushSize
+	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), ui->BrushSizeSpinBox, SLOT(setValue(int)),Qt::UniqueConnection);
+	connect(ui->BrushSizeSpinBox, SIGNAL(valueChanged(int)), ui->BrushSizeSlider, SLOT(setValue(int)), Qt::UniqueConnection);
+	connect(ui->BrushSizeSpinBox, SIGNAL(valueChanged(int)),
+		&m_mainWnd->m_core, SLOT(slotSetBrushSize(int)));
+	// set brushShape
+	connect(ui->BrushComBox, SIGNAL(currentIndexChanged(int)),
+		&m_mainWnd->m_core, SLOT(slotSetBrushShape(int)));
+
 	connect(ui->NextBtn,						SIGNAL(clicked()),					this,		SLOT(NextPage()));
 	connect(ui->BackBtn,						SIGNAL(clicked()),					this,		SLOT(BackPage()));
-	connect(ui->BrushSizeSlider,				SIGNAL(valueChanged(int)),			this,		SLOT(SetBrushSize()),Qt::UniqueConnection);
 	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
 	//connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
@@ -182,30 +192,30 @@ QComboBox* ModuleWidget::GetBrushShapeComBox()
 }
 void ModuleWidget::slotSegmentationView()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->m_core.slotSegmentationView();
+	 
+	m_mainWnd->m_core.slotSegmentationView();
 }
 
 void ModuleWidget::slotChangeLayerNo()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	 
 	int layer = ui->labelComboBox->currentIndex() + 1;
-	const double* value = mainWnd->GetLookupTable()->GetTableValue(layer);
+	const double* value = m_mainWnd->GetLookupTable()->GetTableValue(layer);
 
 	ui->opacitySpinBox->setValue(value[3] * 100);
-	mainWnd->SetImageLayerNo(layer);
+	m_mainWnd->SetImageLayerNo(layer);
 
 }
 
 void ModuleWidget::slotChangeOpacity(int opacity)
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	 
 	int layer = ui->labelComboBox->currentIndex() + 1;
-	double* value = mainWnd->GetLookupTable()->GetTableValue(layer);
+	double* value = m_mainWnd->GetLookupTable()->GetTableValue(layer);
 	value[3] = opacity * 0.01;
-	mainWnd->GetLookupTable()->SetTableValue(layer, value);
-	mainWnd->GetLookupTable()->Build();
-	mainWnd->RenderAllViewer();
+	m_mainWnd->GetLookupTable()->SetTableValue(layer, value);
+	m_mainWnd->GetLookupTable()->Build();
+	m_mainWnd->RenderAllViewer();
 }
 void ModuleWidget::slotChangeROI(int * bound)
 {
@@ -220,8 +230,8 @@ void ModuleWidget::slotChangeROI(int * bound)
 
 void ModuleWidget::slotEnableMWTCalculation(int checked)
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	Ui_MainWindow* main_ui = mainwnd->GetUI();
+	 
+	Ui_MainWindow* main_ui = m_mainWnd->GetUI();
 
 	switch (checked)
 	{
@@ -231,12 +241,12 @@ void ModuleWidget::slotEnableMWTCalculation(int checked)
 		// remove line and label actors
 		for (int i = 0; i < 3; i++)
 		{
-			if (mainwnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
-				mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
-				mainwnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
+			if (m_mainWnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
+				m_mainWnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
+				m_mainWnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
 			}
 		}
-		mainwnd->RenderAll2DViewers();
+		m_mainWnd->RenderAll2DViewers();
 		break;
 	case Qt::Checked:
 		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotCalculateMaximumWallThickness()), Qt::QueuedConnection);
@@ -250,14 +260,14 @@ void ModuleWidget::slotEnableMWTCalculation(int checked)
 
 void ModuleWidget::slotSelectROI()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->m_core.slotSelectROI();
+	 
+	m_mainWnd->m_core.slotSelectROI();
 }
 
 void ModuleWidget::slotResetROI()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
-	mainWnd->m_core.slotResetROI();
+	 
+	m_mainWnd->m_core.slotResetROI();
 }
 
 
@@ -282,12 +292,12 @@ void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int num
 
 void ModuleWidget::slotUpdate2DMeasurements()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
+	 
+	int currentSlice = m_mainWnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = mainwnd->imageManager->getOverlay().GetOutput();
+	vtkImageData* overlayImage = m_mainWnd->imageManager->getOverlay().GetOutput();
 	int extent[6];
-	mainwnd->imageManager->getOverlay().GetDisplayExtent(extent);
+	m_mainWnd->imageManager->getOverlay().GetDisplayExtent(extent);
 	extent[4] = currentSlice;
 	extent[5] = currentSlice;
 
@@ -353,10 +363,10 @@ void ModuleWidget::slotUpdate2DMeasurements()
 
 void ModuleWidget::slotCalculateMaximumWallThickness()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	int currentSlice = mainwnd->GetUI()->zSpinBox->value();
+	 
+	int currentSlice = m_mainWnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = mainwnd->imageManager->getOverlay().GetOutput();
+	vtkImageData* overlayImage = m_mainWnd->imageManager->getOverlay().GetOutput();
 
 	vtkSmartPointer<MaximumWallThickness> calculator = vtkSmartPointer<MaximumWallThickness>::New();
 	calculator->SetImage(overlayImage);
@@ -391,12 +401,12 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 
 		for (int i = 0; i < 3; i++)
 		{
-			if (mainwnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
-				mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
-				mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
+			if (m_mainWnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
+				m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
+				m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
 			}
 		}
-		mainwnd->RenderAll2DViewers();
+		m_mainWnd->RenderAll2DViewers();
 		return;
 	}
 	
@@ -416,12 +426,12 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 			this->ui->MWTTextBrowser->setText("Loop pair extraction incorrect!");
 			for (int j = 0; j < 3; i++)
 			{
-				if (mainwnd->GetMyImageViewer(j)->GetSliceOrientation() == 2) {
-					mainwnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
-					mainwnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
+				if (m_mainWnd->GetMyImageViewer(j)->GetSliceOrientation() == 2) {
+					m_mainWnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
+					m_mainWnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
 				}
 			}
-			mainwnd->RenderAll2DViewers();
+			m_mainWnd->RenderAll2DViewers();
 			return;
 		}
 
@@ -467,15 +477,15 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	// #MyViewerHardCode
 	for (int i = 0; i < 3;i++)
 	{
-		if (mainwnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
-			mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
-			mainwnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
+		if (m_mainWnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
+			m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
+			m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
 		}
 	}
 
 	// reset error message
 	this->ui->MWTTextBrowser->setText("Normal.");
-	mainwnd->RenderAll2DViewers();
+	m_mainWnd->RenderAll2DViewers();
 }
 
 void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
@@ -508,26 +518,26 @@ void ModuleWidget::slotUpdateTableWidget()
 
 void ModuleWidget::InternalUpdate()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	Ui_MainWindow* main_ui = mainwnd->GetUI();
+	 
+	Ui_MainWindow* main_ui = m_mainWnd->GetUI();
 	// if page is 5
 
 	int currentIndex = this->ui->stackedWidget->currentIndex();
 	if (currentIndex == 4) {
 		slotUpdate2DMeasurements();
-		mainwnd->slotMeasureCurrentVolumeOfEveryLabel();
+		m_mainWnd->slotMeasureCurrentVolumeOfEveryLabel();
 		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()), Qt::QueuedConnection);
-		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), mainwnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()), Qt::QueuedConnection);
+		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), m_mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()), Qt::QueuedConnection);
 	}
 	else {
 		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()));
-		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), mainwnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
+		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), m_mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 	}
 }
 
 void ModuleWidget::GenerateReport()
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	 
 	//General 
 	//Basic Information to fill
 	QFileInfo fileInfo("./report.pdf");
@@ -579,12 +589,12 @@ void ModuleWidget::GenerateReport()
 	writer->SetInputConnection(imageResizeFilter->GetOutputPort());
 	
 	// 2d
-	windowToImageFilter->SetInput(mainWnd->GetRenderWindow(3));
+	windowToImageFilter->SetInput(m_mainWnd->GetRenderWindow(3));
 	writer->SetFileName(_2dResult.toStdString().c_str());
 	writer->Update();
 	writer->Write();
 	//3d
-	windowToImageFilter->SetInput(mainWnd->GetRenderWindow(4));
+	windowToImageFilter->SetInput(m_mainWnd->GetRenderWindow(4));
 	writer->SetFileName(_3dResult.toStdString().c_str());
 	writer->Update();
 	writer->Write();
@@ -717,5 +727,10 @@ void ModuleWidget::GenerateReport()
 
 	delete reportGenerator;
 
+}
+
+void ModuleWidget::setMainWindow(MainWindow* mainWnd)
+{
+	m_mainWnd = mainWnd;
 }
 

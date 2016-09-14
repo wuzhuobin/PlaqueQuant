@@ -363,9 +363,9 @@ void InteractorStylePolygonDraw::FillPolygon()
 			polydata->GetPoint(i, worldCoordinate);
 
 			//Take one image data 1 to be reference
-			displayCoordinate[0] = (worldCoordinate[0] - m_origin[0]) / m_spacing[0];
-			displayCoordinate[1] = (worldCoordinate[1] - m_origin[1]) / m_spacing[1];
-			displayCoordinate[2] = (worldCoordinate[2] - m_origin[2]) / m_spacing[2];
+			displayCoordinate[0] = (worldCoordinate[0] - GetOrigin()[0]) / GetSpacing()[0];
+			displayCoordinate[1] = (worldCoordinate[1] - GetOrigin()[1]) / GetSpacing()[1];
+			displayCoordinate[2] = (worldCoordinate[2] - GetOrigin()[2]) / GetSpacing()[2];
 			//cout << s[0] << " " << s[1] << " " << s[2] << endl;
 			//Test whether the points are inside the polygon or not
 			// if the points is too close to the previous point, skip it to avoid error in PointInPolygon algorithm
@@ -373,7 +373,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 			if (d < 1E-5)
 				continue;
 			memcpy(lastPoint, displayCoordinate, sizeof(double) * 3);
-			switch (m_orientation)
+			switch (GetSliceOrientation())
 			{
 			case 0:
 				polygon->GetPoints()->InsertNextPoint(0.0, displayCoordinate[1], displayCoordinate[2]);
@@ -405,17 +405,17 @@ void InteractorStylePolygonDraw::FillPolygon()
 		bounds_int[5] = ceil(bounds[5]) + 3;
 
 		// Clamp values to within extent specified 
-		bounds_int[0] = { bounds_int[0] < this->m_extent[0] ? this->m_extent[0] : bounds_int[0] };
-		bounds_int[1] = { bounds_int[1] > this->m_extent[1] ? this->m_extent[1] : bounds_int[1] };
-		bounds_int[2] = { bounds_int[2] < this->m_extent[2] ? this->m_extent[2] : bounds_int[2] };
-		bounds_int[3] = { bounds_int[3] > this->m_extent[3] ? this->m_extent[3] : bounds_int[3] };
-		bounds_int[4] = { bounds_int[4] < this->m_extent[4] ? this->m_extent[4] : bounds_int[4] };
-		bounds_int[5] = { bounds_int[5] > this->m_extent[5] ? this->m_extent[5] : bounds_int[5] };
+		bounds_int[0] = { bounds_int[0] < this->GetExtent()[0] ? this->GetExtent()[0] : bounds_int[0] };
+		bounds_int[1] = { bounds_int[1] > this->GetExtent()[1] ? this->GetExtent()[1] : bounds_int[1] };
+		bounds_int[2] = { bounds_int[2] < this->GetExtent()[2] ? this->GetExtent()[2] : bounds_int[2] };
+		bounds_int[3] = { bounds_int[3] > this->GetExtent()[3] ? this->GetExtent()[3] : bounds_int[3] };
+		bounds_int[4] = { bounds_int[4] < this->GetExtent()[4] ? this->GetExtent()[4] : bounds_int[4] };
+		bounds_int[5] = { bounds_int[5] > this->GetExtent()[5] ? this->GetExtent()[5] : bounds_int[5] };
 
 
 		double p[3];
 		int p2[3];
-		if (m_orientation == 0)
+		if (GetSliceOrientation() == 0)
 		{
 			for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
 				for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
@@ -438,7 +438,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 				}
 			}
 		}
-		else if (m_orientation == 1)
+		else if (GetSliceOrientation() == 1)
 		{
 			for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
 				for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
@@ -461,7 +461,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 				}
 			}
 		}
-		else if (m_orientation == 2)
+		else if (GetSliceOrientation() == 2)
 		{
 			for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
 				for (int y = bounds_int[2]; y < bounds_int[3]; y++) {

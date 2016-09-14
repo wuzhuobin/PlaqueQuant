@@ -12,13 +12,13 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		planeWidget->SetInputData(m_imageViewer->GetInput());
 		planeWidget->SetImageViewer(m_imageViewer);
 		planeWidget->SetDefaultBound(m_imageViewer->GetBound());
-		planeWidget->SetInteractor(mainWnd->GetVtkRenderWindowInteractor(m_orientation));
+		planeWidget->SetInteractor(mainWnd->GetVtkRenderWindowInteractor(GetSliceOrientation()));
 		//qDebug() << "planeWidget:" << planeWidget;
 		//qDebug() << "planeWidgetCallback" << planeWidgetCallback;
 		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
 		planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
 
-		switch (m_orientation)
+		switch (GetSliceOrientation())
 		{
 		case 0:
 			planeWidgetCallback->SetPlaneWidget(
@@ -47,7 +47,7 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		double* bound = m_imageViewer->GetBound();
 		//double displayBound[6];
 		double	m_currentBound[6];
-		double* m_focalPoint = planeWidget->GetImageViewer()->GetFocalPoint();
+		double* m_focalPoint = planeWidget->GetImageViewer()->GetFocalPointWithWorldCoordinate();
 
 		//Set Current Bound
 		for (int j = 0; j < 3; j++)
@@ -62,7 +62,7 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 			displayBound[j * 2 + 1] = m_focalPoint[j] + roiHalfSize[j] < bound[j * 2 + 1] ? m_focalPoint[j] + roiHalfSize[j] : bound[j * 2 + 1];
 
 			//Restrict display bound on the plane
-			if (m_orientation == j)
+			if (GetSliceOrientation() == j)
 			{
 				displayBound[j * 2] = m_focalPoint[j];
 				displayBound[j * 2 + 1] = m_focalPoint[j];
@@ -109,12 +109,12 @@ void InteractorStyleROI::SelectROI(int* newExtent)
 {
 	const double* bound = planeWidget->GetCurrentBound();
 	
-	newExtent[0] = (bound[0] - m_origin[0]) / m_spacing[0];
-	newExtent[1] = (bound[1] - m_origin[0]) / m_spacing[0];
-	newExtent[2] = (bound[2] - m_origin[1]) / m_spacing[1];
-	newExtent[3] = (bound[3] - m_origin[1]) / m_spacing[1];
-	newExtent[4] = (bound[4] - m_origin[2]) / m_spacing[2];
-	newExtent[5] = (bound[5] - m_origin[2]) / m_spacing[2];
+	newExtent[0] = (bound[0] - GetOrigin()[0]) / GetSpacing()[0];
+	newExtent[1] = (bound[1] - GetOrigin()[0]) / GetSpacing()[0];
+	newExtent[2] = (bound[2] - GetOrigin()[1]) / GetSpacing()[1];
+	newExtent[3] = (bound[3] - GetOrigin()[1]) / GetSpacing()[1];
+	newExtent[4] = (bound[4] - GetOrigin()[2]) / GetSpacing()[2];
+	newExtent[5] = (bound[5] - GetOrigin()[2]) / GetSpacing()[2];
 	
 
 
@@ -149,7 +149,7 @@ void InteractorStyleROI::UpdateAllWidget(double * bound)
 	{
 		//Current bound
 		currentBound = m_planeWidget[i]->GetCurrentBound();
-		double* focalPoint = m_planeWidget[i]->GetImageViewer()->GetFocalPoint();
+		double* focalPoint = m_planeWidget[i]->GetImageViewer()->GetFocalPointWithWorldCoordinate();
 
 		if (bound[0] != currentBound[0] || bound[1] != currentBound[1] ||
 			bound[2] != currentBound[2] || bound[3] != currentBound[3] ||

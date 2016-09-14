@@ -85,7 +85,7 @@ void InteractorStylePaintBrush::SetDrawOpacity(int opacity)
 	this->m_opacity = opacity;
 }
 
-void InteractorStylePaintBrush::SetBrushShape(BRUSH_SHAPE brushShape)
+void InteractorStylePaintBrush::SetBrushShape(int brushShape)
 {
 	m_brushShape = brushShape;
 }
@@ -153,10 +153,10 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 	// Project picked world point to plane and obtain ijk index
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
+		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] + GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
+			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
 	}
 	draw_index_old[0] = (int)(index[0] + 0.5);
@@ -219,10 +219,10 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 	// Project picked world point to plane and obtain ijk index
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
+		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] + GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
+			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
 	}
 	draw_index_old[0] = (int)(index[0] + 0.5);
@@ -323,21 +323,21 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_brush = vtkImageCanvasSource2D::New();
 		m_brush->SetScalarTypeToUnsignedChar();
 		m_brush->SetNumberOfScalarComponents(4);
-		switch (m_orientation)
+		switch (GetSliceOrientation())
 		{
 		case 0:
 		{
-			m_brush->SetExtent(0, 0, m_extent[2], m_extent[3], m_extent[4], m_extent[5]);
+			m_brush->SetExtent(0, 0, GetExtent()[2], GetExtent()[3], GetExtent()[4], GetExtent()[5]);
 			break;
 		}
 		case 1:
 		{
-			m_brush->SetExtent(m_extent[0], m_extent[1], 0, 0, m_extent[4], m_extent[5]);
+			m_brush->SetExtent(GetExtent()[0], GetExtent()[1], 0, 0, GetExtent()[4], GetExtent()[5]);
 			break;
 		}
 		case 2:
 		{
-			m_brush->SetExtent(m_extent[0], m_extent[1], m_extent[2], m_extent[3], 0, 0);
+			m_brush->SetExtent(GetExtent()[0], GetExtent()[1], GetExtent()[2], GetExtent()[3], 0, 0);
 			break;
 		}
 		}
@@ -345,8 +345,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
 		m_brush->Update();
-		m_brush->GetOutput()->SetOrigin(m_origin);
-		m_brush->GetOutput()->SetSpacing(m_spacing);
+		m_brush->GetOutput()->SetOrigin(GetOrigin());
+		m_brush->GetOutput()->SetSpacing(GetSpacing());
 
 		m_brushActor = vtkImageActor::New();
 		m_brushActor->SetInputData(m_brush->GetOutput());
@@ -354,21 +354,21 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		m_brushActor->SetPickable(false);
 		// Set the image actor
 
-		switch (this->m_orientation)
+		switch (this->GetSliceOrientation())
 		{
 		case 0:
 			m_brushActor->SetDisplayExtent(
-				0, 0, m_extent[2], m_extent[3], m_extent[4], m_extent[5]);
+				0, 0, GetExtent()[2], GetExtent()[3], GetExtent()[4], GetExtent()[5]);
 			break;
 
 		case 1:
 			m_brushActor->SetDisplayExtent(
-				m_extent[0], m_extent[1], 0, 0, m_extent[4], m_extent[5]);
+				GetExtent()[0], GetExtent()[1], 0, 0, GetExtent()[4], GetExtent()[5]);
 			break;
 
 		case 2:
 			m_brushActor->SetDisplayExtent(
-				m_extent[0], m_extent[1], m_extent[2], m_extent[3], 0, 0);
+				GetExtent()[0], GetExtent()[1], GetExtent()[2], GetExtent()[3], 0, 0);
 			break;
 		}
 		m_imageViewer->GetAnnotationRenderer()->AddActor(m_brushActor);
@@ -376,6 +376,18 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 	}
 
 	this->m_paintBrushEnabled = b;
+}
+
+void InteractorStylePaintBrush::SetPaintBrushLabel(int paintBrushLabel)
+{
+	this->paintBrushLabel = paintBrushLabel;
+	vtkLookupTable* lookupTable = m_imageViewer->getLookupTable();
+	double rgba[4];
+	const double* _colour = lookupTable->GetTableValue(paintBrushLabel);
+	for (int i = 0; i < 3; ++i) {
+		rgba[i] = _colour[i] * 255;
+	}
+	SetDrawColor(rgba[0], rgba[1], rgba[2]);
 }
 
 
@@ -405,10 +417,10 @@ void InteractorStylePaintBrush::Draw(bool b)
 		return;
 	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
-		picked[m_orientation] = m_origin[m_orientation] + GetSlice() * m_spacing[m_orientation];
+		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] + GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - m_origin[i]) / m_spacing[i];
+			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
 	}
 	int draw_index[3];
@@ -418,7 +430,7 @@ void InteractorStylePaintBrush::Draw(bool b)
 	draw_index[2] = (int)(index[2] + 0.5);
 
 	int x2Dindex, y2Dindex;
-	switch (m_orientation)
+	switch (GetSliceOrientation())
 	{
 	case 0:
 		x2Dindex = 1;
@@ -446,10 +458,10 @@ void InteractorStylePaintBrush::Draw(bool b)
 	//Default:Square
 	else
 	{
-		int loopLowerBoundX = ceil(-m_brushSize / m_spacing[x2Dindex] / 2.);
-		int loopUpperBoundX = ceil(m_brushSize / m_spacing[x2Dindex] / 2.);
-		int loopLowerBoundY = ceil(-m_brushSize / m_spacing[y2Dindex] / 2.);
-		int loopUpperBoundY = ceil(m_brushSize / m_spacing[y2Dindex] / 2.);
+		int loopLowerBoundX = ceil(-m_brushSize / GetSpacing()[x2Dindex] / 2.);
+		int loopUpperBoundX = ceil(m_brushSize / GetSpacing()[x2Dindex] / 2.);
+		int loopLowerBoundY = ceil(-m_brushSize / GetSpacing()[y2Dindex] / 2.);
+		int loopUpperBoundY = ceil(m_brushSize / GetSpacing()[y2Dindex] / 2.);
 
 		for (int x = loopLowerBoundX; x < loopUpperBoundX; x++)
 		{
@@ -471,21 +483,21 @@ void InteractorStylePaintBrush::Draw(bool b)
 
 void InteractorStylePaintBrush::FillBox3D()
 {
-	switch (this->m_orientation)
+	switch (this->GetSliceOrientation())
 	{
 	case 2:
-		m_brush->FillBox(m_extent[0], m_extent[1], m_extent[2], m_extent[3]);
+		m_brush->FillBox(GetExtent()[0], GetExtent()[1], GetExtent()[2], GetExtent()[3]);
 		break;
 	case 1:
-		for (int x = m_extent[0]; x < m_extent[1]; x++)
+		for (int x = GetExtent()[0]; x < GetExtent()[1]; x++)
 		{
-			m_brush->DrawSegment3D(x, 0, m_extent[4], x, 0, m_extent[5]);
+			m_brush->DrawSegment3D(x, 0, GetExtent()[4], x, 0, GetExtent()[5]);
 		}
 		break;
 	case 0:
-		for (int y = m_extent[2]; y < m_extent[3]; y++)
+		for (int y = GetExtent()[2]; y < GetExtent()[3]; y++)
 		{
-			m_brush->DrawSegment3D(0,y, m_extent[4], 0, y, m_extent[5]);
+			m_brush->DrawSegment3D(0,y, GetExtent()[4], 0, y, GetExtent()[5]);
 		}
 		break;	
 	}
@@ -498,10 +510,10 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 	this->m_brush->GetUpdateExtent(brushExtent);
 
 	int index[6];
-	switch (m_orientation)
+	switch (GetSliceOrientation())
 	{
 	case 0:
-		if (x0 < m_extent[2] || x0 > m_extent[3] || y0 < m_extent[4] || y0 > m_extent[5] || x1 < m_extent[2] || x1 > m_extent[3] || y1 < m_extent[4] || y1 > m_extent[5])
+		if (x0 < GetExtent()[2] || x0 > GetExtent()[3] || y0 < GetExtent()[4] || y0 > GetExtent()[5] || x1 < GetExtent()[2] || x1 > GetExtent()[3] || y1 < GetExtent()[4] || y1 > GetExtent()[5])
 			return;
 		index[0] = 0;
 		index[1] = x0;
@@ -511,7 +523,7 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 		index[5] = y1;
 		break;
 	case 1:
-		if (x0 < m_extent[0] || x0 > m_extent[1] || y0 < m_extent[4] || y0 > m_extent[5] || x1 < m_extent[0] || x1 > m_extent[1] || y1 < m_extent[4] || y1 > m_extent[5])
+		if (x0 < GetExtent()[0] || x0 > GetExtent()[1] || y0 < GetExtent()[4] || y0 > GetExtent()[5] || x1 < GetExtent()[0] || x1 > GetExtent()[1] || y1 < GetExtent()[4] || y1 > GetExtent()[5])
 			return;
 		index[0] = x0;
 		index[1] = 0;
@@ -521,7 +533,7 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 		index[5] = y1;
 		break;
 	case 2:
-		if (x0 < m_extent[0] || x0 > m_extent[1] || y0 < m_extent[2] || y0 > m_extent[3] || x1 < m_extent[0] || x1 > m_extent[1] || y1 < m_extent[2] || y1 > m_extent[3])
+		if (x0 < GetExtent()[0] || x0 > GetExtent()[1] || y0 < GetExtent()[2] || y0 > GetExtent()[3] || x1 < GetExtent()[0] || x1 > GetExtent()[1] || y1 < GetExtent()[2] || y1 > GetExtent()[3])
 			return;
 		index[0] = x0;
 		index[1] = y0;
@@ -540,7 +552,7 @@ void InteractorStylePaintBrush::DrawLine3D(int x0, int y0, int x1, int y1)
 void InteractorStylePaintBrush::DrawCircle(int x0, int y0, int x1, int y1, double radius)
 {
 	int x2Dindex, y2Dindex;
-	switch (m_orientation)
+	switch (GetSliceOrientation())
 	{
 	case 0:
 		x2Dindex = 1;
@@ -556,10 +568,10 @@ void InteractorStylePaintBrush::DrawCircle(int x0, int y0, int x1, int y1, doubl
 		break;
 	}
 
-	int loopLowerBoundX = floor(-radius / (this->m_spacing[x2Dindex]));
-	int loopUpperBoundX = ceil(radius / (this->m_spacing[x2Dindex]));
-	int loopLowerBoundY = floor(-radius / (this->m_spacing[y2Dindex]));
-	int loopUpperBoundY = ceil(radius / (this->m_spacing[y2Dindex]));
+	int loopLowerBoundX = floor(-radius / (this->GetSpacing()[x2Dindex]));
+	int loopUpperBoundX = ceil(radius / (this->GetSpacing()[x2Dindex]));
+	int loopLowerBoundY = floor(-radius / (this->GetSpacing()[y2Dindex]));
+	int loopUpperBoundY = ceil(radius / (this->GetSpacing()[y2Dindex]));
 
 
 	// check bound
@@ -572,7 +584,7 @@ void InteractorStylePaintBrush::DrawCircle(int x0, int y0, int x1, int y1, doubl
 	{
 		for (int j = loopLowerBoundY; j < loopUpperBoundY; j++)
 		{
-			double d = pow(i * m_spacing[x2Dindex], 2) + pow(j * m_spacing[y2Dindex], 2.);
+			double d = pow(i * GetSpacing()[x2Dindex], 2) + pow(j * GetSpacing()[y2Dindex], 2.);
 			if (sqrt(d) < radius)
 				this->DrawLine3D(x0 + i, y0 + j, x1 + i, y1 + j);
 		}
@@ -661,25 +673,25 @@ void InteractorStylePaintBrush::UpdateBorderWidgetPosition()
 
 void InteractorStylePaintBrush::ReadfromImageData()
 {
-	switch (this->m_orientation)
+	switch (this->GetSliceOrientation())
 	{
 	case 0:
-		m_brush->SetExtent(0, 0, m_extent[2], m_extent[3], m_extent[4], m_extent[5]);
+		m_brush->SetExtent(0, 0, GetExtent()[2], GetExtent()[3], GetExtent()[4], GetExtent()[5]);
 		m_brush->Update();
-		m_brushActor->SetDisplayExtent(0, 0, m_extent[2], m_extent[3], m_extent[4], m_extent[5]);
+		m_brushActor->SetDisplayExtent(0, 0, GetExtent()[2], GetExtent()[3], GetExtent()[4], GetExtent()[5]);
 		m_brushActor->Update();
 		break;
 	case 1:
-		m_brush->SetExtent(m_extent[0], m_extent[1], 0, 0, m_extent[4], m_extent[5]);
+		m_brush->SetExtent(GetExtent()[0], GetExtent()[1], 0, 0, GetExtent()[4], GetExtent()[5]);
 		m_brush->Update();
-		m_brushActor->SetDisplayExtent(m_extent[0], m_extent[1], 0, 0, m_extent[4], m_extent[5]);
+		m_brushActor->SetDisplayExtent(GetExtent()[0], GetExtent()[1], 0, 0, GetExtent()[4], GetExtent()[5]);
 		m_brushActor->Update();
 		break;
 
 	case 2:
-		m_brush->SetExtent(m_extent[0], m_extent[1], m_extent[2], m_extent[3], 0, 0);
+		m_brush->SetExtent(GetExtent()[0], GetExtent()[1], GetExtent()[2], GetExtent()[3], 0, 0);
 		m_brush->Update();
-		m_brushActor->SetDisplayExtent(m_extent[0], m_extent[1], m_extent[2], m_extent[3], 0, 0);
+		m_brushActor->SetDisplayExtent(GetExtent()[0], GetExtent()[1], GetExtent()[2], GetExtent()[3], 0, 0);
 		m_brushActor->Update();
 		break;
 	}
@@ -689,9 +701,9 @@ void InteractorStylePaintBrush::ReadfromImageData()
 	this->FillBox3D();
 
 	int pos[3], extent[6];
-	memcpy(extent, m_extent, sizeof(extent));
-	extent[m_orientation * 2] = GetSlice();
-	extent[m_orientation * 2 + 1] = GetSlice();
+	memcpy(extent, GetExtent(), sizeof(extent));
+	extent[GetSliceOrientation() * 2] = GetSlice();
+	extent[GetSliceOrientation() * 2 + 1] = GetSlice();
 	for (int x = extent[0]; x <= extent[1]; ++x) {
 		for (int y = extent[2]; y <= extent[3]; ++y) {
 			for (int z = extent[4]; z <= extent[5]; ++z) {
@@ -710,7 +722,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 							m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 							try {
 								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
-								pos[m_orientation] = 0;
+								pos[GetSliceOrientation()] = 0;
 								m_brush->DrawSegment3D(pos[0], pos[1], pos[2], 
 									pos[0], pos[1], pos[2]);
 							}
@@ -827,9 +839,9 @@ void InteractorStylePaintBrush::Write2ImageData()
 {
 	//Update Layer
 	int pos[3], extent[6];
-	memcpy(extent, m_extent, sizeof(extent));
-	extent[m_orientation * 2] = GetSlice();
-	extent[m_orientation * 2 + 1] = GetSlice();
+	memcpy(extent, GetExtent(), sizeof(extent));
+	extent[GetSliceOrientation() * 2] = GetSlice();
+	extent[GetSliceOrientation() * 2 + 1] = GetSlice();
 	double pixelval;
 
 	for (int x = extent[0]; x <= extent[1]; ++x) {
@@ -838,7 +850,7 @@ void InteractorStylePaintBrush::Write2ImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = z;
-				pos[m_orientation] = 0;
+				pos[GetSliceOrientation()] = 0;
 				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(pos));
 				pixelval = 0;
 				if (val == nullptr)
@@ -989,8 +1001,8 @@ void InteractorStylePaintBrush::Render()
 	//mainWnd->RenderAll2DViewers();
 	m_imageViewer->Render();
 	m_brush->Update();
-	m_brush->GetOutput()->SetOrigin(m_origin);
-	m_brush->GetOutput()->SetSpacing(m_spacing);
+	m_brush->GetOutput()->SetOrigin(GetOrigin());
+	m_brush->GetOutput()->SetSpacing(GetSpacing());
 
 }
 
