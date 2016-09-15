@@ -55,7 +55,6 @@ public:
 
 public slots:
     void slotSegmentationView();
-	void slotChangeLayerNo();
 	void slotSelectROI();
 	void slotResetROI();
 	void slotChangeOpacity(int opactiy);

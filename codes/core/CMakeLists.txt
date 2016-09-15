@@ -48,7 +48,6 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 SET(
 	QT_SRC
-	# ${PROJECT_SOURCE_DIR}/main.cxx
 	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
 	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
 	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
@@ -90,16 +89,6 @@ target_link_libraries(
 	Core
 	${LINK_LIBRARIE}
 )
-# add_executable(
-	# Core1
-	# ${MOCSrcs}
-	# ${QT_SRC}
-	# ${QT_INC}	
-# )
-# target_link_libraries(
-	# Core1
-	# ${LINK_LIBRARIE}
-# )
 
 #Grouping in MSVC
 SOURCE_GROUP(

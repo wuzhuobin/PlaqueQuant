@@ -58,7 +58,7 @@ SET(
 	# AbstractInteractorStyles
 	${PROJECT_BINARY_DIR}/codes/InteractorStyles
 	# Abstract Data structure
-	${PROJECT_BINARY_DIR}/codes/AbstractData
+	# ${PROJECT_BINARY_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
@@ -80,7 +80,7 @@ SET(
 	# AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/InteractorStyles
 	# Abstract Data structure
-	${PROJECT_SOURCE_DIR}/codes/AbstractData
+	# ${PROJECT_SOURCE_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
@@ -130,12 +130,12 @@ add_subdirectory(codes/UI)
 add_subdirectory(codes/Widgets)
 add_subdirectory(codes/Main)
 add_subdirectory(codes/InteractorStyles)
-add_subdirectory(codes/AbstractData)
+# add_subdirectory(codes/AbstractData)
 add_subdirectory(codes/GPURenderWithLUT)
 add_subdirectory(codes/Core)
 add_subdirectory(codes/Measurements)
 add_subdirectory(codes/MaximumWallThickness)
-add_subdirectory(codes/Managers)
+# add_subdirectory(codes/Managers)
 add_subdirectory(codes/CenterlineBranching)
 add_subdirectory(codes/MyImageReader)
 

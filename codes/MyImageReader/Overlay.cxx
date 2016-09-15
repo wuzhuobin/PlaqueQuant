@@ -22,6 +22,27 @@ Overlay::Overlay(QObject* parent) : QObject(parent)
 {
 	m_itkOverlay = NULL;
 	m_vtkOverlay = NULL;
+
+	// using m_overlayColor to build the lookupTable
+	m_overlayColor[0] = zeros;
+	m_overlayColor[1] = lumen;
+	m_overlayColor[2] = vesselWall;
+	m_overlayColor[3] = calcification;
+	m_overlayColor[4] = hemorrhage;
+	m_overlayColor[5] = lrnc;
+	m_overlayColor[6] = lm;
+
+	m_lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+	m_lookupTable->SetNumberOfTableValues(7);
+	m_lookupTable->SetTableRange(0.0, 6);
+	for (int i = 0; i < 7; ++i) {
+		double rgba[4];
+		for (int j = 0; j < 4; ++j) {
+			rgba[j] = m_overlayColor[i][j] / 255;
+		}
+		m_lookupTable->SetTableValue(i, rgba);
+	}
+	m_lookupTable->Build();
 }
 
 Overlay::~Overlay()
@@ -110,23 +131,7 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 	}
 
 	m_vtkOverlay->DeepCopy(connector->GetOutput());
-	//const int numofElements = dim[0] * dim[1] * dim[2];
-	//m_vtkOverlay->SetDimensions(dim);
-	//m_vtkOverlay->SetOrigin(origin);
-	//m_vtkOverlay->SetSpacing(spacing);
-	//m_vtkOverlay->AllocateScalars(VTK_DOUBLE, 1);
 
-	//for (int i = 0; i < dim[0]; i++)
-	//{
-	//	for (int j = 0; j < dim[1]; j++)
-	//	{
-	//		for (int k = 0; k < dim[2]; k++)
-	//		{
-	//			float* pixel = static_cast<float*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
-	//			*pixel = 0.;
-	//		}
-	//	}
-	//}
 }
 
 void Overlay::SetDisplayExtent(int *extent)
@@ -191,11 +196,7 @@ void Overlay::Initialize(vtkImageData * img)
 	castfilter->Update();
 
 	m_vtkOverlay = castfilter->GetOutput();
-	//m_vtkOverlay->SetDimensions(img->GetDimensions());
-	//m_vtkOverlay->SetSpacing(img->GetSpacing());
-	//m_vtkOverlay->SetOrigin(img->GetOrigin());
-	////cout << img->GetScalarTypeAsString() << endl;
-	//m_vtkOverlay->AllocateScalars(VTK_DOUBLE, img->GetNumberOfScalarComponents());
+
 	const int* extent = m_vtkOverlay->GetExtent();
 
 
@@ -214,6 +215,10 @@ void Overlay::Initialize(vtkImageData * img)
 	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
 }
 
+void Overlay::SetPixels(std::list<int[3]> positions, std::list<int> values)
+{
+
+}
 
 vtkImageData* Overlay::GetOutput()
 {
@@ -223,18 +228,13 @@ vtkImageData* Overlay::GetOutput()
 		return this->m_vtkOverlay;
 }
 
-vtkImageData * Overlay::GetVTKImageData()
+vtkImageData * Overlay::GetVTKOutput()
 {
 	if (!m_vtkOverlay)
 		return NULL;
 	else
 		return this->m_vtkOverlay;
 }
-
-//ImageType::Pointer Overlay::GetITKOutput(ImageType format)
-//{
-//	return ImageType::Pointer();
-//}
 
 ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 {
@@ -265,4 +265,9 @@ ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 	//}
 	return m_itkOverlay;
 
+}
+
+vtkLookupTable * Overlay::GetLookupTable()
+{
+	return m_lookupTable;
 }

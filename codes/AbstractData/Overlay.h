@@ -48,7 +48,7 @@ public:
 	/**
 	* @deprecated
 	*/
-	vtkImageData* GetVTKImageData();
+	vtkImageData* GetVTKOutput();
 	/**
 	* convert the m_vtkOverlay to itk::ImageData and save it in m_itkOverlay
 	* then return it with the same spacing, origin and direction as the format image

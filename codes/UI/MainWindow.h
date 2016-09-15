@@ -42,16 +42,13 @@ public:
 	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i);
 	vtkLookupTable* GetLookupTable();
 
-	QString				GetFileName(int);
+	//QString				GetFileName(int);
 	int					GetVisibleImageNo();
-	int					GetImageLayerNo();
 	vtkPolyData*		GetCenterlinePD();
 	Ui_MainWindow* GetUI();
 	// Core
 	Core m_core;
 
-	// Set functions
-	void SetImageLayerNo(int);
 
 	// Ui Updates
 	void RenderAllViewer();
@@ -84,7 +81,7 @@ public slots:
 	virtual void dropEvent( QDropEvent *ev );
 	
 	//virtual void slotChangeSlice();
-	virtual void slotChangeSlice(int, int, int);
+	//virtual void slotChangeSlice(int, int, int);
 	//virtual void slotUpdateSlice();
 	//virtual void slotChangeWindowLevel();
 	//virtual void slotChangeWindowLevelUL();
@@ -112,24 +109,24 @@ public slots:
 	//virtual void slotMultiPlanarView();
 
 	// Auto Lumen Segmenation 
-	virtual void slotEnableAutoLumenSegmentation(bool flag);
-	virtual void slotSetContourFilterGenerateValues(int generateValues);
-	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
-	virtual void slotSetLineInterpolatorToPolygon(bool flag);
+	//virtual void slotEnableAutoLumenSegmentation(bool flag);
+	//virtual void slotSetContourFilterGenerateValues(int generateValues);
+	//virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
+	//virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
 	//Overlay
 	//virtual void slotAddExternalOverlay();
     virtual void slotOverlayOpacity(int opacity);
   
 	//Centerline
-	virtual void slotCenterline();
+	//virtual void slotCenterline();
     //Segmentation
 	//virtual void slotSegmentationView();
 	virtual void slotChangeBaseImageUL();
 	virtual void slotChangeBaseImageUR();
 	virtual void slotChangeBaseImageLL();
-	virtual void slotChangeImageSeq(int image_no, int window_no);
-	virtual void slotSelectImageSeq(QAction*);
+	//virtual void slotChangeImageSeq(int image_no, int window_no);
+	//virtual void slotSelectImageSeq(QAction*);
 	//Intensity
 	//virtual void slotChangeIntensity();
 
@@ -226,28 +223,7 @@ private:
 
 	//Overlay
 	//Overlay* SegmentationOverlay;
-	int m_layer_no;		//Main Image
 	int m_boundingExtent[6];
-
-	const int* overlayColor[6];
-
-	const int lumen[3] = { 255, 0, 0 };
-	const int vesselWall[3] = { 0, 0, 255 };
-	const int calcification[3] = { 0,255,0 };
-	const int hemorrhage[3] = { 255, 255, 0 };
-	const int lrnc[3] = { 0, 255, 255 };
-	const int lm[3] = { 255, 0, 255 };
-
-	//vtkLookupTable* LookupTable;
-/*
-
-	this->LookupTable->SetTableValue(0, 0, 0, 0, 0);
-	this->LookupTable->SetTableValue(1, 1, 0, 0, 0.5);
-	this->LookupTable->SetTableValue(2, 0, 0, 1, 0.9);
-	this->LookupTable->SetTableValue(3, 0, 1, 0, 0.1);
-	this->LookupTable->SetTableValue(4, 1, 1, 0, 0.7);
-	this->LookupTable->SetTableValue(5, 0, 1, 1, 0.4);
-	this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);*/
 
 };
  

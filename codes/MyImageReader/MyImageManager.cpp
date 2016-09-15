@@ -8,16 +8,7 @@ MyImageManager::MyImageManager(QObject* parent)
 
 MyImageManager::~MyImageManager()
 {
-	for (QMap<Image<float, 3>::Pointer, QMap<QString, QString>*>::iterator it =
-		this->mapOfDICOMHeader.begin();	it != this->mapOfDICOMHeader.end(); ++it) {
-		delete it.value();
-	}
-	this->mapOfDICOMHeader.clear();
-	
-	for (QList<QMap<QString, QString>*>::iterator it = this->listOfDICOMHeader.begin();
-		it != this->listOfDICOMHeader.end(); ++it) {
-		delete *it;
-	}
+	allClear();
 }
 
 int MyImageManager::getNumberOfImages()
@@ -78,4 +69,28 @@ const QMap<QString, QString>* MyImageManager::getDICOMHeader(Image<float, 3>::Po
 Overlay& MyImageManager::getOverlay()
 {
 	return this->overlay;
+}
+
+void MyImageManager::allClear()
+{
+
+	for (QMap<Image<float, 3>::Pointer, QMap<QString, QString>*>::iterator it =
+		this->mapOfDICOMHeader.begin();	it != this->mapOfDICOMHeader.end(); ++it) {
+		delete it.value();
+	}
+	for (QList<QMap<QString, QString>*>::iterator it = this->listOfDICOMHeader.begin();
+		it != this->listOfDICOMHeader.end(); ++it) {
+		delete *it;
+	}
+
+	this->listOfItkImages.clear();
+	this->listOfVtkViewerInputImages.clear();
+	this->listOfVtkImages.clear();
+	this->listOfDICOMHeader.clear();
+	this->listOfModalityNames.clear();
+
+	this->mapOfDICOMHeader.clear();
+	this->mapOfItkImages.clear();
+	this->mapOfVtkImages.clear();
+
 }

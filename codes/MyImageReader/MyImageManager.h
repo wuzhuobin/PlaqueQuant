@@ -43,7 +43,11 @@ private:
 	friend class IOManager;
 	
 	Overlay overlay;
-	
+	/**
+	 * Clear all the data
+	 */
+	void allClear();
+
 	// QList
 	QList<itk::Image<float, 3>::Pointer> listOfItkImages;
 	QList<vtkSmartPointer<vtkImageData>> listOfVtkViewerInputImages;

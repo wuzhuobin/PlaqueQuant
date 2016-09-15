@@ -3,10 +3,13 @@
 #include <vtkExtractVOI.h>
 
 #include <QMessageBox>
+#include <QAction>
 
 Core::Core(QWidget* parent)
 	:m_imageManager(this), m_ioManager(this), QWidget(parent)
 {
+	// enable registration
+	m_ioManager.enableRegistration(true);
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
 		m_2DimageViewer[i] = vtkSmartPointer<MyImageViewer>::New();
@@ -28,37 +31,12 @@ Core::Core(QWidget* parent)
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
 	this->m_3Dinteractor->Initialize();
 
-	// using m_overlayColor to build the lookupTable
-	m_overlayColor[0] = lumen;
-	m_overlayColor[1] = vesselWall;
-	m_overlayColor[2] = calcification;
-	m_overlayColor[3] = hemorrhage;
-	m_overlayColor[4] = lrnc;
-	m_overlayColor[5] = lm;
 
-	m_lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-	m_lookupTable->SetNumberOfTableValues(7);
-	m_lookupTable->SetTableRange(0.0, 6);
-	m_lookupTable->SetTableValue(0, 0, 0, 0, 0.0);
-	for (int i = 0; i < 6; ++i) {
-		double rgba[4];
-		for (int j = 0; j < 4; ++j) {
-			rgba[j] = m_overlayColor[i][j] / 255;
-		}
-		m_lookupTable->SetTableValue(i+1, rgba);
-	}
-	//m_lookupTable->SetTableValue(1, 1, 0, 0, 0.2);
-	//m_lookupTable->SetTableValue(2, 0, 0, 1, 0.05);
-	//m_lookupTable->SetTableValue(3, 0, 1, 0, 0.4);
-	//m_lookupTable->SetTableValue(4, 1, 1, 0, 0.5);
-	//m_lookupTable->SetTableValue(5, 0, 1, 1, 0.5);
-	//m_lookupTable->SetTableValue(6, 1, 0, 1, 0.5);
-	m_lookupTable->Build();
 
 	m_ioManager.setMyImageManager(&m_imageManager);
 
 	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()), 
-		this, SLOT(slotVisualizeViewer()));
+		this, SLOT(slotVisualizeAll2DViewers()));
 	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()), 
 		this, SLOT(slotAddOverlayToImageViewer()));
 	for (int i = 0; i < VIEWER_NUM; ++i) {
@@ -74,7 +52,7 @@ Core::~Core()
 
 vtkLookupTable * Core::GetLookupTable()
 {
-	return m_lookupTable;
+	return m_imageManager.getOverlay().GetLookupTable();
 }
 
 vtkRenderWindow * Core::GetRenderWindow(int num)
@@ -133,61 +111,83 @@ void Core::slotAddOverlayToImageViewer() {
 		// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
 		// Very strange
 		//this->LookupTable->SetTableRange(0, 6);
-		m_2DimageViewer[i]->SetLookupTable(m_lookupTable);
 		m_2DimageViewer[i]->SetOverlay(&m_imageManager.getOverlay());
 		m_2DimageViewer[i]->GetdrawActor()->SetVisibility(true);
 	}
 	this->m_imageManager.getOverlay().GetOutput()->Modified();
 }
 
-void Core::slotVisualizeViewer()
+void Core::slotVisualizeAll2DViewers()
 {
-	m_viewMode = MULTIPLANAR_VIEW;
 	slotChangeView(MULTIPLANAR_VIEW);
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		m_style[i]->AddSynchronalViewer(m_2DimageViewer[0]);
-		m_style[i]->AddSynchronalViewer(m_2DimageViewer[1]);
-		m_style[i]->AddSynchronalViewer(m_2DimageViewer[2]);
+	if (m_firstInitialize) {
+		for (int i = 0; i < VIEWER_NUM; ++i) {
+			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
+			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
+			for (int j = 0; j < VIEWER_NUM; ++j) {
+				m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
+			}
+			m_interactor[i]->SetInteractorStyle(m_style[i]);
+		}
+		slotAddOverlayToImageViewer();
 	}
-	slotAddOverlayToImageViewer();
-	//Update UI stuff
-	//Assume the four images have equal number of slices
-	//QSpinBox* spinBoxes[3] = { ui->xSpinBox, ui->ySpinBox, ui->zSpinBox };
-	//const int* extent = m_imageManager.getListOfViewerInputImages()[0]->GetExtent();
-	//for (int i = 0; i < 3; ++i) {
-	//	spinBoxes[i]->setMinimum(extent[i * 2]);
-	//	spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
-	//	spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
-	//}
-	//ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
-	//ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
-
-	//connect(ui->windowDoubleSpinBoxUL, SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-	//connect(ui->levelDoubleSpinBoxUL, SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-
-	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()), Qt::QueuedConnection);
-	
-	// set initialized slice to all viewer
+	// reset slice to all viewer
 	for (int i = 0; i < VIEWER_NUM; ++i) {
 		int slice = m_2DimageViewer[i]->GetSliceMax() + m_2DimageViewer[i]->GetSliceMin();
-		m_style[i]->SetCurrentSlice(slice * 0.5);
+		slice = slice * 0.5;
+		m_style[i]->SetCurrentSlice(slice);
 		switch (m_2DimageViewer[i]->GetSliceOrientation()) {
 		case MyImageViewer::SLICE_ORIENTATION_XY:
-			emit signalChangeSliceZ(slice * 0.5);
+			emit signalChangeSliceZ(slice);
 			break;
 		case MyImageViewer::SLICE_ORIENTATION_XZ:
-			emit signalChangeSliceY(slice * 0.5);
+			emit signalChangeSliceY(slice);
 			break;
 		case MyImageViewer::SLICE_ORIENTATION_YZ:
-			emit signalChangeSliceX(slice * 0.5);
+			emit signalChangeSliceX(slice);
 			break;
 		default:
 			break;
 		}
 	}
-	emit signalVisualizeViewer();
+	m_firstInitialize = false;
+
+	emit signalVisualizeAllViewers();
+}
+
+void Core::slotChangeModality(QAction * action)
+{
+	if (action == NULL)
+		return;
+	slotChangeModality(action->text(), action->data().toInt());
+}
+
+void Core::slotChangeModality(QString modalityName, int viewerNum)
+{
+	if (modalityName.isEmpty())
+		return;
+	for (int i = 0; i < m_imageManager.getListOfModalityNames().size(); ++i) {
+		if (modalityName == m_imageManager.getListOfModalityNames()[i]) {
+			if (m_viewMode == MULTIPLANAR_VIEW) {
+				for (int j = 0; j < VIEWER_NUM; ++j) {
+					m_2DimageViewer[j]->SetInputData(
+						this->m_imageManager.getListOfViewerInputImages()[i]);
+					m_2DimageViewer[j]->Render();
+					m_2DimageViewer[j]->InitializeHeader(m_imageManager.getModalityName(i));
+				}
+				break;
+			}
+			else {
+				m_2DimageViewer[viewerNum]->SetInputData(
+					this->m_imageManager.getListOfViewerInputImages()[i]);
+				m_2DimageViewer[viewerNum]->Render();
+				m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager.getModalityName(i));
+				break;
+			}
+		}
+
+	}
+	RenderAllViewer();
 }
 
 void Core::slotSegmentationView() {
@@ -218,23 +218,13 @@ void Core::slotChangeSlice(int slice) {
 
 }
 
-void Core::slotChangeView(Core::VIEW_MODE viewMode)
+void Core::slotChangeView(int viewMode)
 {
 	if (m_viewMode == viewMode && !m_firstInitialize) {
 		return;
 	}
-	if (m_firstInitialize) {
-		for (int i = 0; i < VIEWER_NUM; ++i) {
-			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-			for (int j = 0; j < VIEWER_NUM; ++j) {
-				m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
-			}
-			m_interactor[i]->SetInteractorStyle(m_style[i]);
-		}
-	}
+
 	m_viewMode = viewMode;
-	m_firstInitialize = false;
 	// SEGMENTATION_VIEW
 	if (viewMode) {
 		// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
@@ -250,16 +240,7 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 					this->m_2DimageViewer[i2]->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_XY);
 					this->m_2DimageViewer[i2]->Render();
 					this->m_2DimageViewer[i2]->InitializeHeader(m_imageManager.getModalityName(i2));
-					//this->m_2DimageViewer[i2]->SetupInteractor(m_interactor[i2]);
-					// setup InteractorStyle
-					//m_style[i2]->SetImageViewer(m_2DimageViewer[i2]);
-					//for (int j = 0; j < VIEWER_NUM; ++j) {
-					//	m_style[i2]->AddSynchronalViewer(m_2DimageViewer[j]);
-					//}
-					//m_interactor[i2]->SetInteractorStyle(m_style[i2]);
 
-					//this->m_2DimageViewer[i2]->GetRenderer()->GetActiveCamera()->SetViewUp(0, -1, 0);
-					//this->m_style[i2]->SetOrientation(2);
 					++i2;
 				}
 			}
@@ -279,19 +260,12 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 				{
 					annProps->GetNextProp()->SetVisibility(false);
 				}
-				//this->m_2DimageViewer[i2]->GetRenderWindow()->Modified();
-				//this->m_2DimageViewer[i2]->GetRenderWindow()->Render();
 
 			}
 
 		}
 		emit signalSegmentationView();
-			//this->slotChangeSlice();
 
-		//QAction* action = widgetGroup.checkedAction();
-		//if (action != NULL) {
-		//	action->trigger();
-		//}
 	}
 	// MULTIPLANAR_VIEW
 	else {
@@ -303,44 +277,44 @@ void Core::slotChangeView(Core::VIEW_MODE viewMode)
 			m_2DimageViewer[i]->SetSliceOrientation(i);
 			m_2DimageViewer[i]->Render();
 			m_2DimageViewer[i]->InitializeHeader(m_imageManager.getModalityName(DEFAULT_IMAGE));
-			//m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
-			// setup interactorStyle
-			//m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-			//for (int j = 0; j < VIEWER_NUM; ++j) {
-			//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
-			//}
-			//m_style[i]->initializeQWidget(ui->xSpinBox, ui->ySpinBox, ui->zSpinBox,
-			//	ui->windowDoubleSpinBoxUL, ui->levelDoubleSpinBoxUL,
-			//	m_moduleWidget->GetBrushSizeSpinBox(),
-			//	m_moduleWidget->GetBrushShapeComBox(),
-			//	NULL, NULL);
-			//m_style[i]->SetOrientation(i);
-			//m_interactor[i]->SetInteractorStyle(m_style[i]);
 
-			//if (!m_firstInitialize) {
-				// else only change input and viewer m_orientation
-				this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
-				// Show view props for overlay
-				vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
-				for (int j = 0; j < props->GetNumberOfItems(); j++)
-				{
-					reinterpret_cast<vtkProp*>(props->GetItemAsObject(j))->SetVisibility(true);
-					//props->GetNextProp()->SetVisibility(true);
-				}
-				vtkPropCollection* annProps = m_2DimageViewer[i]->GetAnnotationRenderer()->GetViewProps();
-				for (int j = 0; j < annProps->GetNumberOfItems(); j++)
-				{
-					reinterpret_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(true);
-					//props->GetNextProp()->SetVisibility(true);
-				}
-			//}
+			// else only change input and viewer m_orientation
+			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
+			// Show view props for overlay
+			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
+			for (int j = 0; j < props->GetNumberOfItems(); j++)
+			{
+				reinterpret_cast<vtkProp*>(props->GetItemAsObject(j))->SetVisibility(true);
+				//props->GetNextProp()->SetVisibility(true);
+			}
+			vtkPropCollection* annProps = m_2DimageViewer[i]->GetAnnotationRenderer()->GetViewProps();
+			for (int j = 0; j < annProps->GetNumberOfItems(); j++)
+			{
+				reinterpret_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(true);
+				//props->GetNextProp()->SetVisibility(true);
+			}
 		}
-		//this->slotChangeSlice();
 		emit signalMultiPlanarView();
-		//QAction* action = widgetGroup.checkedAction();
-		//if (action != NULL) {
-		//	action->trigger();
-		//}
+	}
+	// reset slice to all viewer
+	for (int i = 0; i < VIEWER_NUM && !m_firstInitialize; ++i) {
+		//int slice = m_2DimageViewer[i]->GetSliceMax() + m_2DimageViewer[i]->GetSliceMin();
+		//slice = slice * 0.5;
+		int slice = m_2DimageViewer[i]->GetSlice();
+		m_style[i]->SetCurrentSlice(slice);
+		switch (m_2DimageViewer[i]->GetSliceOrientation()) {
+		case MyImageViewer::SLICE_ORIENTATION_XY:
+			emit signalChangeSliceZ(slice);
+			break;
+		case MyImageViewer::SLICE_ORIENTATION_XZ:
+			emit signalChangeSliceY(slice);
+			break;
+		case MyImageViewer::SLICE_ORIENTATION_YZ:
+			emit signalChangeSliceX(slice);
+			break;
+		default:
+			break;
+		}
 	}
 	RenderAllViewer();
 }

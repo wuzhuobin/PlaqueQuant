@@ -121,7 +121,6 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->BackBtn,						SIGNAL(clicked()),					this,		SLOT(BackPage()));
 	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
-	//connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity()));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity(int)));
 	connect(ui->maximumWallThicknessChkBox,		SIGNAL(stateChanged(int)),			this,		SLOT(slotEnableMWTCalculation(int)));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
@@ -194,17 +193,6 @@ void ModuleWidget::slotSegmentationView()
 {
 	 
 	m_mainWnd->m_core.slotSegmentationView();
-}
-
-void ModuleWidget::slotChangeLayerNo()
-{
-	 
-	int layer = ui->labelComboBox->currentIndex() + 1;
-	const double* value = m_mainWnd->GetLookupTable()->GetTableValue(layer);
-
-	ui->opacitySpinBox->setValue(value[3] * 100);
-	m_mainWnd->SetImageLayerNo(layer);
-
 }
 
 void ModuleWidget::slotChangeOpacity(int opacity)

@@ -344,8 +344,10 @@ vtkImageData* MyImageViewer::GetInputLayer()
 void MyImageViewer::SetOverlay(Overlay * overlay)
 {
 	SegmentationOverlay = overlay;
+	SetLookupTable(overlay->GetLookupTable());
 	SetInputDataLayer(overlay->GetOutput());
 }
+
 Overlay * MyImageViewer::GetOverlay()
 {
 	return this->SegmentationOverlay;

@@ -58,7 +58,7 @@ MainWindow::MainWindow()
 	
 	// Open Image
 	connect(ui->actionOpenImage, SIGNAL(triggered()), ioManager, SLOT(slotOpenWithWizard()));
-	connect(&m_core, SIGNAL(signalVisualizeViewer()), this, SLOT(slotVisualizeImage()));
+	connect(&m_core, SIGNAL(signalVisualizeAllViewers()), this, SLOT(slotVisualizeImage()));
 	// Save Segmentaiton 
 	connect(ui->actionSave, SIGNAL(triggered()), ioManager, SLOT(slotSaveSegmentaitonWithDiaglog()));
 	// Open Segmentation
@@ -86,12 +86,32 @@ MainWindow::MainWindow()
 	connect(ui->actionAllAxialView, SIGNAL(triggered()), &m_core, SLOT(slotSegmentationView()));
 
 	// slice 
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), &m_core, SLOT(slotChangeSliceX(int)));
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), &m_core, SLOT(slotChangeSliceY(int)));
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), &m_core, SLOT(slotChangeSliceZ(int)));
-	connect(&m_core, SIGNAL(signalChangeSliceX(int)), ui->xSpinBox, SLOT(setValue(int)));
-	connect(&m_core, SIGNAL(signalChangeSliceY(int)), ui->ySpinBox, SLOT(setValue(int)));
-	connect(&m_core, SIGNAL(signalChangeSliceZ(int)), ui->zSpinBox, SLOT(setValue(int)));
+	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),
+		&m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
+	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),
+		&m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
+	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),
+		&m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
+	connect(&m_core, SIGNAL(signalChangeSliceX(int)), 
+		ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	connect(&m_core, SIGNAL(signalChangeSliceY(int)),
+		ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	connect(&m_core, SIGNAL(signalChangeSliceZ(int)), 
+		ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+
+	// WRONG
+	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),
+	//	&m_core, SLOT(slotChangeSliceX(int)), Qt::QueuedConnection);
+	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),
+	//	&m_core, SLOT(slotChangeSliceY(int)), Qt::QueuedConnection);
+	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),
+	//	&m_core, SLOT(slotChangeSliceZ(int)), Qt::QueuedConnection);
+	//connect(&m_core, SIGNAL(signalChangeSliceX(int)),
+	//	ui->xSpinBox, SLOT(setValue(int)), Qt::QueuedConnection);
+	//connect(&m_core, SIGNAL(signalChangeSliceY(int)),
+	//	ui->ySpinBox, SLOT(setValue(int)), Qt::QueuedConnection);
+	//connect(&m_core, SIGNAL(signalChangeSliceZ(int)),
+	//	ui->zSpinBox, SLOT(setValue(int)), Qt::QueuedConnection);
 
 	// UI
 	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
@@ -132,13 +152,6 @@ MainWindow::MainWindow()
 	connect(ui->LLBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 	connect(ui->LRBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 
-
-
-	// CenterLineAlgorithm
-	connect(ui->actionCenterlineAlgorithm, SIGNAL(triggered()), this, SLOT(slotCenterline()));
-
-	//Tools
-
 	//connect(ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(addOverlay2ImageViewer()));
 
 	//3D view
@@ -160,23 +173,11 @@ MainWindow::MainWindow()
 	//Recent Image
 	createRecentImageActions();
 
-	//Overlay
-	m_layer_no = 1;	
-
 	// Initial Orientation
 	m_orientation= SLICE_ORIENTATION_YZ;
 
 	//Initial Visible image number
 	visibleImageNum = 0;
-    
-	//Parameter
-	this->INITIALIZED_FLAG = false;
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	m_2DimageViewer[i] = MyImageViewer::New();
-	//	m_interactor[i] = vtkRenderWindowInteractor::New();
-	//	m_style[i] = InteractorStyleSwitch::New();
-	//}
 	
 	ui->image1View->SetRenderWindow(m_core.GetRenderWindow(0));
 	ui->image2View->SetRenderWindow(m_core.GetRenderWindow(1));
@@ -214,26 +215,6 @@ MainWindow::MainWindow()
 	//vtkImageOverlay = vtkImageData::New();
 
 	m_InfoDialog = NULL;
-	
-	overlayColor[0] = lumen;
-	overlayColor[1] = vesselWall;
-	overlayColor[2] = calcification;
-	overlayColor[3] = hemorrhage;
-	overlayColor[4] = lrnc;
-	overlayColor[5] = lm;
-	
-	//// #LookupTable
-	//this->LookupTable = vtkLookupTable::New();
-	//this->LookupTable->SetNumberOfTableValues(7);
-	//this->LookupTable->SetTableRange(0.0, 6);
-	//this->LookupTable->SetTableValue(0, 0, 0, 0, 0.0);
-	//this->LookupTable->SetTableValue(1, 1, 0, 0, 0.2);
-	//this->LookupTable->SetTableValue(2, 0, 0, 1, 0.05);
-	//this->LookupTable->SetTableValue(3, 0, 1, 0, 0.4);
-	//this->LookupTable->SetTableValue(4, 1, 1, 0, 0.5);
-	//this->LookupTable->SetTableValue(5, 0, 1, 1, 0.5);
-	//this->LookupTable->SetTableValue(6, 1, 0, 1, 0.5);
-	//this->LookupTable->Build();
 
 	//distanceWidget3D
 	m_distance3DWidget = Distance3DWidget::New();
@@ -260,26 +241,6 @@ MainWindow::~MainWindow()
 
 	ui->image3View->SetRenderWindow(NULL);
 
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	if (m_2DimageViewer[i]) {
-	//		m_2DimageViewer[i]->Delete();
-	//		m_2DimageViewer[i] = NULL;
-	//	}
-	//	if (m_interactor[i]) {
-	//		m_interactor[i]->Delete();
-	//		m_interactor[i] = NULL;
-	//	}
-	//	if (m_style[i]) {
-	//		m_style[i]->Delete();
-	//		m_style[i] = NULL;
-	//	}
-	//}
-	//if (m_3Dinteractor) {
-	//	m_3Dinteractor->Delete();
-	//	m_3Dinteractor = NULL;
-	//}
-
 	if (m_moduleWidget != NULL) {
 		delete m_moduleWidget;
 		m_moduleWidget = NULL;
@@ -293,34 +254,8 @@ MainWindow::~MainWindow()
 		//delete distance3DWidget;
 		//distance3DWidget->Delete();
 	}
-	//if (this->LookupTable != NULL) {
-	//	this->LookupTable->Delete();
-	//	this->LookupTable = NULL;
-	//}
-}
 
-//void MainWindow::addOverlay2ImageViewer()
-//{
-//	int *extent1 = this->imageManager->getOverlay().GetOutput()->GetExtent();
-//	int *extent2 = this->imageManager->getListOfViewerInputImages()[0]->GetExtent();
-//	if (!std::equal(extent1, extent1 + 6, extent2)) {
-//		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
-//		return;
-//	}
-//		for (int i = 0; i < 3; i++)
-//		{
-//			if (segmentationView && i >= visibleImageNum)
-//				break;
-//			// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
-//			// Very strange
-// 			//this->LookupTable->SetTableRange(0, 6);
-//			m_2DimageViewer[i]->SetLookupTable(this->LookupTable);
-//			m_2DimageViewer[i]->SetInputDataLayer(
-//				this->imageManager->getOverlay().GetOutput());
-//			m_2DimageViewer[i]->GetdrawActor()->SetVisibility(true);
-//		}
-//	this->imageManager->getOverlay().GetOutput()->Modified();
-//}
+}
 
 void MainWindow::DisplayErrorMessage(std::string str)
 {
@@ -371,15 +306,6 @@ void MainWindow::slotExit()
 	qApp->exit();
 }
 
-//void MainWindow::slotOpenImage(QString dir)
-//{
-//
-//	//adjustForCurrentFile(wizard.getDirectory());
-//	slotVisualizeImage();
-//
-//
-//}
-
 
 void MainWindow::slotOpenRecentImage()
 {
@@ -415,33 +341,9 @@ bool MainWindow::slotVisualizeImage()
 	setActionsEnable(true);
 	//connected to slotMultiPlanarView
 	ui->actionMultiPlanarView->trigger();
-	//for (int i = 0; i < 3; ++i) {
-	//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[0]);
-	//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[1]);
-	//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[2]);
 
-	//}
-	//Update UI stuff
-    //Assume the four images have equal number of slices
-	//QSpinBox* spinBoxes[3] = {ui->xSpinBox, ui->ySpinBox, ui->zSpinBox};
-	//const int* extent = imageManager->getListOfViewerInputImages()[0]->GetExtent();
-	//for (int i = 0; i < 3; ++i) {
-	//	spinBoxes[i]->setMinimum(extent[i * 2]);
-	//	spinBoxes[i]->setMaximum(extent[i * 2 + 1]);
-	//	spinBoxes[i]->setValue((extent[i * 2 + 1] + extent[i * 2])*0.5);
-	//}
-	//ui->windowDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorWindow());
-	//ui->levelDoubleSpinBoxUL->setValue(m_2DimageViewer[0]->GetColorLevel());
-
-	//connect(ui->windowDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-	//connect(ui->levelDoubleSpinBoxUL,	SIGNAL(valueChanged(double)), this, SLOT(slotChangeWindowLevel()), Qt::QueuedConnection);
-
-
-	//Update Cursor
-	//this->slotChangeSlice();
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
-				
 
 	// initialize image select function 
 	ChangeBaseImageULMenu.clear();
@@ -450,27 +352,27 @@ bool MainWindow::slotVisualizeImage()
 	for (int i = 0; i < this->imageManager->getListOfViewerInputImages().size(); i++)
 	{
 		if (this->imageManager->getListOfViewerInputImages()[i] != NULL) {
-			QAction* act1 = ChangeBaseImageULMenu.addAction(this->GetFileName(i));
-			act1->setData(i);
-
-			QAction* act2 = ChangeBaseImageURMenu.addAction(this->GetFileName(i));
-			act2->setData(i + 10);
-
-			QAction* act3 = ChangeBaseImageLLMenu.addAction(this->GetFileName(i));
-			act3->setData(i + 20);
+			ChangeBaseImageULMenu.addAction(
+				imageManager->getListOfModalityNames()[i])->setData(0);
+			ChangeBaseImageURMenu.addAction(
+				imageManager->getListOfModalityNames()[i])->setData(1);
+			ChangeBaseImageLLMenu.addAction(
+				imageManager->getListOfModalityNames()[i])->setData(2);
 		}
+
 	}
 	ui->ULSelectImgBtn->setMenu(&ChangeBaseImageULMenu);
-	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotSelectImageSeq(QAction*)));
+	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)), 
+		&m_core, SLOT(slotChangeModality(QAction*)));
 
 	ui->URSelectImgBtn->setMenu(&ChangeBaseImageURMenu);
-	connect(&ChangeBaseImageURMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotSelectImageSeq(QAction*)));
+	connect(&ChangeBaseImageURMenu, SIGNAL(triggered(QAction*)),
+		&m_core, SLOT(slotChangeModality(QAction*)));
 
 	ui->LLSelectImgBtn->setMenu(&ChangeBaseImageLLMenu);
-	connect(&ChangeBaseImageLLMenu, SIGNAL(triggered(QAction*)), this, SLOT(slotSelectImageSeq(QAction*)));
+	connect(&ChangeBaseImageLLMenu, SIGNAL(triggered(QAction*)),
+		&m_core, SLOT(slotChangeModality(QAction*)));
 
-
-	//this->addOverlay2ImageViewer();
 	return 0;
 }
 
@@ -752,7 +654,7 @@ void MainWindow::slot3DUpdate()
 	
 	// Extract VOI
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	voi->SetInputData(imageManager->getOverlay().GetVTKImageData());
+	voi->SetInputData(imageManager->getOverlay().GetVTKOutput());
 	voi->SetVOI(imageManager->getOverlay().GetDisplayExtent());
 	voi->Update();
 
@@ -904,46 +806,46 @@ void MainWindow::slot3DUpdate()
 //}
 
 
-void MainWindow::slotChangeSlice(int x, int y, int z)
-{
-	disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
-
-	// Update the display extent1
-	this->imageManager->getOverlay().GetDisplayExtent(this->m_boundingExtent);
-
-	// Clamp the index to within the extent1
-	for (int i = 0; i < 3; i++)
-	{
-		switch (i)
-		{
-		case 0:
-			y = { y < this->m_boundingExtent[2] ? this->m_boundingExtent[2] : y };
-			y = { y > this->m_boundingExtent[3] ? this->m_boundingExtent[3] : y };
-			break;
-
-		case 1:
-			x = { x < this->m_boundingExtent[0] ? this->m_boundingExtent[0] : x };
-			x = { x > this->m_boundingExtent[1] ? this->m_boundingExtent[1] : x };
-			break;
-		case 2:
-			z = { z < this->m_boundingExtent[4] ? this->m_boundingExtent[4] : z };
-			z = { z > this->m_boundingExtent[5] ? this->m_boundingExtent[5] : z };
-			break;
-		}
-	}
-	if (ui->xSpinBox->value() != x) {
-		ui->xSpinBox->setValue(x);
-	}
-	if (ui->ySpinBox->value() != y) {
-		ui->ySpinBox->setValue(y);
-	}
-	if (ui->zSpinBox->value() != z) {
-		ui->zSpinBox->setValue(z);
-	}
-	//this->slotChangeSlice();
-}
+//void MainWindow::slotChangeSlice(int x, int y, int z)
+//{
+//	disconnect(this->ui->xSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+//	disconnect(this->ui->ySpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+//	disconnect(this->ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotChangeSlice()));
+//
+//	// Update the display extent1
+//	this->imageManager->getOverlay().GetDisplayExtent(this->m_boundingExtent);
+//
+//	// Clamp the index to within the extent1
+//	for (int i = 0; i < 3; i++)
+//	{
+//		switch (i)
+//		{
+//		case 0:
+//			y = { y < this->m_boundingExtent[2] ? this->m_boundingExtent[2] : y };
+//			y = { y > this->m_boundingExtent[3] ? this->m_boundingExtent[3] : y };
+//			break;
+//
+//		case 1:
+//			x = { x < this->m_boundingExtent[0] ? this->m_boundingExtent[0] : x };
+//			x = { x > this->m_boundingExtent[1] ? this->m_boundingExtent[1] : x };
+//			break;
+//		case 2:
+//			z = { z < this->m_boundingExtent[4] ? this->m_boundingExtent[4] : z };
+//			z = { z > this->m_boundingExtent[5] ? this->m_boundingExtent[5] : z };
+//			break;
+//		}
+//	}
+//	if (ui->xSpinBox->value() != x) {
+//		ui->xSpinBox->setValue(x);
+//	}
+//	if (ui->ySpinBox->value() != y) {
+//		ui->ySpinBox->setValue(y);
+//	}
+//	if (ui->zSpinBox->value() != z) {
+//		ui->zSpinBox->setValue(z);
+//	}
+//	//this->slotChangeSlice();
+//}
 
 //void MainWindow::slotUpdateSlice()
 //{
@@ -1130,19 +1032,8 @@ void MainWindow::dropEvent( QDropEvent *ev )
 		QString folder = url.toLocalFile();
 		folder.replace("\\","/");
 		
-		//RegistrationWizard wizard(this,folder);
-		//int isFinished = wizard.exec();
+		ioManager->slotOpenWithWizard(folder);
 
-		//if (isFinished == QWizard::Rejected )
-		//	return;
-
-		//if (wizard.getFileNames1()!=NULL) loadImage(1,wizard.getFileNames1());
-		//if (wizard.getFileNames2()!=NULL) loadImage(2,wizard.getFileNames2());
-		//if (wizard.getFileNames3()!=NULL) loadImage(3,wizard.getFileNames3());
-  //      if (wizard.getFileNames4()!=NULL) loadImage(4,wizard.getFileNames4());
-		//if (wizard.getFileNames5()!=NULL) loadImage(5,wizard.getFileNames5());
-		//slotVisualizeImage();
-		//adjustForCurrentFile(wizard.getDirectory());
 	}
 }
 
@@ -1180,27 +1071,6 @@ MyImageViewer * MainWindow::GetMyImageViewer(int i)
 	return m_core.m_2DimageViewer[i];
 }
 
-QString MainWindow::GetFileName(int i)
-{
-    
-    QString FileName;
-	//QString path;
- //   int j = 0, start, end;
-	//path = FileNameList[i].at(0);
-	//if (!path.isEmpty())
-	//{
-	//	start = path.lastIndexOf("/");
-	//	end = path.length();
-	//	for (int k = start + 1; k < end; k++) {
-	//		FileName[j] = path[k];
-	//		j++;
-	//	}
-	//	FileName.remove(".nii");
-	//}
-    return FileName;
-    
-}
-
 int MainWindow::GetVisibleImageNo()
 {
 	return visibleImageNum;
@@ -1208,41 +1078,43 @@ int MainWindow::GetVisibleImageNo()
 
 
 //Segmentation Window
-void MainWindow::slotChangeImageSeq(int image_no, int window_no)
-{
-	if (segmentationView)
-	{
-		m_core.m_2DimageViewer[window_no]->SetInputData(
-			this->imageManager->getListOfViewerInputImages()[image_no]);
-		m_core.m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
-		m_core.m_2DimageViewer[window_no]->Render();
-    }
-	else
-	{
-		for (int i = 0 ; i < 3 ; i++)
-		{
-			m_core.m_2DimageViewer[i]->SetInputData(
-				this->imageManager->getListOfViewerInputImages()[image_no]);
-			m_core.m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
-			m_core.m_2DimageViewer[i]->Render();
-		}
-		
-	}
-				
-}
+//void MainWindow::slotChangeImageSeq(int image_no, int window_no)
+//{
+//	if (segmentationView)
+//	{
+//		m_core.m_2DimageViewer[window_no]->SetInputData(
+//			this->imageManager->getListOfViewerInputImages()[image_no]);
+//		m_core.m_2DimageViewer[window_no]->InitializeHeader(this->GetFileName(image_no));
+//		m_core.m_2DimageViewer[window_no]->Render();
+//    }
+//	else
+//	{
+//		for (int i = 0 ; i < 3 ; i++)
+//		{
+//			m_core.m_2DimageViewer[i]->SetInputData(
+//				this->imageManager->getListOfViewerInputImages()[image_no]);
+//			m_core.m_2DimageViewer[i]->InitializeHeader(this->GetFileName(image_no));
+//			m_core.m_2DimageViewer[i]->Render();
+//		}
+//		
+//	}
+//				
+//}
 
 
-void MainWindow::slotSelectImageSeq(QAction* act)
-{
-	//0-5 is for UL, 10-15 is for UR, 20-25 is for LL
-	if (act->data().toInt() < 10 && act->data().toInt() >= 0)
-		slotChangeImageSeq(act->data().toInt(),0);
-	else if (act->data().toInt() < 20 && act->data().toInt() >= 10)
-		slotChangeImageSeq(act->data().toInt()-10,1);
-	else if (act->data().toInt() < 30 && act->data().toInt() >= 20)
-		slotChangeImageSeq(act->data().toInt()-20,2);
+//void MainWindow::slotSelectImageSeq(QAction* act)
+//{
+//	//0-5 is for UL, 10-15 is for UR, 20-25 is for LL
+//	if (act->data().toInt() < 10 && act->data().toInt() >= 0)
+//		slotChangeImageSeq(act->data().toInt(),0);
+//	else if (act->data().toInt() < 20 && act->data().toInt() >= 10)
+//		slotChangeImageSeq(act->data().toInt()-10,1);
+//	else if (act->data().toInt() < 30 && act->data().toInt() >= 20)
+//		slotChangeImageSeq(act->data().toInt()-20,2);
+//
+//}
 
-}
+
 void MainWindow::slotChangeBaseImageUL()
 {
 	ChangeBaseImageULMenu.show();
@@ -1335,44 +1207,44 @@ void MainWindow::slotChangeBaseImageLL()
 //	//}
 //}
 
-void MainWindow::slotEnableAutoLumenSegmentation(bool flag)
-{
-	for (int i = 0; i < 3; i++)
-	{
-		m_core.m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
-	}
-}
-
-void MainWindow::slotSetContourFilterGenerateValues(int generateValues)
-{
-	for (int i = 0; i < 3; ++i) {
-		m_core.m_style[i]->GetPolygonDraw()->
-			SetContourFilterGenerateValues(generateValues);
-		m_core.m_style[i]->GetPolygonDraw()->
-			GenerateLumenWallContourWidget();
-
-	}
-}
-
-void MainWindow::slotSetLineInterpolatorToSmoothCurve(bool flag)
-{
-	if (flag) {
-		for (int i = 0; i < 3; i++)
-		{
-			m_core.m_style[i]->GetPolygonDraw()->SetLineInterpolator(0);
-		}
-	}
-}
-
-void MainWindow::slotSetLineInterpolatorToPolygon(bool flag)
-{
-	if (flag) {
-		for (int i = 0; i < 3; i++)
-		{
-			m_core.m_style[i]->GetPolygonDraw()->SetLineInterpolator(1);
-		}
-	}
-}
+//void MainWindow::slotEnableAutoLumenSegmentation(bool flag)
+//{
+//	for (int i = 0; i < 3; i++)
+//	{
+//		m_core.m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
+//	}
+//}
+//
+//void MainWindow::slotSetContourFilterGenerateValues(int generateValues)
+//{
+//	for (int i = 0; i < 3; ++i) {
+//		m_core.m_style[i]->GetPolygonDraw()->
+//			SetContourFilterGenerateValues(generateValues);
+//		m_core.m_style[i]->GetPolygonDraw()->
+//			GenerateLumenWallContourWidget();
+//
+//	}
+//}
+//
+//void MainWindow::slotSetLineInterpolatorToSmoothCurve(bool flag)
+//{
+//	if (flag) {
+//		for (int i = 0; i < 3; i++)
+//		{
+//			m_core.m_style[i]->GetPolygonDraw()->SetLineInterpolator(0);
+//		}
+//	}
+//}
+//
+//void MainWindow::slotSetLineInterpolatorToPolygon(bool flag)
+//{
+//	if (flag) {
+//		for (int i = 0; i < 3; i++)
+//		{
+//			m_core.m_style[i]->GetPolygonDraw()->SetLineInterpolator(1);
+//		}
+//	}
+//}
 
 //void MainWindow::slotSegmentationView()
 //{
@@ -1487,22 +1359,6 @@ void MainWindow::UpdateStenosisValue(double val)
 	this->m_moduleWidget->UpdateStenosisValue(val);
 }
 
-void MainWindow::SetImageLayerNo(int layer)
-{
-	m_layer_no = layer;
-	for (int i = 0; i < 3; i++)
-	{
-		if (m_core.m_style[i] != NULL) {
-			m_core.m_style[i]->GetPaintBrush()->SetDrawColor(overlayColor[m_layer_no-1]);
-			m_core.m_style[i]->GetPolygonDraw()->SetVesselWallLabel(m_layer_no);
-		}
-	}
-}
-
-int MainWindow::GetImageLayerNo()
-{
-	return m_layer_no;
-}
 
 InteractorStyleSwitch * MainWindow::GetInteractorStyleImageSwitch(int i)
 {
@@ -1539,154 +1395,154 @@ Ui_MainWindow * MainWindow::GetUI()
 //	this->m_distance3DWidget->On();
 //}
 
-void MainWindow::slotCenterline()
-{
-	cout << "slotCenterLine" << endl;
-	// segmentation
-	//VesselSegmentation* vesselSegmentation = new VesselSegmentation();
-	//vesselSegmentation->SetT1(this->imageManager->getListOfITKImage()[0]);
-	//vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput(itkImage[0]));
-	//vesselSegmentation->SetMPRAGE(itkImage[1]);
-	//vesselSegmentation->Update();
-
-	//FloatImageType::Pointer outputSegmentation = FloatImageType::New();
-	//vesselSegmentation->GetOutputSegmentationImage(outputSegmentation);
-	//itk::ImageFileWriter<FloatImageType>::Pointer imageFileWriter =
-	//	itk::ImageFileWriter<FloatImageType>::New();
-	//imageFileWriter->SetFileName("C:\\Users\\user\\Desktop\\seg.nii");
-	//imageFileWriter->Update();
-
-
-	//this->SegmentationOverlay->SetInputImageData(outputSegmentation);
-
-
-	//vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
-	//vesselSegmentation->GetVesselLumenSurface(lumen);
-
-	//vtkSmartPointer<vtkPolyData> plaque = vtkSmartPointer<vtkPolyData>::New();
-	//vesselSegmentation->GetPlaqueSurface(plaque);
-
-	//vtkSmartPointer<vtkPolyData> wall = vtkSmartPointer<vtkPolyData>::New();
-	//vesselSegmentation->GetVesselWallSurface(wall);
-
-	//// calculate centerlines
-	//ExtractCenterline* lumenExtractCenterline = new ExtractCenterline;
-	//lumenExtractCenterline->SetSurface(lumen);
-	//lumenExtractCenterline->Update();
-	//vtkSmartPointer<vtkPolyData> lumenCapped = vtkSmartPointer<vtkPolyData>::New();
-	//lumenExtractCenterline->GetCappedSurface(lumenCapped);
-	//vtkSmartPointer<vtkPolyData> lumenCenterline = vtkSmartPointer<vtkPolyData>::New();
-	//lumenExtractCenterline->GetCenterline(lumenCenterline);
-
-	//ExtractCenterline* wallExtractCenterline = new ExtractCenterline;
-	//wallExtractCenterline->SetSurface(wall);
-	//wallExtractCenterline->Update();
-	//vtkSmartPointer<vtkPolyData> wallCapped = vtkSmartPointer<vtkPolyData>::New();
-	//wallExtractCenterline->GetCappedSurface(wallCapped);
-	//vtkSmartPointer<vtkPolyData> wallCenterline = vtkSmartPointer<vtkPolyData>::New();
-	//wallExtractCenterline->GetCenterline(wallCenterline);
-
-	//vtkSmartPointer<vtkPolyDataMapper> lumenMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//lumenMapper->SetInputData(lumen);
-
-	//vtkSmartPointer<vtkPolyDataMapper> plaqueMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//plaqueMapper->SetInputData(plaque);
-
-	//vtkSmartPointer<vtkPolyDataMapper> wallMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//wallMapper->SetInputData(wall);
-
-	//// Create Lookup Table to match color
-	//vtkSmartPointer<vtkLookupTable> LUT = vtkSmartPointer<vtkLookupTable>::New();
-	//double LUTmin = min(lumenCenterline->GetScalarRange()[0], wallCenterline->GetScalarRange()[0]);
-	//double LUTmax = max(lumenCenterline->GetScalarRange()[1], wallCenterline->GetScalarRange()[1]);
-
-	//LUT->SetTableRange(LUTmin, LUTmax);
-	//LUT->Build();
-	//LUT->SetTableValue(0, 1.0, 0.0, 0.0, 1);  //Red
-	//LUT->SetTableValue(1, 0.0, 1.0, 0.0, 1); // Green
-	//LUT->SetTableValue(2, 0.0, 0.0, 1.0, 1); // Blue
-
-	//										 // scalar bar
-	//vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-	//scalarBar->SetLookupTable(LUT);
-	//scalarBar->SetTitle("Vessel Radius");
-	//scalarBar->SetNumberOfLabels(4);
-
-	//vtkSmartPointer<vtkPolyDataMapper> lumenCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//lumenCenterlineMapper->SetInputData(lumenCenterline);
-	//lumenCenterlineMapper->ScalarVisibilityOn();
-	//lumenCenterlineMapper->SetScalarModeToUsePointData();
-	//lumenCenterlineMapper->SetColorModeToMapScalars();
-	//lumenCenterlineMapper->SetLookupTable(LUT);
-	//lumenCenterlineMapper->SetUseLookupTableScalarRange(1);
-
-	//vtkSmartPointer<vtkPolyDataMapper> wallCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//wallCenterlineMapper->SetInputData(wallCenterline);
-	//wallCenterlineMapper->ScalarVisibilityOn();
-	//wallCenterlineMapper->SetScalarModeToUsePointData();
-	//wallCenterlineMapper->SetColorModeToMapScalars();
-	//wallCenterlineMapper->SetLookupTable(LUT);
-	//wallCenterlineMapper->SetUseLookupTableScalarRange(1);
-
-	//vtkSmartPointer<vtkActor> lumenActor = vtkSmartPointer<vtkActor>::New();
-	//lumenActor->SetMapper(lumenMapper);
-	//lumenActor->GetProperty()->SetColor(1, 0, 0);
-	//lumenActor->GetProperty()->SetOpacity(0.5);
-
-	//vtkSmartPointer<vtkActor> plaqueActor = vtkSmartPointer<vtkActor>::New();
-	//plaqueActor->SetMapper(plaqueMapper);
-	//plaqueActor->GetProperty()->SetColor(0, 1, 0);
-	//plaqueActor->GetProperty()->SetOpacity(0.2);
-
-	//vtkSmartPointer<vtkActor> wallActor = vtkSmartPointer<vtkActor>::New();
-	//wallActor->SetMapper(wallMapper);
-	//wallActor->GetProperty()->SetColor(0, 0, 1);
-	//wallActor->GetProperty()->SetOpacity(0.3);
-
-	//vtkSmartPointer<vtkActor> lumenCenterlineActor = vtkSmartPointer<vtkActor>::New();
-	//lumenCenterlineActor->SetMapper(lumenCenterlineMapper);
-
-	//vtkSmartPointer<vtkActor> wallCenterlineActor = vtkSmartPointer<vtkActor>::New();
-	//wallCenterlineActor->SetMapper(wallCenterlineMapper);
-
-	//// pick point spheres
-	//vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-	//sphere->SetRadius(0.5);
-	//sphere->SetCenter(lumenCenterline->GetPoint(0));
-
-	//vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//sphereMapper->SetInputConnection(sphere->GetOutputPort());
-
-	//vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
-	//sphereActor->SetMapper(sphereMapper);
-	//sphereActor->GetProperty()->SetColor(1, 0, 0);
-	//m_3DDataRenderer->RemoveAllViewProps();
-	//m_3DDataRenderer->AddActor(lumenActor);
-	//m_3DDataRenderer->AddActor(wallActor);
-	//m_3DDataRenderer->AddActor(wallCenterlineActor);
-	//m_3DDataRenderer->AddActor(sphereActor);
-	//m_3DDataRenderer->AddActor2D(scalarBar);
-
-	//vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New();
-	//ren->AddActor(lumenActor);
-	////ren->AddActor(plaqueActor);
-	//ren->AddActor(wallActor);
-	////ren->AddActor(lumenCenterlineActor);
-	//ren->AddActor(wallCenterlineActor);
-	//ren->AddActor(sphereActor);
-	//ren->AddActor2D(scalarBar);
-
-	//vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
-	//renWin->AddRenderer(ren);
-
-	//vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-	//vtkSmartPointer<MouseInteractorStylePP> style = vtkSmartPointer<MouseInteractorStylePP>::New();
-	//style->SetSurface(wall);
-	//style->SetCenterline(wallCenterline);
-	//style->SetSphere(sphere);
-	//iren->SetInteractorStyle(style);
-	//iren->SetRenderWindow(renWin);
-
-	m_core.m_3DDataRenderer->Render();
-
-}
+//void MainWindow::slotCenterline()
+//{
+//	cout << "slotCenterLine" << endl;
+//	// segmentation
+//	//VesselSegmentation* vesselSegmentation = new VesselSegmentation();
+//	//vesselSegmentation->SetT1(this->imageManager->getListOfITKImage()[0]);
+//	//vesselSegmentation->SetInputSegmentationImage(SegmentationOverlay->GetITKOutput(itkImage[0]));
+//	//vesselSegmentation->SetMPRAGE(itkImage[1]);
+//	//vesselSegmentation->Update();
+//
+//	//FloatImageType::Pointer outputSegmentation = FloatImageType::New();
+//	//vesselSegmentation->GetOutputSegmentationImage(outputSegmentation);
+//	//itk::ImageFileWriter<FloatImageType>::Pointer imageFileWriter =
+//	//	itk::ImageFileWriter<FloatImageType>::New();
+//	//imageFileWriter->SetFileName("C:\\Users\\user\\Desktop\\seg.nii");
+//	//imageFileWriter->Update();
+//
+//
+//	//this->SegmentationOverlay->SetInputImageData(outputSegmentation);
+//
+//
+//	//vtkSmartPointer<vtkPolyData> lumen = vtkSmartPointer<vtkPolyData>::New();
+//	//vesselSegmentation->GetVesselLumenSurface(lumen);
+//
+//	//vtkSmartPointer<vtkPolyData> plaque = vtkSmartPointer<vtkPolyData>::New();
+//	//vesselSegmentation->GetPlaqueSurface(plaque);
+//
+//	//vtkSmartPointer<vtkPolyData> wall = vtkSmartPointer<vtkPolyData>::New();
+//	//vesselSegmentation->GetVesselWallSurface(wall);
+//
+//	//// calculate centerlines
+//	//ExtractCenterline* lumenExtractCenterline = new ExtractCenterline;
+//	//lumenExtractCenterline->SetSurface(lumen);
+//	//lumenExtractCenterline->Update();
+//	//vtkSmartPointer<vtkPolyData> lumenCapped = vtkSmartPointer<vtkPolyData>::New();
+//	//lumenExtractCenterline->GetCappedSurface(lumenCapped);
+//	//vtkSmartPointer<vtkPolyData> lumenCenterline = vtkSmartPointer<vtkPolyData>::New();
+//	//lumenExtractCenterline->GetCenterline(lumenCenterline);
+//
+//	//ExtractCenterline* wallExtractCenterline = new ExtractCenterline;
+//	//wallExtractCenterline->SetSurface(wall);
+//	//wallExtractCenterline->Update();
+//	//vtkSmartPointer<vtkPolyData> wallCapped = vtkSmartPointer<vtkPolyData>::New();
+//	//wallExtractCenterline->GetCappedSurface(wallCapped);
+//	//vtkSmartPointer<vtkPolyData> wallCenterline = vtkSmartPointer<vtkPolyData>::New();
+//	//wallExtractCenterline->GetCenterline(wallCenterline);
+//
+//	//vtkSmartPointer<vtkPolyDataMapper> lumenMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	//lumenMapper->SetInputData(lumen);
+//
+//	//vtkSmartPointer<vtkPolyDataMapper> plaqueMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	//plaqueMapper->SetInputData(plaque);
+//
+//	//vtkSmartPointer<vtkPolyDataMapper> wallMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	//wallMapper->SetInputData(wall);
+//
+//	//// Create Lookup Table to match color
+//	//vtkSmartPointer<vtkLookupTable> LUT = vtkSmartPointer<vtkLookupTable>::New();
+//	//double LUTmin = min(lumenCenterline->GetScalarRange()[0], wallCenterline->GetScalarRange()[0]);
+//	//double LUTmax = max(lumenCenterline->GetScalarRange()[1], wallCenterline->GetScalarRange()[1]);
+//
+//	//LUT->SetTableRange(LUTmin, LUTmax);
+//	//LUT->Build();
+//	//LUT->SetTableValue(0, 1.0, 0.0, 0.0, 1);  //Red
+//	//LUT->SetTableValue(1, 0.0, 1.0, 0.0, 1); // Green
+//	//LUT->SetTableValue(2, 0.0, 0.0, 1.0, 1); // Blue
+//
+//	//										 // scalar bar
+//	//vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+//	//scalarBar->SetLookupTable(LUT);
+//	//scalarBar->SetTitle("Vessel Radius");
+//	//scalarBar->SetNumberOfLabels(4);
+//
+//	//vtkSmartPointer<vtkPolyDataMapper> lumenCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	//lumenCenterlineMapper->SetInputData(lumenCenterline);
+//	//lumenCenterlineMapper->ScalarVisibilityOn();
+//	//lumenCenterlineMapper->SetScalarModeToUsePointData();
+//	//lumenCenterlineMapper->SetColorModeToMapScalars();
+//	//lumenCenterlineMapper->SetLookupTable(LUT);
+//	//lumenCenterlineMapper->SetUseLookupTableScalarRange(1);
+//
+//	//vtkSmartPointer<vtkPolyDataMapper> wallCenterlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	//wallCenterlineMapper->SetInputData(wallCenterline);
+//	//wallCenterlineMapper->ScalarVisibilityOn();
+//	//wallCenterlineMapper->SetScalarModeToUsePointData();
+//	//wallCenterlineMapper->SetColorModeToMapScalars();
+//	//wallCenterlineMapper->SetLookupTable(LUT);
+//	//wallCenterlineMapper->SetUseLookupTableScalarRange(1);
+//
+//	//vtkSmartPointer<vtkActor> lumenActor = vtkSmartPointer<vtkActor>::New();
+//	//lumenActor->SetMapper(lumenMapper);
+//	//lumenActor->GetProperty()->SetColor(1, 0, 0);
+//	//lumenActor->GetProperty()->SetOpacity(0.5);
+//
+//	//vtkSmartPointer<vtkActor> plaqueActor = vtkSmartPointer<vtkActor>::New();
+//	//plaqueActor->SetMapper(plaqueMapper);
+//	//plaqueActor->GetProperty()->SetColor(0, 1, 0);
+//	//plaqueActor->GetProperty()->SetOpacity(0.2);
+//
+//	//vtkSmartPointer<vtkActor> wallActor = vtkSmartPointer<vtkActor>::New();
+//	//wallActor->SetMapper(wallMapper);
+//	//wallActor->GetProperty()->SetColor(0, 0, 1);
+//	//wallActor->GetProperty()->SetOpacity(0.3);
+//
+//	//vtkSmartPointer<vtkActor> lumenCenterlineActor = vtkSmartPointer<vtkActor>::New();
+//	//lumenCenterlineActor->SetMapper(lumenCenterlineMapper);
+//
+//	//vtkSmartPointer<vtkActor> wallCenterlineActor = vtkSmartPointer<vtkActor>::New();
+//	//wallCenterlineActor->SetMapper(wallCenterlineMapper);
+//
+//	//// pick point spheres
+//	//vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+//	//sphere->SetRadius(0.5);
+//	//sphere->SetCenter(lumenCenterline->GetPoint(0));
+//
+//	//vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	//sphereMapper->SetInputConnection(sphere->GetOutputPort());
+//
+//	//vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
+//	//sphereActor->SetMapper(sphereMapper);
+//	//sphereActor->GetProperty()->SetColor(1, 0, 0);
+//	//m_3DDataRenderer->RemoveAllViewProps();
+//	//m_3DDataRenderer->AddActor(lumenActor);
+//	//m_3DDataRenderer->AddActor(wallActor);
+//	//m_3DDataRenderer->AddActor(wallCenterlineActor);
+//	//m_3DDataRenderer->AddActor(sphereActor);
+//	//m_3DDataRenderer->AddActor2D(scalarBar);
+//
+//	//vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New();
+//	//ren->AddActor(lumenActor);
+//	////ren->AddActor(plaqueActor);
+//	//ren->AddActor(wallActor);
+//	////ren->AddActor(lumenCenterlineActor);
+//	//ren->AddActor(wallCenterlineActor);
+//	//ren->AddActor(sphereActor);
+//	//ren->AddActor2D(scalarBar);
+//
+//	//vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
+//	//renWin->AddRenderer(ren);
+//
+//	//vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//	//vtkSmartPointer<MouseInteractorStylePP> style = vtkSmartPointer<MouseInteractorStylePP>::New();
+//	//style->SetSurface(wall);
+//	//style->SetCenterline(wallCenterline);
+//	//style->SetSphere(sphere);
+//	//iren->SetInteractorStyle(style);
+//	//iren->SetRenderWindow(renWin);
+//
+//	m_core.m_3DDataRenderer->Render();
+//
+//}

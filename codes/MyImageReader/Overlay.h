@@ -3,6 +3,8 @@
 
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
+#include <vtkLookupTable.h>
+
 #include <QObject>
 
 #include <itkImage.h>
@@ -14,10 +16,24 @@ class Overlay : public QObject
 	Q_OBJECT
 
 public:
+
+	const int* m_overlayColor[7];
+	const int zeros[4] = {0,0,0,0};
+	const int lumen[4] = { 255, 0, 0, 255 };
+	const int vesselWall[4] = { 0, 0, 255, 255 };
+	const int calcification[4] = { 0,255,0,255 };
+	const int hemorrhage[4] = { 255, 255, 0,255 };
+	const int lrnc[4] = { 0, 255, 255 ,255 };
+	const int lm[4] = { 255, 0, 255 ,255 };
+
 	Overlay(QObject* parent = NULL);
 	~Overlay();
 	bool Update();
-	
+	/**
+	 * It is supposed to use the first vtkImageData to initialize the overlay
+	 * it will deepcopy the img and set all voxels of the copy to 0
+	 * @param	img for deepcopy
+	 */
 	void Initialize(vtkImageData* img);
 	/**
 	 * @deprecated
@@ -39,21 +55,22 @@ public:
 	void SetInputImageData(vtkImageData* imageData);
 	void SetInputImageData(QString fileName);
 	void SetInputImageData(const char* fileName);
-	/**
-	 * @deprecated
-	 */
+
 	void SetPixel(int pos[3], double value);
-	/**
-	 * @deprecated
-	 */
+
 	void SetPixel(int pos[3], unsigned char value);
+	/**
+	 *
+	 */
+	void SetPixels(std::list<int[3]> positions, std::list<int> values);
+
 
 	vtkImageData* GetOutput();
 	/**
 	 * @deprecated
 	 * the same as GetOutput()
 	 */
-	vtkImageData* GetVTKImageData();
+	vtkImageData* GetVTKOutput();
 	/**
 	 * convert the m_vtkOverlay to itk::ImageData and save it in m_itkOverlay
 	 * then return it with the same spacing, origin and direction as the format image
@@ -61,12 +78,17 @@ public:
 	 * @return	m_itkOverlay
 	 */
 	ImageType::Pointer GetITKOutput(ImageType::Pointer format);
+	/**
+	 * Get the lookupTable of this overlay which is generate by the constant
+	 * @return	m_lookupTable
+	 */
+	vtkLookupTable* GetLookupTable();
 
 private:
 
 	vtkSmartPointer<vtkImageData> m_vtkOverlay;
 	ImageType::Pointer m_itkOverlay;
-
+	vtkSmartPointer<vtkLookupTable> m_lookupTable;
 	int DisplayExtent[6];
 };
 

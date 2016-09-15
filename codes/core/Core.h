@@ -3,7 +3,6 @@
 
 #include <QWidget>
 
-#include <vtkLookupTable.h>
 #include <vtkSmartPointer.h>
 
 #include "MyImageViewer.h"
@@ -43,13 +42,17 @@ public slots:
 
 	virtual void slotAddOverlayToImageViewer();
 
-	virtual void slotVisualizeViewer();
+	virtual void slotVisualizeAll2DViewers();
+
+	virtual void slotChangeModality(QAction* action);
+
+	virtual void slotChangeModality(QString modalityName, int viewerNum);
 
 	virtual void slotSegmentationView();
 
 	virtual void slotMultiPlanarView();
 	
-	virtual void slotChangeView(Core::VIEW_MODE viewMode);
+	virtual void slotChangeView(int viewMode);
 
 	virtual void slotChangeSlice(int slice);
 
@@ -85,7 +88,7 @@ public slots:
 	virtual void slotSetImageLayerColor(int layer);
 
 signals:
-	void signalVisualizeViewer();
+	void signalVisualizeAllViewers();
 	void signalMultiPlanarView();
 	void signalSegmentationView();
 	void signalChangeSliceX(int);
@@ -96,17 +99,6 @@ signals:
 public:
 
 	// viewer
-	vtkSmartPointer<vtkLookupTable> m_lookupTable;
-
-	const int* m_overlayColor[6];
-
-	const int lumen[4] = { 255, 0, 0, 255 };
-	const int vesselWall[4] = { 0, 0, 255, 255 };
-	const int calcification[4] = { 0,255,0,255 };
-	const int hemorrhage[4] = { 255, 255, 0,255 };
-	const int lrnc[4] = { 0, 255, 255 ,255 };
-	const int lm[4] = { 255, 0, 255 ,255 };
-
 	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];
 	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[VIEWER_NUM];
 	vtkSmartPointer<InteractorStyleSwitch> m_style[VIEWER_NUM];
@@ -123,7 +115,7 @@ public:
 
 
 	bool m_firstInitialize = true;
-	VIEW_MODE m_viewMode = MULTIPLANAR_VIEW;
+	int m_viewMode = MULTIPLANAR_VIEW;
 
 };
 

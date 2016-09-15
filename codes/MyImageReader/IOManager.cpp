@@ -125,11 +125,7 @@ bool IOManager::LoadImageData(QStringList fileNames)
 	this->myImageManager->listOfVtkViewerInputImages.append(_vtkImageCopy);
 	this->myImageManager->listOfVtkImages.append(_vtkImage);
 	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
-	this->myImageManager->listOfModalityNames += "CUBE T1";
-	this->myImageManager->listOfModalityNames += "CUBE T2";
-	this->myImageManager->listOfModalityNames += "CUBE T1+C";
-	this->myImageManager->listOfModalityNames += "2D DIR/QIR";
-	this->myImageManager->listOfModalityNames += "MPRAGE";
+
 	return true;
 }
 
@@ -162,6 +158,7 @@ void IOManager::slotOpenWithWizard(QString dir)
 	RegistrationWizard wizard(dir);
 	if (wizard.exec() == QWizard::Rejected)
 		return;
+	this->listOfFileNames.clear();
 	for (int i = 0; i < 5; ++i) {
 		if (wizard.getFileNamesN(i + 1) == NULL) {
 			addToListOfFileNames(QStringList());
@@ -184,6 +181,14 @@ void IOManager::slotOpenWithWizard(QString dir)
 
 void IOManager::slotOpenMultiImages()
 {
+	// initialize modality names
+	this->myImageManager->allClear();
+	this->myImageManager->listOfModalityNames += "CUBE T1";
+	this->myImageManager->listOfModalityNames += "CUBE T2";
+	this->myImageManager->listOfModalityNames += "CUBE T1+C";
+	this->myImageManager->listOfModalityNames += "2D DIR/QIR";
+	this->myImageManager->listOfModalityNames += "MPRAGE";
+
 	bool _flag = this->registrationFlag;
 	for (QList<QStringList>::const_iterator cit = this->listOfFileNames.constBegin();
 		cit != this->listOfFileNames.constEnd(); ++cit) {
@@ -198,6 +203,7 @@ void IOManager::slotOpenMultiImages()
 	}
 	this->myImageManager->overlay.Initialize(
 		this->myImageManager->listOfVtkViewerInputImages[0]);
+
 	emit finishOpenMultiImages();
 }
 

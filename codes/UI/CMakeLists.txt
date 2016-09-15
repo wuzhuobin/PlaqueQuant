@@ -95,16 +95,16 @@ SOURCE_GROUP(
 SOURCE_GROUP(
 	"Forms FIles" 	
 	FILES 
-	${MODULE_QT_UI}
+	${UI_QT_UI}
 	)
 SOURCE_GROUP(
 	"Header Files" 
 	FILES 
-	${MODULE_QT_INC}
+	${UI_QT_INC}
 	)
 SOURCE_GROUP(
 	"Source Files" 
 	FILES 
-	${MODULE_QT_SRC}
+	${UI_QT_SRC}
 	)
 
