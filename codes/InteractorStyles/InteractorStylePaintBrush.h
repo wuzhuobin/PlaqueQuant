@@ -79,7 +79,11 @@ private:
 	void FillBox3D();
 	void Draw(bool b);
 	void UpdateBorderWidgetPosition();
-	void Write2ImageData();
+	/**
+	 *@deprecated
+	 */
+	void WriteToImageData();
+	void WriteToOverlay();
 	void ReadfromImageData();
 
 	bool CheckValidPick(double*);

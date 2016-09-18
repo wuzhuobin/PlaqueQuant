@@ -45,7 +45,7 @@ InteractorStylePaintBrush::InteractorStylePaintBrush()
 	m_colorBule = 0;
 	m_opacity = 255;
 	m_brushShape = SQUARE;
-	m_brushSize = 10;
+	m_brushSize = 1;
 	
 	this->m_paintBrushEnabled = false;
 }
@@ -119,7 +119,7 @@ void InteractorStylePaintBrush::OnLeftButtonUp()
 {
 	if (!m_isDraw)
 	{
-		this->Write2ImageData();
+		this->WriteToOverlay();
 		m_imageViewer->GetdrawActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
@@ -182,7 +182,7 @@ void InteractorStylePaintBrush::OnRightButtonUp()
 	m_rightFunctioning = false;
 	if (!m_isDraw)
 	{
-		this->Write2ImageData();
+		this->WriteToOverlay();
 		m_imageViewer->GetdrawActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
@@ -316,8 +316,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 		// Delete m_overlay image
 
 
-		if (this->Interactor)
-			this->Interactor->Render();
+		//if (this->Interactor)
+		//	this->Interactor->Render();
 
 		/// Set up brush boarder widget
 		m_brush = vtkImageCanvasSource2D::New();
@@ -489,13 +489,13 @@ void InteractorStylePaintBrush::FillBox3D()
 		m_brush->FillBox(GetExtent()[0], GetExtent()[1], GetExtent()[2], GetExtent()[3]);
 		break;
 	case 1:
-		for (int x = GetExtent()[0]; x < GetExtent()[1]; x++)
+		for (int x = GetExtent()[0]; x <= GetExtent()[1]; x++)
 		{
 			m_brush->DrawSegment3D(x, 0, GetExtent()[4], x, 0, GetExtent()[5]);
 		}
 		break;
 	case 0:
-		for (int y = GetExtent()[2]; y < GetExtent()[3]; y++)
+		for (int y = GetExtent()[2]; y <= GetExtent()[3]; y++)
 		{
 			m_brush->DrawSegment3D(0,y, GetExtent()[4], 0, y, GetExtent()[5]);
 		}
@@ -835,13 +835,15 @@ void InteractorStylePaintBrush::ReadfromImageData()
 
 }
 
-void InteractorStylePaintBrush::Write2ImageData()
+void InteractorStylePaintBrush::WriteToImageData()
 {
 	//Update Layer
 	int pos[3], extent[6];
 	memcpy(extent, GetExtent(), sizeof(extent));
 	extent[GetSliceOrientation() * 2] = GetSlice();
 	extent[GetSliceOrientation() * 2 + 1] = GetSlice();
+
+
 	double pixelval;
 
 	for (int x = extent[0]; x <= extent[1]; ++x) {
@@ -873,11 +875,11 @@ void InteractorStylePaintBrush::Write2ImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = z;
+
 				m_imageViewer->GetOverlay()->SetPixel(pos, pixelval);
 			}
 		}
 	}
-
 	//switch (m_orientation)
 	//{
 	//case 0:
@@ -991,18 +993,27 @@ void InteractorStylePaintBrush::Write2ImageData()
 
 }
 
+void InteractorStylePaintBrush::WriteToOverlay()
+{
+	int pos[3], extent[6];
+	memcpy(extent, m_brush->GetUpdateExtent(), sizeof(extent));
+	extent[GetSliceOrientation() * 2] = GetSlice();
+	extent[GetSliceOrientation() * 2 + 1] = GetSlice();
+
+	m_imageViewer->GetOverlay()->SetPixels(extent, m_brush->GetOutput());
+}
+
 
 void InteractorStylePaintBrush::Render()
 {
-	//MainWindow* mainWnd = MainWindow::GetMainWindow();
-	//if (m_brush == NULL)
-	//	return;
-
-	//mainWnd->RenderAll2DViewers();
-	m_imageViewer->Render();
 	m_brush->Update();
 	m_brush->GetOutput()->SetOrigin(GetOrigin());
 	m_brush->GetOutput()->SetSpacing(GetSpacing());
+
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		(*it)->Render();
+	}
 
 }
 

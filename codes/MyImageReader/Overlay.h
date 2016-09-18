@@ -8,6 +8,9 @@
 #include <QObject>
 
 #include <itkImage.h>
+
+#include "MeasurementFor3D.h"
+
 typedef itk::Image<float, 3> ImageType;
 
 
@@ -28,6 +31,9 @@ public:
 
 	Overlay(QObject* parent = NULL);
 	~Overlay();
+	/**
+	 * @deprecated
+	 */
 	bool Update();
 	/**
 	 * It is supposed to use the first vtkImageData to initialize the overlay
@@ -55,15 +61,26 @@ public:
 	void SetInputImageData(vtkImageData* imageData);
 	void SetInputImageData(QString fileName);
 	void SetInputImageData(const char* fileName);
-
+	/**
+	 * set the overlay with value in pos[3]
+	 * @param	the coordinate of the pixel to be set to value
+	 * @param	the value of the pixel to be set
+	 */
 	void SetPixel(int pos[3], double value);
-
+	/**
+	 * @deprecated
+	 */
 	void SetPixel(int pos[3], unsigned char value);
 	/**
-	 *
+	 * replace all the pixels in the extent of the overlay
+	 * the extent is supposed be a slice of image, so there should be 2 same extent
+	 * when the replacing is finished, it emits signalOverlayUpdated()
+	 * @param	extent 2 exents should be the same to determine the direction
+	 * @param	image the image to replace the overlay in the extent
 	 */
-	void SetPixels(std::list<int[3]> positions, std::list<int> values);
-
+	void SetPixels(int* extent, vtkImageData* image);
+	/***/
+	void Measure();
 
 	vtkImageData* GetOutput();
 	/**
@@ -83,13 +100,21 @@ public:
 	 * @return	m_lookupTable
 	 */
 	vtkLookupTable* GetLookupTable();
+	/***/
+	double* GetVolumes();
+
+signals:
+	void signalOverlayUpdated();
 
 private:
 
 	vtkSmartPointer<vtkImageData> m_vtkOverlay;
 	ImageType::Pointer m_itkOverlay;
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
+
 	int DisplayExtent[6];
+
+	MeasurementFor3D m_measurementFor3D;
 };
 
 #endif

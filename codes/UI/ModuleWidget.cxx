@@ -116,6 +116,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	// set brushShape
 	connect(ui->BrushComBox, SIGNAL(currentIndexChanged(int)),
 		&m_mainWnd->m_core, SLOT(slotSetBrushShape(int)));
+	// measurement
+	connect(&m_mainWnd->m_core.GetMyImageManager()->getOverlay(), SIGNAL(signalOverlayUpdated()),
+		this, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 
 	connect(ui->NextBtn,						SIGNAL(clicked()),					this,		SLOT(NextPage()));
 	connect(ui->BackBtn,						SIGNAL(clicked()),					this,		SLOT(BackPage()));
@@ -265,11 +268,13 @@ void ModuleWidget::slotReportGetInput()
 	this->GenerateReport();
 }
 
-void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes)
+void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel()
 {
 	cout << "volumes\n";
 	ui->measurement3DTableWidget->clearContents();
-	
+	double* volumes = m_mainWnd->m_core.GetMyImageManager()->getOverlay().GetVolumes();
+	int numOfVolumes = m_mainWnd->m_core.GetMyImageManager()->getOverlay().GetLookupTable()->
+		GetNumberOfColors();
 	for (int i = 0; i < numOfVolumes; ++i) {
 		ui->measurement3DTableWidget->setItem(i, 0,
 			new QTableWidgetItem(QString::number(volumes[i])));
@@ -513,13 +518,11 @@ void ModuleWidget::InternalUpdate()
 	int currentIndex = this->ui->stackedWidget->currentIndex();
 	if (currentIndex == 4) {
 		slotUpdate2DMeasurements();
-		m_mainWnd->slotMeasureCurrentVolumeOfEveryLabel();
+		//m_mainWnd->slotMeasureCurrentVolumeOfEveryLabel();
 		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()), Qt::QueuedConnection);
-		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), m_mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()), Qt::QueuedConnection);
 	}
 	else {
 		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()));
-		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), m_mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
 	}
 }
 

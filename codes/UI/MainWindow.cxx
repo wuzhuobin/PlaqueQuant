@@ -376,18 +376,18 @@ bool MainWindow::slotVisualizeImage()
 	return 0;
 }
 
-void MainWindow::slotMeasureCurrentVolumeOfEveryLabel()
-{
-	MeasurementFor3D measure;
-	measure.SetInputData(this->imageManager->getOverlay().GetOutput());
-	measure.SetLookupTable(m_core.GetLookupTable());
-	measure.Update();
-	double* volumes = measure.GetVolumes();
-	m_moduleWidget->slotMeasureCurrentVolumeOfEveryLabel(volumes, 
-		m_core.GetLookupTable()->GetNumberOfColors());
-
-
-}
+//void MainWindow::slotMeasureCurrentVolumeOfEveryLabel()
+//{
+//	MeasurementFor3D measure;
+//	measure.SetInputData(this->imageManager->getOverlay().GetOutput());
+//	measure.SetLookupTable(m_core.GetLookupTable());
+//	measure.Update();
+//	double* volumes = measure.GetVolumes();
+//	m_moduleWidget->slotMeasureCurrentVolumeOfEveryLabel(volumes, 
+//		m_core.GetLookupTable()->GetNumberOfColors());
+//
+//
+//}
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)
 {

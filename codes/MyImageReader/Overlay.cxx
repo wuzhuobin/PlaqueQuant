@@ -77,6 +77,8 @@ void Overlay::SetInputImageData(vtkImageData* imageData)
 	imageCast->SetInputData(imageData);
 	imageCast->Update();
 	m_vtkOverlay = imageCast->GetOutput();
+
+	emit signalOverlayUpdated();
 }
 
 
@@ -165,6 +167,9 @@ void Overlay::SetPixel(int pos[3], double value)
 		if (pixel == nullptr) {
 			return;
 		}
+		//if (value != 0) {
+		//	cout << pos[0] << ' ' << pos[1] << ' ' << pos[2] << endl;
+		//}
 		pixel[0] = value;
 		//cout << pixel[0] << endl;
 }
@@ -213,11 +218,59 @@ void Overlay::Initialize(vtkImageData * img)
 	}
 
 	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
+	emit signalOverlayUpdated();
 }
 
-void Overlay::SetPixels(std::list<int[3]> positions, std::list<int> values)
+void Overlay::SetPixels(int* extent, vtkImageData* image)
 {
+	for (int orientation = 0; orientation < 3; ++orientation) {
+		// find correct orientation
+		if (extent[orientation*2] == extent[orientation*2 + 1]) {
+			for (int x = extent[0]; x <= extent[1]; ++x) {
+				for (int y = extent[2]; y <= extent[3]; ++y) {
+					for (int z = extent[4]; z <= extent[5]; ++z) {
+						int pos[3] = { x,y,z };
+						double pixelval = 0;
+						int _tmp = pos[orientation];
+						pos[orientation] = 0;
+						unsigned char* val = static_cast<unsigned char*>(
+							image->GetScalarPointer(pos));
+						if (val == nullptr)
+							continue;
+						if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0) {
+							for (int i = 0; i < m_lookupTable->GetNumberOfColors(); ++i) {
+								double rgba[4];
+								uchar rgbaUCHAR[4];
+								m_lookupTable->GetIndexedColor(i, rgba);
+								m_lookupTable->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
+								if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && 
+									val[2] == rgbaUCHAR[2]) {
+									pixelval = i;
+									break;
+								}
+
+							}
+
+						}
+						pos[orientation] = _tmp;
+						SetPixel(pos, pixelval);
+					}
+				}
+			}
+			break;
+		}
+	}
+	m_vtkOverlay->Modified();
+	Measure();
+	emit signalOverlayUpdated();
+}
+
+void Overlay::Measure()
+{
+	m_measurementFor3D.SetInputData(m_vtkOverlay);
+	m_measurementFor3D.SetLookupTable(m_lookupTable);
+	m_measurementFor3D.Update();
 }
 
 vtkImageData* Overlay::GetOutput()
@@ -270,4 +323,9 @@ ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
 vtkLookupTable * Overlay::GetLookupTable()
 {
 	return m_lookupTable;
+}
+
+double * Overlay::GetVolumes()
+{
+	return m_measurementFor3D.GetVolumes();;
 }

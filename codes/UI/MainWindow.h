@@ -143,8 +143,8 @@ public slots:
 	//bool loadImage(int, QStringList*list);
 	bool slotVisualizeImage();
 
-	//Alogrithm
-	void slotMeasureCurrentVolumeOfEveryLabel();
+	////Alogrithm
+	//void slotMeasureCurrentVolumeOfEveryLabel();
 
 	//virtual void addOverlay2ImageViewer();
 

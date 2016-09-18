@@ -36,8 +36,9 @@ void MeasurementFor3D::Update()
 	double pixelSize = 1;
 	int num = lookupTable->GetNumberOfColors();
 	int* numberOfPixels = new int[num];
-	volumes = new double[num];
-
+	if (volumes == NULL) {
+		volumes = new double[num];
+	}
 	overlay->GetSpacing(spacing);
 	overlay->GetExtent(extent);
 	// calculate the volume of a single pixel
@@ -89,5 +90,15 @@ void MeasurementFor3D::Update()
 double* MeasurementFor3D::GetVolumes()
 {
 	return this->volumes;
+}
+
+void MeasurementFor3D::GetVolumes(double * volumes)
+{
+	if (this->volumes == NULL || this->overlay == NULL || this->lookupTable == NULL) {
+		volumes = NULL;
+	}
+	else {
+		memcpy(volumes, this->volumes, sizeof(double)*this->lookupTable->GetNumberOfColors());
+	}
 }
 
