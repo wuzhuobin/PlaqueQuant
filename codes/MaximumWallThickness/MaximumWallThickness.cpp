@@ -505,7 +505,7 @@ bool MaximumWallThickness::ThicknessCal()
 		splineFilter->SetNumberOfSubdivisions(5);
 		splineFilter->Update();
 		vesselLoop->DeepCopy(splineFilter->GetOutput());
-		cout << "Vessel: " << vesselLoop->GetNumberOfPoints() << endl;
+		//cout << "Vessel: " << vesselLoop->GetNumberOfPoints() << endl;
 
 		// for lumen
 		spline->SetPoints(lumenLoop->GetPoints());
@@ -513,7 +513,7 @@ bool MaximumWallThickness::ThicknessCal()
 		splineFilter->SetNumberOfSubdivisions(5);
 		splineFilter->Update();
 		lumenLoop->DeepCopy(splineFilter->GetOutput());
-		cout << "Lumen: " << lumenLoop->GetNumberOfPoints() << endl;
+		//cout << "Lumen: " << lumenLoop->GetNumberOfPoints() << endl;
 
 		// Build kd tree
 		double d = VTK_DOUBLE_MIN;

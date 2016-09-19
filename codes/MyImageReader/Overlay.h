@@ -9,7 +9,6 @@
 
 #include <itkImage.h>
 
-#include "MeasurementFor3D.h"
 
 typedef itk::Image<float, 3> ImageType;
 
@@ -80,7 +79,9 @@ public:
 	 */
 	void SetPixels(int* extent, vtkImageData* image);
 	/***/
-	void Measure();
+	void Measure3D();
+	void Measure2D();
+	void Measure2D(int slice);
 
 	vtkImageData* GetOutput();
 	/**
@@ -101,7 +102,9 @@ public:
 	 */
 	vtkLookupTable* GetLookupTable();
 	/***/
-	double* GetVolumes();
+	double* Get3DMeasurements();
+	QStringList Get3DMeasurementsStrings();
+	QStringList Get2DMeasurementsStrings(int slice);
 
 signals:
 	void signalOverlayUpdated();
@@ -113,8 +116,11 @@ private:
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
 
 	int DisplayExtent[6];
+	double* m_3DMeasurements = nullptr;
+	// lumen area, vessel area, NMI, distance
+	QList<QStringList> m_2DMeasurements;
+	QStringList m_volumeStrings;
 
-	MeasurementFor3D m_measurementFor3D;
 };
 
 #endif

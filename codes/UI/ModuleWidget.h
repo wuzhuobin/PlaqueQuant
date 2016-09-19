@@ -67,8 +67,9 @@ public slots:
 	void BackPage();
 	void SetBrushSize();
 	void slotReportGetInput();
-	void slotMeasureCurrentVolumeOfEveryLabel();
+	void slotUpdate3DMeasurements();
 	void slotUpdate2DMeasurements();
+	void slotUpdate2DMeasurements(int slice);
 	void slotCalculateMaximumWallThickness();
 	void slotEnableAutoLumenSegmentation(bool flag);
 

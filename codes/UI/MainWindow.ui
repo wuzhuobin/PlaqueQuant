@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1160</width>
+    <width>1419</width>
     <height>966</height>
    </rect>
   </property>
@@ -43,6 +43,23 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="QDockWidget" name="dockWidget">
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>46</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>320</width>
+        <height>524287</height>
+       </size>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_2"/>
+     </widget>
+    </item>
     <item>
      <layout class="QGridLayout" name="viewGridLayout">
       <property name="spacing">
@@ -896,7 +913,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1160</width>
+     <width>1419</width>
      <height>23</height>
     </rect>
    </property>
@@ -970,7 +987,7 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="dockWidget">
+  <widget class="QDockWidget" name="dockWidget2">
    <property name="minimumSize">
     <size>
      <width>320</width>

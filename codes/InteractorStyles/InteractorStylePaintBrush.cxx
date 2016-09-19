@@ -1001,6 +1001,11 @@ void InteractorStylePaintBrush::WriteToOverlay()
 	extent[GetSliceOrientation() * 2 + 1] = GetSlice();
 
 	m_imageViewer->GetOverlay()->SetPixels(extent, m_brush->GetOutput());
+
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		(*it)->Render();
+	}
 }
 
 
@@ -1009,11 +1014,8 @@ void InteractorStylePaintBrush::Render()
 	m_brush->Update();
 	m_brush->GetOutput()->SetOrigin(GetOrigin());
 	m_brush->GetOutput()->SetSpacing(GetSpacing());
+	m_imageViewer->Render();
 
-	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
-		it != m_synchronalViewers.end(); ++it) {
-		(*it)->Render();
-	}
 
 }
 

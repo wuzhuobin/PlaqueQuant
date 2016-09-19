@@ -105,7 +105,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	//connect
 	//connect(ui->autoLumenSegmentationPushButton, SIGNAL(clicked()),					m_mainWnd,	SLOT(slotCenterline()));
 	connect(ui->generateReportPushButton,		SIGNAL(clicked()), 					this,		SLOT(slotReportGetInput()));
-	// set labelColor
+	// set labelColorbachelor
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
 		&m_mainWnd->m_core,SLOT(slotSetImageLayerColor(int)));
 	// set brushSize
@@ -118,7 +118,11 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		&m_mainWnd->m_core, SLOT(slotSetBrushShape(int)));
 	// measurement
 	connect(&m_mainWnd->m_core.GetMyImageManager()->getOverlay(), SIGNAL(signalOverlayUpdated()),
-		this, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
+		this, SLOT(slotUpdate3DMeasurements()));
+	connect(&m_mainWnd->m_core.GetMyImageManager()->getOverlay(), SIGNAL(signalOverlayUpdated()),
+		this, SLOT(slotUpdate2DMeasurements()));
+	connect(&m_mainWnd->m_core, SIGNAL(signalChangeSliceZ(int)),
+		this, SLOT(slotUpdate2DMeasurements(int)));
 
 	connect(ui->NextBtn,						SIGNAL(clicked()),					this,		SLOT(NextPage()));
 	connect(ui->BackBtn,						SIGNAL(clicked()),					this,		SLOT(BackPage()));
@@ -128,7 +132,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->maximumWallThicknessChkBox,		SIGNAL(stateChanged(int)),			this,		SLOT(slotEnableMWTCalculation(int)));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
-	//connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), mainWnd, SLOT(slotMeasureCurrentVolumeOfEveryLabel()));
+	//connect(ui->measureCurrentVolumeOfEveryLabelPushButton, SIGNAL(clicked()), mainWnd, SLOT(slotUpdate3DMeasurements()));
 
 
 	this->GenerateReportPushButtonVisible();
@@ -268,90 +272,36 @@ void ModuleWidget::slotReportGetInput()
 	this->GenerateReport();
 }
 
-void ModuleWidget::slotMeasureCurrentVolumeOfEveryLabel()
+void ModuleWidget::slotUpdate3DMeasurements()
 {
-	cout << "volumes\n";
+	m_mainWnd->m_core.GetMyImageManager()->getOverlay().Measure3D();
+
 	ui->measurement3DTableWidget->clearContents();
-	double* volumes = m_mainWnd->m_core.GetMyImageManager()->getOverlay().GetVolumes();
+	QStringList volumes = m_mainWnd->m_core.GetMyImageManager()->
+		getOverlay().Get3DMeasurementsStrings();
 	int numOfVolumes = m_mainWnd->m_core.GetMyImageManager()->getOverlay().GetLookupTable()->
 		GetNumberOfColors();
 	for (int i = 0; i < numOfVolumes; ++i) {
 		ui->measurement3DTableWidget->setItem(i, 0,
-			new QTableWidgetItem(QString::number(volumes[i])));
-		cout << volumes[i] << endl;
+			new QTableWidgetItem(volumes[i]));
 	}
-	
+
 }
 
 void ModuleWidget::slotUpdate2DMeasurements()
 {
-	 
-	int currentSlice = m_mainWnd->GetUI()->zSpinBox->value();
+	slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
+}
 
-	vtkImageData* overlayImage = m_mainWnd->imageManager->getOverlay().GetOutput();
-	int extent[6];
-	m_mainWnd->imageManager->getOverlay().GetDisplayExtent(extent);
-	extent[4] = currentSlice;
-	extent[5] = currentSlice;
+void ModuleWidget::slotUpdate2DMeasurements(int slice)
+{
+	QStringList _2DMeasurements = m_mainWnd->m_core.GetMyImageManager()->getOverlay().
+		Get2DMeasurementsStrings(slice);
 
-	// Extract slice image
-	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	voi->SetInputData(overlayImage);
-	voi->SetVOI(extent);
-	voi->Update();
-
-	// calculate wall thickness
-	vtkSmartPointer<MaximumWallThickness> mwt = vtkSmartPointer<MaximumWallThickness>::New();
-	mwt->SetSliceImage(voi->GetOutput());
-	try {
-		mwt->Update();
-	}
-	catch (MaximumWallThickness::ERROR_CODE e) {
-		cerr << "MaximumWallThickness error: " << e << endl;
-		//return;
+	for (int i = 0; i < 4; ++i) {
+		ui->measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem(_2DMeasurements[i]));
 	}
 
-	// Calculate areas
-	vtkSmartPointer<MeasurementFor2D> m2d = vtkSmartPointer<MeasurementFor2D>::New();
-	m2d->SetSliceImage(voi->GetOutput());
-	try {
-		m2d->Update();
-	}
-	catch (MeasurementFor2D::ERROR_CODE e) {
-		cerr << "MeasurementFor2D error: " << e << endl;
-	}
-
-	/// Write measurements to table
-	// Error checking
-	double lumenArea, vesselArea, NMI, distance; // #todo: Allow multiple branch
-	try {
-		lumenArea = m2d->GetOutput(0).LumenArea;
-		vesselArea = m2d->GetOutput(0).VesselWallArea;
-		NMI = vesselArea / (lumenArea + vesselArea);
-	}
-	catch (...) {
-		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem("Undefined"));
-		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem("Undefined"));
-		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem("Undefined"));
-	}
-	try {
-		distance = mwt->GetDistanceLoopPairVect().at(0).Distance;
-	}
-	catch (...) {
-		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem("Undefined"));
-	}
-
-	// Write to table
-	try {
-		ui->measurement2DTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).LumenArea, 'f', 2)));
-		ui->measurement2DTableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(m2d->GetOutput(0).VesselWallArea, 'f', 2)));
-		ui->measurement2DTableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance, 'f', 2)));
-		ui->measurement2DTableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(NMI, 'f', 4)));
-	}
-	catch (...) {
-		// #DisplayErrorMsgHere
-		cerr << "Error assigning items to table!\n";
-	}
 }
 
 void ModuleWidget::slotCalculateMaximumWallThickness()
@@ -518,7 +468,7 @@ void ModuleWidget::InternalUpdate()
 	int currentIndex = this->ui->stackedWidget->currentIndex();
 	if (currentIndex == 4) {
 		slotUpdate2DMeasurements();
-		//m_mainWnd->slotMeasureCurrentVolumeOfEveryLabel();
+		//m_mainWnd->slotUpdate3DMeasurements();
 		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotUpdate2DMeasurements()), Qt::QueuedConnection);
 	}
 	else {

@@ -80,73 +80,34 @@ public slots:
 	virtual void dragEnterEvent(QDragEnterEvent *ev);
 	virtual void dropEvent( QDropEvent *ev );
 	
-	//virtual void slotChangeSlice();
-	//virtual void slotChangeSlice(int, int, int);
-	//virtual void slotUpdateSlice();
-	//virtual void slotChangeWindowLevel();
-	//virtual void slotChangeWindowLevelUL();
-    //virtual void slotChangeWindowLevelUR();
-    //virtual void slotChangeWindowLevelLL();
-    //virtual void slotChangeWindowLevelLR();
-
 	//Action
 	virtual void slotExit();
-	//virtual void slotOpenImage(QString dir);
-	//virtual void slotOpenImage();
+
 	virtual void slotOpenRecentImage();
-	//virtual void slotSaveSegmentation();
+
 	virtual void slotAbout();
 	virtual void slotHelp();
 	virtual void slot3DUpdate();
-	//virtual void slotMeasureCurrentVolumeOfEveryLabel(double* volumes, int numOfVolumes);
-
-	//virtual void slotNavigationMode();
-	//virtual void slotWindowLevelMode();
-	//virtual void slotBrushMode();
-	//virtual void slotContourMode();
-	//virtual void slotROIMode();
+	/**
+	 * four viewers and maximum
+	 */
 	virtual void slotImage(int image);
-	//virtual void slotMultiPlanarView();
 
-	// Auto Lumen Segmenation 
-	//virtual void slotEnableAutoLumenSegmentation(bool flag);
-	//virtual void slotSetContourFilterGenerateValues(int generateValues);
-	//virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
-	//virtual void slotSetLineInterpolatorToPolygon(bool flag);
-
-	//Overlay
-	//virtual void slotAddExternalOverlay();
-    virtual void slotOverlayOpacity(int opacity);
-  
-	//Centerline
-	//virtual void slotCenterline();
-    //Segmentation
-	//virtual void slotSegmentationView();
+	/**
+	 * Show up the menu for changing the modality
+	 */
 	virtual void slotChangeBaseImageUL();
 	virtual void slotChangeBaseImageUR();
 	virtual void slotChangeBaseImageLL();
-	//virtual void slotChangeImageSeq(int image_no, int window_no);
-	//virtual void slotSelectImageSeq(QAction*);
-	//Intensity
-	//virtual void slotChangeIntensity();
 
-	//Widget
-	//virtual void slotRuler(bool b);
 	virtual void slotChangeROI();
-	//virtual void slotSelectROI();
-	//virtual void slotResetROI();
 
 	//Widget running 
 	virtual void slotShowProgressDialog(int value, QString text);
 
 	//Visualization
-	//bool loadImage(int, QStringList*list);
 	bool slotVisualizeImage();
 
-	////Alogrithm
-	//void slotMeasureCurrentVolumeOfEveryLabel();
-
-	//virtual void addOverlay2ImageViewer();
 
 
 private:
@@ -165,25 +126,7 @@ private:
 	QActionGroup viewerGroup;
 	//viewGroup
 	QActionGroup viewGroup;
-
-
-
     
-	//2D/3D view
-	//MyImageViewer*				m_2DimageViewer[3];
-	//vtkRenderWindow*			m_3DimageViewer;
-	//vtkRenderer*				m_3DDataRenderer;
-	//vtkRenderer*				m_3DAnnotationRenderer;
-	//vtkRenderWindowInteractor*  m_3Dinteractor;
-	//vtkRenderWindowInteractor*  m_interactor[3];
-	//InteractorStyleSwitch*		m_style[3];
-	//InteractorStyleSwitch3D*	m_style3D;
-
-
-
-    
-	//3D ruler
-	Distance3DWidget* m_distance3DWidget;
 	//Recent File
 	const static int MAX_RECENT_IMAGE = 10;
 	QList<QAction*> recentFileActionList;

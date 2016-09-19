@@ -12,6 +12,10 @@
 #include <vtkSimpleImageToImageFilter.h>
 #include <vtkExtractVOI.h>
 
+#include "MeasurementFor3D.h"
+#include "MeasurementFor2D.h"
+#include "MaximumWallThickness.h"
+
 typedef itk::OrientImageFilter<ImageType, ImageType> OrienterType;
 typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
 typedef itk::ImageSeriesReader< ImageType >			ReaderType;
@@ -69,15 +73,16 @@ void Overlay::SetInputImageData(vtkImageData* imageData)
 {
 	if (imageData->GetScalarType() == VTK_DOUBLE) {
 		m_vtkOverlay = imageData;
-		return;
 	}
-	vtkSmartPointer<vtkImageCast> imageCast =
-		vtkSmartPointer<vtkImageCast>::New();
-	imageCast->SetOutputScalarTypeToDouble();
-	imageCast->SetInputData(imageData);
-	imageCast->Update();
-	m_vtkOverlay = imageCast->GetOutput();
-
+	else {
+		vtkSmartPointer<vtkImageCast> imageCast =
+			vtkSmartPointer<vtkImageCast>::New();
+		imageCast->SetOutputScalarTypeToDouble();
+		imageCast->SetInputData(imageData);
+		imageCast->Update();
+		m_vtkOverlay = imageCast->GetOutput();
+	}
+	Measure2D();
 	emit signalOverlayUpdated();
 }
 
@@ -193,32 +198,36 @@ bool Overlay::Update()
 void Overlay::Initialize(vtkImageData * img)
 {
 	m_vtkOverlay = vtkSmartPointer<vtkImageData>::New();
-	m_vtkOverlay->DeepCopy(img);
-	
-	vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
-	castfilter->SetInputData(m_vtkOverlay);
-	castfilter->SetOutputScalarTypeToDouble();
-	castfilter->Update();
+	m_vtkOverlay->SetExtent(img->GetExtent());
+	m_vtkOverlay->SetOrigin(img->GetOrigin());
+	m_vtkOverlay->SetSpacing(img->GetSpacing());
+	m_vtkOverlay->AllocateScalars(img->GetScalarType(), img->GetNumberOfScalarComponents());
+	SetInputImageData(m_vtkOverlay);
+	//m_vtkOverlay->DeepCopy(img);
+	//
+	//vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
+	//castfilter->SetInputData(m_vtkOverlay);
+	//castfilter->SetOutputScalarTypeToDouble();
+	//castfilter->Update();
 
-	m_vtkOverlay = castfilter->GetOutput();
+	//m_vtkOverlay = castfilter->GetOutput();
 
-	const int* extent = m_vtkOverlay->GetExtent();
+	//const int* extent = m_vtkOverlay->GetExtent();
 
 
-	for (int i = extent[0]; i <= extent[1]; i++)
-	{
-		for (int j = extent[2]; j <= extent[3]; j++)
-		{
-			for (int k = extent[4]; k <= extent[5]; k++)
-			{
-				double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
-				*pixel = 0;
-			}
-		}
-	}
+	//for (int i = extent[0]; i <= extent[1]; i++)
+	//{
+	//	for (int j = extent[2]; j <= extent[3]; j++)
+	//	{
+	//		for (int k = extent[4]; k <= extent[5]; k++)
+	//		{
+	//			double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
+	//			*pixel = 0;
+	//		}
+	//	}
+	//}
 
 	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
-	emit signalOverlayUpdated();
 }
 
 void Overlay::SetPixels(int* extent, vtkImageData* image)
@@ -262,15 +271,94 @@ void Overlay::SetPixels(int* extent, vtkImageData* image)
 		}
 	}
 	m_vtkOverlay->Modified();
-	Measure();
 	emit signalOverlayUpdated();
 }
 
-void Overlay::Measure()
+void Overlay::Measure3D()
 {
+	if (m_3DMeasurements != nullptr) {
+		delete m_3DMeasurements;
+	}
+	m_3DMeasurements = new double[m_lookupTable->GetNumberOfColors()];
+
+	MeasurementFor3D m_measurementFor3D;
 	m_measurementFor3D.SetInputData(m_vtkOverlay);
 	m_measurementFor3D.SetLookupTable(m_lookupTable);
 	m_measurementFor3D.Update();
+	m_measurementFor3D.GetVolumes(m_3DMeasurements);
+
+	
+}
+
+void Overlay::Measure2D()
+{
+	m_2DMeasurements.clear();
+
+	const int* extent = m_vtkOverlay->GetExtent();
+	for (int z = extent[4]; z <= extent[5]; ++z) {
+		Measure2D(z);
+	}
+}
+
+void Overlay::Measure2D(int slice)
+{
+	const int* extent = m_vtkOverlay->GetExtent();
+
+	// Extract slice image
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	voi->SetInputData(m_vtkOverlay);
+	voi->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
+	voi->Update();
+	slice = slice - extent[4];
+	// calculate wall thickness
+	vtkSmartPointer<MaximumWallThickness> mwt = vtkSmartPointer<MaximumWallThickness>::New();
+	mwt->SetSliceImage(voi->GetOutput());
+	try {
+		//mwt->Update();
+	}
+	catch (MaximumWallThickness::ERROR_CODE e) {
+		cerr << "MaximumWallThickness error: " << e << endl;
+		//return;
+	}
+
+	// Calculate areas
+	vtkSmartPointer<MeasurementFor2D> m2d = vtkSmartPointer<MeasurementFor2D>::New();
+	m2d->SetSliceImage(voi->GetOutput());
+	try {
+		m2d->Update();
+	}
+	catch (MeasurementFor2D::ERROR_CODE e) {
+		cerr << "MeasurementFor2D error: " << e << endl;
+	}
+	QStringList _2DMeasurements;
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Undefined";
+	/// Write measurements to table
+	// Error checking
+	//double lumenArea, vesselArea, NMI, distance; // #todo: Allow multiple branch
+	try {
+		_2DMeasurements[0] = QString::number(m2d->GetOutput(0).LumenArea);
+		_2DMeasurements[1] = QString::number(m2d->GetOutput(0).VesselWallArea);
+		_2DMeasurements[3] = QString::number(
+			m2d->GetOutput(0).VesselWallArea /
+			(m2d->GetOutput(0).LumenArea + m2d->GetOutput(0).VesselWallArea));
+	}
+	catch (...) {
+	}
+	try {
+		_2DMeasurements[2] = QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance);
+	}
+	catch (...) {
+	}
+	// to ensure it won't 
+	while (slice >= m_2DMeasurements.size() ) {
+		m_2DMeasurements += _2DMeasurements;
+	}
+	m_2DMeasurements[slice] = _2DMeasurements;
+
+
 }
 
 vtkImageData* Overlay::GetOutput()
@@ -325,7 +413,35 @@ vtkLookupTable * Overlay::GetLookupTable()
 	return m_lookupTable;
 }
 
-double * Overlay::GetVolumes()
+double * Overlay::Get3DMeasurements()
 {
-	return m_measurementFor3D.GetVolumes();;
+	Measure3D();
+
+	return m_3DMeasurements;
+}
+
+QStringList Overlay::Get3DMeasurementsStrings()
+{
+	m_volumeStrings.clear();
+	for (int i = 0; i < m_lookupTable->GetNumberOfColors(); ++i) {
+		m_volumeStrings.append(QString::number(m_3DMeasurements[i]));
+	}
+	return m_volumeStrings;
+}
+
+QStringList Overlay::Get2DMeasurementsStrings(int slice)
+{
+	const int* extent = m_vtkOverlay->GetExtent();
+	if (slice < extent[4]) {
+		Measure2D(extent[4]);
+		return m_2DMeasurements[0];
+	}
+	else if (slice > extent[5]) {
+		Measure2D(extent[5]);
+		return m_2DMeasurements[m_2DMeasurements.size() - 1];
+	}
+	else {
+		Measure2D(slice);
+		return m_2DMeasurements[slice - extent[4]];
+	}
 }
