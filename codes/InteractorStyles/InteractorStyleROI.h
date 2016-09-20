@@ -29,6 +29,5 @@ private:
 	MyPlaneWidgetCallback* planeWidgetCallback;
 
 	double displayBound[6];
-
 };
 

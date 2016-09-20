@@ -63,12 +63,12 @@ void MeasurementFor3D::Update()
 	vtkSmartPointer<vtkImageAccumulate> imageAccumulate =
 		vtkSmartPointer<vtkImageAccumulate>::New();
 	imageAccumulate->SetInputData(overlay);
-	imageAccumulate->SetComponentExtent(0, num-1, 0, 0, 0, 0); // #LookupTable
+	imageAccumulate->SetComponentExtent(0, num, 0, 0, 0, 0); // #LookupTable
 	imageAccumulate->SetComponentOrigin(0, 0, 0);
 	imageAccumulate->SetComponentSpacing(1, 0, 0);
 	imageAccumulate->Update();
 	cerr << "numberOfPixels" << endl;
-	for (int i = 0; i < num - 1; ++i) {
+	for (int i = 0; i < num ; ++i) {
 		numberOfPixels[i] = *static_cast<int*>(
 			imageAccumulate->GetOutput()->GetScalarPointer(i, 0, 0));
 		cerr << numberOfPixels[i];

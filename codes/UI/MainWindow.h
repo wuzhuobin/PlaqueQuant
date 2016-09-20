@@ -27,6 +27,7 @@
 
 
 class ModuleWidget;
+class MeasurementWidget;
 class MainWindow: public QMainWindow
 {
 	Q_OBJECT
@@ -149,7 +150,9 @@ private:
     
 	//Dock Widget
 	friend class ModuleWidget;
+	friend class MeasurementWidget;
 	ModuleWidget* m_moduleWidget;
+	MeasurementWidget* m_measurementWidget;
 
 	//Navigation
 	double m_focalPoint[3];

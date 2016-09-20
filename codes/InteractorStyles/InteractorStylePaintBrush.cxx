@@ -1016,7 +1016,6 @@ void InteractorStylePaintBrush::Render()
 	m_brush->GetOutput()->SetSpacing(GetSpacing());
 	m_imageViewer->Render();
 
-
 }
 
 

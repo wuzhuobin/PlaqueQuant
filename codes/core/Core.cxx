@@ -130,7 +130,10 @@ void Core::slotVisualizeAll2DViewers()
 			m_interactor[i]->SetInteractorStyle(m_style[i]);
 		}
 		slotAddOverlayToImageViewer();
+		m_firstInitialize = false;
+		emit signalMultiPlanarView();
 	}
+
 	// reset slice to all viewer
 	for (int i = 0; i < VIEWER_NUM; ++i) {
 		int slice = m_2DimageViewer[i]->GetSliceMax() + m_2DimageViewer[i]->GetSliceMin();
@@ -150,7 +153,6 @@ void Core::slotVisualizeAll2DViewers()
 			break;
 		}
 	}
-	m_firstInitialize = false;
 
 	emit signalVisualizeAllViewers();
 }
@@ -191,11 +193,20 @@ void Core::slotChangeModality(QString modalityName, int viewerNum)
 }
 
 void Core::slotSegmentationView() {
+	if (m_viewMode == SEGMENTATION_VIEW) {
+		return;
+	}
 	slotChangeView(SEGMENTATION_VIEW);
+	emit signalSegmentationView();
 }
 
 void Core::slotMultiPlanarView() {
+	if (m_viewMode == MULTIPLANAR_VIEW) {
+		return;
+	}
 	slotChangeView(MULTIPLANAR_VIEW);
+	emit signalMultiPlanarView();
+
 }
 
 void Core::slotChangeSlice(int slice) {
@@ -220,9 +231,6 @@ void Core::slotChangeSlice(int slice) {
 
 void Core::slotChangeView(int viewMode)
 {
-	if (m_viewMode == viewMode && !m_firstInitialize) {
-		return;
-	}
 
 	m_viewMode = viewMode;
 	// SEGMENTATION_VIEW
@@ -264,7 +272,6 @@ void Core::slotChangeView(int viewMode)
 			}
 
 		}
-		emit signalSegmentationView();
 
 	}
 	// MULTIPLANAR_VIEW
@@ -294,7 +301,7 @@ void Core::slotChangeView(int viewMode)
 				//props->GetNextProp()->SetVisibility(true);
 			}
 		}
-		emit signalMultiPlanarView();
+
 	}
 	// reset slice to all viewer
 	for (int i = 0; i < VIEWER_NUM && !m_firstInitialize; ++i) {
@@ -514,15 +521,18 @@ void Core::slotSelectROI()
 			extractVOIFilter->Update();
 			this->m_imageManager.getListOfViewerInputImages()[i]->DeepCopy(
 				extractVOIFilter->GetOutput());
+
 		}
 	}
-
+	slotChangeView(MULTIPLANAR_VIEW);
 	//this->m_imageManager.getOverlay().SetDisplayExtent(newExtent);
 
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
-		this->m_2DimageViewer[i]->SetBound(m_style[i]->GetROI()->GetPlaneWidget()->GetCurrentBound());
 		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
+		this->m_2DimageViewer[i]->GetInputLayer()->Modified();
+		this->m_2DimageViewer[i]->Render();
+
 	}
 
 	//ui->actionMultiPlanarView->trigger();
@@ -539,10 +549,10 @@ void Core::slotResetROI()
 				m_imageManager.getListOfVtkImages()[i]);
 		}
 	}
-
+	slotChangeView(MULTIPLANAR_VIEW);
 	//this->imageManager.getOverlay().DisplayExtentOff();
 
-	emit signalMultiPlanarView();
+
 	//ui->actionMultiPlanarView->trigger();
 	//ui->actionNavigation->trigger();
 

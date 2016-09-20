@@ -7,6 +7,7 @@
 #include "VesselSegmentation.h"
 #include "ExtractCenterline.h"
 #include "ModuleWidget.h"
+#include "MeasurementWidget.hpp"
 #include "GPUVolumeRenderingFilter.h"
 #include "MeasurementFor3D.h"
 #include "Centerline.h"
@@ -51,6 +52,9 @@ MainWindow::MainWindow()
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
 	ui->dockWidget->setWidget(m_moduleWidget);
+	m_measurementWidget = new MeasurementWidget(this);
+	ui->dockWidget2->setWidget(m_measurementWidget);
+
 	setActionsEnable(false);
 
 	this->setWindowTitle("PlaqueQuant");
@@ -83,6 +87,8 @@ MainWindow::MainWindow()
 	viewGroup.setExclusive(true);
 	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), &m_core, SLOT(slotMultiPlanarView()));
 	connect(ui->actionAllAxialView, SIGNAL(triggered()), &m_core, SLOT(slotSegmentationView()));
+	connect(&m_core, SIGNAL(signalMultiPlanarView()), ui->actionMultiPlanarView, SLOT(trigger()));
+	connect(&m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
 	// slice 
 	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),
@@ -233,6 +239,7 @@ void MainWindow::setActionsEnable( bool b )
 	ui->actionImage4->setEnabled(b);
 	ui->actionFourViews->setEnabled(b);
 	ui->dockWidget->setEnabled(b); 
+	ui->dockWidget2->setEnabled(b);
 	ui->actionMultiPlanarView->setEnabled(b);
 	ui->actionAllAxialView->setEnabled(b);
 	ui->ULBtn->setEnabled(b);
@@ -285,6 +292,8 @@ bool MainWindow::slotVisualizeImage()
 
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
+	// update DICOM header imformation
+	m_measurementWidget->slotUpdateImformation();
 
 	// initialize image select function 
 	ChangeBaseImageULMenu.clear();

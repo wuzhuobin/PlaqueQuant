@@ -1,6 +1,8 @@
 #include "InteractorStyleROI.h"
 #include "MainWindow.h"
 
+#include <vtkExtractVOI.h>
+
 vtkStandardNewMacro(InteractorStyleROI);
 
 void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
@@ -193,6 +195,7 @@ InteractorStyleROI::InteractorStyleROI()
 
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();
+
 }
 
 
