@@ -51,13 +51,13 @@ MainWindow::MainWindow()
 	
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
-	ui->dockWidget->setWidget(m_moduleWidget);
+	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	m_measurementWidget = new MeasurementWidget(this);
-	ui->dockWidget2->setWidget(m_measurementWidget);
-
+	ui->measurementDockWidget->setWidget(m_measurementWidget);
+	ui->widgetDockWidget->setWidget(m_moduleWidget);
+	this->tabifyDockWidget(ui->widgetDockWidget, ui->measurementDockWidget);
 	setActionsEnable(false);
 
-	this->setWindowTitle("PlaqueQuant");
 	
 	// Open Image
 	connect(ui->actionOpenImage, SIGNAL(triggered()), ioManager, SLOT(slotOpenWithWizard()));
@@ -238,8 +238,8 @@ void MainWindow::setActionsEnable( bool b )
 	ui->actionImage3->setEnabled(b);
 	ui->actionImage4->setEnabled(b);
 	ui->actionFourViews->setEnabled(b);
-	ui->dockWidget->setEnabled(b); 
-	ui->dockWidget2->setEnabled(b);
+	ui->widgetDockWidget->setEnabled(b);
+	ui->measurementDockWidget->setEnabled(b);
 	ui->actionMultiPlanarView->setEnabled(b);
 	ui->actionAllAxialView->setEnabled(b);
 	ui->ULBtn->setEnabled(b);

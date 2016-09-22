@@ -295,9 +295,9 @@ void Overlay::Measure2D()
 	m_2DMeasurements.clear();
 
 	const int* extent = m_vtkOverlay->GetExtent();
-	for (int z = extent[4]; z <= extent[5]; ++z) {
-		Measure2D(z);
-	}
+	//for (int z = extent[4]; z <= extent[5]; ++z) {
+	//	Measure2D(z);
+	//}
 }
 
 void Overlay::Measure2D(int slice)
@@ -312,9 +312,11 @@ void Overlay::Measure2D(int slice)
 	slice = slice - extent[4];
 	// calculate wall thickness
 	vtkSmartPointer<MaximumWallThickness> mwt = vtkSmartPointer<MaximumWallThickness>::New();
+	mwt->SetLumemIntensity(1);
+	mwt->SetVesselIntensity(2);
 	mwt->SetSliceImage(voi->GetOutput());
 	try {
-		//mwt->Update();
+		mwt->Update();
 	}
 	catch (MaximumWallThickness::ERROR_CODE e) {
 		cerr << "MaximumWallThickness error: " << e << endl;
@@ -352,6 +354,7 @@ void Overlay::Measure2D(int slice)
 	}
 	catch (...) {
 	}
+
 	// to ensure it won't 
 	while (slice >= m_2DMeasurements.size() ) {
 		m_2DMeasurements += _2DMeasurements;

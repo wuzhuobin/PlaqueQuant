@@ -54,25 +54,23 @@ add_library(
 	${MYIMAGEREADER_SRC}
 	${QMYIMAGEREADER_SRC}
 	)
-add_executable(
-	MyImageReaderTest
-	${MYIMAGEREADER_INC}
-	${MYIMAGEREADER_SRC}
-	${QMYIMAGEREADER_SRC}
-	${MAIN_SRC}
-)
+# add_executable(
+# 	MyImageReaderTest
+# 	${MYIMAGEREADER_INC}
+# 	${MYIMAGEREADER_SRC}
+# 	${QMYIMAGEREADER_SRC}
+# 	${MAIN_SRC}
+# )
 target_link_libraries(
 	MyImageReader
 	${ITK_LIBRARIES}
 	${VTK_LIBRARIES}
 	Qt5::Widgets
 )
-target_link_libraries(
-	MyImageReaderTest
-	${ITK_LIBRARIES}
-	${VTK_LIBRARIES}
-	Qt5::Widgets
-)
+# target_link_libraries(
+# 	MyImageReaderTest
+# 	${link_directories}
+# )
 source_group(
 	"Generated FIles" 
 	FILES

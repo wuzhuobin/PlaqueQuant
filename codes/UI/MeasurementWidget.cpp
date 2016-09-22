@@ -70,6 +70,7 @@ void MeasurementWidget::slotUpdate2DMeasurements()
 
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 {
+
 	QStringList _2DMeasurements = m_mainWnd->m_core.GetMyImageManager()->getOverlay().
 		Get2DMeasurementsStrings(slice);
 
