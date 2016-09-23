@@ -26,6 +26,7 @@ Copyright (C) 2016
 #include "InteractorStylePolygonDraw.h"
 #include "InteractorStylePaintBrush.h"
 #include "InteractorStyleROI.h"
+#include "InteractorStyleRuler.h"
 #include "StyleSwitchMacro.h"
 
 class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
@@ -40,6 +41,7 @@ public:
 	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
 	vtkGetMacro(ROI, InteractorStyleROI*);
+	vtkGetMacro(Ruler, InteractorStyleRuler*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
@@ -49,6 +51,7 @@ public:
 	SetInteractorStyleMacro(PolygonDraw);
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
+	SetInteractorStyleMacro(Ruler);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
@@ -56,6 +59,7 @@ public:
 	CurrentStyleMacro(PolygonDraw);
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
+	CurrentStyleMacro(Ruler);
 
 	//bool CurrentStyleIsNavigation();
 	//bool CurrentStyleIsWindowLevel();
@@ -93,6 +97,7 @@ private:
 	InteractorStylePolygonDraw* PolygonDraw;
 	InteractorStylePaintBrush*	PaintBrush;
 	InteractorStyleROI* ROI;
+	InteractorStyleRuler* Ruler;
 	vtkInteractorStyle*	CurrentStyle;
 };
 

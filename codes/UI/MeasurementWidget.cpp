@@ -78,6 +78,7 @@ void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 		ui.measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem(_2DMeasurements[i]));
 	}
 
+	ui.MWTTextBrowser->setText(_2DMeasurements[4]);
 }
 
 void MeasurementWidget::slotUpdateImformation()

@@ -62,7 +62,6 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 		ROI = NULL;
 	}
 
-
 }
 
 void InteractorStyleSwitch::InternalUpdate()

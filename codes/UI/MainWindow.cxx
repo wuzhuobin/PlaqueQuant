@@ -56,6 +56,8 @@ MainWindow::MainWindow()
 	ui->measurementDockWidget->setWidget(m_measurementWidget);
 	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	this->tabifyDockWidget(ui->widgetDockWidget, ui->measurementDockWidget);
+	ui->widgetDockWidget->raise();
+	ui->widgetDockWidget->show();
 	setActionsEnable(false);
 
 	

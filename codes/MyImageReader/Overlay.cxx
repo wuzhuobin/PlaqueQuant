@@ -295,73 +295,85 @@ void Overlay::Measure2D()
 	m_2DMeasurements.clear();
 
 	const int* extent = m_vtkOverlay->GetExtent();
-	//for (int z = extent[4]; z <= extent[5]; ++z) {
-	//	Measure2D(z);
-	//}
+	for (int z = extent[4]; z <= extent[5]; ++z) {
+		Measure2D(z);
+	}
 }
 
 void Overlay::Measure2D(int slice)
 {
-	const int* extent = m_vtkOverlay->GetExtent();
+	QStringList _2DMeasurements;
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Undefined";
+	_2DMeasurements += "Normal";
+	// to ensure it won't be out of index
+	while (slice >= m_2DMeasurements.size()) {
+		m_2DMeasurements += _2DMeasurements;
+	}
 
+	const int* extent = m_vtkOverlay->GetExtent();
 	// Extract slice image
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
 	voi->SetInputData(m_vtkOverlay);
 	voi->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
 	voi->Update();
 	slice = slice - extent[4];
-	// calculate wall thickness
-	vtkSmartPointer<MaximumWallThickness> mwt = vtkSmartPointer<MaximumWallThickness>::New();
-	mwt->SetLumemIntensity(1);
-	mwt->SetVesselIntensity(2);
-	mwt->SetSliceImage(voi->GetOutput());
-	try {
-		mwt->Update();
-	}
-	catch (MaximumWallThickness::ERROR_CODE e) {
-		cerr << "MaximumWallThickness error: " << e << endl;
-		//return;
-	}
-
 	// Calculate areas
 	vtkSmartPointer<MeasurementFor2D> m2d = vtkSmartPointer<MeasurementFor2D>::New();
 	m2d->SetSliceImage(voi->GetOutput());
-	try {
-		m2d->Update();
-	}
-	catch (MeasurementFor2D::ERROR_CODE e) {
-		cerr << "MeasurementFor2D error: " << e << endl;
-	}
-	QStringList _2DMeasurements;
-	_2DMeasurements += "Undefined";
-	_2DMeasurements += "Undefined";
-	_2DMeasurements += "Undefined";
-	_2DMeasurements += "Undefined";
-	/// Write measurements to table
+
 	// Error checking
 	//double lumenArea, vesselArea, NMI, distance; // #todo: Allow multiple branch
 	try {
+		m2d->Update();
 		_2DMeasurements[0] = QString::number(m2d->GetOutput(0).LumenArea);
 		_2DMeasurements[1] = QString::number(m2d->GetOutput(0).VesselWallArea);
 		_2DMeasurements[3] = QString::number(
 			m2d->GetOutput(0).VesselWallArea /
 			(m2d->GetOutput(0).LumenArea + m2d->GetOutput(0).VesselWallArea));
 	}
-	catch (...) {
+	catch (MeasurementFor2D::ERROR_CODE e) {
+		cerr << "MeasurementFor2D error: " << e << endl;
 	}
+
+	// calculate wall thickness
+	vtkSmartPointer<MaximumWallThickness> mwt =
+		vtkSmartPointer<MaximumWallThickness>::New();
+	mwt->SetLumemIntensity(1);
+	mwt->SetVesselIntensity(2);
+	mwt->SetSliceImage(voi->GetOutput());
 	try {
+		mwt->Update();
 		_2DMeasurements[2] = QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance);
 	}
-	catch (...) {
-	}
-
-	// to ensure it won't 
-	while (slice >= m_2DMeasurements.size() ) {
-		m_2DMeasurements += _2DMeasurements;
+	catch (MaximumWallThickness::ERROR_CODE e) {
+		cerr << "MaximumWallThickness error: " << e << endl;
+		switch (e) {
+		case MaximumWallThickness::ERROR_EXTRACT_LOOP:
+			_2DMeasurements[4] = "Extract loop failed!";
+			break;
+		case MaximumWallThickness::ERROR_EXTRACT_SLICE:
+			_2DMeasurements[4] = "Extract slice failed!";
+			break;
+		case MaximumWallThickness::ERROR_INPUT_NOT_A_SLICE:
+			_2DMeasurements[4] = "Input is not a slice!";
+			break;
+		case MaximumWallThickness::ERROR_THICKNESS_CAL:
+			_2DMeasurements[4] = "";
+			break;
+		case MaximumWallThickness::ERROR_UNDEFINED_BRANCH:
+			_2DMeasurements[4] = "Cannot pair up vessel wall and lumen!";
+			break;
+		case MaximumWallThickness::ERROR_VALUE_TRANSFORM:
+			_2DMeasurements[4] = "Type casting failed!";
+			break;
+		default:
+			break;
+		}
 	}
 	m_2DMeasurements[slice] = _2DMeasurements;
-
-
 }
 
 vtkImageData* Overlay::GetOutput()

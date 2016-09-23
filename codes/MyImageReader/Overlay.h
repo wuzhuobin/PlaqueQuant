@@ -117,7 +117,7 @@ private:
 
 	int DisplayExtent[6];
 	double* m_3DMeasurements = nullptr;
-	// lumen area, vessel area, NMI, distance
+	// lumen area, vessel area, NMI, distance, distance error imfo
 	QList<QStringList> m_2DMeasurements;
 	QStringList m_volumeStrings;
 
