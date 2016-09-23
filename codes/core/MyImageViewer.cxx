@@ -51,7 +51,7 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	this->SetAnnotationRenderer(ren);
 	ren->Delete();
 	// Widget 
-	this->DistanceWidget = vtkDistanceWidget::New();
+	//this->//distancewidget = vtk//distancewidget::New();
 	this->AngleWidget = vtkAngleWidget::New();
 
 	// OrientationTextActor 
@@ -132,8 +132,8 @@ MyImageViewer::~MyImageViewer()
 	}
 
 	//Widget
-	if (this->DistanceWidget != NULL)
-		this->DistanceWidget->Delete();
+	//if (this->distancewidget != NULL)
+		//this->distancewidget->Delete();
 	if (this->AngleWidget != NULL)
 		this->AngleWidget->Delete();
 
@@ -623,27 +623,27 @@ void MyImageViewer::SetRulerEnabled(bool b)
 {
 	if (b)
 	{
-		if (DistanceWidget)
-			DistanceWidget->Delete();
+		//if (//distancewidget)
+			//distancewidget->Delete();
 
-		DistanceWidget = vtkDistanceWidget::New();
-		DistanceWidget->SetInteractor(RenderWindow->GetInteractor());
-		DistanceWidget->SetPriority(RenderWindow->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
+		//distancewidget = vtk//distancewidget::New();
+		//distancewidget->SetInteractor(RenderWindow->GetInteractor());
+		//distancewidget->SetPriority(RenderWindow->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
 
 		vtkSmartPointer< vtkPointHandleRepresentation2D > rulerHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
 		vtkSmartPointer< vtkDistanceRepresentation2D > distanceRep = vtkSmartPointer< vtkDistanceRepresentation2D >::New();
 		distanceRep->SetHandleRepresentation(rulerHandleRep);
-		DistanceWidget->SetRepresentation(distanceRep);
+		//distancewidget->SetRepresentation(distanceRep);
 		distanceRep->InstantiateHandleRepresentation();
 		distanceRep->SetLabelFormat("%-#11.2f mm");
 		distanceRep->GetAxis()->GetProperty()->SetColor(0, 1, 0);
 
-		DistanceWidget->CreateDefaultRepresentation();
-		DistanceWidget->On();
+		//distancewidget->CreateDefaultRepresentation();
+		//distancewidget->On();
 	}
 	else
 	{
-		DistanceWidget->Off();
+		//distancewidget->Off();
 
 	}
 

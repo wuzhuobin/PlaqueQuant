@@ -203,7 +203,7 @@ protected:
 
 
 	//Widget
-	vtkDistanceWidget* DistanceWidget;
+	//vtkDistanceWidget* DistanceWidget;
 
 	vtkAngleWidget*	 AngleWidget;
 	//Parameter

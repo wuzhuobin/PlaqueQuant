@@ -366,7 +366,7 @@ void Core::slotNavigationMode()
 		m_style[i]->SetInteractorStyleToNavigation();
 	}
 
-	this->slotRuler(false);
+	//this->slotRuler(false);
 }
 
 void Core::slotWindowLevelMode()
@@ -376,7 +376,7 @@ void Core::slotWindowLevelMode()
 	{
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
-	this->slotRuler(false);
+	//this->slotRuler(false);
 }
 
 void Core::slotBrushMode()
@@ -388,7 +388,7 @@ void Core::slotBrushMode()
 	//Update ui
 	//m_moduleWidget->SetPage(2);
 
-	this->slotRuler(false);
+	//this->slotRuler(false);
 }
 
 void Core::slotSetBrushSize(int size)
@@ -430,7 +430,7 @@ void Core::slotContourMode()
 	}
 	//m_moduleWidget->SetPage(1);
 
-	this->slotRuler(false);
+	//this->slotRuler(false);
 }
 
 void Core::slotEnableAutoLumenSegmentation(bool flag)
@@ -474,10 +474,13 @@ void Core::slotSetLineInterpolatorToPolygon(bool flag)
 
 void Core::slotRuler(bool b)
 {
-	for (int i = 0; i< VIEWER_NUM; i++)
-	{
-		m_2DimageViewer[i]->SetRulerEnabled(b);
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->SetInteractorStyleToRuler();
 	}
+	//for (int i = 0; i< VIEWER_NUM; i++)
+	//{
+	//	m_2DimageViewer[i]->SetRulerEnabled(b);
+	//}
 
 }
 
@@ -493,7 +496,7 @@ void Core::slotROIMode()
 		m_style[i]->SetInteractorStyleToROI();
 	}
 
-	this->slotRuler(false);
+	//this->slotRuler(false);
 }
 
 void Core::slotChangeROI()

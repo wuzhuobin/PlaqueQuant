@@ -27,6 +27,16 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PolygonDraw = InteractorStylePolygonDraw::New();
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
+	Ruler = InteractorStyleRuler::New();
+
+	allStyles.push_back(InteractorStyleTesting);
+	allStyles.push_back(WindowLevel);
+	allStyles.push_back(Navigation);
+	allStyles.push_back(PolygonDraw);
+	allStyles.push_back(PaintBrush);
+	allStyles.push_back(ROI);
+	allStyles.push_back(Ruler);
+
 	this->CurrentStyle = 0;
 }
 
@@ -68,20 +78,24 @@ void InteractorStyleSwitch::InternalUpdate()
 {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
-	//if (this->CurrentStyle != this->PolygonDraw) 
-	this->PolygonDraw->SetPolygonModeEnabled(false);
-
-	//if (this->m_imageViewer->GetRenderWindow()) {
-	//	this->m_imageViewer->Render();
+	if (this->CurrentStyle != this->PolygonDraw) 
+		this->PolygonDraw->SetPolygonModeEnabled(false);
+	if (this->CurrentStyle != this->PaintBrush)
+		this->PaintBrush->SetPaintBrushModeEnabled(false);
+	
+	if (this->CurrentStyle != this->Ruler)
+		this->Ruler->SetDistanceWidgetEnabled(false);
+	if(this->CurrentStyle!=this->ROI)
+		this->ROI->SetPlaneWidgetEnabled(false);
+	//if (this->imageViewer->GetRenderWindow()) {
+	//	this->imageViewer->Render();
 	//}
 
-	//if (this->CurrentStyle != this->PaintBrush)
-	this->PaintBrush->SetPaintBrushModeEnabled(false);
-
-	this->ROI->SetPlaneWidgetEnabled(false);
 
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(true);
+	if (this->CurrentStyle == this->Ruler)
+		this->Ruler->SetDistanceWidgetEnabled(true);
 
 }
 
@@ -98,93 +112,79 @@ void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
 			" SetAutoAdjustCameraClippingRange");
 		return;
 	}
-
-	this->AutoAdjustCameraClippingRange = value;
-	this->InteractorStyleTesting->SetAutoAdjustCameraClippingRange(value);
-	this->Navigation->SetAutoAdjustCameraClippingRange(value);
-	this->WindowLevel->SetAutoAdjustCameraClippingRange(value);
-	this->PolygonDraw->SetAutoAdjustCameraClippingRange(value);
-	this->PaintBrush->SetAutoAdjustCameraClippingRange(value);
-	this->ROI->SetAutoAdjustCameraClippingRange(value);
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		(*it)->SetAutoAdjustCameraClippingRange(value);
+	}
 	this->Modified();
 }
 
 void InteractorStyleSwitch::SetDefaultRenderer(vtkRenderer* renderer)
 {
-	this->vtkInteractorStyle::SetDefaultRenderer(renderer);
-	this->InteractorStyleTesting->SetDefaultRenderer(renderer);
-	this->Navigation->SetDefaultRenderer(renderer);
-	this->WindowLevel->SetDefaultRenderer(renderer);
-	this->PolygonDraw->SetDefaultRenderer(renderer);
-	this->PaintBrush->SetDefaultRenderer(renderer);
-	this->ROI->SetDefaultRenderer(renderer);
+	vtkInteractorStyle::SetDefaultRenderer(renderer);
+
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		(*it)->SetDefaultRenderer(renderer);
+	}
 }
 
 void InteractorStyleSwitch::SetCurrentRenderer(vtkRenderer* renderer)
 {
-	this->vtkInteractorStyle::SetCurrentRenderer(renderer);
-	this->InteractorStyleTesting->SetCurrentRenderer(renderer);
-	this->Navigation->SetCurrentRenderer(renderer);
-	this->WindowLevel->SetCurrentRenderer(renderer);
-	this->PolygonDraw->SetCurrentRenderer(renderer);
-	this->PaintBrush->SetCurrentRenderer(renderer);
-	this->ROI->SetCurrentRenderer(renderer);
+	vtkInteractorStyle::SetCurrentRenderer(renderer);
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		(*it)->SetCurrentRenderer(renderer);
+	}
 }
 
-void InteractorStyleSwitch::SetImageViewer(MyImageViewer* m_imageViewer)
+void InteractorStyleSwitch::SetImageViewer(MyImageViewer* imageViewer)
 {
-	//this->m_imageViewer = m_imageViewer;
-	this->Navigation->SetImageViewer(m_imageViewer);
-	this->WindowLevel->SetImageViewer(m_imageViewer);
-	this->PolygonDraw->SetImageViewer(m_imageViewer);
-	this->PaintBrush->SetImageViewer(m_imageViewer);
-	this->ROI->SetImageViewer(m_imageViewer);
+	//this->imageViewer = imageViewer;
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		AbstractInteractorStyleImage* _style = 
+			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		if (_style != NULL) {
+			_style->SetImageViewer(imageViewer);
+		}
+	}
 }
 
 void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
 {
-	this->Navigation->AddSynchronalViewer(imageViewer);
-	this->WindowLevel->AddSynchronalViewer(imageViewer);
-	this->PaintBrush->AddSynchronalViewer(imageViewer);
-	this->PolygonDraw->AddSynchronalViewer(imageViewer);
-	this->ROI->AddSynchronalViewer(imageViewer);
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		AbstractInteractorStyleImage* _style =
+			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		if (_style != NULL) {
+			_style->AddSynchronalViewer(imageViewer);
+		}
+	}
 }
 
 void InteractorStyleSwitch::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)
 {
-	this->Navigation->SetSynchronalViewers(synchronalViewers);
-	this->WindowLevel->SetSynchronalViewers(synchronalViewers);
-	this->PaintBrush->SetSynchronalViewers(synchronalViewers);
-	this->PolygonDraw->SetSynchronalViewers(synchronalViewers);
-	this->ROI->SetSynchronalViewers(synchronalViewers);
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		AbstractInteractorStyleImage* _style =
+			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		if (_style != NULL) {
+			_style->SetSynchronalViewers(synchronalViewers);
+		}
+	}
 }
-
-//void InteractorStyleSwitch::initializeQWidget(QSpinBox * sliceX, QSpinBox * sliceY, QSpinBox * sliceZ,
-//	QDoubleSpinBox * window, QDoubleSpinBox * level,
-//	QSpinBox * drawBrushSize,
-//	QComboBox * drawShape,
-//	QCheckBox * drawVolumetric,
-//	QCheckBox * drawIsotropic)
-//{
-//	this->Navigation->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-//	this->WindowLevel->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-//	this->PolygonDraw->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-//	this->PaintBrush->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-//	this->WindowLevel->SetWindowLevelSpinBox(window, level);
-//	this->PaintBrush->SetDrawBrushSizeSpinBox(drawBrushSize);
-//	this->PaintBrush->SetDrawBrushShapeComBox(drawShape);
-//	this->PaintBrush->SetDrawVolumetricCheckBox(drawVolumetric);
-//	this->PaintBrush->SetDrawIsotropicCheckBox(drawIsotropic);
-//	this->ROI->SetSliceSpinBox(sliceX, sliceY, sliceZ);
-//}
 
 void InteractorStyleSwitch::SetCurrentSlice(int slice)
 {
-	this->Navigation->SetCurrentSlice(slice);
-	this->WindowLevel->SetCurrentSlice(slice);
-	this->PaintBrush->SetCurrentSlice(slice);
-	this->PolygonDraw->SetCurrentSlice(slice);
-	this->ROI->SetCurrentSlice(slice);
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		AbstractInteractorStyleImage* _style =
+			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		if (_style != NULL) {
+			_style->SetCurrentSlice(slice);
+		}
+	}
 }
 
 //void InteractorStyleSwitch::SetOrientation(int index)
@@ -199,12 +199,10 @@ void InteractorStyleSwitch::SetCurrentSlice(int slice)
 void InteractorStyleSwitch::SetEnabled(int i)
 {
 	Superclass::SetEnabled(i);
-
-	this->Navigation->SetEnabled(i);
-	this->PaintBrush->SetEnabled(i);
-	this->PolygonDraw->SetEnabled(i);
-	this->WindowLevel->SetEnabled(i);
-	this->ROI->SetEnabled(i);
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		(*it)->SetEnabled(i);
+	}
 }
 
 void InteractorStyleSwitch::SetEnabledOn()

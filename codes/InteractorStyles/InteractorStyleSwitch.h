@@ -21,6 +21,8 @@ Copyright (C) 2016
 #include <vtkRenderer.h>
 #include <vtkInteractorStyleSwitchBase.h>
 
+#include <list>
+
 #include "InteractorStyleNavigation.h"
 #include "InteractorStyleWindowLevel.h"
 #include "InteractorStylePolygonDraw.h"
@@ -70,12 +72,6 @@ public:
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
 	virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
 	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
-	//virtual void initializeQWidget(QSpinBox* sliceX, QSpinBox* sliceY, QSpinBox* sliceZ,
-	//	QDoubleSpinBox* window, QDoubleSpinBox* level,
-	//	QSpinBox* drawBrushSize,
-	//	QComboBox* drawShape,
-	//	QCheckBox* drawVolumetric,
-	//	QCheckBox* drawIsotropic);
 	virtual void SetCurrentSlice(int slice);
 	//virtual void SetOrientation(int);
 	virtual void SetEnabled(int);
@@ -99,6 +95,7 @@ private:
 	InteractorStyleROI* ROI;
 	InteractorStyleRuler* Ruler;
 	vtkInteractorStyle*	CurrentStyle;
+	std::list<vtkInteractorStyle*> allStyles;
 };
 
 

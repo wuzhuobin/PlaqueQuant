@@ -3,9 +3,8 @@
 
 #include "InteractorStyleNavigation.h"
 
-#include <vtkPointHandleRepresentation2D.h>
-#include <vtkDistanceRepresentation2D.h>
 #include <vtkDistanceWidget.h>
+#include <vtkDistanceRepresentation3D.h>
 
 class InteractorStyleRuler :
 	public InteractorStyleNavigation
@@ -20,17 +19,10 @@ protected:
 	InteractorStyleRuler();
 	~InteractorStyleRuler();
 
-	virtual void OnLeftButtonDown();
-	virtual void OnRightButtonDown();
-	virtual void OnMouseWheelBackward();
-	virtual void OnMouseWheelForward();
-	virtual void OnMiddleButtonDown();
-
-
 private:
 	bool m_distanceWidgetEnabledFlag = false;
 	//vtkPointHandleRepresentation2D* m_pointHandleRepresentation2D = NULL;
-	//vtkDistanceRepresentation2D* m_distanceRepresentation2D = NULL;
+	vtkDistanceRepresentation3D* m_distanceRepresentation3D = NULL;
 	vtkDistanceWidget* m_distanceWidget = NULL;
 };
 
