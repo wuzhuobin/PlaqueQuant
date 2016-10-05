@@ -120,7 +120,7 @@ void InteractorStylePaintBrush::OnLeftButtonUp()
 	if (!m_isDraw)
 	{
 		this->WriteToOverlay();
-		m_imageViewer->GetdrawActor()->SetVisibility(true);
+		m_imageViewer->GetOverlayActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -172,7 +172,7 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 		this->ReadfromImageData();
 		this->Render();
 	}
-	m_imageViewer->GetdrawActor()->SetVisibility(false);
+	m_imageViewer->GetOverlayActor()->SetVisibility(false);
 	Draw(true);
 	this->Render();
 }
@@ -183,7 +183,7 @@ void InteractorStylePaintBrush::OnRightButtonUp()
 	if (!m_isDraw)
 	{
 		this->WriteToOverlay();
-		m_imageViewer->GetdrawActor()->SetVisibility(true);
+		m_imageViewer->GetOverlayActor()->SetVisibility(true);
 		//Clear Layer
 		m_brush->SetDrawColor(0, 0, 0, 0);
 		this->FillBox3D();
@@ -239,7 +239,7 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 		this->Render();
 	}
 
-	m_imageViewer->GetdrawActor()->SetVisibility(false);
+	m_imageViewer->GetOverlayActor()->SetVisibility(false);
 	this->Draw(false);
 	this->Render();
 	m_rightFunctioning = true;

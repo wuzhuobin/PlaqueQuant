@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkLeaderActor2D.h>
 
+#include <QList>
 
 vtkStandardNewMacro(MyImageViewer);
 
@@ -40,8 +41,8 @@ MyImageViewer::MyImageViewer(QObject* parent)
 {
 	this->CursorActor = NULL;
 	this->AnnotationRenderer = NULL;
-	this->drawActor = vtkImageActor::New();
-	this->AnnotationWindowLevel = vtkImageMapToWindowLevelColors::New();
+	this->OverlayActor = vtkImageActor::New();
+	this->OverlayWindowLevel = vtkImageMapToWindowLevelColors::New();
 
 
 	//Setup the pipeline again because of Annotation
@@ -89,13 +90,13 @@ MyImageViewer::MyImageViewer(QObject* parent)
 //----------------------------------------------------------------------------
 MyImageViewer::~MyImageViewer()
 {
-	if (this->AnnotationWindowLevel) {
-		this->AnnotationWindowLevel->Delete();
-		this->AnnotationWindowLevel = NULL;
+	if (this->OverlayWindowLevel) {
+		this->OverlayWindowLevel->Delete();
+		this->OverlayWindowLevel = NULL;
 	}
-	if (this->drawActor) {
-		this->drawActor->Delete();
-		this->drawActor = NULL;
+	if (this->OverlayActor) {
+		this->OverlayActor->Delete();
+		this->OverlayActor = NULL;
 	}
 	if (this->AnnotationRenderer != NULL) {
 		this->AnnotationRenderer->Delete();
@@ -162,17 +163,17 @@ void MyImageViewer::UpdateDisplayExtent()
 		switch (this->SliceOrientation)
 		{
 		case MyImageViewer::SLICE_ORIENTATION_XY:
-			this->drawActor->SetDisplayExtent(
+			this->OverlayActor->SetDisplayExtent(
 				w_ext[0], w_ext[1], w_ext[2], w_ext[3], this->Slice, this->Slice);
 			break;
 
 		case MyImageViewer::SLICE_ORIENTATION_XZ:
-			this->drawActor->SetDisplayExtent(
+			this->OverlayActor->SetDisplayExtent(
 				w_ext[0], w_ext[1], this->Slice, this->Slice, w_ext[4], w_ext[5]);
 			break;
 
 		case MyImageViewer::SLICE_ORIENTATION_YZ:
-			this->drawActor->SetDisplayExtent(
+			this->OverlayActor->SetDisplayExtent(
 				this->Slice, this->Slice, w_ext[2], w_ext[3], w_ext[4], w_ext[5]);
 			break;
 		}
@@ -206,16 +207,16 @@ void MyImageViewer::InstallPipeline()
 		this->RenderWindow->AddRenderer(this->AnnotationRenderer); 
 	}
 	// add label view prop to renderer
-	if (this->AnnotationRenderer && this->drawActor)
+	if (this->AnnotationRenderer && this->OverlayActor)
 	{
-		this->AnnotationRenderer->AddViewProp(this->drawActor);
+		this->AnnotationRenderer->AddViewProp(this->OverlayActor);
 	}
 
 	// Setup connection with window level mapper
-	if (this->drawActor && this->AnnotationWindowLevel)
+	if (this->OverlayActor && this->OverlayWindowLevel)
 	{
-		this->drawActor->GetMapper()->SetInputConnection(
-			this->AnnotationWindowLevel->GetOutputPort());
+		this->OverlayActor->GetMapper()->SetInputConnection(
+			this->OverlayWindowLevel->GetOutputPort());
 	}
 	// add cursor 
 	if (this->Renderer && this->CursorActor)
@@ -223,19 +224,18 @@ void MyImageViewer::InstallPipeline()
 		this->Renderer->AddActor(this->CursorActor);
 	}
 
-
 }
 
 //----------------------------------------------------------------------------
 void MyImageViewer::UnInstallPipeline()
 {
 	Superclass::UnInstallPipeline();
-	if (this->drawActor)
+	if (this->OverlayActor)
 	{
-		this->drawActor->GetMapper()->SetInputConnection(NULL);
+		this->OverlayActor->GetMapper()->SetInputConnection(NULL);
 	}
-	if (this->AnnotationRenderer && this->drawActor) {
-		this->AnnotationRenderer->RemoveActor(drawActor);
+	if (this->AnnotationRenderer && this->OverlayActor) {
+		this->AnnotationRenderer->RemoveActor(OverlayActor);
 	}
 	if (this->RenderWindow && this->AnnotationRenderer) {
 		this->RenderWindow->RemoveRenderer(this->AnnotationRenderer);
@@ -325,12 +325,12 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 
 void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 {
-	this->AnnotationWindowLevel->SetInputData(in);
+	this->OverlayWindowLevel->SetInputData(in);
 	// in case when LookupTable has not been set
 	if (this->LookupTable != NULL) {
 		int num = this->LookupTable->GetNumberOfTableValues();
-		AnnotationWindowLevel->SetWindow(num - 1 );
-		AnnotationWindowLevel->SetLevel((num - 1)*0.5);
+		OverlayWindowLevel->SetWindow(num - 1 );
+		OverlayWindowLevel->SetLevel((num - 1)*0.5);
 	}
 	this->UpdateDisplayExtent();
 
@@ -338,7 +338,7 @@ void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 //----------------------------------------------------------------------------
 vtkImageData* MyImageViewer::GetInputLayer()
 {
-	return vtkImageData::SafeDownCast(this->AnnotationWindowLevel->GetInput());
+	return vtkImageData::SafeDownCast(this->OverlayWindowLevel->GetInput());
 }
 //----------------------------------------------------------------------------
 void MyImageViewer::SetOverlay(Overlay * overlay)
@@ -366,7 +366,7 @@ void MyImageViewer::PrintSelf(ostream& os, vtkIndent indent)
 	os << indent << "ImageActor:\n";
 	this->ImageActor->PrintSelf(os, indent.GetNextIndent());
 	os << indent << "ImageActorContour:\n";
-	this->drawActor->PrintSelf(os, indent.GetNextIndent());
+	this->OverlayActor->PrintSelf(os, indent.GetNextIndent());
 	os << indent << "WindowLevel:\n" << endl;
 	this->WindowLevel->PrintSelf(os, indent.GetNextIndent());
 	os << indent << "Slice: " << this->Slice << endl;
@@ -432,13 +432,13 @@ vtkLookupTable* MyImageViewer::getLookupTable()
 void MyImageViewer::SetLookupTable(vtkLookupTable * LookupTable)
 {
 	this->LookupTable = LookupTable;
-	this->drawActor->GetProperty()->SetInterpolationTypeToNearest();
-	this->drawActor->GetProperty()->SetLookupTable(LookupTable);
+	this->OverlayActor->GetProperty()->SetInterpolationTypeToNearest();
+	this->OverlayActor->GetProperty()->SetLookupTable(LookupTable);
 
 	int num = LookupTable->GetNumberOfTableValues();
-	AnnotationWindowLevel->SetWindow(num - 1);
-	AnnotationWindowLevel->SetLevel((num - 1) * 0.5);
-	//this->drawActor->SetVisibility(false);
+	OverlayWindowLevel->SetWindow(num - 1);
+	OverlayWindowLevel->SetLevel((num - 1) * 0.5);
+	//this->OverlayActor->SetVisibility(false);
 }
 
 void MyImageViewer::SetFocalPointWithWorldCoordinate(double x, double y, double z)
@@ -495,6 +495,27 @@ void MyImageViewer::GetFocalPointWithWorldCoordinate(double * coordinate)
 double * MyImageViewer::GetFocalPointWithWorldCoordinate()
 {
 	return Cursor3D->GetFocalPoint();
+}
+
+void MyImageViewer::SetVisibility(bool flag)
+{
+	QList<vtkProp*>  props;
+	props += this->ImageActor;
+	props += this->OrientationTextActor[0];
+	props += this->OrientationTextActor[1];
+	props += this->OrientationTextActor[2];
+	props += this->OrientationTextActor[3];
+	props += this->HeaderActor;
+	props += this->IntTextActor;
+	props += this->CursorActor;
+	props += this->OverlayActor;
+
+
+	for (QList<vtkProp*>::const_iterator cit = props.cbegin(); cit != props.cend(); ++cit) {
+		if ((*cit) != NULL) {
+			(*cit)->SetVisibility(flag);
+		}
+	}
 }
 
 void MyImageViewer::SetBound(double* b)
@@ -575,7 +596,6 @@ void MyImageViewer::InitializeOrientationText()
 			OrientationTextActor[i]->GetTextProperty()->SetColor(1.0, 0.7490, 0.0);
 			Renderer->AddActor2D(OrientationTextActor[i]);
 		}
-
 	}
 	switch (SliceOrientation)
 	{

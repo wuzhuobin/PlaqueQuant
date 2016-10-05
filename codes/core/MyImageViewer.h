@@ -82,6 +82,9 @@ public:
 	// Text methods
 	virtual void InitializeHeader(QString File);
 
+	// Description:
+	// Set all Actors' visibility
+	virtual void SetVisibility(bool flag);
 
 	// Cursor methods
 	virtual void SetBound(double* b);
@@ -113,8 +116,8 @@ public:
 	// Description:
 	// Get the internal render window, renderer, image actor, and
 	// image map instances.
-	vtkGetObjectMacro(drawActor, vtkImageActor);
-	vtkGetObjectMacro(AnnotationWindowLevel, vtkImageMapToWindowLevelColors);
+	vtkGetObjectMacro(OverlayActor, vtkImageActor);
+	vtkGetObjectMacro(OverlayWindowLevel, vtkImageMapToWindowLevelColors);
 	//vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
 	vtkGetObjectMacro(AnnotationRenderer, vtkRenderer);
 	// Description:
@@ -194,11 +197,11 @@ protected:
 	double Bound[6];
 
 	//Label and Annotation
-	vtkImageMapToWindowLevelColors* AnnotationWindowLevel;
-	vtkImageActor* drawActor;
+	vtkImageMapToWindowLevelColors* OverlayWindowLevel;
+	vtkImageActor* OverlayActor;
 	vtkRenderer* AnnotationRenderer;
 
-	// LookupTable for drawActor
+	// LookupTable for OverlayActor
 	vtkLookupTable* LookupTable;
 
 

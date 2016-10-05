@@ -112,7 +112,7 @@ void Core::slotAddOverlayToImageViewer() {
 		// Very strange
 		//this->LookupTable->SetTableRange(0, 6);
 		m_2DimageViewer[i]->SetOverlay(&m_imageManager.getOverlay());
-		m_2DimageViewer[i]->GetdrawActor()->SetVisibility(true);
+		m_2DimageViewer[i]->GetOverlayActor()->SetVisibility(true);
 	}
 	this->m_imageManager.getOverlay().GetOutput()->Modified();
 }
