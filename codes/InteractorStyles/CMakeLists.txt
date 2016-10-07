@@ -52,6 +52,8 @@ file(
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.cxx 
 	${PROJECT_SOURCE_DIR}/LumenSegmentation.cxx
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.cxx
+	${PROJECT_SOURCE_DIR}/MyBorderWidget.cxx
 	PARENT_SCOPE
 	)
 file(
@@ -61,6 +63,8 @@ file(
 	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h 
 	${PROJECT_SOURCE_DIR}/LumenSegmentation.h
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.h
+	${PROJECT_SOURCE_DIR}/MyBorderWidget.H
 	PARENT_SCOPE
 	)
 add_library(

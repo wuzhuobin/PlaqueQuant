@@ -1,10 +1,10 @@
-#include "MyPlaneWidget.h"
+#include "MyPlaneWidget2.h"
 #include "vtkObjectFactory.h"
 
-#include "MainWindow.h"
-vtkStandardNewMacro(MyPlaneWidget);
+//#include "MainWindow.h"
+vtkStandardNewMacro(MyPlaneWidget2);
 
-void MyPlaneWidget::initializeCustomFunction()
+void MyPlaneWidget2::initializeCustomFunction()
 {
 
 	this->ConeActor->SetVisibility(false);
@@ -35,35 +35,35 @@ void MyPlaneWidget::initializeCustomFunction()
 
 }
 
-void MyPlaneWidget::SetDefaultBound(double* bound)
+void MyPlaneWidget2::SetDefaultBound(double* bound)
 {
 	memcpy(m_deafultBound, bound, sizeof(m_deafultBound));
 
 }
 
-double* MyPlaneWidget::GetDefaultBound(){
+double* MyPlaneWidget2::GetDefaultBound(){
 	return m_deafultBound;
 }
 
-void MyPlaneWidget::SetImageViewer(MyImageViewer* viewer){
+void MyPlaneWidget2::SetImageViewer(MyImageViewer* viewer){
 	m_2DImageViewer = viewer;
 }
 
-MyImageViewer* MyPlaneWidget::GetImageViewer(){
+MyImageViewer* MyPlaneWidget2::GetImageViewer(){
 	return m_2DImageViewer;
 }
 
-void MyPlaneWidget::SetCurrentBound(double* bound)
+void MyPlaneWidget2::SetCurrentBound(double* bound)
 {
 	memcpy(m_currentBound, bound, sizeof(m_currentBound));
 }
 
-double* MyPlaneWidget::GetCurrentBound()
+double* MyPlaneWidget2::GetCurrentBound()
 {
 	return this->m_currentBound;
 }
 
-void MyPlaneWidget::SetVisibility(bool b)
+void MyPlaneWidget2::SetVisibility(bool b)
 {
 	for (int i=0;i<4;i++)
 	{
@@ -72,7 +72,7 @@ void MyPlaneWidget::SetVisibility(bool b)
 	this->PlaneActor->SetVisibility(b);
 }
 
-void MyPlaneWidget::ReplaceWidget(double bds[6])
+void MyPlaneWidget2::ReplaceWidget(double bds[6])
 {
 	int i;
 	double bounds[6], center[3];
@@ -146,10 +146,10 @@ void MyPlaneWidget::ReplaceWidget(double bds[6])
 	this->SizeHandles();
 }
 
-void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
+void MyPlaneWidget2Callback::Execute(vtkObject *caller, unsigned long ev, void* )
 {
-	MyPlaneWidget *planeWidget = 
-		dynamic_cast<MyPlaneWidget*>(caller);
+	MyPlaneWidget2 *planeWidget = 
+		dynamic_cast<MyPlaneWidget2*>(caller);
 	//double* currentBound = planeWidget->GetCurrentBound();
 	double currentBound[6];
 	double* defaultBound = planeWidget->GetDefaultBound(); 		
@@ -207,7 +207,7 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 		currentBound[4] = planeWidget->GetCurrentBound()[4];
 		currentBound[5] = planeWidget->GetCurrentBound()[5];
 	}
-	MainWindow::GetMainWindow()->slotChangeROI();
+	//MainWindow::GetMainWindow()->slotChangeROI();
 	//Update all PlaneWidget
 	for (int i=0 ; i<3; i++) 
 	{
@@ -240,7 +240,7 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 	}
 }
 
-void MyPlaneWidgetCallback::SetPlaneWidget(MyPlaneWidget* s, MyPlaneWidget* c, MyPlaneWidget* a)
+void MyPlaneWidget2Callback::SetPlaneWidget(MyPlaneWidget2* s, MyPlaneWidget2* c, MyPlaneWidget2* a)
 {
 	m_planeWidget[0] = s;
 	m_planeWidget[1] = c;

@@ -56,7 +56,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
 	${PROJECT_SOURCE_DIR}/Core.cxx
 	${PROJECT_SOURCE_DIR}/MyImageViewer.cxx
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
+	# ${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
 )
 
 SET(
@@ -69,7 +69,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
 	${PROJECT_SOURCE_DIR}/Core.h
 	${PROJECT_SOURCE_DIR}/MyImageViewer.h
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
+	# ${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
 )
 
 

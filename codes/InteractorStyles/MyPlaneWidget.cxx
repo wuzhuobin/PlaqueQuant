@@ -1,7 +1,7 @@
 #include "MyPlaneWidget.h"
 #include "vtkObjectFactory.h"
 
-#include "MainWindow.h"
+//#include "MainWindow.h"
 vtkStandardNewMacro(MyPlaneWidget);
 
 void MyPlaneWidget::initializeCustomFunction()
@@ -207,7 +207,7 @@ void MyPlaneWidgetCallback::Execute(vtkObject *caller, unsigned long ev, void* )
 		currentBound[4] = planeWidget->GetCurrentBound()[4];
 		currentBound[5] = planeWidget->GetCurrentBound()[5];
 	}
-	MainWindow::GetMainWindow()->slotChangeROI();
+	//MainWindow::GetMainWindow()->slotChangeROI();
 	//Update all PlaneWidget
 	for (int i=0 ; i<3; i++) 
 	{

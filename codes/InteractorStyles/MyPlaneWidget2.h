@@ -1,5 +1,5 @@
-#ifndef MYPLANEWIDGET_H
-#define MYPLANEWIDGET_H
+#ifndef MyPlaneWidget2_H
+#define MyPlaneWidget2_H
 
 #include "vtkCommand.h"
 #include "vtkCallbackCommand.h"
@@ -12,11 +12,13 @@
 #include "vtkActor.h"
 #include "MyImageViewer.h"
 
- class MyPlaneWidget : public vtkPlaneWidget
+#include <list>
+
+ class MyPlaneWidget2 : public vtkPlaneWidget
 {
 public:
-	static MyPlaneWidget *New();
-	vtkTypeMacro(MyPlaneWidget, vtkPlaneWidget);
+	static MyPlaneWidget2 *New();
+	vtkTypeMacro(MyPlaneWidget2, vtkPlaneWidget);
 
 	virtual void initializeCustomFunction();
 	void ReplaceWidget(double bds[6]);
@@ -36,20 +38,21 @@ private:
 	MyImageViewer* m_2DImageViewer;
 };
 
-class MyPlaneWidgetCallback : public vtkCommand
+class MyPlaneWidget2Callback : public vtkCommand
 {
 public:
-	MyPlaneWidgetCallback(){}
+	MyPlaneWidget2Callback(){}
 
-	static MyPlaneWidgetCallback *New(){return new MyPlaneWidgetCallback;}
+	static MyPlaneWidget2Callback *New(){return new MyPlaneWidget2Callback;}
 
 	virtual void Execute(vtkObject *caller, unsigned long ev, void* );
-	void SetPlaneWidget(MyPlaneWidget* s, MyPlaneWidget* c, MyPlaneWidget* a);
+	void SetPlaneWidget(MyPlaneWidget2* s, MyPlaneWidget2* c, MyPlaneWidget2* a);
 
 private:
-	MyPlaneWidget* m_planeWidget[3];
+	//std::list<MyPlaneWidget2> 
+	MyPlaneWidget2* m_planeWidget[3];
 
 };
 
 
-#endif //MYPLANEWIDGET_H
+#endif //MyPlaneWidget2_H

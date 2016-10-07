@@ -1,5 +1,5 @@
-#ifndef MYPLANEWIDGET_H
-#define MYPLANEWIDGET_H
+#ifndef MyPlaneWidget_H
+#define MyPlaneWidget_H
 
 #include "vtkCommand.h"
 #include "vtkCallbackCommand.h"
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif //MYPLANEWIDGET_H
+#endif //MyPlaneWidget_H

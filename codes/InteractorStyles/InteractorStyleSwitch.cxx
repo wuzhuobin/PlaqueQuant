@@ -42,35 +42,43 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 
 InteractorStyleSwitch::~InteractorStyleSwitch()
 {
-	if (InteractorStyleTesting != NULL) {
-		InteractorStyleTesting->Delete();
-		InteractorStyleTesting = 0;
-	}
+	//if (InteractorStyleTesting != NULL) {
+	//	InteractorStyleTesting->Delete();
+	//	InteractorStyleTesting = 0;
+	//}
 
-	if (WindowLevel != NULL) {
-		WindowLevel->Delete();
-		WindowLevel = NULL;
-	}
+	//if (WindowLevel != NULL) {
+	//	WindowLevel->Delete();
+	//	WindowLevel = NULL;
+	//}
 
-	if (Navigation != NULL) {
-		Navigation->Delete();
-		Navigation = NULL;
-	}
+	//if (Navigation != NULL) {
+	//	Navigation->Delete();
+	//	Navigation = NULL;
+	//}
 
-	if (PolygonDraw != NULL) {
-		PolygonDraw->Delete();
-		PolygonDraw = NULL;
-	}
+	//if (PolygonDraw != NULL) {
+	//	PolygonDraw->Delete();
+	//	PolygonDraw = NULL;
+	//}
 
-	if (PaintBrush != NULL) {
-		PaintBrush->Delete();
-		PaintBrush = NULL;
-	}
+	//if (PaintBrush != NULL) {
+	//	PaintBrush->Delete();
+	//	PaintBrush = NULL;
+	//}
 
-	if (ROI != NULL) {
-		ROI->Delete();
-		ROI = NULL;
+	//if (ROI != NULL) {
+	//	ROI->Delete();
+	//	ROI = NULL;
+	//}
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		if ((*it) != NULL) {
+			(*it)->Delete();
+			(*it) == NULL;
+		}
 	}
+	allStyles.clear();
 
 }
 

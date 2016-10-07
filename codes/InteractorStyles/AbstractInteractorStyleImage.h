@@ -18,7 +18,6 @@ Copyright (C) 2016
 #ifndef ABSTRACT_INTERACTOR_STYLE_IMAGE_H
 #define ABSTRACT_INTERACTOR_STYLE_IMAGE_H
 
-//#include <QSpinBox>
 
 /// VTK
 #include <vtkInteractorStyleImage.h>

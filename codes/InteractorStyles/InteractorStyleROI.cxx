@@ -4,7 +4,7 @@
 #include <vtkExtractVOI.h>
 
 vtkStandardNewMacro(InteractorStyleROI);
-
+using namespace std;
 void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 {
 	MainWindow *mainWnd = MainWindow::GetMainWindow();
@@ -14,7 +14,18 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		planeWidget->SetInputData(m_imageViewer->GetInput());
 		planeWidget->SetImageViewer(m_imageViewer);
 		planeWidget->SetDefaultBound(m_imageViewer->GetBound());
-		planeWidget->SetInteractor(mainWnd->GetVtkRenderWindowInteractor(GetSliceOrientation()));
+		planeWidget->SetInteractor(this->Interactor);
+
+
+
+		//for (list<MyImageViewer*>::const_iterator cit = m_synchronalViewers.cbegin();
+		//	cit != m_synchronalViewers.cend(); ++cit) {
+		//	InteractorStyleSwitch* _switch = 
+		//		dynamic_cast<InteractorStyleSwitch*>((*cit)->GetInteractorStyle());
+		//	if (_switch != NULL) {
+		//		_switch->GetROI()->GetPlaneWidget()
+		//	}
+		//}
 		//qDebug() << "planeWidget:" << planeWidget;
 		//qDebug() << "planeWidgetCallback" << planeWidgetCallback;
 		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
