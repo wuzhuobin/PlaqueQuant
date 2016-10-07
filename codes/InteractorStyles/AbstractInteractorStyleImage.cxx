@@ -128,17 +128,17 @@ int * AbstractInteractorStyleImage::GetExtent()
 
 void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
 {
+	int ijk[3];
+	m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
+	ijk[GetSliceOrientation()] = slice;
+	SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+}
+
+void AbstractInteractorStyleImage::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
+{
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
-		if ((*it)->GetSliceOrientation() == GetSliceOrientation()) {
-			(*it)->SetSlice(slice);
-		}
-		else {
-			int ijk[3];
-			(*it)->GetFocalPointWithImageCoordinate(ijk);
-			ijk[GetSliceOrientation()] = slice;
-			(*it)->SetFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-		}
+		(*it)->SetFocalPointWithImageCoordinate(i, j, k);
 		(*it)->Render();
 	}
 }

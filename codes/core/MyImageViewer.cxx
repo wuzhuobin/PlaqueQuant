@@ -203,11 +203,11 @@ void MyImageViewer::InstallPipeline()
 {
 	vtkImageViewer2::InstallPipeline();
 	// add the renderer to render window if it hasn't been added
-	if (this->RenderWindow && this->AnnotationRenderer && !this->RenderWindow->HasRenderer(this->AnnotationRenderer)) {
+	if (this->RenderWindow && this->AnnotationRenderer ) {
 		this->RenderWindow->AddRenderer(this->AnnotationRenderer); 
 	}
 	// add label view prop to renderer
-	if (this->AnnotationRenderer && this->OverlayActor)
+	if (this->AnnotationRenderer && this->OverlayActor) 
 	{
 		this->AnnotationRenderer->AddViewProp(this->OverlayActor);
 	}
@@ -223,7 +223,18 @@ void MyImageViewer::InstallPipeline()
 	{
 		this->Renderer->AddActor(this->CursorActor);
 	}
-
+	// Text 
+	if (this->HeaderActor && this->Renderer) {
+		this->Renderer->AddActor(this->HeaderActor);
+	}
+	if (this->IntTextActor && this->Renderer) {
+		this->Renderer->AddActor(this->IntTextActor);
+	}
+	for (int i = 0; i < 4; ++i) {
+		if (this->OrientationTextActor[i] && this->Renderer) {
+			this->Renderer->AddActor(this->OrientationTextActor[i]);
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -243,6 +254,18 @@ void MyImageViewer::UnInstallPipeline()
 	if (this->Renderer && this->CursorActor)
 	{
 		this->Renderer->RemoveActor(this->CursorActor);
+	}
+	// Text 
+	if (this->HeaderActor && this->Renderer) {
+		this->Renderer->RemoveActor(this->HeaderActor);
+	}
+	if (this->IntTextActor && this->Renderer) {
+		this->Renderer->RemoveActor(this->IntTextActor);
+	}
+	for (int i = 0; i < 4; ++i) {
+		if (this->OrientationTextActor[i] && this->Renderer) {
+			this->Renderer->RemoveActor(this->OrientationTextActor[i]);
+		}
 	}
 }
 
@@ -292,14 +315,14 @@ void MyImageViewer::Render()
 		this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
 	}
 	// update cursor3d
-	double ijk[3];
-	Cursor3D->GetFocalPoint(ijk);
-	double sliceWorldCoordinate = 
-		Slice * GetInput()->GetSpacing()[SliceOrientation] + GetInput()->GetOrigin()[SliceOrientation];
-	ijk[SliceOrientation] = sliceWorldCoordinate;
-	SetFocalPointWithWorldCoordinate(ijk[0], ijk[1], ijk[2]);
+	//double ijk[3];
+	//Cursor3D->GetFocalPoint(ijk);
+	//double sliceWorldCoordinate = 
+	//	Slice * GetInput()->GetSpacing()[SliceOrientation] + GetInput()->GetOrigin()[SliceOrientation];
+	//ijk[SliceOrientation] = sliceWorldCoordinate;
+	//SetFocalPointWithWorldCoordinate(ijk[0], ijk[1], ijk[2]);
 	// update orientationText
-	ResizeOrientationText();
+	ResizeHeaderAndOrientationText();
 	if (this->GetInput())
 	{
 		this->RenderWindow->Render();
@@ -424,7 +447,7 @@ void MyImageViewer::SetAnnotationRenderer(vtkRenderer * arg)
 	this->UpdateOrientation();
 }
 
-vtkLookupTable* MyImageViewer::getLookupTable()
+vtkLookupTable* MyImageViewer::GetLookupTable()
 {
 	return this->LookupTable;
 }
@@ -438,41 +461,49 @@ void MyImageViewer::SetLookupTable(vtkLookupTable * LookupTable)
 	int num = LookupTable->GetNumberOfTableValues();
 	OverlayWindowLevel->SetWindow(num - 1);
 	OverlayWindowLevel->SetLevel((num - 1) * 0.5);
-	//this->OverlayActor->SetVisibility(false);
 }
 
 void MyImageViewer::SetFocalPointWithWorldCoordinate(double x, double y, double z)
 {
-	Cursor3D->SetFocalPoint(x, y, z);
-	//cout << __func__ << endl;
-	//cout << x << ' ' << y << ' ' << z << endl;
-	Cursor3D->Update();
+	//Cursor3D->SetFocalPoint(x, y, z);
+	//Cursor3D->Update();
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
-	x = (x - origin[0])/spacing[0];
-	y = (y - origin[1])/spacing[1];
-	z = (z - origin[2])/spacing[2];
-	InitializeIntensityText(QString::number(
-		(GetInput()->GetScalarComponentAsDouble(x, y, z, 0))));
-	//SliceImplicitPlane->SetOrigin(x, y, z);
+	int i = (x - origin[0])/spacing[0];
+	int j = (y - origin[1])/spacing[1];
+	int k = (z - origin[2])/spacing[2];
+	SetFocalPointWithImageCoordinate(i, j, k);
+	//int ijk[3] = { i, j, k };
+	//SetSlice(ijk[this->SliceOrientation]);
+	//InitializeIntensityText(QString::number(
+	//	(GetInput()->GetScalarComponentAsDouble(i, j ,k, 0))));
+	//this->Render();
 }
 
 void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
-	double point[3] = { i*spacing[0] + origin[0],
-		j*spacing[1] + origin[1], k*spacing[2] + origin[2] };
-	//cout << __func__ << endl;
-	//for (int in = 0; in < 3; in++) {
-	//	cout << point[in]<<' ';
-	//}
-	Cursor3D->SetFocalPoint(i*spacing[0] + origin[0],
-		j*spacing[1] + origin[1], k*spacing[2] + origin[2]);
+	double point[3] = { 
+		i*spacing[0] + origin[0],
+		j*spacing[1] + origin[1], 
+		k*spacing[2] + origin[2] };
+
+	const double* pointOld = Cursor3D->GetFocalPoint();
+
+	if (pointOld[0] == point[0] && pointOld[1] == point[1] && pointOld[2] == point[2]) {
+		return;
+	}
+
+	Cursor3D->SetFocalPoint(point);
 	Cursor3D->Update();
+	int ijk[3] = { i, j, k };
+	SetSlice(ijk[this->SliceOrientation]);
 	InitializeIntensityText(QString::number(
 		(GetInput()->GetScalarComponentAsDouble(i, j, k, 0))));
 	this->Render();
+
+	emit FocalPointWithImageCoordinateChanged(i, j, k);
 }
 
 void MyImageViewer::GetFocalPointWithImageCoordinate(int * coordinate)
@@ -621,7 +652,7 @@ void MyImageViewer::InitializeOrientationText()
 
 }
 
-void MyImageViewer::ResizeOrientationText()
+void MyImageViewer::ResizeHeaderAndOrientationText()
 {
 	int* size = Renderer->GetSize();
 	int margin = 15;

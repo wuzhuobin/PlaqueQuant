@@ -89,8 +89,7 @@ public:
 	// Cursor methods
 	virtual void SetBound(double* b);
 	virtual double* GetBound();
-	virtual void SetFocalPointWithWorldCoordinate(double x, double y, double z);
-	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
+
 	virtual void GetFocalPointWithImageCoordinate(int* coordinate);
 	virtual void GetFocalPointWithWorldCoordinate(double* coordinate);
 	virtual double* GetFocalPointWithWorldCoordinate();
@@ -118,14 +117,13 @@ public:
 	// image map instances.
 	vtkGetObjectMacro(OverlayActor, vtkImageActor);
 	vtkGetObjectMacro(OverlayWindowLevel, vtkImageMapToWindowLevelColors);
-	//vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
 	vtkGetObjectMacro(AnnotationRenderer, vtkRenderer);
 	// Description:
 	// Set your own Annotation Renderer
 	virtual void SetAnnotationRenderer(vtkRenderer *arg);
 
 	// LookupTable
-	virtual vtkLookupTable* getLookupTable();
+	virtual vtkLookupTable* GetLookupTable();
 	virtual void SetLookupTable(vtkLookupTable* LookupTable);
 
 	// Description:
@@ -153,22 +151,31 @@ public slots:
 	// Slice
 	virtual void SetSlice(int s);
 
+	/**
+	 * the following methods of setting focal point will also change current slice
+	 * @param
+	 * 
+	 */
+	virtual void SetFocalPointWithWorldCoordinate(double x, double y, double z);
+	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
+
 	virtual void SetColorLevel(double level);
 
 	virtual void SetColorWindow(double window);
 
 signals:
 	
-	void SliceChanged(int);
-	void ColorLevelChanged(double);
-	void ColorWindowChanged(double);
+	void FocalPointWithImageCoordinateChanged(int i, int j, int k);
+	void SliceChanged(int slice);
+	void ColorLevelChanged(double colorLevel);
+	void ColorWindowChanged(double colorWindow);
 
 protected:
 	MyImageViewer(QObject* parent = NULL);
 	~MyImageViewer();
 
 	// Text Method
-	virtual void ResizeOrientationText();
+	virtual void ResizeHeaderAndOrientationText();
 	virtual void InitializeIntensityText(QString IntText);
 	virtual void InitializeOrientationText();
 
@@ -177,41 +184,41 @@ protected:
 	virtual void UpdateOrientation();
 
 	//OrientationText
-	vtkTextActor*	OrientationTextActor[4];
+	vtkTextActor*	OrientationTextActor[4] = { NULL };
 
 	//Header
-	vtkTextActor* HeaderActor;
+	vtkTextActor* HeaderActor = NULL;
 
 	// IntensityText
-	vtkTextActor* IntTextActor;
+	vtkTextActor* IntTextActor = NULL;
 
 	// Overlay
-	Overlay* SegmentationOverlay;
+	Overlay* SegmentationOverlay = NULL;
 
 	//Cursor
-	vtkCursor3D*		 Cursor3D;
-	vtkPolyDataMapper* CursorMapper;
-	vtkActor*			 CursorActor;
+	vtkCursor3D*		 Cursor3D = NULL;
+	vtkPolyDataMapper* CursorMapper = NULL;
+	vtkActor*			 CursorActor = NULL;
 	virtual void SetCursorBoundary();
 	//Bound of cursor
-	double Bound[6];
+	double Bound[6] = { 0 };
 
 	//Label and Annotation
-	vtkImageMapToWindowLevelColors* OverlayWindowLevel;
-	vtkImageActor* OverlayActor;
-	vtkRenderer* AnnotationRenderer;
+	vtkImageMapToWindowLevelColors* OverlayWindowLevel = NULL;
+	vtkImageActor* OverlayActor = NULL;
+	vtkRenderer* AnnotationRenderer = NULL;
 
 	// LookupTable for OverlayActor
-	vtkLookupTable* LookupTable;
+	vtkLookupTable* LookupTable = NULL;
 
 
 	//Widget
 	//vtkDistanceWidget* DistanceWidget;
 
-	vtkAngleWidget*	 AngleWidget;
+	vtkAngleWidget*	 AngleWidget = NULL;
 	//Parameter
 	//vtkPlane* SliceImplicitPlane;
-	double DefaultWindowLevel[2];
+	double DefaultWindowLevel[2] = { 0 };
 
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.

@@ -73,6 +73,8 @@ public:
 	virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
 	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	virtual void SetCurrentSlice(int slice);
+	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+
 	//virtual void SetOrientation(int);
 	virtual void SetEnabled(int);
 	virtual void SetEnabledOn();

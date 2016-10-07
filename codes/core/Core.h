@@ -62,6 +62,8 @@ public slots:
 
 	virtual void slotChangeSliceZ(int z);
 
+	virtual void slotChangeFocalPointWithImageCoordinate(int i, int j, int k);
+
 	// mode stuff
 	virtual void slotNavigationMode();
 

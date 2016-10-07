@@ -41,7 +41,8 @@ public:
 	//virtual void SetOrientation(int m_orientation);
 	//virtual int GetOrientation();
 	virtual vtkActor* PickActor(int x, int y);
-	void SetCurrentSlice(int slice);
+	virtual void SetCurrentSlice(int slice);
+	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 
 protected:

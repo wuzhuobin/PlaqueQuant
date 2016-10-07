@@ -187,6 +187,18 @@ void InteractorStyleSwitch::SetCurrentSlice(int slice)
 	}
 }
 
+void InteractorStyleSwitch::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		AbstractInteractorStyleImage* _style =
+			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		if (_style != NULL) {
+			_style->SetCurrentFocalPointWithImageCoordinate(i, j, k);
+		}
+	}
+}
+
 //void InteractorStyleSwitch::SetOrientation(int index)
 //{
 //	this->Navigation->SetOrientation(index);

@@ -381,7 +381,7 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 void InteractorStylePaintBrush::SetPaintBrushLabel(int paintBrushLabel)
 {
 	this->paintBrushLabel = paintBrushLabel;
-	vtkLookupTable* lookupTable = m_imageViewer->getLookupTable();
+	vtkLookupTable* lookupTable = m_imageViewer->GetLookupTable();
 	double rgba[4];
 	const double* _colour = lookupTable->GetTableValue(paintBrushLabel);
 	for (int i = 0; i < 3; ++i) {
@@ -714,12 +714,12 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
-					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+					for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); ++i) {
 						if (*val == i) {
 							double rgba[4];
 							uchar rgbaUCHAR[4];
-							m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-							m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+							m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+							m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 							try {
 								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 								pos[GetSliceOrientation()] = 0;
@@ -751,12 +751,12 @@ void InteractorStylePaintBrush::ReadfromImageData()
 	//			if (val == nullptr)
 	//				continue;
 	//			if (*val > 0) {
-	//				for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+	//				for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); ++i) {
 	//					if (*val == i) {
 	//						double rgba[4];
 	//						uchar rgbaUCHAR[4];
-	//						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-	//						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+	//						m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+	//						m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 	//						try {
 	//							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 	//							m_brush->DrawSegment3D(0, y, z, 0, y, z);
@@ -783,12 +783,12 @@ void InteractorStylePaintBrush::ReadfromImageData()
 	//			if (val == nullptr)
 	//				continue;
 	//			if (*val > 0) {
-	//				for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+	//				for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); ++i) {
 	//					if (*val == i) {
 	//						double rgba[4];
 	//						uchar rgbaUCHAR[4];
-	//						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-	//						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+	//						m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+	//						m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 	//						try {
 	//							m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 	//							//m_brush->SetDrawColor(255, 0, 0, 1);
@@ -816,12 +816,12 @@ void InteractorStylePaintBrush::ReadfromImageData()
 	//			if (val == nullptr)
 	//				continue;
 	//			if (*val > 0) {
-	//				for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); ++i) {
+	//				for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); ++i) {
 	//					if (*val == i) {
 	//						double rgba[4];
 	//						uchar rgbaUCHAR[4];
-	//						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-	//						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+	//						m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+	//						m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 	//						m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 	//						m_brush->DrawPoint(x, y);
 	//						break;
@@ -858,12 +858,12 @@ void InteractorStylePaintBrush::WriteToImageData()
 				if (val == nullptr)
 					continue;
 				if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0) {
-					for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+					for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); i++)
 					{
 						double rgba[4];
 						uchar rgbaUCHAR[4];
-						m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-						m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+						m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+						m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 						if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 							pixelval = i;
@@ -894,12 +894,12 @@ void InteractorStylePaintBrush::WriteToImageData()
 	//			uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(0, y, z));
 	//			if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0) {
 	//				// Check if color of the lookup table matches the color drawn on canvas
-	//				for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+	//				for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); i++)
 	//				{
 	//					double rgba[4];
 	//					uchar rgbaUCHAR[4];
-	//					m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-	//					m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+	//					m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+	//					m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 	//					if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 	//						pixelval = i;
@@ -929,12 +929,12 @@ void InteractorStylePaintBrush::WriteToImageData()
 	//			pos[2] = z;
 	//			uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, 0, z));
 	//			if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-	//				for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+	//				for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); i++)
 	//				{
 	//					double rgba[4];
 	//					uchar rgbaUCHAR[4];
-	//					m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-	//					m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+	//					m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+	//					m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 	//					if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 	//						pixelval = i;
@@ -963,12 +963,12 @@ void InteractorStylePaintBrush::WriteToImageData()
 	//			pos[2] = m_sliceSplinBox[m_orientation]->value();
 	//			uchar * val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(x, y, 0));
 	//			if (val[0] > 0 || val[1] > 0 || val[2] > 0 || val[3] > 0)
-	//				for (int i = 0; i < m_imageViewer->getLookupTable()->GetNumberOfColors(); i++)
+	//				for (int i = 0; i < m_imageViewer->GetLookupTable()->GetNumberOfColors(); i++)
 	//				{
 	//					double rgba[4];
 	//					uchar rgbaUCHAR[4];
-	//					m_imageViewer->getLookupTable()->GetIndexedColor(i, rgba);
-	//					m_imageViewer->getLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+	//					m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
+	//					m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
 
 	//					if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] && val[2] == rgbaUCHAR[2]) {
 	//						pixelval = i;

@@ -39,10 +39,11 @@ Core::Core(QWidget* parent)
 		this, SLOT(slotVisualizeAll2DViewers()));
 	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()), 
 		this, SLOT(slotAddOverlayToImageViewer()));
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		connect(m_2DimageViewer[i], SIGNAL(SliceChanged(int)), 
-			this, SLOT(slotChangeSlice(int)));
-	}
+
+	connect(m_2DimageViewer[DEFAULT_IMAGE], SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)),
+		this, SLOT(slotChangeFocalPointWithImageCoordinate(int, int, int)));
+
+
 }
 
 Core::~Core() 
@@ -135,24 +136,11 @@ void Core::slotVisualizeAll2DViewers()
 	}
 
 	// reset slice to all viewer
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		int slice = m_2DimageViewer[i]->GetSliceMax() + m_2DimageViewer[i]->GetSliceMin();
-		slice = slice * 0.5;
-		m_style[i]->SetCurrentSlice(slice);
-		switch (m_2DimageViewer[i]->GetSliceOrientation()) {
-		case MyImageViewer::SLICE_ORIENTATION_XY:
-			emit signalChangeSliceZ(slice);
-			break;
-		case MyImageViewer::SLICE_ORIENTATION_XZ:
-			emit signalChangeSliceY(slice);
-			break;
-		case MyImageViewer::SLICE_ORIENTATION_YZ:
-			emit signalChangeSliceX(slice);
-			break;
-		default:
-			break;
-		}
-	}
+	const int* extent = m_2DimageViewer[DEFAULT_IMAGE]->GetInput()->GetExtent();
+	slotChangeFocalPointWithImageCoordinate(
+		(extent[1] - extent[0]) / 2,
+		(extent[3] - extent[2]) / 2,
+		(extent[5] - extent[4]) / 2);
 
 	emit signalVisualizeAllViewers();
 }
@@ -255,19 +243,7 @@ void Core::slotChangeView(int viewMode)
 			if (i1 >= m_imageManager.getListOfVtkImages().size() && i2 < VIEWER_NUM ) {
 				this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 				// disable view props
-				vtkPropCollection* props = this->m_2DimageViewer[i2]->GetRenderer()->GetViewProps();
-				props->InitTraversal();
-				for (int j = 0; j < props->GetNumberOfItems(); j++)
-				{
-					props->GetNextProp()->SetVisibility(false);
-				}
-
-				vtkPropCollection* annProps = m_2DimageViewer[i2]->GetAnnotationRenderer()->GetViewProps();
-				annProps->InitTraversal();
-				for (int j = 0; j < annProps->GetNumberOfItems(); j++)
-				{
-					annProps->GetNextProp()->SetVisibility(false);
-				}
+				m_2DimageViewer[i2]->SetVisibility(false);
 
 			}
 
@@ -288,76 +264,71 @@ void Core::slotChangeView(int viewMode)
 			// else only change input and viewer m_orientation
 			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
 			// Show view props for overlay
-			vtkPropCollection* props = this->m_2DimageViewer[i]->GetRenderer()->GetViewProps();
-			for (int j = 0; j < props->GetNumberOfItems(); j++)
-			{
-				reinterpret_cast<vtkProp*>(props->GetItemAsObject(j))->SetVisibility(true);
-				//props->GetNextProp()->SetVisibility(true);
-			}
-			vtkPropCollection* annProps = m_2DimageViewer[i]->GetAnnotationRenderer()->GetViewProps();
-			for (int j = 0; j < annProps->GetNumberOfItems(); j++)
-			{
-				reinterpret_cast<vtkProp*>(annProps->GetItemAsObject(j))->SetVisibility(true);
-				//props->GetNextProp()->SetVisibility(true);
-			}
+			m_2DimageViewer[i]->SetVisibility(true);
+
 		}
 
 	}
 	// reset slice to all viewer
-	for (int i = 0; i < VIEWER_NUM && !m_firstInitialize; ++i) {
-		//int slice = m_2DimageViewer[i]->GetSliceMax() + m_2DimageViewer[i]->GetSliceMin();
-		//slice = slice * 0.5;
-		int slice = m_2DimageViewer[i]->GetSlice();
-		m_style[i]->SetCurrentSlice(slice);
-		switch (m_2DimageViewer[i]->GetSliceOrientation()) {
-		case MyImageViewer::SLICE_ORIENTATION_XY:
-			emit signalChangeSliceZ(slice);
-			break;
-		case MyImageViewer::SLICE_ORIENTATION_XZ:
-			emit signalChangeSliceY(slice);
-			break;
-		case MyImageViewer::SLICE_ORIENTATION_YZ:
-			emit signalChangeSliceX(slice);
-			break;
-		default:
-			break;
-		}
-	}
+	int ijk[3];
+	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+	slotChangeFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+
 	RenderAllViewer();
 }
 
 void Core::slotChangeSliceX(int x) {
 
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		if (m_2DimageViewer[i]->GetSliceOrientation() == MyImageViewer::SLICE_ORIENTATION_YZ &&
-			m_2DimageViewer[i]->GetSlice() != x) {
-			// SetSlice will emit SliceChanged signal which is connected to slotChangeSlice()
-			m_style[i]->SetCurrentSlice(x);
-		}
+	int ijk[3];
+	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+	if (x == ijk[0]) {
+		return;
 	}
+	ijk[0] = x;
+	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+
+	emit signalChangeSliceX(x);
 
 }
 
 void Core::slotChangeSliceY(int y) {
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		if (m_2DimageViewer[i]->GetSliceOrientation() == MyImageViewer::SLICE_ORIENTATION_XZ &&
-			m_2DimageViewer[i]->GetSlice() != y) {
-			// SetSlice will emit SliceChanged signal which is connected to slotChangeSlice()
-			m_style[i]->SetCurrentSlice(y);
-		}
+
+
+	int ijk[3];
+	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+	if (y == ijk[1]) {
+		return;
 	}
+	ijk[1] = y;
+	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+
+
+	emit signalChangeSliceY(y);
+
 }
 
 void Core::slotChangeSliceZ(int z) {
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		if (m_2DimageViewer[i]->GetSliceOrientation() == MyImageViewer::SLICE_ORIENTATION_XY &&
-			m_2DimageViewer[i]->GetSlice() != z) {
-			// SetSlice will emit SliceChanged signal which is connected to slotChangeSlice()
-			m_style[i]->SetCurrentSlice(z);
-		}
+
+
+	int ijk[3];
+	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+	if (z == ijk[2]) {
+		return;
 	}
+	ijk[2] = z;
+	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+
+
+	emit signalChangeSliceZ(z);
 }
 
+void Core::slotChangeFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	emit signalChangeSliceX(i);
+	emit signalChangeSliceY(j);
+	emit signalChangeSliceZ(k);
+
+}
 
 void Core::slotNavigationMode()
 {

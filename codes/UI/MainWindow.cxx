@@ -516,7 +516,7 @@ void MainWindow::slot3DUpdate()
 			GPUVolumeRenderingFilter::New();
 
 		volumeRenderingFilter->SetInputData(voi->GetOutput());
-		volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
+		volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->GetLookupTable());
 		volumeRenderingFilter->GetVolume()->SetPickable(1);
 		volumeRenderingFilter->Update();
 
@@ -570,7 +570,7 @@ void MainWindow::slot3DUpdate()
 		GPUVolumeRenderingFilter::New();
 	
 	volumeRenderingFilter->SetInputData(voi->GetOutput());
-	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->getLookupTable());
+	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->GetLookupTable());
 	volumeRenderingFilter->GetVolume()->SetPickable(1);
 	//volumeRenderingFilter->GetVolumeProperty()->SetInterpolationTypeToLinear();
 	volumeRenderingFilter->Update();
@@ -599,7 +599,7 @@ void MainWindow::resizeEvent( QResizeEvent * event )
 		//for (int i = 0; i < 3; i++)
 		//{
 		//	if (m_2DimageViewer[i] != NULL)
-		//		m_2DimageViewer[i]->ResizeOrientationText();
+		//		m_2DimageViewer[i]->ResizeHeaderAndOrientationText();
 		//}
 }
 
