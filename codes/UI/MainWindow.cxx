@@ -44,7 +44,7 @@
 
 MainWindow::MainWindow() 
 	:widgetGroup(this), viewerGroup(this), viewGroup(this),
-	m_core(new Core(this)), imageManager(m_core->GetMyImageManager()), ioManager(m_core->GetIOManager())
+	m_core(new Core(this))
 {
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
@@ -69,16 +69,16 @@ MainWindow::MainWindow()
 	ui->image4View->SetRenderWindow(m_core->GetRenderWindow(3));
 	
 	this->m_core->Initialization();
-	cout << "print stuff";
 
+	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,			SLOT(slotVisualizeImage()));
+	
 	// Open Image
-	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,		SLOT(slotVisualizeImage()));
 	connect(ui->actionOpenImage,	SIGNAL(triggered())					, ioManager,	SLOT(slotOpenWithWizard()));
-	// Save Segmentaiton 
-	connect(ui->actionSave, SIGNAL(triggered()), ioManager, SLOT(slotSaveSegmentaitonWithDiaglog()));
-	// Open Segmentation
-	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), ioManager,
-		SLOT(slotOpenSegmentationWithDiaglog()));
+	
+	// Segmentation
+	connect(ui->actionSave,			SIGNAL(triggered())					,ioManager,		SLOT(slotSaveSegmentaitonWithDiaglog()));
+	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), ioManager,SLOT(slotOpenSegmentationWithDiaglog()));
+	
 	// different mode
 	widgetGroup.addAction(ui->actionNavigation);
 	widgetGroup.addAction(ui->actionWindowLevel);
@@ -87,12 +87,12 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
 	widgetGroup.setExclusive(true);
-	connect(ui->actionNavigation, SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
-	connect(ui->actionWindowLevel, SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
-	connect(ui->actionContour, SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
-	connect(ui->actionBrush, SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
-	connect(ui->actionRuler, SIGNAL(triggered(bool)), this->m_core, SLOT(slotRuler(bool)));
-	connect(ui->actionROI, SIGNAL(triggered()), this->m_core, SLOT(slotROIMode()));
+	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
+	connect(ui->actionWindowLevel,	SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
+	connect(ui->actionContour,		SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
+	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
+	connect(ui->actionRuler,		SIGNAL(triggered(bool)),	this->m_core, SLOT(slotRuler(bool)));
+	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
 	viewGroup.addAction(ui->actionAllAxialView);
@@ -103,23 +103,17 @@ MainWindow::MainWindow()
 	connect(this->m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
 	// slice 
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),
-		this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),
-		this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),
-		this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceX(int)), 
-		ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceY(int)),
-		ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceZ(int)), 
-		ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
+	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
+	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
+	connect(this->m_core, SIGNAL(signalChangeSliceX(int)),ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	connect(this->m_core, SIGNAL(signalChangeSliceY(int)),ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	connect(this->m_core, SIGNAL(signalChangeSliceZ(int)),ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
 
 	// UI
-	connect(ui->actionExit,	SIGNAL(triggered()), this, SLOT(slotExit()));
-	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotAbout()));
-	connect(ui->actionHelp,	SIGNAL(triggered()), this, SLOT(slotHelp()));
+	connect(ui->actionExit,		SIGNAL(triggered()), this, SLOT(slotExit()));
+	connect(ui->actionAbout,	SIGNAL(triggered()), this, SLOT(slotAbout()));
+	connect(ui->actionHelp,		SIGNAL(triggered()), this, SLOT(slotHelp()));
 	
 	// change modality
 	connect(ui->ULSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUL()));

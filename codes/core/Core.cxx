@@ -403,18 +403,6 @@ void Core::slotSetImageLayerColor(int layer) {
 
 void Core::slotGenerateCenterlineBtn()
 {
-
-}
-
-#include <GPUVolumeRenderingFilter.h>
-#include <vtkClipPolyData.h>
-#include "SurfaceCreator.h"
-#include "Centerline.h"
-
-void Core::slotUpdate3DLabelBtn()
-{
-	this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
-
 	// Extract VOI
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
 	voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
@@ -508,6 +496,7 @@ void Core::slotUpdate3DLabelBtn()
 	mapper->SetLookupTable(this->GetLookupTable());
 	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
 	mapper->Update();
+
 	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
 	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
 	Actor->SetMapper(mapper);
@@ -515,18 +504,22 @@ void Core::slotUpdate3DLabelBtn()
 	Actor->GetProperty()->SetRepresentationToSurface();
 	Actor->SetPickable(1);
 	this->m_3DDataRenderer->AddActor(Actor);
+}
 
-	//vtkSmartPointer<vtkPolyDataMapper> mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//mapper2->SetInputData(surface);
-	//mapper2->SetLookupTable(this->LookupTable);
-	//mapper2->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	//mapper2->Update();
-	//vtkSmartPointer<vtkActor> Actor2 = vtkSmartPointer<vtkActor>::New();
-	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	//Actor2->SetMapper(mapper2);
-	//Actor2->GetProperty()->SetRepresentationToWireframe();
-	//Actor2->SetPickable(1);
-	//this->m_3DDataRenderer->AddActor(Actor2);
+#include <GPUVolumeRenderingFilter.h>
+#include <vtkClipPolyData.h>
+#include "SurfaceCreator.h"
+#include "Centerline.h"
+
+void Core::slotUpdate3DLabelBtn()
+{
+	this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
+
+	// Extract VOI
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
+	voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
+	voi->Update();
 
 	///Volume Render
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
