@@ -37,12 +37,12 @@ public:
 	const QMap<QString, itk::Image<float, 3>::Pointer> getMapOfItkImages();
 	const QMap<QString, vtkSmartPointer<vtkImageData>> getMapOfVtkImages();
 	const QMap<QString, QString>* getDICOMHeader(itk::Image<float, 3>::Pointer itkImage);
-	Overlay& getOverlay();
+	Overlay* getOverlay();
 
 private:
 	friend class IOManager;
 	
-	Overlay overlay;
+	Overlay* overlay;
 	/**
 	 * Clear all the data
 	 */

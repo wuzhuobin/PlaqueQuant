@@ -2,12 +2,13 @@
 
 using namespace itk;
 MyImageManager::MyImageManager(QObject* parent)
-	:overlay(parent), QObject(parent)
+	:overlay(new Overlay(parent)), QObject(parent)
 {
 }
 
 MyImageManager::~MyImageManager()
 {
+	delete overlay;
 	allClear();
 }
 
@@ -66,7 +67,7 @@ const QMap<QString, QString>* MyImageManager::getDICOMHeader(Image<float, 3>::Po
 	return this->mapOfDICOMHeader[itkImage];
 }
 
-Overlay& MyImageManager::getOverlay()
+Overlay* MyImageManager::getOverlay()
 {
 	return this->overlay;
 }

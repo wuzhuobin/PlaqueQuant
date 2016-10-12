@@ -210,7 +210,7 @@ bool MaximumWallThickness::ExtractLoops()
 		throw ERROR_NO_SEGMENTATION_FOUND;
 	}
 
-	int vesselWallLabel = MainWindow::LABEL_CALCIFICATION;
+	int vesselWallLabel = Core::LABEL_CALCIFICATION;
 
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
 	thres->ThresholdBetween(m_lumenIntensity - 0.1, m_lumenIntensity + 0.1);

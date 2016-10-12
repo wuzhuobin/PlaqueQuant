@@ -11,11 +11,12 @@
 #include "ReportGenerator.h"
 #include "MainWindow.h"
 
-MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent) {
+MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent) 
+{
 	ui.setupUi(this);
 
-	m_mainWnd = static_cast<MainWindow*>(parent);
-
+	m_mainWnd = MainWindow::GetMainWindow();
+	Core* core = m_mainWnd->GetCore();
 	// Set table widget properties
 	ui.measurement3DTableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ui.measurement3DTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -25,11 +26,12 @@ MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent) {
 	ui.measurement2DTableWidget->setColumnHidden(1, true);
 
 	// measurement
-	connect(&m_mainWnd->m_core.GetMyImageManager()->getOverlay(), SIGNAL(signalOverlayUpdated()),
+	Overlay* overlay = core->GetMyImageManager()->getOverlay();
+	connect(overlay, SIGNAL(signalOverlayUpdated()),
 		this, SLOT(slotUpdate3DMeasurements()));
-	connect(&m_mainWnd->m_core.GetMyImageManager()->getOverlay(), SIGNAL(signalOverlayUpdated()),
+	connect(overlay, SIGNAL(signalOverlayUpdated()),
 		this, SLOT(slotUpdate2DMeasurements()));
-	connect(&m_mainWnd->m_core, SIGNAL(signalChangeSliceZ(int)),
+	connect(core, SIGNAL(signalChangeSliceZ(int)),
 		this, SLOT(slotUpdate2DMeasurements(int)));
 
 	// generate report
@@ -49,12 +51,12 @@ void MeasurementWidget::setMainWindow(MainWindow * mainWnd)
 
 void MeasurementWidget::slotUpdate3DMeasurements()
 {
-	m_mainWnd->m_core.GetMyImageManager()->getOverlay().Measure3D();
+	m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->Measure3D();
 
 	ui.measurement3DTableWidget->clearContents();
-	QStringList volumes = m_mainWnd->m_core.GetMyImageManager()->
-		getOverlay().Get3DMeasurementsStrings();
-	int numOfVolumes = m_mainWnd->m_core.GetMyImageManager()->getOverlay().GetLookupTable()->
+	QStringList volumes = m_mainWnd->GetCore()->GetMyImageManager()->
+		getOverlay()->Get3DMeasurementsStrings();
+	int numOfVolumes = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->GetLookupTable()->
 		GetNumberOfColors();
 	for (int i = 0; i < numOfVolumes; ++i) {
 		ui.measurement3DTableWidget->setItem(i, 0,
@@ -71,7 +73,7 @@ void MeasurementWidget::slotUpdate2DMeasurements()
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 {
 
-	QStringList _2DMeasurements = m_mainWnd->m_core.GetMyImageManager()->getOverlay().
+	QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->
 		Get2DMeasurementsStrings(slice);
 
 	for (int i = 0; i < 4; ++i) {
@@ -84,7 +86,7 @@ void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 void MeasurementWidget::slotUpdateImformation()
 {
 	QMap<QString, QString>* header = 
-		m_mainWnd->m_core.GetMyImageManager()->getListOfDICOMHeader()[Core::DEFAULT_IMAGE];
+		m_mainWnd->GetCore()->GetMyImageManager()->getListOfDICOMHeader()[Core::DEFAULT_IMAGE];
 
 	if (header == NULL) {
 		return;

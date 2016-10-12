@@ -201,7 +201,7 @@ void IOManager::slotOpenMultiImages()
 		}
 		slotOpenOneImage(*cit);
 	}
-	this->myImageManager->overlay.Initialize(
+	this->myImageManager->overlay->Initialize(
 		this->myImageManager->listOfVtkViewerInputImages[0]);
 
 	emit finishOpenMultiImages();
@@ -232,7 +232,7 @@ void IOManager::slotOpenSegmentation(QString fileName)
 	reader->SetFileName(fileName.toStdString());
 	reader->Update();
 	_itkImage = reader->GetOutput();
-	this->myImageManager->overlay.SetInputImageData(_itkImage);
+	this->myImageManager->overlay->SetInputImageData(_itkImage);
 
 	//if (_itkImage.IsNotNull()) {
 	//	// using the same m_orientation ITK_COORDINATE_ORIENTATION_RAI
@@ -265,7 +265,7 @@ void IOManager::slotSaveSegmentation(QString path)
 {
 	ImageFileWriter<Image<float, 3>>::Pointer writer =
 		ImageFileWriter<Image<float, 3>>::New();
-	writer->SetInput(this->myImageManager->overlay.GetITKOutput(
+	writer->SetInput(this->myImageManager->overlay->GetITKOutput(
 		this->myImageManager->listOfItkImages[0]));
 	writer->SetFileName(path.toStdString().c_str());
 	writer->Write();

@@ -21,7 +21,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	m_contourRadioButtonGroup(this)
 {
 	m_mainWnd = static_cast<MainWindow*>(parent);
-
+	Core* core = m_mainWnd->GetCore();
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
     
@@ -62,29 +62,29 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		ui->autoLumenSegmentationSpinBox, SLOT(setValue(int)));
 	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), this,
 		SLOT(slotEnableAutoLumenSegmentation(bool)));
-	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), &m_mainWnd->m_core, 
+	connect(ui->autoLumenSegmentationCheckBox, SIGNAL(toggled(bool)), core, 
 		SLOT(slotEnableAutoLumenSegmentation(bool)));
-	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), &m_mainWnd->m_core, 
+	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)), core,
 		SLOT(slotSetContourFilterGenerateValues(int)));
-	connect(ui->smoothCurveRadioButton, SIGNAL(toggled(bool)), &m_mainWnd->m_core,
+	connect(ui->smoothCurveRadioButton, SIGNAL(toggled(bool)), core,
 		SLOT(slotSetLineInterpolatorToSmoothCurve(bool)));
-	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), &m_mainWnd->m_core,
+	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), core,
 		SLOT(slotSetLineInterpolatorToPolygon(bool)));
 
 	//connect
 	// set labelColorbachelor
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
-		&m_mainWnd->m_core,SLOT(slotSetImageLayerColor(int)));
+		core,SLOT(slotSetImageLayerColor(int)));
 	// set brushSize
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), 
 		ui->BrushSizeSpinBox, SLOT(setValue(int)),Qt::UniqueConnection);
 	connect(ui->BrushSizeSpinBox, SIGNAL(valueChanged(int)),
 		ui->BrushSizeSlider, SLOT(setValue(int)), Qt::UniqueConnection);
 	connect(ui->BrushSizeSpinBox, SIGNAL(valueChanged(int)),
-		&m_mainWnd->m_core, SLOT(slotSetBrushSize(int)));
+		core, SLOT(slotSetBrushSize(int)));
 	// set brushShape
 	connect(ui->BrushComBox, SIGNAL(currentIndexChanged(int)),
-		&m_mainWnd->m_core, SLOT(slotSetBrushShape(int)));
+		core, SLOT(slotSetBrushShape(int)));
 	// set overlay opacity
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity(int)));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
@@ -144,8 +144,7 @@ void ModuleWidget::SetBrushSize()
 
 void ModuleWidget::slotSegmentationView()
 {
-	 
-	m_mainWnd->m_core.slotSegmentationView();
+	m_mainWnd->GetCore()->slotSegmentationView();
 }
 
 void ModuleWidget::slotChangeOpacity(int opacity)
@@ -202,13 +201,13 @@ void ModuleWidget::slotEnableMWTCalculation(int checked)
 void ModuleWidget::slotSelectROI()
 {
 	 
-	m_mainWnd->m_core.slotSelectROI();
+	m_mainWnd->GetCore()->slotSelectROI();
 }
 
 void ModuleWidget::slotResetROI()
 {
 	 
-	m_mainWnd->m_core.slotResetROI();
+	m_mainWnd->GetCore()->slotResetROI();
 }
 
 void ModuleWidget::slotCalculateMaximumWallThickness()
@@ -216,7 +215,7 @@ void ModuleWidget::slotCalculateMaximumWallThickness()
 	 
 	int currentSlice = m_mainWnd->GetUI()->zSpinBox->value();
 
-	vtkImageData* overlayImage = m_mainWnd->imageManager->getOverlay().GetOutput();
+	vtkImageData* overlayImage = m_mainWnd->imageManager->getOverlay()->GetOutput();
 
 	vtkSmartPointer<MaximumWallThickness> calculator = vtkSmartPointer<MaximumWallThickness>::New();
 	calculator->SetImage(overlayImage);

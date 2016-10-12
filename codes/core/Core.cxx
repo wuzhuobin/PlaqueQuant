@@ -1,27 +1,29 @@
 #include "Core.h"
 
 #include <vtkExtractVOI.h>
-
+#include <vtkRendererCollection.h>
+#include <vtkImageThreshold.h>
 #include <QMessageBox>
 #include <QAction>
 
 Core::Core(QWidget* parent)
-	:m_imageManager(this), m_ioManager(this), QWidget(parent)
+	:m_imageManager(new  MyImageManager(this)), m_ioManager(new IOManager(this)), QWidget(parent)
 {
 	// enable registration
-	m_ioManager.enableRegistration(true);
+	m_ioManager->enableRegistration(true);
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
 		m_2DimageViewer[i] = vtkSmartPointer<MyImageViewer>::New();
 		m_interactor[i] = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 		m_style[i] = vtkSmartPointer<InteractorStyleSwitch>::New();
 	}
-
 	this->m_3DDataRenderer = vtkRenderer::New();
 	this->m_3DAnnotationRenderer = vtkRenderer::New();
 	this->m_style3D = InteractorStyleSwitch3D::New();
 	this->m_3Dinteractor = vtkRenderWindowInteractor::New();
 	this->m_3DimageViewer = vtkRenderWindow::New();
+
+	this->m_centerlinePD = NULL;
 }
 
 void Core::Initialization()
@@ -37,15 +39,20 @@ void Core::Initialization()
 
 
 
-	m_ioManager.setMyImageManager(&m_imageManager);
+	m_ioManager->setMyImageManager(m_imageManager);
 
-	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()),
+	connect(m_ioManager, SIGNAL(finishOpenMultiImages()),
 		this, SLOT(slotVisualizeAll2DViewers()));
-	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()),
+	connect(m_ioManager, SIGNAL(finishOpenSegmentation()),
 		this, SLOT(slotAddOverlayToImageViewer()));
 
 	connect(m_2DimageViewer[DEFAULT_IMAGE], SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)),
 		this, SLOT(slotChangeFocalPointWithImageCoordinate(int, int, int)));
+}
+
+vtkSmartPointer<vtkPolyData> Core::GetCenterlinePD()
+{
+	return this->m_centerlinePD;
 }
 
 Core::~Core() 
@@ -55,7 +62,7 @@ Core::~Core()
 
 vtkLookupTable * Core::GetLookupTable()
 {
-	return m_imageManager.getOverlay().GetLookupTable();
+	return m_imageManager->getOverlay()->GetLookupTable();
 }
 
 vtkRenderWindow * Core::GetRenderWindow(int num)
@@ -94,17 +101,17 @@ void Core::DisplayErrorMessage(std::string str)
 
 IOManager * Core::GetIOManager()
 {
-	return &m_ioManager;
+	return m_ioManager;
 }
 
 MyImageManager * Core::GetMyImageManager()
 {
-	return &m_imageManager;
+	return m_imageManager;
 }
 
 void Core::slotAddOverlayToImageViewer() {
-	int *extent1 = this->m_imageManager.getOverlay().GetOutput()->GetExtent();
-	int *extent2 = this->m_imageManager.getListOfViewerInputImages()[0]->GetExtent();
+	int *extent1 = this->m_imageManager->getOverlay()->GetOutput()->GetExtent();
+	int *extent2 = this->m_imageManager->getListOfViewerInputImages()[0]->GetExtent();
 	if (!std::equal(extent1, extent1 + 6, extent2)) {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
 		return;
@@ -114,10 +121,10 @@ void Core::slotAddOverlayToImageViewer() {
 		// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
 		// Very strange
 		//this->LookupTable->SetTableRange(0, 6);
-		m_2DimageViewer[i]->SetOverlay(&m_imageManager.getOverlay());
+		m_2DimageViewer[i]->SetOverlay(m_imageManager->getOverlay());
 		m_2DimageViewer[i]->GetOverlayActor()->SetVisibility(true);
 	}
-	this->m_imageManager.getOverlay().GetOutput()->Modified();
+	this->m_imageManager->getOverlay()->GetOutput()->Modified();
 }
 
 void Core::slotVisualizeAll2DViewers()
@@ -158,22 +165,22 @@ void Core::slotChangeModality(QString modalityName, int viewerNum)
 {
 	if (modalityName.isEmpty())
 		return;
-	for (int i = 0; i < m_imageManager.getListOfModalityNames().size(); ++i) {
-		if (modalityName == m_imageManager.getListOfModalityNames()[i]) {
+	for (int i = 0; i < m_imageManager->getListOfModalityNames().size(); ++i) {
+		if (modalityName == m_imageManager->getListOfModalityNames()[i]) {
 			if (m_viewMode == MULTIPLANAR_VIEW) {
 				for (int j = 0; j < VIEWER_NUM; ++j) {
 					m_2DimageViewer[j]->SetInputData(
-						this->m_imageManager.getListOfViewerInputImages()[i]);
+						this->m_imageManager->getListOfViewerInputImages()[i]);
 					m_2DimageViewer[j]->Render();
-					m_2DimageViewer[j]->InitializeHeader(m_imageManager.getModalityName(i));
+					m_2DimageViewer[j]->InitializeHeader(m_imageManager->getModalityName(i));
 				}
 				break;
 			}
 			else {
 				m_2DimageViewer[viewerNum]->SetInputData(
-					this->m_imageManager.getListOfViewerInputImages()[i]);
+					this->m_imageManager->getListOfViewerInputImages()[i]);
 				m_2DimageViewer[viewerNum]->Render();
-				m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager.getModalityName(i));
+				m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager->getModalityName(i));
 				break;
 			}
 		}
@@ -228,21 +235,21 @@ void Core::slotChangeView(int viewMode)
 		// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
 		for (int i1 = 0, i2 = 0; i2 < VIEWER_NUM; ++i2)
 		{
-			for (; i1 < this->m_imageManager.getListOfViewerInputImages().size() && i2 < VIEWER_NUM;
+			for (; i1 < this->m_imageManager->getListOfViewerInputImages().size() && i2 < VIEWER_NUM;
 				++i1) {
 				// skip the NULL image
-				if (this->m_imageManager.getListOfViewerInputImages()[i1] != NULL) {
+				if (this->m_imageManager->getListOfViewerInputImages()[i1] != NULL) {
 					// SetupInteractor should be ahead of InitializeHeader
 					this->m_2DimageViewer[i2]->SetInputData(
-						this->m_imageManager.getListOfViewerInputImages()[i1]);
+						this->m_imageManager->getListOfViewerInputImages()[i1]);
 					this->m_2DimageViewer[i2]->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_XY);
 					this->m_2DimageViewer[i2]->Render();
-					this->m_2DimageViewer[i2]->InitializeHeader(m_imageManager.getModalityName(i2));
+					this->m_2DimageViewer[i2]->InitializeHeader(m_imageManager->getModalityName(i2));
 
 					++i2;
 				}
 			}
-			if (i1 >= m_imageManager.getListOfVtkImages().size() && i2 < VIEWER_NUM ) {
+			if (i1 >= m_imageManager->getListOfVtkImages().size() && i2 < VIEWER_NUM ) {
 				this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 				// disable view props
 				m_2DimageViewer[i2]->SetVisibility(false);
@@ -258,10 +265,10 @@ void Core::slotChangeView(int viewMode)
 			// Change input to same image, default 0
 			// SetupInteractor should be ahead of InitializeHeader
 			m_2DimageViewer[i]->SetInputData(
-				this->m_imageManager.getListOfViewerInputImages()[DEFAULT_IMAGE]);
+				this->m_imageManager->getListOfViewerInputImages()[DEFAULT_IMAGE]);
 			m_2DimageViewer[i]->SetSliceOrientation(i);
 			m_2DimageViewer[i]->Render();
-			m_2DimageViewer[i]->InitializeHeader(m_imageManager.getModalityName(DEFAULT_IMAGE));
+			m_2DimageViewer[i]->InitializeHeader(m_imageManager->getModalityName(DEFAULT_IMAGE));
 
 			// else only change input and viewer m_orientation
 			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
@@ -394,6 +401,160 @@ void Core::slotSetImageLayerColor(int layer) {
 	}
 }
 
+void Core::slotGenerateCenterlineBtn()
+{
+
+}
+
+#include <GPUVolumeRenderingFilter.h>
+#include <vtkClipPolyData.h>
+#include "SurfaceCreator.h"
+#include "Centerline.h"
+
+void Core::slotUpdate3DLabelBtn()
+{
+	this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
+
+	// Extract VOI
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
+	voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
+	voi->Update();
+
+	// Threshold the iamge
+	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
+	thres->SetInputData(voi->GetOutput());
+	thres->ThresholdBetween(LABEL_LUMEN - 0.1, LABEL_LUMEN + 0.1);
+	thres->SetOutValue(0);
+	thres->SetInValue(10);
+	thres->Update();
+
+	/// Obtain centerline
+	SurfaceCreator* surfaceCreator = new SurfaceCreator();
+	surfaceCreator->SetInput(thres->GetOutput());
+	surfaceCreator->SetValue(10);
+	surfaceCreator->SetSmoothIteration(15);
+	surfaceCreator->SetDiscrete(false);
+	surfaceCreator->SetResamplingFactor(1.0);
+	surfaceCreator->Update();
+
+	// Clip at the end of the boundaries
+	vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
+	surface->DeepCopy(surfaceCreator->GetOutput());
+	vtkSmartPointer<vtkPlane> plane[2];
+	plane[0] = vtkSmartPointer<vtkPlane>::New();
+	plane[1] = vtkSmartPointer<vtkPlane>::New();
+	plane[0]->SetNormal(0, 0, -1);
+	plane[1]->SetNormal(0, 0, 1);
+	double zCoord1 = (this->m_imageManager->getOverlay()->GetDisplayExtent()[5] - 1) *
+		this->m_imageManager->getListOfViewerInputImages()[0]->GetSpacing()[2] +
+		this->m_imageManager->getListOfViewerInputImages()[0]->GetOrigin()[2];
+	double zCoord2 = (this->m_imageManager->getOverlay()->GetDisplayExtent()[4] + 1) *
+		this->m_imageManager->getListOfViewerInputImages()[0]->GetSpacing()[2] +
+		this->m_imageManager->getListOfViewerInputImages()[0]->GetOrigin()[2];
+	plane[0]->SetOrigin(0, 0, zCoord1);
+	plane[1]->SetOrigin(0, 0, zCoord2);
+	for (int i = 0; i < 2; i++)
+	{
+		vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
+		clipper->SetClipFunction(plane[i]);
+		clipper->SetInputData(surface);
+		clipper->Update();
+		surface->DeepCopy(clipper->GetOutput());
+	}
+
+
+	Centerline* cl = new Centerline;
+	try {
+		cl->SetSurface(surface);
+		cl->Update();
+	}
+	catch (std::exception &e) {
+		QString errorMsg(e.what());
+		QString msg("\nCenterline calculations failed. Some functions might not be available. Please select an ROI with cylindrical structures. (Branches are allowed)");
+		this->DisplayErrorMessage((errorMsg + msg).toStdString());
+
+		///Volume Render
+		GPUVolumeRenderingFilter* volumeRenderingFilter =
+			GPUVolumeRenderingFilter::New();
+
+		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
+		volumeRenderingFilter->GetVolume()->SetPickable(1);
+		volumeRenderingFilter->Update();
+
+		this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
+
+		this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->SetBackground(0.3, 0.3, 0.3);
+		this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->ResetCamera();
+		this->m_3DimageViewer->Render();
+		this->m_style3D->SetInteractorStyleTo3DDistanceWidget();
+
+		return;
+	}
+
+
+	if (m_centerlinePD != NULL) {
+		this->m_centerlinePD->Delete();
+		this->m_centerlinePD = NULL;
+	}
+	this->m_centerlinePD = vtkPolyData::New();
+	this->m_centerlinePD->DeepCopy(cl->GetCenterline());
+
+	delete cl;
+
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(this->m_centerlinePD);
+	mapper->SetLookupTable(this->GetLookupTable());
+	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	mapper->Update();
+	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
+	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	Actor->SetMapper(mapper);
+	Actor->GetProperty()->SetOpacity(0.9);
+	Actor->GetProperty()->SetRepresentationToSurface();
+	Actor->SetPickable(1);
+	this->m_3DDataRenderer->AddActor(Actor);
+
+	//vtkSmartPointer<vtkPolyDataMapper> mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//mapper2->SetInputData(surface);
+	//mapper2->SetLookupTable(this->LookupTable);
+	//mapper2->SetScalarRange(0, 6); // Change this too if you change the look up table!
+	//mapper2->Update();
+	//vtkSmartPointer<vtkActor> Actor2 = vtkSmartPointer<vtkActor>::New();
+	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
+	//Actor2->SetMapper(mapper2);
+	//Actor2->GetProperty()->SetRepresentationToWireframe();
+	//Actor2->SetPickable(1);
+	//this->m_3DDataRenderer->AddActor(Actor2);
+
+	///Volume Render
+	GPUVolumeRenderingFilter* volumeRenderingFilter =
+		GPUVolumeRenderingFilter::New();
+
+	volumeRenderingFilter->SetInputData(voi->GetOutput());
+	volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
+	volumeRenderingFilter->GetVolume()->SetPickable(1);
+	//volumeRenderingFilter->GetVolumeProperty()->SetInterpolationTypeToLinear();
+	volumeRenderingFilter->Update();
+
+	this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
+	this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->SetBackground(0.3, 0.3, 0.3);
+	this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->ResetCamera();
+	this->m_3DimageViewer->Render();
+	this->m_style3D->SetInteractorStyleTo3DDistanceWidget();
+	//delete surfaceCreator;
+
+	/*vtkRenderWindow* rwin = vtkRenderWindow::New();
+	rwin->AddRenderer(vtkRenderer::New());
+	rwin->GetRenderers()->GetFirstRenderer()->AddVolume(volumeRenderingFilter->GetVolume());
+	vtkRenderWindowInteractor* interacotr = vtkRenderWindowInteractor::New();
+	rwin->SetInteractor(interacotr);
+	interacotr->Initialize();
+	rwin->Render();
+	interacotr->Start();*/
+}
+
 void Core::slotContourMode()
 {
 	for (int i = 0; i < VIEWER_NUM; i++)
@@ -488,20 +649,20 @@ void Core::slotSelectROI()
 	// Extract VOI of the overlay Image data
 
 	// Extract VOI of the vtkImage data
-	for (int i = 0; i < this->m_imageManager.getListOfViewerInputImages().size(); ++i) {
-		if (m_imageManager.getListOfViewerInputImages()[i] != NULL) {
+	for (int i = 0; i < this->m_imageManager->getListOfViewerInputImages().size(); ++i) {
+		if (m_imageManager->getListOfViewerInputImages()[i] != NULL) {
 			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
 				vtkSmartPointer<vtkExtractVOI>::New();
-			extractVOIFilter->SetInputData(m_imageManager.getListOfViewerInputImages()[i]);
+			extractVOIFilter->SetInputData(m_imageManager->getListOfViewerInputImages()[i]);
 			extractVOIFilter->SetVOI(newExtent);
 			extractVOIFilter->Update();
-			this->m_imageManager.getListOfViewerInputImages()[i]->DeepCopy(
+			this->m_imageManager->getListOfViewerInputImages()[i]->DeepCopy(
 				extractVOIFilter->GetOutput());
 
 		}
 	}
 	slotChangeView(MULTIPLANAR_VIEW);
-	//this->m_imageManager.getOverlay().SetDisplayExtent(newExtent);
+	//this->m_imageManager->getOverlay().SetDisplayExtent(newExtent);
 
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
@@ -518,11 +679,11 @@ void Core::slotSelectROI()
 }
 void Core::slotResetROI()
 {
-	for (int i = 0; i < m_imageManager.getListOfViewerInputImages().size(); ++i)
+	for (int i = 0; i < m_imageManager->getListOfViewerInputImages().size(); ++i)
 	{
-		if (m_imageManager.getListOfViewerInputImages()[i] != NULL) {
-			m_imageManager.getListOfViewerInputImages()[i]->DeepCopy(
-				m_imageManager.getListOfVtkImages()[i]);
+		if (m_imageManager->getListOfViewerInputImages()[i] != NULL) {
+			m_imageManager->getListOfViewerInputImages()[i]->DeepCopy(
+				m_imageManager->getListOfVtkImages()[i]);
 		}
 	}
 	slotChangeView(MULTIPLANAR_VIEW);

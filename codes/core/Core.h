@@ -16,67 +16,71 @@ class Core:public QWidget
 {
 	Q_OBJECT
 public:
+	Core(QWidget* parent = nullptr);
+	~Core();
+
+	void Initialization();
+
+	// Get functions
+	vtkSmartPointer<vtkPolyData> GetCenterlinePD();
+	vtkLookupTable*		GetLookupTable();
+	vtkRenderWindow*	GetRenderWindow(int num);
+	IOManager*			GetIOManager();
+	MyImageManager*		GetMyImageManager();
+
+	void RenderAllViewer();
+	void DisplayErrorMessage(std::string str);
+	
 	enum VIEW_MODE
 	{
 		MULTIPLANAR_VIEW = 0,
 		SEGMENTATION_VIEW = 1
 	};
-	const static int VIEWER_NUM = 3;
+	
+	enum LABEL_MAPPING {
+		LABEL_NULL = 0,
+		LABEL_LUMEN = 1,
+		LABEL_VESSEL_WALL = 2,
+		LABEL_CALCIFICATION = 3,
+		LABEL_HEMORRHAGE = 4,
+		LABEL_IRNC = 5,
+		LABEL_LM = 6
+	};
+
 	const static int DEFAULT_IMAGE = 0;
-	Core(QWidget* parent = nullptr);
+	const static int VIEWER_NUM = 3;
 
-	void Initialization();
-
-	~Core();
-
-	vtkLookupTable* GetLookupTable();
-
-	vtkRenderWindow* GetRenderWindow(int num);
-
-	void RenderAllViewer();
-
-	void DisplayErrorMessage(std::string str);
-
-	IOManager* GetIOManager();
-
-	MyImageManager* GetMyImageManager();
 
 public slots:
 
+	// Initialization
+	virtual void slotVisualizeAll2DViewers();
 	virtual void slotAddOverlayToImageViewer();
 
-	virtual void slotVisualizeAll2DViewers();
-
+	// Modality
 	virtual void slotChangeModality(QAction* action);
-
 	virtual void slotChangeModality(QString modalityName, int viewerNum);
-
-	virtual void slotSegmentationView();
-
-	virtual void slotMultiPlanarView();
 	
+	// View Modes
+	virtual void slotSegmentationView();
+	virtual void slotMultiPlanarView();
 	virtual void slotChangeView(int viewMode);
 
+	// Viewers's slice position
 	virtual void slotChangeSlice(int slice);
-
 	virtual void slotChangeSliceX(int x);
-
 	virtual void slotChangeSliceY(int y);
-
 	virtual void slotChangeSliceZ(int z);
-
 	virtual void slotChangeFocalPointWithImageCoordinate(int i, int j, int k);
 
 	// mode stuff
 	virtual void slotNavigationMode();
-
 	virtual void slotWindowLevelMode();
-
 	virtual void slotBrushMode();
 	virtual void slotSetBrushSize(int size);
 	virtual void slotSetBrushShape(int shape);
-
 	virtual void slotContourMode();
+
 	// Auto Lumen Segmenation 
 	virtual void slotEnableAutoLumenSegmentation(bool flag);
 	virtual void slotSetContourFilterGenerateValues(int generateValues);
@@ -87,10 +91,14 @@ public slots:
 	virtual void slotChangeROI();
 	virtual void slotSelectROI();
 	virtual void slotResetROI();
-
 	virtual void slotRuler(bool b);
+
 	// set layer color
 	virtual void slotSetImageLayerColor(int layer);
+
+	// Button slots
+	virtual void slotGenerateCenterlineBtn();
+	virtual void slotUpdate3DLabelBtn();
 
 signals:
 	void signalVisualizeAllViewers();
@@ -107,7 +115,6 @@ public:
 	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];
 	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[VIEWER_NUM];
 	vtkSmartPointer<InteractorStyleSwitch> m_style[VIEWER_NUM];
-
 	vtkRenderWindow*			m_3DimageViewer;
 	vtkRenderer*				m_3DDataRenderer;
 	vtkRenderer*				m_3DAnnotationRenderer;
@@ -115,8 +122,9 @@ public:
 	InteractorStyleSwitch3D*	m_style3D;
 
 	// Data
-	MyImageManager m_imageManager;
-	IOManager m_ioManager;
+	MyImageManager* m_imageManager;
+	IOManager*		m_ioManager;
+	vtkSmartPointer<vtkPolyData> m_centerlinePD;
 
 
 	bool m_firstInitialize = true;

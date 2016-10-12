@@ -44,10 +44,13 @@
 
 MainWindow::MainWindow() 
 	:widgetGroup(this), viewerGroup(this), viewGroup(this),
-	m_core(this), imageManager(m_core.GetMyImageManager()), ioManager(m_core.GetIOManager())
+	m_core(new Core(this)), imageManager(m_core->GetMyImageManager()), ioManager(m_core->GetIOManager())
 {
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
+
+	this->imageManager = m_core->GetMyImageManager();
+	this->ioManager = m_core->GetIOManager();
 
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
@@ -60,16 +63,17 @@ MainWindow::MainWindow()
 	ui->widgetDockWidget->show();
 	setActionsEnable(false);
 
-	ui->image1View->SetRenderWindow(m_core.GetRenderWindow(0));
-	ui->image2View->SetRenderWindow(m_core.GetRenderWindow(1));
-	ui->image3View->SetRenderWindow(m_core.GetRenderWindow(2));
-	ui->image4View->SetRenderWindow(m_core.GetRenderWindow(3));
+	ui->image1View->SetRenderWindow(m_core->GetRenderWindow(0));
+	ui->image2View->SetRenderWindow(m_core->GetRenderWindow(1));
+	ui->image3View->SetRenderWindow(m_core->GetRenderWindow(2));
+	ui->image4View->SetRenderWindow(m_core->GetRenderWindow(3));
 	
-	this->m_core.Initialization();
+	this->m_core->Initialization();
+	cout << "print stuff";
 
 	// Open Image
-	connect(ui->actionOpenImage, SIGNAL(triggered()), ioManager, SLOT(slotOpenWithWizard()));
-	connect(&m_core, SIGNAL(signalVisualizeAllViewers()), this, SLOT(slotVisualizeImage()));
+	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,		SLOT(slotVisualizeImage()));
+	connect(ui->actionOpenImage,	SIGNAL(triggered())					, ioManager,	SLOT(slotOpenWithWizard()));
 	// Save Segmentaiton 
 	connect(ui->actionSave, SIGNAL(triggered()), ioManager, SLOT(slotSaveSegmentaitonWithDiaglog()));
 	// Open Segmentation
@@ -83,33 +87,33 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
 	widgetGroup.setExclusive(true);
-	connect(ui->actionNavigation, SIGNAL(triggered()), &m_core, SLOT(slotNavigationMode()));
-	connect(ui->actionWindowLevel, SIGNAL(triggered()), &m_core, SLOT(slotWindowLevelMode()));
-	connect(ui->actionContour, SIGNAL(triggered()), &m_core, SLOT(slotContourMode()));
-	connect(ui->actionBrush, SIGNAL(triggered()), &m_core, SLOT(slotBrushMode()));
-	connect(ui->actionRuler, SIGNAL(triggered(bool)), &m_core, SLOT(slotRuler(bool)));
-	connect(ui->actionROI, SIGNAL(triggered()), &m_core, SLOT(slotROIMode()));
+	connect(ui->actionNavigation, SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
+	connect(ui->actionWindowLevel, SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
+	connect(ui->actionContour, SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
+	connect(ui->actionBrush, SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
+	connect(ui->actionRuler, SIGNAL(triggered(bool)), this->m_core, SLOT(slotRuler(bool)));
+	connect(ui->actionROI, SIGNAL(triggered()), this->m_core, SLOT(slotROIMode()));
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
 	viewGroup.addAction(ui->actionAllAxialView);
 	viewGroup.setExclusive(true);
-	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), &m_core, SLOT(slotMultiPlanarView()));
-	connect(ui->actionAllAxialView, SIGNAL(triggered()), &m_core, SLOT(slotSegmentationView()));
-	connect(&m_core, SIGNAL(signalMultiPlanarView()), ui->actionMultiPlanarView, SLOT(trigger()));
-	connect(&m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
+	connect(ui->actionMultiPlanarView, SIGNAL(triggered()), this->m_core, SLOT(slotMultiPlanarView()));
+	connect(ui->actionAllAxialView, SIGNAL(triggered()), this->m_core, SLOT(slotSegmentationView()));
+	connect(this->m_core, SIGNAL(signalMultiPlanarView()), ui->actionMultiPlanarView, SLOT(trigger()));
+	connect(this->m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
 	// slice 
 	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),
-		&m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
+		this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
 	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),
-		&m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
+		this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
 	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),
-		&m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
-	connect(&m_core, SIGNAL(signalChangeSliceX(int)), 
+		this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
+	connect(this->m_core, SIGNAL(signalChangeSliceX(int)), 
 		ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(&m_core, SIGNAL(signalChangeSliceY(int)),
+	connect(this->m_core, SIGNAL(signalChangeSliceY(int)),
 		ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(&m_core, SIGNAL(signalChangeSliceZ(int)), 
+	connect(this->m_core, SIGNAL(signalChangeSliceZ(int)), 
 		ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
 
 	// UI
@@ -198,6 +202,11 @@ MainWindow* MainWindow::GetMainWindow()
 }
 
 
+Core* MainWindow::GetCore()
+{
+	return this->m_core;
+}
+
 MainWindow::~MainWindow()
 {
 	ui->image1View->SetRenderWindow(NULL);
@@ -220,7 +229,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::DisplayErrorMessage(std::string str)
 {
-	m_core.DisplayErrorMessage(str);
+	m_core->DisplayErrorMessage(str);
 
 }
 
@@ -318,15 +327,15 @@ bool MainWindow::slotVisualizeImage()
 	}
 	ui->ULSelectImgBtn->setMenu(&ChangeBaseImageULMenu);
 	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)), 
-		&m_core, SLOT(slotChangeModality(QAction*)));
+		this->m_core, SLOT(slotChangeModality(QAction*)));
 
 	ui->URSelectImgBtn->setMenu(&ChangeBaseImageURMenu);
 	connect(&ChangeBaseImageURMenu, SIGNAL(triggered(QAction*)),
-		&m_core, SLOT(slotChangeModality(QAction*)));
+		this->m_core, SLOT(slotChangeModality(QAction*)));
 
 	ui->LLSelectImgBtn->setMenu(&ChangeBaseImageLLMenu);
 	connect(&ChangeBaseImageLLMenu, SIGNAL(triggered(QAction*)),
-		&m_core, SLOT(slotChangeModality(QAction*)));
+		this->m_core, SLOT(slotChangeModality(QAction*)));
 
 	return 0;
 }
@@ -442,163 +451,25 @@ void MainWindow::slotImage(int image)
 	default:
 		break;
 	}
-	m_core.RenderAllViewer();
+	m_core->RenderAllViewer();
 }
 
 void MainWindow::slotChangeROI()
 {
 	int extent[6];
-	m_core.m_style[0]->GetROI()->SelectROI(extent);
+	m_core->m_style[0]->GetROI()->SelectROI(extent);
 	m_moduleWidget->slotChangeROI(extent);
 }
 
 void MainWindow::slot3DUpdate()
 {
 
-	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveAllViewProps();
-	
-	// Extract VOI
-	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	voi->SetInputData(imageManager->getOverlay().GetVTKOutput());
-	voi->SetVOI(imageManager->getOverlay().GetDisplayExtent());
-	voi->Update();
-
-	// Threshold the iamge
-	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
-	thres->SetInputData(voi->GetOutput());
-	thres->ThresholdBetween(MainWindow::LABEL_LUMEN - 0.1, MainWindow::LABEL_LUMEN + 0.1);
-	thres->SetOutValue(0);
-	thres->SetInValue(10);
-	thres->Update();
-
-	/// Obtain centerline
-	SurfaceCreator* surfaceCreator = new SurfaceCreator();
-	surfaceCreator->SetInput(thres->GetOutput());
-	surfaceCreator->SetValue(10);
-	surfaceCreator->SetSmoothIteration(15);
-	surfaceCreator->SetDiscrete(false);
-	surfaceCreator->SetResamplingFactor(1.0);
-	surfaceCreator->Update();
-
-	// Clip at the end of the boundaries
-	vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
-	surface->DeepCopy(surfaceCreator->GetOutput());
-	vtkSmartPointer<vtkPlane> plane[2];
-	plane[0] = vtkSmartPointer<vtkPlane>::New();
-	plane[1] = vtkSmartPointer<vtkPlane>::New();
-	plane[0]->SetNormal(0, 0, -1);
-	plane[1]->SetNormal(0, 0, 1);
-	double zCoord1 = (imageManager->getOverlay().GetDisplayExtent()[5] - 1) * 
-		this->imageManager->getListOfViewerInputImages()[0]->GetSpacing()[2] + 
-		this->imageManager->getListOfViewerInputImages()[0]->GetOrigin()[2];
-	double zCoord2 = (imageManager->getOverlay().GetDisplayExtent()[4] + 1) * 
-		this->imageManager->getListOfViewerInputImages()[0]->GetSpacing()[2] + 
-		this->imageManager->getListOfViewerInputImages()[0]->GetOrigin()[2];
-	plane[0]->SetOrigin(0, 0, zCoord1);
-	plane[1]->SetOrigin(0, 0, zCoord2);
-	for (int i = 0; i < 2;i++)
-	{
-		vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
-		clipper->SetClipFunction(plane[i]);
-		clipper->SetInputData(surface);
-		clipper->Update();
-		surface->DeepCopy(clipper->GetOutput());
-	}
-
-
-	Centerline* cl = new Centerline;
-	try {
-		cl->SetSurface(surface);
-		cl->Update();
-	}
-	catch (Centerline::ERROR_CODE e) {
-		this->DisplayErrorMessage("Centerline calculations failed. Some functions might not be available. Please select an ROI with cylindrical structures. (Branches are allowed)");
-
-		///Volume Render
-		GPUVolumeRenderingFilter* volumeRenderingFilter =
-			GPUVolumeRenderingFilter::New();
-
-		volumeRenderingFilter->SetInputData(voi->GetOutput());
-		volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->GetLookupTable());
-		volumeRenderingFilter->GetVolume()->SetPickable(1);
-		volumeRenderingFilter->Update();
-
-		m_core.m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
-
-		this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3, 0.3, 0.3);
-		this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-		this->ui->image4View->GetRenderWindow()->Render();
-		m_core.m_style3D->SetInteractorStyleTo3DDistanceWidget();
-
-		return;
-	}
-
-
-	if (m_centerlinePD != NULL) {
-		this->m_centerlinePD->Delete();
-		this->m_centerlinePD = NULL;
-	}
-	this->m_centerlinePD = vtkPolyData::New();
-	this->m_centerlinePD->DeepCopy(cl->GetCenterline());
-
-	delete cl;
-
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(this->m_centerlinePD);
-	mapper->SetLookupTable(m_core.GetLookupTable());
-	mapper->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	mapper->Update();
-	vtkSmartPointer<vtkActor> Actor = vtkSmartPointer<vtkActor>::New();
-	//Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	Actor->SetMapper(mapper);
-	Actor->GetProperty()->SetOpacity(0.9);
-	Actor->GetProperty()->SetRepresentationToSurface();
-	Actor->SetPickable(1);
-	m_core.m_3DDataRenderer->AddActor(Actor);
-
-	//vtkSmartPointer<vtkPolyDataMapper> mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
-	//mapper2->SetInputData(surface);
-	//mapper2->SetLookupTable(this->LookupTable);
-	//mapper2->SetScalarRange(0, 6); // Change this too if you change the look up table!
-	//mapper2->Update();
-	//vtkSmartPointer<vtkActor> Actor2 = vtkSmartPointer<vtkActor>::New();
-	////Actor->GetProperty()->SetColor(overlayColor[0][0]/255.0, overlayColor[0][1] / 255.0, overlayColor[0][2] / 255.0);
-	//Actor2->SetMapper(mapper2);
-	//Actor2->GetProperty()->SetRepresentationToWireframe();
-	//Actor2->SetPickable(1);
-	//this->m_3DDataRenderer->AddActor(Actor2);
-
-	///Volume Render
-	GPUVolumeRenderingFilter* volumeRenderingFilter =
-		GPUVolumeRenderingFilter::New();
-	
-	volumeRenderingFilter->SetInputData(voi->GetOutput());
-	volumeRenderingFilter->SetLookUpTable(this->GetMyImageViewer(0)->GetLookupTable());
-	volumeRenderingFilter->GetVolume()->SetPickable(1);
-	//volumeRenderingFilter->GetVolumeProperty()->SetInterpolationTypeToLinear();
-	volumeRenderingFilter->Update();
-
-	m_core.m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
-	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0.3,0.3,0.3);
-	this->ui->image4View->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-	this->ui->image4View->GetRenderWindow()->Render();
-	m_core.m_style3D->SetInteractorStyleTo3DDistanceWidget();
-	//delete surfaceCreator;
-
-	/*vtkRenderWindow* rwin = vtkRenderWindow::New();
-	rwin->AddRenderer(vtkRenderer::New());
-	rwin->GetRenderers()->GetFirstRenderer()->AddVolume(volumeRenderingFilter->GetVolume());
-	vtkRenderWindowInteractor* interacotr = vtkRenderWindowInteractor::New();
-	rwin->SetInteractor(interacotr);
-	interacotr->Initialize();
-	rwin->Render();
-	interacotr->Start();*/
 }
 
 void MainWindow::resizeEvent( QResizeEvent * event )
 {
 	QMainWindow::resizeEvent(event);
-	m_core.RenderAllViewer();
+	m_core->RenderAllViewer();
 		//for (int i = 0; i < 3; i++)
 		//{
 		//	if (m_2DimageViewer[i] != NULL)
@@ -656,7 +527,7 @@ vtkRenderWindow * MainWindow::GetRenderWindow(int i)
 
 MyImageViewer * MainWindow::GetMyImageViewer(int i)
 {
-	return m_core.m_2DimageViewer[i];
+	return m_core->m_2DimageViewer[i];
 }
 
 int MainWindow::GetVisibleImageNo()
@@ -681,7 +552,7 @@ void MainWindow::slotChangeBaseImageLL()
 
 void MainWindow::RenderAllViewer()
 {
-	m_core.RenderAllViewer();
+	m_core->RenderAllViewer();
 }
 
 void MainWindow::RenderAll2DViewers()
@@ -691,7 +562,7 @@ void MainWindow::RenderAll2DViewers()
 	{
 		if (segmentationView && i >= visibleImageNum)
 			break;
-		m_core.m_2DimageViewer[i]->GetRenderWindow()->Render();
+		m_core->m_2DimageViewer[i]->GetRenderWindow()->Render();
 	}
 }
 
@@ -703,17 +574,17 @@ void MainWindow::UpdateStenosisValue(double val)
 
 InteractorStyleSwitch * MainWindow::GetInteractorStyleImageSwitch(int i)
 {
-	return m_core.m_style[i];
+	return m_core->m_style[i];
 }
 
 vtkRenderWindowInteractor * MainWindow::GetVtkRenderWindowInteractor(int i)
 {
-	return m_core.m_interactor[i];
+	return m_core->m_interactor[i];
 }
 
 vtkLookupTable * MainWindow::GetLookupTable()
 {
-	return m_core.GetLookupTable();
+	return m_core->GetLookupTable();
 }
 
 vtkPolyData * MainWindow::GetCenterlinePD()

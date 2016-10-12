@@ -59,10 +59,10 @@ void MeasurementFor2D::CountLabels()
 	Measurements2D output;
 
 
-	int *val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(MainWindow::LABEL_LUMEN, 0, 0));
+	int *val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(Core::LABEL_LUMEN, 0, 0));
 	output.LumenArea = (*val * pixelArea);
 
-	val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(MainWindow::LABEL_VESSEL_WALL, 0, 0));
+	val = static_cast<int*>(imageAccumulate->GetOutput()->GetScalarPointer(Core::LABEL_VESSEL_WALL, 0, 0));
 	output.VesselWallArea = (*val * pixelArea);
 
 	this->m_outputList.push_back(output);

@@ -28,59 +28,45 @@
 
 class ModuleWidget;
 class MeasurementWidget;
-class MainWindow: public QMainWindow
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	explicit MainWindow(); 	
+	explicit MainWindow();
 	~MainWindow();
 	static MainWindow* GetMainWindow();
 
 	// Get Functions
-	vtkRenderWindow* GetRenderWindow(int i);
-	MyImageViewer* GetMyImageViewer(int i);
-	InteractorStyleSwitch* GetInteractorStyleImageSwitch(int i);
-	vtkRenderWindowInteractor* GetVtkRenderWindowInteractor(int i);
-	vtkLookupTable* GetLookupTable();
-
+	Core*						GetCore();
+	vtkRenderWindow*			GetRenderWindow(int i);
+	MyImageViewer*				GetMyImageViewer(int i);
+	InteractorStyleSwitch*		GetInteractorStyleImageSwitch(int i);
+	vtkRenderWindowInteractor*	GetVtkRenderWindowInteractor(int i);
+	vtkLookupTable*				GetLookupTable();
 	//QString				GetFileName(int);
 	int					GetVisibleImageNo();
 	vtkPolyData*		GetCenterlinePD();
-	Ui_MainWindow* GetUI();
-	// Core
-	Core m_core;
-
-
+	Ui_MainWindow*		GetUI();
+	
 	// Ui Updates
 	void RenderAllViewer();
 	void RenderAll2DViewers();
 	void UpdateStenosisValue(double val);
 
-	
-	enum SLICE_ORIENTATION
-  {
-    SLICE_ORIENTATION_YZ = 0,
-    SLICE_ORIENTATION_XZ = 1,
-    SLICE_ORIENTATION_XY = 2
-  };
 
-	enum LABEL_MAPPING {
-		LABEL_NULL = 0,
-		LABEL_LUMEN = 1,
-		LABEL_VESSEL_WALL = 2,
-		LABEL_CALCIFICATION = 3,
-		LABEL_HEMORRHAGE = 4,
-		LABEL_IRNC = 5,
-		LABEL_LM = 6
+	enum SLICE_ORIENTATION
+	{
+		SLICE_ORIENTATION_YZ = 0,
+		SLICE_ORIENTATION_XZ = 1,
+		SLICE_ORIENTATION_XY = 2
 	};
 
-
-public slots:
+	public slots:
 	//GUI
 	virtual void resizeEvent(QResizeEvent * event);
 	virtual void dragEnterEvent(QDragEnterEvent *ev);
-	virtual void dropEvent( QDropEvent *ev );
-	
+	virtual void dropEvent(QDropEvent *ev);
+
 	//Action
 	virtual void slotExit();
 
@@ -127,7 +113,7 @@ private:
 	QActionGroup viewerGroup;
 	//viewGroup
 	QActionGroup viewGroup;
-    
+
 	//Recent File
 	const static int MAX_RECENT_IMAGE = 10;
 	QList<QAction*> recentFileActionList;
@@ -137,17 +123,19 @@ private:
 
 	// UI related
 	void DisplayErrorMessage(std::string);
-	
+
 	//Data
 	vtkPolyData* m_centerlinePD;
 	MyImageManager* imageManager;
 	IOManager* ioManager;
 
+	// Core
+	Core* m_core;
 
 
-    //Orientation
+	//Orientation
 	int m_orientation;
-    
+
 	//Dock Widget
 	friend class ModuleWidget;
 	friend class MeasurementWidget;
@@ -156,8 +144,8 @@ private:
 
 	//Navigation
 	double m_focalPoint[3];
-    
-    int visibleImageNum;
+
+	int visibleImageNum;
 
 	//Information
 	Dialog* m_InfoDialog;
