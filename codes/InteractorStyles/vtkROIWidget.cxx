@@ -8,6 +8,10 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkBorderRepresentation.h>
 #include <vtkObjectFactory.h>
+#include <vtkProperty2D.h>
+#include <vtkCamera.h>
+#include <vtkMath.h>
+
 #include "vtkROIWidget.h"
 #include "MainWindow.h"
 

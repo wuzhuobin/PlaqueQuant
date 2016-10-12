@@ -93,7 +93,6 @@ void InteractorStylePolygonDraw::OnLeftButtonDown()
 		this->SetPolygonModeEnabled(true);
 		this->CONTOUR_IS_ON_FLAG = true;
 	}
-
 	AbstractInteractorStyleImage::OnLeftButtonDown();
 }
 
@@ -328,6 +327,8 @@ void InteractorStylePolygonDraw::SetLineInterpolator(int i)
 	default:
 		break;
 	}
+	SetPolygonModeEnabled(false);
+	SetPolygonModeEnabled(true);
 }
 
 void InteractorStylePolygonDraw::FillPolygon()
@@ -491,7 +492,10 @@ void InteractorStylePolygonDraw::FillPolygon()
 	SetPolygonModeEnabled(false);
 	SetPolygonModeEnabled(true);
 	m_imageViewer->GetInputLayer()->Modified();
-
+	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+		it != m_synchronalViewers.end(); ++it) {
+		(*it)->Render();
+	}
 
 
 }

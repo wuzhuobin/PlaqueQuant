@@ -71,7 +71,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -396,13 +396,6 @@
            <widget class="QRadioButton" name="polygonRadionButton">
             <property name="text">
              <string>Polygon</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>Close Polygon as the user select vertics</string>
             </property>
            </widget>
           </item>
