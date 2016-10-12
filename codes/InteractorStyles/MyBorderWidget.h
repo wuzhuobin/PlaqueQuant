@@ -3,6 +3,7 @@
 
 #include <vtkBorderWidget.h>
 #include <vtkCommand.h>
+#include <vtkImageViewer2.h>
 
 #include <list>
 
@@ -15,8 +16,11 @@ public:
 	static MyBorderWidget *New();
 	vtkTypeMacro(MyBorderWidget, vtkBorderWidget);
 
-	void SetImageViewer(MyImageViewer* viewer);
-
+	void UpdateBorderWidget();
+	void SetImageViewer(vtkImageViewer2* viewer);
+	void SetLowerLeft(double x, double y, double z);
+	void SetUpperRight(double x, double y, double z);
+	MyBorderWidgetCallback* GetBorderWidgetCallback();
 
 protected:
 	MyBorderWidget();
@@ -24,7 +28,8 @@ protected:
 
 private:
 	friend class MyBorderWidgetCallback;
-	MyImageViewer* m_imageViewer;
+	vtkSmartPointer<MyBorderWidgetCallback> m_callBack = nullptr;
+	vtkImageViewer2* m_imageViewer = nullptr;
 };
 
 
@@ -37,13 +42,16 @@ public:
 	vtkTypeMacro(MyBorderWidgetCallback, vtkCommand);
 
 	virtual void Execute(vtkObject *caller, unsigned long ev, void*);
+	void SetMyBorderWidget(MyBorderWidget* myBorderWidget);
 
-	void AddBorderWidget(vtkBorderWidget* borderWidget);
-	void SetBorderWidgets(std::list<vtkBorderWidget*> borderWidgets);
+	void AddBorderWidget(MyBorderWidget* borderWidget);
+	void SetBorderWidgets(std::list<MyBorderWidget*> borderWidgets);
 
 
 private:
-	std::list<vtkBorderWidget*> m_borderWidgets;
+	std::list<MyBorderWidget*> m_borderWidgets;
+	MyBorderWidget* m_borderWidget;
+
 };
 
 

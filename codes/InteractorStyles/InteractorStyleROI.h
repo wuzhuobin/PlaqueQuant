@@ -1,6 +1,7 @@
 #pragma once
 #include "InteractorStyleNavigation.h"
 
+#include "MyBorderWidget.h"
 #include "MyPlaneWidget.h"
 
 class InteractorStyleROI :
@@ -25,6 +26,9 @@ protected:
 
 
 private:
+
+	vtkSmartPointer<MyBorderWidget> m_borderWidget;
+
 	MyPlaneWidget* planeWidget;
 	MyPlaneWidgetCallback* planeWidgetCallback;
 

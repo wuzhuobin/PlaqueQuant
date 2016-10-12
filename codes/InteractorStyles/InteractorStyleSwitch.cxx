@@ -75,7 +75,7 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 		it != allStyles.end(); ++it) {
 		if ((*it) != NULL) {
 			(*it)->Delete();
-			(*it) == NULL;
+			(*it) = NULL;
 		}
 	}
 	allStyles.clear();

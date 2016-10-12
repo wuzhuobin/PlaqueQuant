@@ -10,14 +10,47 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 	MainWindow *mainWnd = MainWindow::GetMainWindow();
 
 	if (flag) {
+		int int_defaultBound[6];
+		m_imageViewer->GetInput()->GetExtent(int_defaultBound);
+		//int_defaultBound[GetSliceOrientation()] = 0;
+		//int_defaultBound[GetSliceOrientation() + 1] = 0;
+
+		m_borderWidget->SetInteractor(this->Interactor);
+		m_borderWidget->SetImageViewer(m_imageViewer);
+		//m_borderWidget->SetLowerLeft(int_defaultBound[0], int_defaultBound[2], int_defaultBound[3]);
+		//m_borderWidget->SetUpperRight(int_defaultBound[1], int_defaultBound[3], int_defaultBound[5]);
+		switch (GetSliceOrientation())
+		{
+		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
+			break;
+		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
+			break;
+		case vtkImageViewer2::SLICE_ORIENTATION_XY:
+			break;
+		}
+		m_borderWidget->EnabledOn();
+
+
+
+
+
+		//switch (GetSliceOrientation()) {
+		//case vtkImageViewer2::SLICE_ORIENTATION_YZ:
+		//	break;
+		//case vtkImageViewer2::SLICE_ORIENTATION_XZ:
+		//	break;
+		//case vtkImageViewer2::SLICE_ORIENTATION_XY:
+		//	break;
+
+		//}
+
+
+		///
 		planeWidget->initializeCustomFunction();
 		planeWidget->SetInputData(m_imageViewer->GetInput());
 		planeWidget->SetImageViewer(m_imageViewer);
 		planeWidget->SetDefaultBound(m_imageViewer->GetBound());
 		planeWidget->SetInteractor(this->Interactor);
-
-
-
 		//for (list<MyImageViewer*>::const_iterator cit = m_synchronalViewers.cbegin();
 		//	cit != m_synchronalViewers.cend(); ++cit) {
 		//	InteractorStyleSwitch* _switch = 
@@ -202,7 +235,9 @@ MyPlaneWidget * InteractorStyleROI::GetPlaneWidget()
 InteractorStyleROI::InteractorStyleROI()
 	:InteractorStyleNavigation()
 {
-	this->m_imageViewer = NULL;
+	//this->m_imageViewer = NULL;
+
+	m_borderWidget = vtkSmartPointer<MyBorderWidget>::New();
 
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();
