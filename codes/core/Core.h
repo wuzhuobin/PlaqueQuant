@@ -24,6 +24,9 @@ public:
 	const static int VIEWER_NUM = 3;
 	const static int DEFAULT_IMAGE = 0;
 	Core(QWidget* parent = nullptr);
+
+	void Initialization();
+
 	~Core();
 
 	vtkLookupTable* GetLookupTable();

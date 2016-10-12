@@ -17,16 +17,20 @@ Core::Core(QWidget* parent)
 		m_style[i] = vtkSmartPointer<InteractorStyleSwitch>::New();
 	}
 
-	/// Set up 3D renderer
+	this->m_3DDataRenderer = vtkRenderer::New();
+	this->m_3DAnnotationRenderer = vtkRenderer::New();
 	this->m_style3D = InteractorStyleSwitch3D::New();
 	this->m_3Dinteractor = vtkRenderWindowInteractor::New();
 	this->m_3DimageViewer = vtkRenderWindow::New();
+}
+
+void Core::Initialization()
+{
+	/// Set up 3D renderer
 	this->m_3DimageViewer->SetNumberOfLayers(2);
 	this->m_3DimageViewer->SetInteractor(this->m_3Dinteractor);
 	this->m_3Dinteractor->SetInteractorStyle(this->m_style3D);
-	this->m_3DAnnotationRenderer = vtkRenderer::New();
 	this->m_3DAnnotationRenderer->SetLayer(1);
-	this->m_3DDataRenderer = vtkRenderer::New();
 	this->m_3DDataRenderer->SetLayer(0);
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
 	this->m_3Dinteractor->Initialize();
@@ -35,15 +39,13 @@ Core::Core(QWidget* parent)
 
 	m_ioManager.setMyImageManager(&m_imageManager);
 
-	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()), 
+	connect(&m_ioManager, SIGNAL(finishOpenMultiImages()),
 		this, SLOT(slotVisualizeAll2DViewers()));
-	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()), 
+	connect(&m_ioManager, SIGNAL(finishOpenSegmentation()),
 		this, SLOT(slotAddOverlayToImageViewer()));
 
 	connect(m_2DimageViewer[DEFAULT_IMAGE], SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)),
 		this, SLOT(slotChangeFocalPointWithImageCoordinate(int, int, int)));
-
-
 }
 
 Core::~Core() 

@@ -48,7 +48,7 @@ MainWindow::MainWindow()
 {
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
-	
+
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
 	ui->widgetDockWidget->setWidget(m_moduleWidget);
@@ -60,7 +60,13 @@ MainWindow::MainWindow()
 	ui->widgetDockWidget->show();
 	setActionsEnable(false);
 
+	ui->image1View->SetRenderWindow(m_core.GetRenderWindow(0));
+	ui->image2View->SetRenderWindow(m_core.GetRenderWindow(1));
+	ui->image3View->SetRenderWindow(m_core.GetRenderWindow(2));
+	ui->image4View->SetRenderWindow(m_core.GetRenderWindow(3));
 	
+	this->m_core.Initialization();
+
 	// Open Image
 	connect(ui->actionOpenImage, SIGNAL(triggered()), ioManager, SLOT(slotOpenWithWizard()));
 	connect(&m_core, SIGNAL(signalVisualizeAllViewers()), this, SLOT(slotVisualizeImage()));
@@ -170,10 +176,7 @@ MainWindow::MainWindow()
 	//Initial Visible image number
 	visibleImageNum = 0;
 	
-	ui->image1View->SetRenderWindow(m_core.GetRenderWindow(0));
-	ui->image2View->SetRenderWindow(m_core.GetRenderWindow(1));
-	ui->image3View->SetRenderWindow(m_core.GetRenderWindow(2));
-	ui->image4View->SetRenderWindow(m_core.GetRenderWindow(3));
+
 
 	//ImageAlignment(NULL) = NULL;
 	this->m_centerlinePD = NULL;
