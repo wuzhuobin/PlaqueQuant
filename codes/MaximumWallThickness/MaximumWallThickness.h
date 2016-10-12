@@ -1,6 +1,19 @@
+/*
+Author:		Wong, Matthew Lun
+Date:		06th, August 2016
+Occupation:	Chinese University of Hong Kong,
+Department of Imaging and Inteventional Radiology,
+Junior Research Assistant
+
+This class calculates the distance between two circular boundaries with the mutual center within
+the inner bound.
+
+Wong Matthew Lun, Lok Ka Hei
+Copyright (C) 2016
+*/
+
 #ifndef MAXIMUMWALLTHICKNESS_H
 #define MAXIMUMWALLTHICKNESS_H
-#endif // !MAXIUMWALLTHICKNESS_H
 
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
@@ -94,4 +107,5 @@ private:
 
 };
 
+#endif // !MAXIUMWALLTHICKNESS_H
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
- 
+ cmake_policy(SET CMP0020 NEW)
 PROJECT(PlaqueQuant)
 
 IF(COMMAND CMAKE_POLICY)
@@ -63,24 +63,24 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/GPURenderWithLUT
 	${PROJECT_BINARY_DIR}/codes/Measurements 
 	# Source for maximum wall thickness
-	${PROJECT_BINAR_DIR}/codes/MaximumWallThickness
-	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
+	${PROJECT_BINARY_DIR}/codes/MaximumWallThickness
+	${PROJECT_BINARY_DIR}/codes/CenterlineBranching
+	#Source for license 
+	${PROJECT_BINARY_DIR}/codes/License
+
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/codes/Module
 	${PROJECT_SOURCE_DIR}/codes/Core
-	# AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/AbstractData
-	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
-	# Source for GPURender
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
 	${PROJECT_SOURCE_DIR}/codes/Measurements 
-	# Source for maxmimum wall thickness
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
+	${PROJECT_SOURCE_DIR}/codes/License
 )
 
 SET(

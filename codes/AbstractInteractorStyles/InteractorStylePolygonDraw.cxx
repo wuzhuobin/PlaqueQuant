@@ -484,8 +484,7 @@ void InteractorStylePolygonDraw::FillPolygon()
 	SetPolygonModeEnabled(false);
 	SetPolygonModeEnabled(true);
 	mainWnd->GetOverlay()->GetOutput()->Modified();
-
-
-
+	mainWnd->RenderAll2DViewers();
+	
 }
 

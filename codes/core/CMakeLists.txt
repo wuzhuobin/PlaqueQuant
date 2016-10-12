@@ -143,6 +143,7 @@ target_link_libraries(
 	Measurements
 	MaximumWallThickness
 	CenterlineBranching
+	Widget_License
 )
 
 
