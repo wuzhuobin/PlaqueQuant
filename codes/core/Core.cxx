@@ -1,5 +1,8 @@
 #include "Core.h"
-
+#include "SurfaceCreator.h"
+#include "Centerline.h"
+#include <GPUVolumeRenderingFilter.h>
+#include <vtkClipPolyData.h>
 #include <vtkExtractVOI.h>
 #include <vtkRendererCollection.h>
 #include <vtkImageThreshold.h>
@@ -506,10 +509,7 @@ void Core::slotGenerateCenterlineBtn()
 	this->m_3DDataRenderer->AddActor(Actor);
 }
 
-#include <GPUVolumeRenderingFilter.h>
-#include <vtkClipPolyData.h>
-#include "SurfaceCreator.h"
-#include "Centerline.h"
+
 
 void Core::slotUpdate3DLabelBtn()
 {
