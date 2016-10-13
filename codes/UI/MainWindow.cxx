@@ -93,6 +93,7 @@ MainWindow::MainWindow()
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered(bool)),	this->m_core, SLOT(slotRuler(bool)));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
+	
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
 	viewGroup.addAction(ui->actionAllAxialView);
@@ -152,7 +153,8 @@ MainWindow::MainWindow()
 	//connect(ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(addOverlay2ImageViewer()));
 
 	//3D view
-	connect(ui->updateBtn, SIGNAL(clicked()), this, SLOT(slot3DUpdate()));
+	connect(ui->updateBtn,		SIGNAL(clicked()), this->m_core, SLOT(slotUpdate3DLabelBtn()));
+	connect(ui->generateCLBtn,	SIGNAL(clicked()), this->m_core, SLOT(slotGenerateCenterlineBtn()));
 
 	//Initial Segmentation window
 	segmentationView = false;
