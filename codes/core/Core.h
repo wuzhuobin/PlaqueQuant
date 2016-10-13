@@ -96,6 +96,7 @@ public slots:
 
 	// set layer color
 	virtual void slotSetImageLayerColor(int layer);
+	virtual void slotSetPaintBrushToEraser(bool flag);
 
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();

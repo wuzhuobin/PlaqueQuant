@@ -95,6 +95,11 @@ void InteractorStylePaintBrush::SetBrushSize(int size)
 	m_brushSize = size;
 }
 
+void InteractorStylePaintBrush::EnableEarserMode(bool flag)
+{
+	this->m_eraserModeFlag = flag;
+}
+
 //void InteractorStylePaintBrush::SetDrawBrushSizeSpinBox(QSpinBox * s)
 //{
 //	m_drawBrushSizeSpinBox = s;
@@ -720,15 +725,15 @@ void InteractorStylePaintBrush::ReadfromImageData()
 							uchar rgbaUCHAR[4];
 							m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
 							m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
-							try {
+							//try {
 								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 								pos[GetSliceOrientation()] = 0;
 								m_brush->DrawSegment3D(pos[0], pos[1], pos[2], 
 									pos[0], pos[1], pos[2]);
-							}
-							catch (...) {
-								break;
-							}
+							//}
+							//catch (...) {
+							//	break;
+							//}
 							break;
 						}
 					}

@@ -54,11 +54,8 @@ public:
 
 	void SetBrushShape(int brushShape);
 	void SetBrushSize(int size);
-	
-	//void SetDrawBrushSizeSpinBox(QSpinBox* s);
-	//void SetDrawBrushShapeComBox(QComboBox* comboBox);
-	//void SetDrawVolumetricCheckBox(QCheckBox* checkBox);
-	//void SetDrawIsotropicCheckBox(QCheckBox* checkBox);
+	void EnableEarserMode(bool flag);
+
 
 protected:
 	InteractorStylePaintBrush();
@@ -104,6 +101,7 @@ private:
 	bool m_isDraw;
 	bool m_paintBrushEnabled;
 	int m_brushShape = SQUARE;
+	bool m_eraserModeFlag = false;
 
 	////PaintBrush
 	//QComboBox*  m_drawBrushShapeComboBox;

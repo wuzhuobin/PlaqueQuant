@@ -71,7 +71,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -400,6 +400,24 @@
            </widget>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>Fill</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <widget class="QGroupBox" name="groupBox_6">
             <property name="title">
              <string>Auto Lumen Segmentation </string>
@@ -633,7 +651,7 @@
           <item>
            <widget class="QCheckBox" name="checkBox_2">
             <property name="text">
-             <string>3D</string>
+             <string>Eraser</string>
             </property>
            </widget>
           </item>

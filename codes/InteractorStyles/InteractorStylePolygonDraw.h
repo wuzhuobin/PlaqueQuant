@@ -40,6 +40,7 @@ public:
 	void SetContourFilterGenerateValues(int generateValues);
 	void GenerateLumenWallContourWidget();
 	void SetLineInterpolator(int i);
+	void FillPolygon();
 
 protected:
 	InteractorStylePolygonDraw();
@@ -54,7 +55,6 @@ protected:
 private:
 	bool CheckDoubleClicked();
 	void DisplayPolygon(vtkObject*, long unsigned, void*);
-	void FillPolygon();
 
 
 	QTime m_timer;
