@@ -12,6 +12,13 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 	if (flag) {
 		int int_defaultBound[6];
 		m_imageViewer->GetInput()->GetExtent(int_defaultBound);
+
+		double worldBound[6];
+
+		for (int i = 0; i < 3; ++i) {
+			worldBound[i] = int_defaultBound[i] * GetSpacing()[i] + GetOrigin()[i];
+			worldBound[i + 1] = int_defaultBound[i] * GetSpacing()[i] + GetOrigin()[i];
+		}
 		//int_defaultBound[GetSliceOrientation()] = 0;
 		//int_defaultBound[GetSliceOrientation() + 1] = 0;
 
@@ -26,6 +33,8 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
 			break;
 		case vtkImageViewer2::SLICE_ORIENTATION_XY:
+			m_borderWidget->SetLowerLeft(worldBound[0], worldBound[2], worldBound[4]);
+			m_borderWidget->SetUpperRight(worldBound[1], worldBound[3], worldBound[5]);
 			break;
 		}
 		m_borderWidget->EnabledOn();

@@ -54,7 +54,6 @@ file(
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.cxx
 	${PROJECT_SOURCE_DIR}/MyBorderWidget.cxx
-	${PROJECT_SOURCE_DIR}/vtkROIWidget.cxx
 	PARENT_SCOPE
 	)
 file(
@@ -66,7 +65,6 @@ file(
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.h
 	${PROJECT_SOURCE_DIR}/MyBorderWidget.h
-	${PROJECT_SOURCE_DIR}/vtkROIWidget.h
 	PARENT_SCOPE
 	)
 add_library(

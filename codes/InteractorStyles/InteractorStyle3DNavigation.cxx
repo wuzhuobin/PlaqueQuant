@@ -15,7 +15,6 @@ Copyright (C) 2016
 */
 
 #include <vtkSmartPointer.h>
-#include <vtkCenterOfMass.h>
 #include "InteractorStyle3DNavigation.h"
 #include "MainWindow.h"
 

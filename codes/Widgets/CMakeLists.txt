@@ -24,12 +24,17 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
-#VMTK
-find_package(VMTK REQUIRED)
-if (NOT VMTK_FOUND)
-	message(FATAL_ERROR "error: VMTK is not found")
+#QT
+if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
+  # Instruct CMake to run moc automatically when needed.
+  # set(CMAKE_AUTOMOC ON)
+  find_package(Qt5PrintSupport REQUIRED)
+  find_package(Qt5Widgets REQUIRED QUIET)
+  # add_definitions(-DQT5_IS_LOADED)
+else()
+  find_package(Qt4 REQUIRED)
+  include(${QT_USE_FILE})
 endif()
-include(${VMTK_USE_FILE})
 
 #link other libraries
 link_directories(
@@ -40,26 +45,31 @@ include_directories(
 	${MAIN_INCLUDE_DIRS}
 	)
 
-SET(
-	LIBRARY_OUTPUT_PATH 
-	${CMAKE_SOURCE_DIR}/lib
-	)
-
 SET(WIDGET_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Distance3DWidget.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/MyBorderWidget.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/MyWidgetManager.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/MyPlaneWidget.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/vtkROIWidget.cxx
 	)
 
 SET(WIDGET_INC 
 	${CMAKE_CURRENT_SOURCE_DIR}/Distance3DWidget.h
+	${CMAKE_CURRENT_SOURCE_DIR}/MyBorderWidget.h	
+	${CMAKE_CURRENT_SOURCE_DIR}/MyWidgetManager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/MyPlaneWidget.h
+	${CMAKE_CURRENT_SOURCE_DIR}/vtkROIWidget.h
 	)
+
+QT5_WRAP_CPP(MOCSrcs ${WIDGET_INC})
 
 ADD_LIBRARY(
 	Widgets 
 	${WIDGET_SRC} 
 	${WIDGET_INC}
+	${MOCSrcs}
 	)
 target_link_libraries(
 	Widgets 
-	${VTK_LIBRARIES} 
-	${ITK_LIBRARIES}
+	${LINK_LIBRARIE}
 	)

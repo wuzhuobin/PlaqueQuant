@@ -10,6 +10,7 @@
 #include "InteractorStyleSwitch3D.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
+#include "MyWidgetManager.h"
 
 
 class Core:public QWidget
@@ -120,6 +121,9 @@ public:
 	vtkRenderer*				m_3DAnnotationRenderer;
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	InteractorStyleSwitch3D*	m_style3D;
+
+	// widget
+	MyWidgetManager* m_widgetManager = NULL;
 
 	// Data
 	MyImageManager* m_imageManager;

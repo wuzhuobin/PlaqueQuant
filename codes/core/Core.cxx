@@ -1,4 +1,8 @@
 #include "Core.h"
+#include <GPUVolumeRenderingFilter.h>
+#include <vtkClipPolyData.h>
+#include "SurfaceCreator.h"
+#include "Centerline.h"
 
 #include <vtkExtractVOI.h>
 #include <vtkRendererCollection.h>
@@ -7,8 +11,13 @@
 #include <QAction>
 
 Core::Core(QWidget* parent)
-	:m_imageManager(new  MyImageManager(this)), m_ioManager(new IOManager(this)), QWidget(parent)
+	:QWidget(parent)
 {
+	m_imageManager = new  MyImageManager(this);
+	m_ioManager = new IOManager(this);
+	m_widgetManager = new MyWidgetManager(this);
+
+
 	// enable registration
 	m_ioManager->enableRegistration(true);
 	for (int i = 0; i < VIEWER_NUM; i++)
@@ -506,10 +515,6 @@ void Core::slotGenerateCenterlineBtn()
 	this->m_3DDataRenderer->AddActor(Actor);
 }
 
-#include <GPUVolumeRenderingFilter.h>
-#include <vtkClipPolyData.h>
-#include "SurfaceCreator.h"
-#include "Centerline.h"
 
 void Core::slotUpdate3DLabelBtn()
 {
@@ -613,15 +618,19 @@ void Core::slotRuler(bool b)
 
 void Core::slotROIMode()
 {
-	if (SEGMENTATION_VIEW) {
-		//connected to slotMultiPlanarView()
-		emit signalMultiPlanarView();
-		//ui->actionMultiPlanarView->trigger();
-	}
-	//m_moduleWidget->SetPage(0);
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		m_style[i]->SetInteractorStyleToROI();
-	}
+	//if (SEGMENTATION_VIEW) {
+	//	//connected to slotMultiPlanarView()
+	//	emit signalMultiPlanarView();
+	//	//ui->actionMultiPlanarView->trigger();
+	//}
+	////m_moduleWidget->SetPage(0);
+	//for (int i = 0; i < VIEWER_NUM; ++i) {
+	//	m_style[i]->SetInteractorStyleToROI();
+	//}
+	//for (int i = 0; i < VIEWER_NUM; ++i) {
+	//	m_style[i]->SetInteractorStyleToNavigation();
+	//}
+	
 
 	//this->slotRuler(false);
 }

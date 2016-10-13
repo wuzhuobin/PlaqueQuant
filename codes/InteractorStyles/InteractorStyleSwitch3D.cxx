@@ -99,7 +99,7 @@ void InteractorStyleSwitch3D::SetCurrentRenderer(vtkRenderer* renderer)
 {
 	Superclass::SetCurrentRenderer(renderer);
 	this->Navigation->SetCurrentRenderer(renderer);
-	this->Navigation->SetCurrentRenderer(renderer);
+	this->DistanceWidget->SetCurrentRenderer(renderer);
 
 }
 
