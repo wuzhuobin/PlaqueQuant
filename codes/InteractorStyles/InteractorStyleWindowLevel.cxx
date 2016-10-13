@@ -102,7 +102,13 @@ void InteractorStyleWindowLevel::OnKeyPress()
 	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r") {
 		SetWindowLevel(windowLevel[0], windowLevel[1]);
+		return;
 	}
+	AbstractInteractorStyleImage::OnKeyPress();
+}
+
+void InteractorStyleWindowLevel::OnChar()
+{
 }
 
 

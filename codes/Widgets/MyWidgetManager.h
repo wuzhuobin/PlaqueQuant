@@ -21,16 +21,16 @@ public:
 
 	void SetInteractor(vtkRenderWindowInteractor* interactor);
 
-	void EnableROIBorderWidget();
+	void EnableROIWidget();
 
 
-	vtkROIBorderWidget* GetROIBorderWidget();
+	vtkROIWidget* GetROIWidget();
 
 	
 protected:
 
 	QList<vtkAbstractWidget*> m_widgets;
-	vtkSmartPointer<vtkROIBorderWidget> m_roiBorderWidget = nullptr;
+	vtkSmartPointer<vtkROIWidget> m_roiWidget = nullptr;
 	vtkRenderWindowInteractor* m_interactor = nullptr;
 
 private:

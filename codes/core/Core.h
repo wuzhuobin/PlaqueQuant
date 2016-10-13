@@ -101,6 +101,10 @@ public slots:
 	virtual void slotGenerateCenterlineBtn();
 	virtual void slotUpdate3DLabelBtn();
 
+	// Validation Patient ID and Patien name
+	virtual void slotValidatePatientInformation();
+
+
 signals:
 	void signalVisualizeAllViewers();
 	void signalMultiPlanarView();

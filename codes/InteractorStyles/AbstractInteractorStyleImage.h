@@ -36,6 +36,7 @@ public:
 	virtual void SetImageViewer(MyImageViewer* imageViewer);
 	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
 	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
+	virtual void SynchronizedZooming();
 	//virtual void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
 	//virtual void SetOrientation(int m_orientation);
 	//virtual int GetOrientation();
@@ -58,7 +59,7 @@ protected:
 	virtual void OnMiddleButtonUp();
 	virtual void OnMouseMove();
 	virtual void OnChar();
-	virtual void OnKeyPressed();
+	virtual void OnKeyPress();
 
 	void MoveSliceForward();
 	void MoveSliceBackward();

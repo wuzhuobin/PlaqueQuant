@@ -138,6 +138,9 @@ void Core::slotAddOverlayToImageViewer() {
 
 void Core::slotVisualizeAll2DViewers()
 {
+	// Validate Patient Id and Information, if they are different, 
+	// a error message will pop up.
+	slotValidatePatientInformation();
 	slotChangeView(MULTIPLANAR_VIEW);
 	if (m_firstInitialize) {
 		for (int i = 0; i < VIEWER_NUM; ++i) {
@@ -554,6 +557,36 @@ void Core::slotUpdate3DLabelBtn()
 	interacotr->Start();*/
 }
 
+void Core::slotValidatePatientInformation()
+{
+	if (m_imageManager->getNumberOfImages() == 1) {
+		return;
+	}
+	bool allTheSame = true;
+	QMap<QString, QString>* header =
+		m_imageManager->getListOfDICOMHeader()[Core::DEFAULT_IMAGE];
+	if (header == NULL) {
+		return;
+	}
+	QString patientName = header->value("0010|0010");
+	QString patientID = header->value("0010|0020");
+	for (int i = 1; i < m_imageManager->getListOfViewerInputImages().size(); ++i) {
+		if (m_imageManager->getListOfViewerInputImages()[i] == NULL) {
+			continue;
+		}
+		QString _patientName = m_imageManager->getListOfDICOMHeader()[i]->
+			value("0010|0010");
+		QString _patientID = m_imageManager->getListOfDICOMHeader()[i]->
+			value("0010|0020");
+		if (patientName != patientName || patientID != patientID) {
+			allTheSame = false;
+			DisplayErrorMessage("Attention! Patiention Name or Patiention Id of your images"
+				"might be different. ");
+			break;
+		}
+	}
+}
+
 void Core::slotContourMode()
 {
 	for (int i = 0; i < VIEWER_NUM; i++)
@@ -619,21 +652,17 @@ void Core::slotRuler(bool b)
 
 void Core::slotROIMode()
 {
-	//if (SEGMENTATION_VIEW) {
-	//	//connected to slotMultiPlanarView()
-	//	emit signalMultiPlanarView();
-	//	//ui->actionMultiPlanarView->trigger();
-	//}
-	////m_moduleWidget->SetPage(0);
-	//for (int i = 0; i < VIEWER_NUM; ++i) {
-	//	m_style[i]->SetInteractorStyleToROI();
-	//}
-	//for (int i = 0; i < VIEWER_NUM; ++i) {
-	//	m_style[i]->SetInteractorStyleToNavigation();
-	//}
-	
+	if (SEGMENTATION_VIEW) {
+		//connected to slotMultiPlanarView()
+		emit signalMultiPlanarView();
+		//ui->actionMultiPlanarView->trigger();
+	}
+	//m_moduleWidget->SetPage(0);
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->SetInteractorStyleToROI();
+	}
 
-	//this->slotRuler(false);
+
 }
 
 void Core::slotChangeROI()

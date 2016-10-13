@@ -4,12 +4,12 @@
 MyWidgetManager::MyWidgetManager(QObject* parent)
 	:QObject(parent)
 {
-	m_roiBorderWidget = vtkSmartPointer<vtkROIBorderWidget>::New();
+	m_roiWidget = vtkSmartPointer<vtkROIWidget>::New();
 	
 	
 	
 	
-	m_widgets += m_roiBorderWidget;
+	m_widgets += m_roiWidget;
 }
 
 MyWidgetManager::~MyWidgetManager()
@@ -25,15 +25,15 @@ void MyWidgetManager::SetInteractor(vtkRenderWindowInteractor * interactor)
 	}
 }
 
-void MyWidgetManager::EnableROIBorderWidget()
+void MyWidgetManager::EnableROIWidget()
 {
 	for (int i = 0; i < m_widgets.size(); ++i) {
 		m_widgets[i]->EnabledOff();
 	}
-	m_roiBorderWidget->EnabledOn();
+	m_roiWidget->EnabledOn();
 }
 
-vtkROIBorderWidget * MyWidgetManager::GetROIBorderWidget()
+vtkROIWidget * MyWidgetManager::GetROIWidget()
 {
-	return m_roiBorderWidget;
+	return m_roiWidget;
 }

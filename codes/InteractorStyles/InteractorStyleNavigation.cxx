@@ -58,18 +58,23 @@ void InteractorStyleNavigation::OnLeftButtonUp()
 	AbstractInteractorStyleImage::OnLeftButtonUp();
 }
 
-
+void InteractorStyleNavigation::OnChar()
+{
+	switch (this->Interactor->GetKeyCode())
+	{
+	case 'R':
+	case 'r':
+		AbstractInteractorStyleImage::OnChar();
+		SynchronizedZooming();
+		break;
+	default:
+		break;
+	}
+}
 
 void InteractorStyleNavigation::SynchronizedZooming()
 {
-	double scale = m_imageViewer->GetRenderer()->GetActiveCamera()->GetParallelScale();
-	
-	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
-		it != m_synchronalViewers.end(); ++it) {
-			(*it)->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
-			(*it)->Render();
-	}
-
+	AbstractInteractorStyleImage::SynchronizedZooming();
 }
 
 void InteractorStyleNavigation::CalculateIndex()
