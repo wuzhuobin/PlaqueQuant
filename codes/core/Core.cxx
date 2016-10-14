@@ -46,7 +46,12 @@ void Core::Initialization()
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
 	this->m_3Dinteractor->Initialize();
 
-
+	vtkROIWidget* roi = this->m_widgetManager->GetROIWidget();
+	for (int i = 0; i < 3;i++)
+	{
+		roi->SetBorderWidgetsInteractor(i, this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor());
+	}
+	roi->SetInteractor(this->m_3Dinteractor);
 
 	m_ioManager->setMyImageManager(m_imageManager);
 
@@ -54,7 +59,6 @@ void Core::Initialization()
 		this, SLOT(slotVisualizeAll2DViewers()));
 	connect(m_ioManager, SIGNAL(finishOpenSegmentation()),
 		this, SLOT(slotAddOverlayToImageViewer()));
-
 	connect(m_2DimageViewer[DEFAULT_IMAGE], SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)),
 		this, SLOT(slotChangeFocalPointWithImageCoordinate(int, int, int)));
 }
@@ -554,6 +558,56 @@ void Core::slotUpdate3DLabelBtn()
 	interacotr->Start();*/
 }
 
+int* Core::ConvertBoundsToExtent(double* bounds)
+{
+	// Error check
+	if (this->m_imageManager->getNumberOfImages() == 0)
+		return nullptr;
+
+	int imExtent[6];
+	double spacing[3], origin[3];
+	this->m_imageManager->getListOfVtkImages().at(0)->GetSpacing(spacing);
+	this->m_imageManager->getListOfVtkImages().at(0)->GetOrigin(origin);
+	this->m_imageManager->getListOfVtkImages().at(0)->GetExtent(imExtent);
+
+	int* extent = (int*)malloc(sizeof(int) * 6);
+	extent[0] = round((bounds[0] - origin[0]) / spacing[0]);
+	extent[1] = round((bounds[1] - origin[0]) / spacing[0]);
+	extent[2] = round((bounds[2] - origin[1]) / spacing[1]);
+	extent[3] = round((bounds[3] - origin[1]) / spacing[1]);
+	extent[4] = round((bounds[4] - origin[2]) / spacing[2]);
+	extent[5] = round((bounds[5] - origin[2]) / spacing[2]);
+
+	for (int i = 0; i < 3;i++)
+	{
+		extent[2*i] = { extent[2*i] < imExtent[2*i] ? imExtent[2*i] : extent[2*i] };
+		extent[2*i+1] = { extent[2*i+1] > imExtent[2*i+1] ? imExtent[2*i+1] : extent[2*i+1] };
+	}
+
+	return extent;
+}
+
+double* Core::CovertExtentToBounds(int* extent)
+{
+	// Error check
+	if (this->m_imageManager->getNumberOfImages() == 0)
+		return nullptr;
+
+	double spacing[3], origin[3];
+	this->m_imageManager->getListOfVtkImages().at(0)->GetSpacing(spacing);
+	this->m_imageManager->getListOfVtkImages().at(0)->GetOrigin(origin);
+
+	double* bounds = (double*)malloc(sizeof(double) * 6);
+	bounds[0] = extent[0] * spacing[0] + origin[0];
+	bounds[1] = extent[1] * spacing[0] + origin[0];
+	bounds[2] = extent[2] * spacing[1] + origin[1];
+	bounds[3] = extent[3] * spacing[1] + origin[1];
+	bounds[4] = extent[4] * spacing[2] + origin[2];
+	bounds[5] = extent[5] * spacing[2] + origin[2];
+
+	return bounds;
+}
+
 void Core::slotContourMode()
 {
 	for (int i = 0; i < VIEWER_NUM; i++)
@@ -607,8 +661,18 @@ void Core::slotSetLineInterpolatorToPolygon(bool flag)
 
 void Core::slotRuler(bool b)
 {
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		m_style[i]->SetInteractorStyleToRuler();
+	if (b) 
+	{
+		for (int i = 0; i < VIEWER_NUM; ++i) {
+			m_style[i]->SetInteractorStyleToRuler();
+		}
+	}
+	else {
+		for (int i = 0; i < 3;i++)
+		{
+		m_style[i]->GetRuler()->SetDistanceWidgetEnabled(false);
+			
+		}
 	}
 	//for (int i = 0; i< VIEWER_NUM; i++)
 	//{
@@ -619,27 +683,31 @@ void Core::slotRuler(bool b)
 
 void Core::slotROIMode()
 {
-	//if (SEGMENTATION_VIEW) {
-	//	//connected to slotMultiPlanarView()
-	//	emit signalMultiPlanarView();
-	//	//ui->actionMultiPlanarView->trigger();
-	//}
-	////m_moduleWidget->SetPage(0);
-	//for (int i = 0; i < VIEWER_NUM; ++i) {
-	//	m_style[i]->SetInteractorStyleToROI();
-	//}
-	//for (int i = 0; i < VIEWER_NUM; ++i) {
-	//	m_style[i]->SetInteractorStyleToNavigation();
-	//}
-	
+	this->slotRuler(false);
 
-	//this->slotRuler(false);
+	if (this->m_imageManager->getNumberOfImages() != 0 && !this->m_widgetManager->GetROIWidget()->GetEnabled())
+	{
+		double bounds[6];
+		this->m_imageManager->getListOfViewerInputImages().at(0)->GetBounds(bounds);
+		this->m_widgetManager->EnableROIWidget(
+			this->m_2DimageViewer, 
+			this->m_3DimageViewer, 
+			bounds, 
+			this->m_2DimageViewer[0]->GetFocalPointWithWorldCoordinate());
+		this->m_widgetManager->GetROIWidget()->GetRepresentation()->VisibilityOff();
+	}
+	else {
+		this->m_widgetManager->DisableROIWidget();
+		this->RenderAllViewer();
+	}
 }
 
 void Core::slotChangeROI()
 {
-	int extent[6];
-	m_style[0]->GetROI()->SelectROI(extent);
+	/// Depricted
+
+	//int extent[6];
+	//m_style[0]->GetROI()->SelectROI(extent);
 	//m_moduleWidget->slotChangeROI(extent);
 }
 
@@ -647,7 +715,14 @@ void Core::slotSelectROI()
 {
 
 	int newExtent[6];
-	m_style[0]->GetROI()->SelectROI(newExtent);
+	double newBounds[6];
+	double* bounds = this->m_widgetManager->GetROIWidget()->GetRepresentation()->GetBounds();
+	memcpy(newExtent, this->ConvertBoundsToExtent(bounds), sizeof(int) * 6);
+
+	// Convert clamped value back to bounds for ROI widget
+	memcpy(newBounds, this->CovertExtentToBounds(newExtent), sizeof(double) * 6);
+	this->m_widgetManager->GetROIWidget()->GetRepresentation()->PlaceWidget(newBounds);
+
 	//m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
 	// Extract VOI of the overlay Image data
 

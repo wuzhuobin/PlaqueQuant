@@ -73,3 +73,4 @@ target_link_libraries(
 	Widgets 
 	${LINK_LIBRARIE}
 	)
+

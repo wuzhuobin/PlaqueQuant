@@ -109,7 +109,10 @@ signals:
 	void signalChangeSliceY(int);
 	void signalChangeSliceZ(int);
 
-//private:
+private:
+	int* ConvertBoundsToExtent(double* bounds);
+	double* CovertExtentToBounds(int* extent);
+
 public:
 
 	// viewer
