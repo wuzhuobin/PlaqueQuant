@@ -649,7 +649,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox_2">
+           <widget class="QCheckBox" name="eraserCheckBox">
             <property name="text">
              <string>Eraser</string>
             </property>

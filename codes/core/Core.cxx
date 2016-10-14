@@ -415,17 +415,13 @@ void Core::slotSetImageLayerColor(int layer) {
 
 void Core::slotSetPaintBrushToEraser(bool flag)
 {
-	if (true) {
-		for (int i = 0; i < VIEWER_NUM; i++)
-		{
-			if (m_style[i] != NULL) {
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		if (m_style[i] != NULL) {
 
-				m_style[i]->GetPaintBrush()->SetPaintBrushLabel(0);
-			}
+			m_style[i]->GetPaintBrush()->EnableEarserMode(flag);
 		}
 	}
-	
-
 }
 
 void Core::slotGenerateCenterlineBtn()

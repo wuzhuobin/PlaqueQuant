@@ -178,7 +178,8 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 		this->Render();
 	}
 	m_imageViewer->GetOverlayActor()->SetVisibility(false);
-	Draw(true);
+	// if paint is in eraser mode, the left click will also eraser the painting 
+	Draw(!m_eraserModeFlag);
 	this->Render();
 }
 
@@ -265,8 +266,10 @@ void InteractorStylePaintBrush::OnMouseMove()
 	if (!this->m_paintBrushEnabled)
 		this->SetPaintBrushModeEnabled(true);
 
-	if (m_leftFunctioning == true)
-		Draw(true);
+	if (m_leftFunctioning == true) {
+		// if paint is in eraser mode, the left click will also eraser the painting 
+		Draw(!m_eraserModeFlag);
+	}
 	if (m_rightFunctioning == true)
 		Draw(false);
 
@@ -1000,7 +1003,7 @@ void InteractorStylePaintBrush::WriteToImageData()
 
 void InteractorStylePaintBrush::WriteToOverlay()
 {
-	int pos[3], extent[6];
+	int extent[6];
 	memcpy(extent, m_brush->GetUpdateExtent(), sizeof(extent));
 	extent[GetSliceOrientation() * 2] = GetSlice();
 	extent[GetSliceOrientation() * 2 + 1] = GetSlice();
