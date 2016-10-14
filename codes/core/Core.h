@@ -83,6 +83,8 @@ public slots:
 	virtual void slotContourMode();
 
 	// Auto Lumen Segmenation 
+	virtual void slotFillContour();
+	virtual void slotClearContour();
 	virtual void slotEnableAutoLumenSegmentation(bool flag);
 	virtual void slotSetContourFilterGenerateValues(int generateValues);
 	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);

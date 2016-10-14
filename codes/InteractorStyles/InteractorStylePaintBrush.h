@@ -54,7 +54,7 @@ public:
 
 	void SetBrushShape(int brushShape);
 	void SetBrushSize(int size);
-	void EnableEarserMode(bool flag);
+	void EnableEraserMode(bool flag);
 
 
 protected:

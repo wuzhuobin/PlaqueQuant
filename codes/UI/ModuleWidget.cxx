@@ -57,6 +57,10 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->m_contourRadioButtonGroup.addButton(this->ui->polygonRadionButton);
 	this->m_contourRadioButtonGroup.addButton(this->ui->smoothCurveRadioButton);
 	this->m_contourRadioButtonGroup.setExclusive(true);
+	connect(ui->fillContourPushButton, SIGNAL(clicked()), 
+		core, SLOT(slotFillContour()));
+	connect(ui->clearContourPushButton, SIGNAL(clicked()),
+		core, SLOT(slotClearContour()));
 	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
 		ui->autoLumenSegmentationHorizontalSlider, SLOT(setValue(int)));
 	connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),

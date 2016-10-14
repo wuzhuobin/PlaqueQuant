@@ -11,6 +11,7 @@
 #include <vtkImageCast.h>
 #include <vtkSimpleImageToImageFilter.h>
 #include <vtkExtractVOI.h>
+#include <vtkDoubleArray.h>
 
 #include "MeasurementFor3D.h"
 #include "MeasurementFor2D.h"
@@ -270,6 +271,18 @@ void Overlay::SetPixels(int* extent, vtkImageData* image)
 			break;
 		}
 	}
+	m_vtkOverlay->Modified();
+	emit signalOverlayUpdated();
+}
+
+void Overlay::SetPixels(vtkPoints* points, int label)
+{
+	for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i) {
+		const double* ijk_double = points->GetPoint(i);
+		int ijk[3] = { ijk_double[0], ijk_double[1], ijk_double[2] };
+		SetPixel(ijk, (double)label);
+	}
+
 	m_vtkOverlay->Modified();
 	emit signalOverlayUpdated();
 }

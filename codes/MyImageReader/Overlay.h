@@ -78,6 +78,10 @@ public:
 	 * @param	image the image to replace the overlay in the extent
 	 */
 	void SetPixels(int* extent, vtkImageData* image);
+	/**
+	 * replace all the pixels specified by the @param points with the @param label
+	 */
+	void SetPixels(vtkPoints* points, int label);
 	/***/
 	void Measure3D();
 	void Measure2D();

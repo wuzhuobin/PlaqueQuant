@@ -30,6 +30,7 @@ Copyright (C) 2016
 #include <vtkLinearContourLineInterpolator.h>
 #include <vtkBezierContourLineInterpolator.h>
 #include <vtkProperty.h>
+#include <vtkDoubleArray.h>
 
 #include "InteractorStylePolygonDraw.h"
 #include "LumenSegmentation.h"
@@ -377,20 +378,22 @@ void InteractorStylePolygonDraw::FillPolygon()
 			if (d < 1E-5)
 				continue;
 			memcpy(lastPoint, displayCoordinate, sizeof(double) * 3);
-			switch (GetSliceOrientation())
-			{
-			case 0:
-				polygon->GetPoints()->InsertNextPoint(0.0, displayCoordinate[1], displayCoordinate[2]);
-				break;
-			case 1:
-				polygon->GetPoints()->InsertNextPoint(displayCoordinate[0], 0.0, displayCoordinate[2]);
-				break;
-			case 2:
-				polygon->GetPoints()->InsertNextPoint(displayCoordinate[0], displayCoordinate[1], 0.0);
-				break;
-			default:
-				break;
-			}
+			displayCoordinate[GetSliceOrientation()] = 0.0;
+			polygon->GetPoints()->InsertNextPoint(displayCoordinate);
+			//switch (GetSliceOrientation())
+			//{
+			//case 0:
+			//	polygon->GetPoints()->InsertNextPoint(0.0, displayCoordinate[1], displayCoordinate[2]);
+			//	break;
+			//case 1:
+			//	polygon->GetPoints()->InsertNextPoint(displayCoordinate[0], 0.0, displayCoordinate[2]);
+			//	break;
+			//case 2:
+			//	polygon->GetPoints()->InsertNextPoint(displayCoordinate[0], displayCoordinate[1], 0.0);
+			//	break;
+			//default:
+			//	break;
+			//}
 		}
 		//Test whether the points are inside the polygon or not
 		double n[3];
@@ -416,79 +419,103 @@ void InteractorStylePolygonDraw::FillPolygon()
 		bounds_int[4] = { bounds_int[4] < this->GetExtent()[4] ? this->GetExtent()[4] : bounds_int[4] };
 		bounds_int[5] = { bounds_int[5] > this->GetExtent()[5] ? this->GetExtent()[5] : bounds_int[5] };
 
+		// for using overlay::SetPixels()
 
 		double p[3];
 		int p2[3];
-		if (GetSliceOrientation() == 0)
-		{
-			for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
-				for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
-					p[0] = 0.0;
-					p[1] = (double)y;
-					p[2] = (double)z;
-					p2[0] = m_imageViewer->GetSlice();
-					p2[1] = y;
-					p2[2] = z;
-					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
-						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
-						// fill the contour
-						double * pixel = static_cast<double *>(
-							m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
-						if (pixel == nullptr) {
-							return;
-						}
-						*pixel = label[i];
-					}
-				}
-			}
-		}
-		else if (GetSliceOrientation() == 1)
-		{
-			for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
-				for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
-					p[0] = (double)x;
-					p[1] = 0.0;
-					p[2] = (double)z;
-					p2[0] = x;
-					p2[1] = m_imageViewer->GetSlice();
-					p2[2] = z;
-					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
-						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
-						// fill the contour
-						double * pixel = static_cast<double *>(
-							m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
-						if (pixel == nullptr) {
-							return;
-						}
-						*pixel = label[i];
-					}
-				}
-			}
-		}
-		else if (GetSliceOrientation() == 2)
-		{
-			for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
-				for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
-					p[0] = (double)x;
-					p[1] = (double)y;
-					p[2] = 0.0;
-					p2[0] = x;
-					p2[1] = y;
-					p2[2] = m_imageViewer->GetSlice();
-					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
-						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
-						// fill the contour
-						double * pixel = static_cast<double *>(
-							m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
-						if (pixel == nullptr) {
-							return;
-						}
-						*pixel = label[i];
-					}
 
+		vtkSmartPointer<vtkPoints> points =
+			vtkSmartPointer<vtkPoints>::New();
+		bounds_int[GetSliceOrientation() * 2] = 0;
+		bounds_int[GetSliceOrientation() * 2 + 1] = 0;
+
+		for (int x = bounds_int[0]; x <= bounds_int[1]; x++) {
+			for (int y = bounds_int[2]; y <= bounds_int[3]; y++) {
+				for (int z = bounds_int[4]; z <= bounds_int[5]; z++) {
+					p[0] = x;
+					p[1] = y;
+					p[2] = z;
+					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+						p[GetSliceOrientation()] = m_imageViewer->GetSlice();
+						points->InsertNextPoint(p[0], p[1], p[2]);
+					}
 				}
 			}
 		}
+
+		m_imageViewer->GetOverlay()->SetPixels(points, label[i]);
+
+		//if (GetSliceOrientation() == 0)
+		//{
+		//	for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
+		//		for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
+		//			p[0] = 0.0;
+		//			p[1] = (double)y;
+		//			p[2] = (double)z;
+		//			p2[0] = m_imageViewer->GetSlice();
+		//			p2[1] = y;
+		//			p2[2] = z;
+		//			if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+		//				static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+		//				// fill the contour
+		//				double * pixel = static_cast<double *>(
+		//					m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
+		//				if (pixel == nullptr) {
+		//					return;
+		//				}
+		//				*pixel = label[i];
+		//			}
+		//		}
+		//	}
+		//}
+		//else if (GetSliceOrientation() == 1)
+		//{
+		//	for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
+		//		for (int z = bounds_int[4]; z < bounds_int[5]; z++) {
+		//			p[0] = (double)x;
+		//			p[1] = 0.0;
+		//			p[2] = (double)z;
+		//			p2[0] = x;
+		//			p2[1] = m_imageViewer->GetSlice();
+		//			p2[2] = z;
+		//			if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+		//				static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+		//				// fill the contour
+		//				double * pixel = static_cast<double *>(
+		//					m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
+		//				if (pixel == nullptr) {
+		//					return;
+		//				}
+		//				*pixel = label[i];
+		//			}
+		//		}
+		//	}
+		//}
+		//else if (GetSliceOrientation() == 2)
+		//{
+		//	for (int x = bounds_int[0]; x < bounds_int[1]; x++) {
+		//		for (int y = bounds_int[2]; y < bounds_int[3]; y++) {
+		//			p[0] = (double)x;
+		//			p[1] = (double)y;
+		//			p[2] = 0.0;
+		//			p2[0] = x;
+		//			p2[1] = y;
+		//			p2[2] = m_imageViewer->GetSlice();
+		//			if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+		//				static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
+		//				// fill the contour
+		//				double * pixel = static_cast<double *>(
+		//					m_imageViewer->GetInputLayer()->GetScalarPointer(p2));
+		//				if (pixel == nullptr) {
+		//					return;
+		//				}
+		//				*pixel = label[i];
+		//			}
+
+		//		}
+		//	}
+		//}
 
 	}
 

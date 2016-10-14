@@ -20,6 +20,7 @@ Core::Core(QWidget* parent)
 
 	// enable registration
 	m_ioManager->enableRegistration(true);
+
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
 		m_2DimageViewer[i] = vtkSmartPointer<MyImageViewer>::New();
@@ -567,7 +568,7 @@ void Core::slotUpdate3DLabelBtn()
 	rwin->Render();
 	interacotr->Start();*/
 }
-
+#include <qdebug.h>
 void Core::slotValidatePatientInformation()
 {
 	if (m_imageManager->getNumberOfImages() == 1) {
@@ -581,6 +582,8 @@ void Core::slotValidatePatientInformation()
 	}
 	QString patientName = header->value("0010|0010");
 	QString patientID = header->value("0010|0020");
+	//qDebug() << patientName;
+	//qDebug() << patientID;
 	for (int i = 1; i < m_imageManager->getListOfViewerInputImages().size(); ++i) {
 		if (m_imageManager->getListOfViewerInputImages()[i] == NULL) {
 			continue;
@@ -589,7 +592,9 @@ void Core::slotValidatePatientInformation()
 			value("0010|0010");
 		QString _patientID = m_imageManager->getListOfDICOMHeader()[i]->
 			value("0010|0020");
-		if (patientName != patientName || patientID != patientID) {
+		//qDebug() << _patientName;
+		//qDebug() << _patientID;
+		if (patientName != _patientName || patientID != _patientID) {
 			allTheSame = false;
 			DisplayErrorMessage("Attention! Patiention Name or Patiention Id of your images"
 				"might be different. ");
@@ -608,6 +613,24 @@ void Core::slotContourMode()
 	//m_moduleWidget->SetPage(1);
 
 	//this->slotRuler(false);
+}
+
+void Core::slotFillContour()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_style[i]->GetPolygonDraw()->FillPolygon();
+	}
+}
+
+void Core::slotClearContour()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(false);
+		m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(true);
+
+	}
 }
 
 void Core::slotEnableAutoLumenSegmentation(bool flag)
