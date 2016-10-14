@@ -95,6 +95,11 @@ void InteractorStylePaintBrush::SetBrushSize(int size)
 	m_brushSize = size;
 }
 
+void InteractorStylePaintBrush::EnableEarserMode(bool flag)
+{
+	this->m_eraserModeFlag = flag;
+}
+
 //void InteractorStylePaintBrush::SetDrawBrushSizeSpinBox(QSpinBox * s)
 //{
 //	m_drawBrushSizeSpinBox = s;
@@ -173,7 +178,8 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 		this->Render();
 	}
 	m_imageViewer->GetOverlayActor()->SetVisibility(false);
-	Draw(true);
+	// if paint is in eraser mode, the left click will also eraser the painting 
+	Draw(!m_eraserModeFlag);
 	this->Render();
 }
 
@@ -260,8 +266,10 @@ void InteractorStylePaintBrush::OnMouseMove()
 	if (!this->m_paintBrushEnabled)
 		this->SetPaintBrushModeEnabled(true);
 
-	if (m_leftFunctioning == true)
-		Draw(true);
+	if (m_leftFunctioning == true) {
+		// if paint is in eraser mode, the left click will also eraser the painting 
+		Draw(!m_eraserModeFlag);
+	}
 	if (m_rightFunctioning == true)
 		Draw(false);
 
@@ -720,15 +728,15 @@ void InteractorStylePaintBrush::ReadfromImageData()
 							uchar rgbaUCHAR[4];
 							m_imageViewer->GetLookupTable()->GetIndexedColor(i, rgba);
 							m_imageViewer->GetLookupTable()->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
-							try {
+							//try {
 								m_brush->SetDrawColor(rgbaUCHAR[0], rgbaUCHAR[1], rgbaUCHAR[2], rgbaUCHAR[3]);
 								pos[GetSliceOrientation()] = 0;
 								m_brush->DrawSegment3D(pos[0], pos[1], pos[2], 
 									pos[0], pos[1], pos[2]);
-							}
-							catch (...) {
-								break;
-							}
+							//}
+							//catch (...) {
+							//	break;
+							//}
 							break;
 						}
 					}
@@ -995,7 +1003,7 @@ void InteractorStylePaintBrush::WriteToImageData()
 
 void InteractorStylePaintBrush::WriteToOverlay()
 {
-	int pos[3], extent[6];
+	int extent[6];
 	memcpy(extent, m_brush->GetUpdateExtent(), sizeof(extent));
 	extent[GetSliceOrientation() * 2] = GetSlice();
 	extent[GetSliceOrientation() * 2 + 1] = GetSlice();

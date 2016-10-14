@@ -35,7 +35,7 @@ protected:
 
 	virtual void OnMouseMove();
 	virtual void OnLeftButtonUp();
-
+	virtual void OnChar();
 private:
 
 

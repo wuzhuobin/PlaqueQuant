@@ -484,6 +484,13 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
+	const int* extent = GetInput()->GetExtent();
+	if (i < extent[0] || i > extent[1] || 
+		j < extent[2] || j > extent[3] || 
+		k < extent[4] || k > extent[5]
+		) {
+		return;
+	}
 	double point[3] = { 
 		i*spacing[0] + origin[0],
 		j*spacing[1] + origin[1], 
@@ -494,6 +501,7 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 	if (pointOld[0] == point[0] && pointOld[1] == point[1] && pointOld[2] == point[2]) {
 		return;
 	}
+	
 
 	Cursor3D->SetFocalPoint(point);
 	Cursor3D->Update();

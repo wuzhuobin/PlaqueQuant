@@ -96,10 +96,15 @@ public slots:
 
 	// set layer color
 	virtual void slotSetImageLayerColor(int layer);
+	virtual void slotSetPaintBrushToEraser(bool flag);
 
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();
 	virtual void slotUpdate3DLabelBtn();
+
+	// Validation Patient ID and Patien name
+	virtual void slotValidatePatientInformation();
+
 
 signals:
 	void signalVisualizeAllViewers();

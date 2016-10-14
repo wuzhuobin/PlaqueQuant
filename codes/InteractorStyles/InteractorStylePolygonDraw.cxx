@@ -329,8 +329,6 @@ void InteractorStylePolygonDraw::SetLineInterpolator(int i)
 	case 1:
 		this->m_interpolator = vtkLinearContourLineInterpolator::New();
 		break;
-	default:
-		break;
 	}
 	SetPolygonModeEnabled(false);
 	SetPolygonModeEnabled(true);

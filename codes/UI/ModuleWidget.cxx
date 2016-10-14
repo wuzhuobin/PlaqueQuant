@@ -17,9 +17,10 @@
 
 ModuleWidget::ModuleWidget(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::ModuleWidget),
 	m_contourRadioButtonGroup(this)
 {
+
+	ui = new Ui::ModuleWidget;
 	m_mainWnd = static_cast<MainWindow*>(parent);
 	Core* core = m_mainWnd->GetCore();
     ui->setupUi(this);
@@ -86,6 +87,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	// set brushShape
 	connect(ui->BrushComBox, SIGNAL(currentIndexChanged(int)),
 		core, SLOT(slotSetBrushShape(int)));
+	// set brushEraserMode
+	connect(ui->eraserCheckBox, SIGNAL(toggled(bool)),
+		core, SLOT(slotSetPaintBrushToEraser(bool)));
 	// set overlay opacity
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			this,		SLOT(slotChangeOpacity(int)));
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));

@@ -41,6 +41,7 @@ protected:
 
 	virtual void OnMouseMove();
 	virtual void OnKeyPress();
+	virtual void OnChar();
 
 private:
 	void WindowLevel();
