@@ -100,26 +100,6 @@ void InteractorStylePaintBrush::EnableEraserMode(bool flag)
 	this->m_eraserModeFlag = flag;
 }
 
-//void InteractorStylePaintBrush::SetDrawBrushSizeSpinBox(QSpinBox * s)
-//{
-//	m_drawBrushSizeSpinBox = s;
-//}
-//
-//void InteractorStylePaintBrush::SetDrawBrushShapeComBox(QComboBox * comboBox)
-//{
-//	m_drawBrushShapeComboBox = comboBox;
-//}
-//
-//void InteractorStylePaintBrush::SetDrawVolumetricCheckBox(QCheckBox * checkBox)
-//{
-//	m_drawVolumetricCheckBox = checkBox;
-//}
-//
-//void InteractorStylePaintBrush::SetDrawIsotropicCheckBox(QCheckBox * checkBox)
-//{
-//	m_drawIsotropicCheckBox = checkBox;
-//}
-
 void InteractorStylePaintBrush::OnLeftButtonUp()
 {
 	if (!m_isDraw)

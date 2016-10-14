@@ -44,6 +44,7 @@ void Core::Initialization()
 	this->m_3Dinteractor->SetInteractorStyle(this->m_style3D);
 	this->m_3DAnnotationRenderer->SetLayer(1);
 	this->m_3DDataRenderer->SetLayer(0);
+	this->m_3DDataRenderer->SetBackground(0.3, 0.3, 0.3);
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
 	this->m_3Dinteractor->Initialize();
 

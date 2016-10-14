@@ -61,16 +61,32 @@ SET(WIDGET_INC
 	${CMAKE_CURRENT_SOURCE_DIR}/vtkROIWidget.h
 	)
 
-QT5_WRAP_CPP(MOCSrcs ${WIDGET_INC})
+QT5_WRAP_CPP(WIDGET_SRC_MOC ${WIDGET_INC})
 
 ADD_LIBRARY(
 	Widgets 
 	${WIDGET_SRC} 
 	${WIDGET_INC}
-	${MOCSrcs}
+	${WIDGET_SRC_MOC}
 	)
 target_link_libraries(
 	Widgets 
 	${LINK_LIBRARIE}
 	)
 
+#Grouping in MSVC
+SOURCE_GROUP(
+	"Generated FIles" 
+	FILES
+	${WIDGET_SRC_MOC}
+)
+SOURCE_GROUP(
+	"Header Files" 
+	FILES 
+	${WIDGET_INC}
+)
+SOURCE_GROUP(
+	"Source Files" 
+	FILES 
+	${WIDGET_SRC}
+)

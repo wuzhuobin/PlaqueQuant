@@ -257,6 +257,8 @@ void MainWindow::setActionsEnable( bool b )
 	ui->ULSelectImgBtn->setEnabled(b);
 	ui->URSelectImgBtn->setEnabled(b);
 	ui->LLSelectImgBtn->setEnabled(b);
+
+	
 }
 
 void MainWindow::slotExit() 
