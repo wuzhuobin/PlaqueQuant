@@ -57,6 +57,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->m_contourRadioButtonGroup.addButton(this->ui->polygonRadionButton);
 	this->m_contourRadioButtonGroup.addButton(this->ui->smoothCurveRadioButton);
 	this->m_contourRadioButtonGroup.setExclusive(true);
+	/// Polygon segmentation
 	connect(ui->fillContourPushButton, SIGNAL(clicked()), 
 		core, SLOT(slotFillContour()));
 	connect(ui->clearContourPushButton, SIGNAL(clicked()),
@@ -75,11 +76,10 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		SLOT(slotSetLineInterpolatorToSmoothCurve(bool)));
 	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), core,
 		SLOT(slotSetLineInterpolatorToPolygon(bool)));
-
-	//connect
-	// set labelColorbachelor
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
 		core,SLOT(slotSetImageLayerColor(int)));
+
+	/// Paint brush segmentation
 	// set brushSize
 	connect(ui->BrushSizeSlider, SIGNAL(valueChanged(int)), 
 		ui->BrushSizeSpinBox, SLOT(setValue(int)),Qt::UniqueConnection);
@@ -98,7 +98,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(ui->opacitySlider,					SIGNAL(valueChanged(int)),			ui->opacitySpinBox, SLOT(setValue(int)));
 	connect(ui->opacitySpinBox,					SIGNAL(valueChanged(int)),			ui->opacitySlider, SLOT(setValue(int)));
 
-	// set page
+	/// set page
 	connect(m_mainWnd->ui->actionNavigation, SIGNAL(triggered()),
 		this, SLOT(slotSetPage()));
 	connect(m_mainWnd->ui->actionWindowLevel, SIGNAL(triggered()),
@@ -112,6 +112,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	connect(m_mainWnd->ui->actionROI, SIGNAL(triggered()),
 		this, SLOT(slotSetPage()));
 
+	/// ROI
 	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
 	connect(ui->maximumWallThicknessChkBox,		SIGNAL(stateChanged(int)),			this,		SLOT(slotEnableMWTCalculation(int)));

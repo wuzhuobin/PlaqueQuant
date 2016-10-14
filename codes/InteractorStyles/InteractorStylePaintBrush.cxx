@@ -95,7 +95,7 @@ void InteractorStylePaintBrush::SetBrushSize(int size)
 	m_brushSize = size;
 }
 
-void InteractorStylePaintBrush::EnableEarserMode(bool flag)
+void InteractorStylePaintBrush::EnableEraserMode(bool flag)
 {
 	this->m_eraserModeFlag = flag;
 }

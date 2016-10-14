@@ -346,11 +346,19 @@ void vtkROIWidget::SetBorderWidgetsInteractor(int index, vtkRenderWindowInteract
 	}
 }
 
+void vtkROIWidget::SetPositionPointer(double* pos)
+{
+	this->m_cursorPos = pos;
+}
+
 void vtkROIWidget::UpdateBorderWidgets()
 {
 	//if (!this->m_planes[0] || !this->m_planes[1] || !this->m_planes[2]) {
 	//	return;
 	//}
+	if (!this->Enabled)
+		return;
+
 	/// obtain box widget info
 	vtkBoxRepresentation* boxRep = reinterpret_cast<vtkBoxRepresentation*>(this->WidgetRep);
 	vtkSmartPointer<vtkPolyData> boxRepPoly = vtkSmartPointer<vtkPolyData>::New();
@@ -378,10 +386,8 @@ void vtkROIWidget::UpdateBorderWidgets()
 			continue;
 		}
 
-		// Check if the corner is out of boundary of the given plane
-		double pos[3];
-		this->m_planes[i]->GetOrigin(pos);
-		if (pos[i] < corner1[i] || pos[i] > corner2[i]) {
+		// #vtkROIWidgetModified
+		if (m_cursorPos[i] < corner1[i] || m_cursorPos[i] > corner2[i]) {
 			this->m_borderRep[i]->GetBorderProperty()->SetOpacity(0.4);
 			this->m_borderRep[i]->SetPickable(false);
 			this->m_borderWidgets[i]->GetInteractor()->Render();

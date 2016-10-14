@@ -7,8 +7,9 @@
 #include <vtkAbstractWidget.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderWindowInteractor.h>
-
 #include "vtkROIWidget.h"
+
+class MyImageViewer;
 
 class MyWidgetManager : public QObject
 {
@@ -20,8 +21,13 @@ public:
 
 
 	void SetInteractor(vtkRenderWindowInteractor* interactor);
-
+	void EnableROIWidget(
+		vtkSmartPointer<MyImageViewer> viewer2D[3], 
+		vtkRenderWindow* viewer3D, 
+		double* placeBounds, 
+		double* cursorPos);
 	void EnableROIWidget();
+	void DisableROIWidget();
 
 
 	vtkROIWidget* GetROIWidget();
@@ -30,14 +36,11 @@ public:
 protected:
 
 	QList<vtkAbstractWidget*> m_widgets;
-	vtkSmartPointer<vtkROIWidget> m_roiWidget = nullptr;
-	vtkRenderWindowInteractor* m_interactor = nullptr;
+	vtkSmartPointer<vtkROIWidget> m_roi;
+	vtkRenderWindowInteractor* m_interactor;
 
 private:
 	
 
 };
-
-
-
 #endif // !__MYWIDGETMANAGER_H__

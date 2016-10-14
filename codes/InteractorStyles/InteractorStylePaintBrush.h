@@ -24,10 +24,6 @@ Copyright (C) 2016
 
 
 //Extra
-#include <QComboBox>
-#include <QSpinBox>
-#include <QCheckBox>
-
 #include <vtkRenderWindowInteractor.h>
 #include <vtkImageCanvasSource2D.h>
 #include <vtkBorderWidget.h>

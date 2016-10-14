@@ -58,6 +58,8 @@ public:
 
 	vtkTypeMacro(vtkROIWidget, vtkBoxWidget2);
 
+	virtual void SetPositionPointer(double* pos);
+
 	virtual void UpdateBorderWidgets();
 	virtual void SetBorderWidgetsInteractor(int, vtkRenderWindowInteractor*);
 
@@ -76,7 +78,7 @@ protected:
 	vtkSmartPointer<vtkBorderRepresentation>	m_borderRep[3];
 	vtkSmartPointer<vtkROIUpdateAllBorderWidgetCallBack> m_callback;
 
-	double m_cursorPos[3];
+	double* m_cursorPos;
 
 private:
 
