@@ -69,6 +69,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/CenterlineBranching
 	${PROJECT_BINARY_DIR}/codes/MyImageReader
 	${PROJECT_BINARY_DIR}/codes/Managers
+	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
@@ -90,7 +91,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
 	${PROJECT_SOURCE_DIR}/codes/MyImageReader
-	${PROJECT_SOURCE_DIR}/codes/Managers
+	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	)
 
 SET(
@@ -138,6 +139,7 @@ add_subdirectory(codes/MaximumWallThickness)
 # add_subdirectory(codes/Managers)
 add_subdirectory(codes/CenterlineBranching)
 add_subdirectory(codes/MyImageReader)
+add_subdirectory(codes/LumenExtraction)
 
 # Add_subdirectory(codes)
 

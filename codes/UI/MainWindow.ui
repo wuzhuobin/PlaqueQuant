@@ -906,7 +906,7 @@
      <x>0</x>
      <y>0</y>
      <width>1500</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -969,6 +969,7 @@
     <addaction name="actionOpenSegmentation"/>
     <addaction name="actionROI"/>
     <addaction name="actionContour"/>
+    <addaction name="actionSmartContour"/>
     <addaction name="actionRuler"/>
     <addaction name="actionCenterlineAlgorithm"/>
    </widget>
@@ -1004,6 +1005,7 @@
    <addaction name="separator"/>
    <addaction name="actionROI"/>
    <addaction name="actionContour"/>
+   <addaction name="actionSmartContour"/>
    <addaction name="actionBrush"/>
    <addaction name="separator"/>
    <addaction name="actionMultiPlanarView"/>
@@ -1395,6 +1397,21 @@
   <action name="actionCenterlineAlgorithm">
    <property name="text">
     <string>Centerline Algorithm</string>
+   </property>
+  </action>
+  <action name="actionSmartContour">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/Project.qrc">
+     <normaloff>:/icons/1476453573_Wand.ico</normaloff>:/icons/1476453573_Wand.ico</iconset>
+   </property>
+   <property name="text">
+    <string>SmartContour</string>
+   </property>
+   <property name="toolTip">
+    <string>Smart Contour</string>
    </property>
   </action>
  </widget>

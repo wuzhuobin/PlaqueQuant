@@ -43,9 +43,9 @@
 //#include <itkImageFileWriter.h>
 
 MainWindow::MainWindow() 
-	:widgetGroup(this), viewerGroup(this), viewGroup(this),
-	m_core(new Core(this))
+	:widgetGroup(this), viewerGroup(this), viewGroup(this)
 {
+	m_core = new Core(this);
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
 
