@@ -33,9 +33,9 @@ int main()
 	seed2[2] = 47;
 
 	double seed3[3];
-	seed2[0] = 27;
-	seed2[1] = 59;
-	seed2[2] = 30;
+	seed3[0] = 27;
+	seed3[1] = 59;
+	seed3[2] = 30;
 
 	LumenExtraction* lumenExtractor = new LumenExtraction;
 	lumenExtractor->SetInputData(image);

@@ -18,7 +18,7 @@ void MouseInteractorStyleCenterline::OnKeyPress()
 
 			// Create a sphere
 			vtkSmartPointer<vtkSphereSource> sphereSource = vtkSmartPointer<vtkSphereSource>::New();
-			double sphereCenter[3];
+			//double sphereCenter[3];
 			sphereSource->SetCenter(0, 0, 0);
 			sphereSource->SetRadius(0.3);
 			seedList.insert(m_numOfSeeds, sphereSource);
@@ -121,7 +121,7 @@ void MouseInteractorStyleCenterline::OnKeyPress()
 			int _sourceSeedCount = 0;
 			int _targetSeedCount = 0;
 
-			for (int i = 0; i < m_numOfSeeds; i++)
+			for (unsigned int i = 0; i < m_numOfSeeds; i++)
 			{
 				// Find the closest point ids to the seeds
 				//cout << seedList[i+1]->GetCenter()[0] << "," << seedList[i]->GetCenter()[1] << "," << seedList[i]->GetCenter()[2];

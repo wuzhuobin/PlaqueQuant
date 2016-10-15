@@ -2,7 +2,9 @@
 #ifndef MEASUREMENTWIDGET_HPP
 #define MEASUREMENTWIDGET_HPP
 #include <QWidget>
+
 #include "ui_measurementwidget.h"
+
 
 class MainWindow;
 

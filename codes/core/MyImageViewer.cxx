@@ -536,8 +536,12 @@ double * MyImageViewer::GetFocalPointWithWorldCoordinate()
 	return Cursor3D->GetFocalPoint();
 }
 
-void MyImageViewer::SetVisibility(bool flag)
+void MyImageViewer::SetAllBlack(bool flag)
 {
+	if (this->AllBlackFlag == flag) {
+		return;
+	}
+	this->AllBlackFlag = flag;
 	QList<vtkProp*>  props;
 	props += this->ImageActor;
 	props += this->OrientationTextActor[0];
@@ -552,9 +556,10 @@ void MyImageViewer::SetVisibility(bool flag)
 
 	for (QList<vtkProp*>::const_iterator cit = props.cbegin(); cit != props.cend(); ++cit) {
 		if ((*cit) != NULL) {
-			(*cit)->SetVisibility(flag);
+			(*cit)->SetVisibility(!flag);
 		}
 	}
+	emit AllBlackAlready(flag);
 }
 
 void MyImageViewer::SetBound(double* b)

@@ -94,7 +94,10 @@ public slots:
 	virtual void slotChangeROI();
 	virtual void slotSelectROI();
 	virtual void slotResetROI();
-	virtual void slotRuler(bool b);
+	
+	// Ruler
+	virtual void slotRulerMode();
+	virtual void slotEnableMaximumWallThickneesLabel(bool flag);
 
 	// set layer color
 	virtual void slotSetImageLayerColor(int layer);

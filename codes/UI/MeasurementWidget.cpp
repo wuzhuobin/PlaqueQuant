@@ -7,7 +7,7 @@
 #include <vtkImageResize.h>
 #include <vtkPNGWriter.h>
 
-
+#include "Overlay.h"
 #include "ReportGenerator.h"
 #include "MainWindow.h"
 
@@ -51,8 +51,7 @@ void MeasurementWidget::setMainWindow(MainWindow * mainWnd)
 
 void MeasurementWidget::slotUpdate3DMeasurements()
 {
-	m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->Measure3D();
-
+	m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();
 	ui.measurement3DTableWidget->clearContents();
 	QStringList volumes = m_mainWnd->GetCore()->GetMyImageManager()->
 		getOverlay()->Get3DMeasurementsStrings();
@@ -72,7 +71,7 @@ void MeasurementWidget::slotUpdate2DMeasurements()
 
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 {
-
+	m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure2D(slice);
 	QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->
 		Get2DMeasurementsStrings(slice);
 

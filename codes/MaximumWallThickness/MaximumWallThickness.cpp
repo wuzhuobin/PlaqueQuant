@@ -9,7 +9,7 @@
 #include <vtkObjectFactory.h>
 
 
-#include "MainWindow.h"
+//#include "MainWindow.h"
 
 
 #include "MaximumWallThickness.h"
@@ -49,12 +49,7 @@ void MaximumWallThickness::SetVesselIntensity(int i)
 
 void MaximumWallThickness::SetImage(vtkImageData *im)
 {
-	if (this->m_image) {
-		this->m_image->Delete();
-	}
-
-	this->m_image = vtkSmartPointer<vtkImageData>::New();
-	this->m_image->DeepCopy(im);
+	this->m_image = im;
 	this->m_image->GetExtent(this->m_extent);
 }
 
@@ -65,19 +60,11 @@ void MaximumWallThickness::SetSliceNumber(int i)
 
 void MaximumWallThickness::SetSliceImage(vtkImageData *im)
 {
-	if (this->m_sliceImage != NULL) {
-		this->m_sliceImage->Delete();
-		this->m_sliceImage = NULL;
-	}
-
-	this->m_sliceImage = vtkSmartPointer<vtkImageData>::New();
-	this->m_sliceImage->DeepCopy(im);
+	this->m_sliceImage = im;
 
 	// check extent
 	this->m_sliceImage->GetExtent(this->m_extent);
 	if (this->m_extent[4] != this->m_extent[5]) {
-		this->m_sliceImage->Delete();
-		this->m_sliceImage = NULL;
 		throw ERROR_INPUT_NOT_A_SLICE;
 	}
 	else {
@@ -87,6 +74,8 @@ void MaximumWallThickness::SetSliceImage(vtkImageData *im)
 
 void MaximumWallThickness::Update()
 {
+	m_loopPairVect.clear();
+	m_distanceVect.clear();
 	//if (!this->ExtractSlice()) {
 	//	throw ERROR_EXTRACT_SLICE;
 	//	return;
@@ -169,7 +158,7 @@ bool MaximumWallThickness::ValueTransform()
 	castFilter->SetOutputScalarType(VTK_DOUBLE);
 	castFilter->Update();
 
-	this->m_sliceImage->DeepCopy(castFilter->GetOutput());
+	this->m_sliceImage = castFilter->GetOutput();
 
 	return true;
 }
@@ -210,7 +199,7 @@ bool MaximumWallThickness::ExtractLoops()
 		throw ERROR_NO_SEGMENTATION_FOUND;
 	}
 
-	int vesselWallLabel = Core::LABEL_CALCIFICATION;
+	//int vesselWallLabel = Core::LABEL_CALCIFICATION;
 
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
 	thres->ThresholdBetween(m_lumenIntensity - 0.1, m_lumenIntensity + 0.1);

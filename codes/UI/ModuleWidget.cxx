@@ -3,15 +3,6 @@
 #include <QTextBrowser>
 #include <qtablewidget.h>
 
-
-#include <vtkLine.h>
-#include <vtkPointData.h>
-#include <vtkPolyData.h>
-#include <vtkDistanceWidget.h>
-#include <vtkDistanceRepresentation2D.h>
-#include <vtkCellArray.h>
-
-#include "MaximumWallThickness.h"
 #include "ModuleWidget.h"
 
 
@@ -26,22 +17,6 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
     
-    // Initialize widget
-	m_maxParameters = 10;
-	this->m_labelActor = vtkSmartPointer<vtkActor2D>::New();
-	this->m_lineActor = vtkSmartPointer<vtkActor>::New();
-	this->m_displayPD = vtkSmartPointer<vtkPolyData>::New();
-	this->m_labelArray = vtkSmartPointer<vtkStringArray>::New();
-	this->m_labelArray->SetName("Distance");
-	this->m_sizeArray = vtkSmartPointer<vtkIntArray>::New();
-	this->m_sizeArray->SetName("Sizes");
-	this->m_p2labelfilter = vtkSmartPointer<vtkPointSetToLabelHierarchy>::New();
-	this->m_p2labelfilter->SetLabelArrayName("Distance");
-	this->m_p2labelfilter->SetPriorityArrayName("Sizes");
-
-	this->m_lineActor->GetProperty()->SetColor(0, 1, 0);
-	this->m_lineActor->GetProperty()->SetLineWidth(2);
-
 	// setting of the contourWidget of auto lumen segmentation
 	this->ui->autoLumenSegmentationHorizontalSlider->setEnabled(false);
 	this->ui->autoLumenSegmentationSpinBox->setValue(
@@ -111,11 +86,13 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotSetPage()));
 	connect(m_mainWnd->ui->actionROI, SIGNAL(triggered()),
 		this, SLOT(slotSetPage()));
+	connect(m_mainWnd->ui->actionSmartContour, SIGNAL(triggered()),
+		this, SLOT(slotSetPage()));
 
 	/// ROI
 	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
 	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
-	connect(ui->maximumWallThicknessChkBox,		SIGNAL(stateChanged(int)),			this,		SLOT(slotEnableMWTCalculation(int)));
+	connect(ui->maximumWallThicknessChkBox,		SIGNAL(toggled(bool)),				core,		SLOT(slotEnableMaximumWallThickneesLabel(bool)));
 }
 
 ModuleWidget::~ModuleWidget()
@@ -129,16 +106,20 @@ void ModuleWidget::slotSetPage()
 	if (actionSender == m_mainWnd->ui->actionNavigation) {
 	}
 	else if (actionSender == m_mainWnd->ui->actionRuler) {
-		ui->stackedWidget->setCurrentIndex(3);
+		ui->stackedWidget->setCurrentIndex(4);
 	}
 	else if (actionSender == m_mainWnd->ui->actionContour) {
-		ui->stackedWidget->setCurrentIndex(1);
+		ui->stackedWidget->setCurrentIndex(2);
 	}
 	else if (actionSender == m_mainWnd->ui->actionBrush) {
-		ui->stackedWidget->setCurrentIndex(2);
+		ui->stackedWidget->setCurrentIndex(3);
 	}
 	else if (actionSender == m_mainWnd->ui->actionROI) {
 		ui->stackedWidget->setCurrentIndex(0);
+	}
+	else if (actionSender == m_mainWnd->ui->actionSmartContour) {
+		ui->stackedWidget->setCurrentIndex(1);
+
 	}
 
 }
@@ -177,36 +158,6 @@ void ModuleWidget::slotChangeROI(int * bound)
 
 }
 
-void ModuleWidget::slotEnableMWTCalculation(int checked)
-{
-	 
-	Ui_MainWindow* main_ui = m_mainWnd->GetUI();
-
-	switch (checked)
-	{
-	case Qt::Unchecked:
-		// disconnect zSpinBox with MWT calculation
-		disconnect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotCalculateMaximumWallThickness()));
-		// remove line and label actors
-		for (int i = 0; i < 3; i++)
-		{
-			if (m_mainWnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
-				m_mainWnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
-				m_mainWnd->GetMyImageViewer(2)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
-			}
-		}
-		m_mainWnd->RenderAll2DViewers();
-		break;
-	case Qt::Checked:
-		connect(main_ui->zSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotCalculateMaximumWallThickness()), Qt::QueuedConnection);
-		// connect zSpinBox 
-		this->slotCalculateMaximumWallThickness();
-		break;
-	default:
-		break;
-	}
-}
-
 void ModuleWidget::slotSelectROI()
 {
 	 
@@ -217,133 +168,6 @@ void ModuleWidget::slotResetROI()
 {
 	 
 	m_mainWnd->GetCore()->slotResetROI();
-}
-
-void ModuleWidget::slotCalculateMaximumWallThickness()
-{
-	 
-	int currentSlice = m_mainWnd->GetUI()->zSpinBox->value();
-
-	vtkImageData* overlayImage = m_mainWnd->imageManager->getOverlay()->GetOutput();
-
-	vtkSmartPointer<MaximumWallThickness> calculator = vtkSmartPointer<MaximumWallThickness>::New();
-	calculator->SetImage(overlayImage);
-	calculator->SetSliceNumber(currentSlice);
-	try {
-		calculator->Update();
-	} 
-	catch (MaximumWallThickness::ERROR_CODE e) {
-		// #DisplayErrorMsgHere
-		switch (e) {
-		case MaximumWallThickness::ERROR_EXTRACT_LOOP:
-			this->ui->MWTTextBrowser->setText("Extract loop failed!");
-			break;
-		case MaximumWallThickness::ERROR_EXTRACT_SLICE:
-			this->ui->MWTTextBrowser->setText("Extract slice failed!");
-			break;
-		case MaximumWallThickness::ERROR_INPUT_NOT_A_SLICE:
-			this->ui->MWTTextBrowser->setText("Input is not a slice!");
-			break;
-		case MaximumWallThickness::ERROR_THICKNESS_CAL:
-			this->ui->MWTTextBrowser->setText("");
-			break;
-		case MaximumWallThickness::ERROR_UNDEFINED_BRANCH:
-			this->ui->MWTTextBrowser->setText("Cannot pair up vessel wall and lumen!");
-			break;
-		case MaximumWallThickness::ERROR_VALUE_TRANSFORM:
-			this->ui->MWTTextBrowser->setText("Type casting failed!");
-			break;
-		default:
-			break;
-		}
-
-		for (int i = 0; i < 3; i++)
-		{
-			if (m_mainWnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
-				m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
-				m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
-			}
-		}
-		m_mainWnd->RenderAll2DViewers();
-		return;
-	}
-	
-	// clean variables
-	this->m_labelArray->Reset();
-	this->m_sizeArray->Reset();
-
-	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-	std::vector<MaximumWallThickness::DistanceLoopPair> looppairs = calculator->GetDistanceLoopPairVect();
-	for (int i = 0; i < looppairs.size(); i++)
-	{
-		MaximumWallThickness::DistanceLoopPair l_lp = looppairs.at(i);
-		double p1[3], p2[3];
-		if (l_lp.LoopPair.first->GetNumberOfPoints() == 0) {
-			// #DisplayErrorMsgHere
-			this->ui->MWTTextBrowser->setText("Loop pair extraction incorrect!");
-			for (int j = 0; j < 3; i++)
-			{
-				if (m_mainWnd->GetMyImageViewer(j)->GetSliceOrientation() == 2) {
-					m_mainWnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
-					m_mainWnd->GetMyImageViewer(j)->GetAnnotationRenderer()->RemoveActor2D(this->m_labelActor);
-				}
-			}
-			m_mainWnd->RenderAll2DViewers();
-			return;
-		}
-
-		l_lp.LoopPair.first->GetPoint(l_lp.PIDs.first, p1);
-		l_lp.LoopPair.second->GetPoint(l_lp.PIDs.second, p2);
-
-		points->InsertNextPoint(p1);
-		points->InsertNextPoint(p2);
-		
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(points->GetNumberOfPoints() - 2);
-		cells->InsertCellPoint(points->GetNumberOfPoints() - 1);
-
-		// Update UI
-		this->m_sizeArray->InsertNextValue(3);
-		this->m_sizeArray->InsertNextValue(3);
-
-		char distanceString[25];
-		sprintf_s(distanceString, "%.3f mm", l_lp.Distance);
-		this->m_labelArray->InsertNextValue(distanceString);
-		this->m_labelArray->InsertNextValue(" ");
-
-	}
-
-	this->m_displayPD->SetPoints(points);
-	this->m_displayPD->SetLines(cells);
-	this->m_displayPD->GetPointData()->AddArray(this->m_labelArray);
-	this->m_displayPD->GetPointData()->AddArray(this->m_sizeArray);
-
-	this->m_p2labelfilter->SetInputData(this->m_displayPD);
-	this->m_p2labelfilter->Update();
-
-	vtkSmartPointer<vtkLabelPlacementMapper> labelMapper = vtkSmartPointer<vtkLabelPlacementMapper>::New();
-	labelMapper->SetInputConnection(this->m_p2labelfilter->GetOutputPort());
-	this->m_labelActor->SetMapper(labelMapper);
-
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(this->m_displayPD);
-	mapper->Update();
-
-	this->m_lineActor->SetMapper(mapper);
-
-	// #MyViewerHardCode
-	for (int i = 0; i < 3;i++)
-	{
-		if (m_mainWnd->GetMyImageViewer(i)->GetSliceOrientation() == 2) {
-			m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor(this->m_lineActor);
-			m_mainWnd->GetMyImageViewer(i)->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
-		}
-	}
-
-	// reset error message
-	this->ui->MWTTextBrowser->setText("Normal.");
-	m_mainWnd->RenderAll2DViewers();
 }
 
 void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)

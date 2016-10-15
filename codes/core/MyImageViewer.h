@@ -82,10 +82,6 @@ public:
 	// Text methods
 	virtual void InitializeHeader(QString File);
 
-	// Description:
-	// Set all Actors' visibility
-	virtual void SetVisibility(bool flag);
-
 	// Cursor methods
 	virtual void SetBound(double* b);
 	virtual double* GetBound();
@@ -163,12 +159,17 @@ public slots:
 
 	virtual void SetColorWindow(double window);
 
+	// Description:
+	// Set all Actors' visibility
+	virtual void SetAllBlack(bool flag);
+
 signals:
 	
 	void FocalPointWithImageCoordinateChanged(int i, int j, int k);
 	void SliceChanged(int slice);
 	void ColorLevelChanged(double colorLevel);
 	void ColorWindowChanged(double colorWindow);
+	void AllBlackAlready(bool flag);
 
 protected:
 	MyImageViewer(QObject* parent = NULL);
@@ -219,6 +220,9 @@ protected:
 	//Parameter
 	//vtkPlane* SliceImplicitPlane;
 	double DefaultWindowLevel[2] = { 0 };
+
+	// All Black flag
+	bool AllBlackFlag = false;
 
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.

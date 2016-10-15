@@ -13,9 +13,7 @@
 #include <vtkExtractVOI.h>
 #include <vtkDoubleArray.h>
 
-#include "MeasurementFor3D.h"
-#include "MeasurementFor2D.h"
-#include "MaximumWallThickness.h"
+
 
 typedef itk::OrientImageFilter<ImageType, ImageType> OrienterType;
 typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
@@ -52,6 +50,9 @@ Overlay::Overlay(QObject* parent) : QObject(parent)
 
 Overlay::~Overlay()
 {
+	for (int i = 0; i < m_measurementFor2D.size(); ++i) {
+		delete m_measurementFor2D[i];
+	}
 }
 
 void Overlay::SetInputImageData(ImageType::Pointer imageData)
@@ -279,7 +280,10 @@ void Overlay::SetPixels(vtkPoints* points, int label)
 {
 	for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i) {
 		const double* ijk_double = points->GetPoint(i);
-		int ijk[3] = { ijk_double[0], ijk_double[1], ijk_double[2] };
+		int ijk[3] = { 
+			(double)ijk_double[0], 
+			(double)ijk_double[1], 
+			(double)ijk_double[2] };
 		SetPixel(ijk, (double)label);
 	}
 
@@ -289,18 +293,9 @@ void Overlay::SetPixels(vtkPoints* points, int label)
 
 void Overlay::Measure3D()
 {
-	if (m_3DMeasurements != nullptr) {
-		delete m_3DMeasurements;
-	}
-	m_3DMeasurements = new double[m_lookupTable->GetNumberOfColors()];
-
-	MeasurementFor3D m_measurementFor3D;
 	m_measurementFor3D.SetInputData(m_vtkOverlay);
 	m_measurementFor3D.SetLookupTable(m_lookupTable);
 	m_measurementFor3D.Update();
-	m_measurementFor3D.GetVolumes(m_3DMeasurements);
-
-	
 }
 
 void Overlay::Measure2D()
@@ -315,6 +310,10 @@ void Overlay::Measure2D()
 
 void Overlay::Measure2D(int slice)
 {
+	const int* extent = m_vtkOverlay->GetExtent();
+	if (slice < extent[4] || slice > extent[5]) {
+		return;
+	}
 	QStringList _2DMeasurements;
 	_2DMeasurements += "Undefined";
 	_2DMeasurements += "Undefined";
@@ -325,8 +324,10 @@ void Overlay::Measure2D(int slice)
 	while (slice >= m_2DMeasurements.size()) {
 		m_2DMeasurements += _2DMeasurements;
 	}
+	while (slice >= m_measurementFor2D.size()) {
+		m_measurementFor2D += new MeasurementFor2DIntegrated();
+	}
 
-	const int* extent = m_vtkOverlay->GetExtent();
 	// Extract slice image
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
 	voi->SetInputData(m_vtkOverlay);
@@ -334,32 +335,33 @@ void Overlay::Measure2D(int slice)
 	voi->Update();
 	slice = slice - extent[4];
 	// Calculate areas
-	vtkSmartPointer<MeasurementFor2D> m2d = vtkSmartPointer<MeasurementFor2D>::New();
-	m2d->SetSliceImage(voi->GetOutput());
+	m_measurementFor2D[slice]->m2d->SetSliceImage(voi->GetOutput());
 
 	// Error checking
 	//double lumenArea, vesselArea, NMI, distance; // #todo: Allow multiple branch
 	try {
-		m2d->Update();
-		_2DMeasurements[0] = QString::number(m2d->GetOutput(0).LumenArea);
-		_2DMeasurements[1] = QString::number(m2d->GetOutput(0).VesselWallArea);
+		m_measurementFor2D[slice]->m2d->Update();
+		_2DMeasurements[0] = QString::number(
+			m_measurementFor2D[slice]->m2d->GetOutput(0).LumenArea);
+		_2DMeasurements[1] = QString::number(
+			m_measurementFor2D[slice]->m2d->GetOutput(0).VesselWallArea);
 		_2DMeasurements[3] = QString::number(
-			m2d->GetOutput(0).VesselWallArea /
-			(m2d->GetOutput(0).LumenArea + m2d->GetOutput(0).VesselWallArea));
+			m_measurementFor2D[slice]->m2d->GetOutput(0).VesselWallArea /
+			(m_measurementFor2D[slice]->m2d->GetOutput(0).LumenArea + 
+				m_measurementFor2D[slice]->m2d->GetOutput(0).VesselWallArea));
 	}
 	catch (MeasurementFor2D::ERROR_CODE e) {
 		cerr << "MeasurementFor2D error: " << e << endl;
 	}
 
 	// calculate wall thickness
-	vtkSmartPointer<MaximumWallThickness> mwt =
-		vtkSmartPointer<MaximumWallThickness>::New();
-	mwt->SetLumemIntensity(1);
-	mwt->SetVesselIntensity(2);
-	mwt->SetSliceImage(voi->GetOutput());
+	m_measurementFor2D[slice]->mwt->SetLumemIntensity(1);
+	m_measurementFor2D[slice]->mwt->SetVesselIntensity(2);
+	m_measurementFor2D[slice]->mwt->SetSliceImage(voi->GetOutput());
 	try {
-		mwt->Update();
-		_2DMeasurements[2] = QString::number(mwt->GetDistanceLoopPairVect().at(0).Distance);
+		m_measurementFor2D[slice]->mwt->Update();
+		_2DMeasurements[2] = QString::number(
+			m_measurementFor2D[slice]->mwt->GetDistanceLoopPairVect().at(0).Distance);
 	}
 	catch (MaximumWallThickness::ERROR_CODE e) {
 		cerr << "MaximumWallThickness error: " << e << endl;
@@ -441,35 +443,44 @@ vtkLookupTable * Overlay::GetLookupTable()
 	return m_lookupTable;
 }
 
-double * Overlay::Get3DMeasurements()
+MeasurementFor3D Overlay::GetMeasurementFor3D()
 {
-	Measure3D();
+	return m_measurementFor3D;
+}
 
-	return m_3DMeasurements;
+double * Overlay::Get3DMeasurementsAsDouble()
+{
+	return m_measurementFor3D.GetVolumes();
 }
 
 QStringList Overlay::Get3DMeasurementsStrings()
 {
+	double* _3DMeasurements = Get3DMeasurementsAsDouble();
 	m_volumeStrings.clear();
 	for (int i = 0; i < m_lookupTable->GetNumberOfColors(); ++i) {
-		m_volumeStrings.append(QString::number(m_3DMeasurements[i]));
+		m_volumeStrings.append(QString::number(_3DMeasurements[i]));
 	}
 	return m_volumeStrings;
+}
+
+Overlay::MeasurementFor2DIntegrated Overlay::GetMeasurementFor2D(int slice)
+{
+	return *(m_measurementFor2D[slice]);
 }
 
 QStringList Overlay::Get2DMeasurementsStrings(int slice)
 {
 	const int* extent = m_vtkOverlay->GetExtent();
 	if (slice < extent[4]) {
-		Measure2D(extent[4]);
+		//Measure2D(extent[4]);
 		return m_2DMeasurements[0];
 	}
 	else if (slice > extent[5]) {
-		Measure2D(extent[5]);
+		//Measure2D(extent[5]);
 		return m_2DMeasurements[m_2DMeasurements.size() - 1];
 	}
 	else {
-		Measure2D(slice);
+		//Measure2D(slice);
 		return m_2DMeasurements[slice - extent[4]];
 	}
 }

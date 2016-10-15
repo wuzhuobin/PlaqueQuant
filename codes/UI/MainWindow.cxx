@@ -86,12 +86,13 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionBrush);
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
+	widgetGroup.addAction(ui->actionSmartContour);
 	widgetGroup.setExclusive(true);
 	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel,	SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
 	connect(ui->actionContour,		SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
-	connect(ui->actionRuler,		SIGNAL(triggered(bool)),	this->m_core, SLOT(slotRuler(bool)));
+	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);

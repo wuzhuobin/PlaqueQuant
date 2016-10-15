@@ -9,6 +9,9 @@
 
 #include <itkImage.h>
 
+#include "MeasurementFor3D.h"
+#include "MeasurementFor2D.h"
+#include "MaximumWallThickness.h"
 
 typedef itk::Image<float, 3> ImageType;
 
@@ -19,7 +22,8 @@ class Overlay : public QObject
 
 public:
 
-	const int* m_overlayColor[7];
+	static const int NUMBER_OF_COLOR = 7;
+	const int* m_overlayColor[NUMBER_OF_COLOR];
 	const int zeros[4] = {0,0,0,0};
 	const int lumen[4] = { 255, 0, 0, 255 };
 	const int vesselWall[4] = { 0, 0, 255, 255 };
@@ -27,6 +31,15 @@ public:
 	const int hemorrhage[4] = { 255, 255, 0,255 };
 	const int lrnc[4] = { 0, 255, 255 ,255 };
 	const int lm[4] = { 255, 0, 255 ,255 };
+
+	// 2D parts data
+	struct MeasurementFor2DIntegrated
+	{
+		vtkSmartPointer<MeasurementFor2D> m2d =
+			vtkSmartPointer<MeasurementFor2D>::New();
+		vtkSmartPointer<MaximumWallThickness> mwt =
+			vtkSmartPointer<MaximumWallThickness>::New();
+	};
 
 	Overlay(QObject* parent = NULL);
 	~Overlay();
@@ -82,10 +95,7 @@ public:
 	 * replace all the pixels specified by the @param points with the @param label
 	 */
 	void SetPixels(vtkPoints* points, int label);
-	/***/
-	void Measure3D();
-	void Measure2D();
-	void Measure2D(int slice);
+
 
 	vtkImageData* GetOutput();
 	/**
@@ -105,9 +115,24 @@ public:
 	 * @return	m_lookupTable
 	 */
 	vtkLookupTable* GetLookupTable();
+	/**
+	* Calculate the 3D measurements of the overlay, which are the volume information
+	*/
+	void Measure3D();
+	/**
+	* Calculate the 2D measurements of the overlay, which are the area information and
+	* distance information
+	*/
+	void Measure2D();
+	void Measure2D(int slice);
+
 	/***/
-	double* Get3DMeasurements();
+	MeasurementFor3D GetMeasurementFor3D();
+	double* Get3DMeasurementsAsDouble();
 	QStringList Get3DMeasurementsStrings();
+
+	// 2D parts data
+	MeasurementFor2DIntegrated GetMeasurementFor2D(int slice);
 	QStringList Get2DMeasurementsStrings(int slice);
 
 signals:
@@ -120,7 +145,12 @@ private:
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
 
 	int DisplayExtent[6];
-	double* m_3DMeasurements = nullptr;
+
+	// 3D parts data
+	MeasurementFor3D m_measurementFor3D;
+
+	QList<MeasurementFor2DIntegrated*> m_measurementFor2D;
+
 	// lumen area, vessel area, NMI, distance, distance error imfo
 	QList<QStringList> m_2DMeasurements;
 	QStringList m_volumeStrings;

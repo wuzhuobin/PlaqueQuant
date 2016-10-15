@@ -270,7 +270,7 @@ void Core::slotChangeView(int viewMode)
 			if (i1 >= m_imageManager->getListOfVtkImages().size() && i2 < VIEWER_NUM ) {
 				this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 				// disable view props
-				m_2DimageViewer[i2]->SetVisibility(false);
+				m_2DimageViewer[i2]->SetAllBlack(true);
 
 			}
 
@@ -291,7 +291,7 @@ void Core::slotChangeView(int viewMode)
 			// else only change input and viewer m_orientation
 			this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor()->Enable();
 			// Show view props for overlay
-			m_2DimageViewer[i]->SetVisibility(true);
+			m_2DimageViewer[i]->SetAllBlack(false);
 
 		}
 
@@ -727,32 +727,22 @@ void Core::slotSetLineInterpolatorToPolygon(bool flag)
 	}
 }
 
-void Core::slotRuler(bool b)
+void Core::slotRulerMode()
 {
-	if (b) 
-	{
-		for (int i = 0; i < VIEWER_NUM; ++i) {
-			m_style[i]->SetInteractorStyleToRuler();
-		}
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->SetInteractorStyleToRuler();
 	}
-	else {
-		for (int i = 0; i < 3;i++)
-		{
-		m_style[i]->GetRuler()->SetDistanceWidgetEnabled(false);
-			
-		}
-	}
-	//for (int i = 0; i< VIEWER_NUM; i++)
-	//{
-	//	m_2DimageViewer[i]->SetRulerEnabled(b);
-	//}
+}
 
+void Core::slotEnableMaximumWallThickneesLabel(bool flag)
+{
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->GetRuler()->EnableMaximumWallThickneesLabel(flag);
+	}
 }
 
 void Core::slotROIMode()
 {
-	this->slotRuler(false);
-
 	if (this->m_imageManager->getNumberOfImages() != 0 && !this->m_widgetManager->GetROIWidget()->GetEnabled())
 	{
 		double bounds[6];

@@ -6,13 +6,6 @@
 #include <QDir>
 #include <QButtonGroup>
 
-#include <vtkStringArray.h>
-#include <vtkPointSetToLabelHierarchy.h>
-#include <vtkIntArray.h>
-#include <vtkLabelPlacementMapper.h>
-#include <vtkActor2D.h>
-#include <vtkActor.h>
-
 #include "MainWindow.h"
 
 
@@ -39,12 +32,10 @@ public slots:
 	void slotResetROI();
 	void slotChangeOpacity(int opactiy);
 	void slotChangeROI(int* bound);
-	void slotEnableMWTCalculation(int);
 	void slotSetPage();
 	//void slotAddLumen();
 	//void slotAddVesselWall();
 	void SetBrushSize();
-	void slotCalculateMaximumWallThickness();
 	void slotEnableAutoLumenSegmentation(bool flag);
 
 	virtual void slotUpdateTableWidget();
@@ -63,13 +54,6 @@ private:
 	QStringList NameList, ParameterList;
     //bool First_Load;
     int m_visible_image_no;
-
-	vtkSmartPointer<vtkPolyData>					m_displayPD;
-	vtkSmartPointer<vtkActor>						m_lineActor;
-	vtkSmartPointer<vtkActor2D>						m_labelActor;
-	vtkSmartPointer<vtkStringArray>					m_labelArray;
-	vtkSmartPointer<vtkIntArray>					m_sizeArray;
-	vtkSmartPointer<vtkPointSetToLabelHierarchy>	m_p2labelfilter;
 
 	QButtonGroup m_contourRadioButtonGroup;
 

@@ -14,7 +14,6 @@ MeasurementFor2D::Measurements2D MeasurementFor2D::GetOutput(int i)
 
 MeasurementFor2D::MeasurementFor2D()
 {
-	this->SliceImage = NULL;
 }
 
 MeasurementFor2D::~MeasurementFor2D()
@@ -24,22 +23,17 @@ MeasurementFor2D::~MeasurementFor2D()
 
 void MeasurementFor2D::SetSliceImage(vtkImageData *im)
 {
-	if (this->SliceImage != NULL)
-		this->SliceImage->Delete();
-
-	this->SliceImage = vtkSmartPointer<vtkImageData>::New();
-	this->SliceImage->DeepCopy(im);
+	this->SliceImage = im;
 
 	this->SliceImage->GetExtent(this->ImageExtent);
 	if (this->ImageExtent[4] != this->ImageExtent[5]) {
-		this->SliceImage->Delete();
-		this->SliceImage = NULL;
 		throw ERROR_INPUT_NOT_A_SLICE;
 	}
 }
 
 void MeasurementFor2D::Update()
 {
+	this->m_outputList.clear();
 	this->CountLabels();
 }
 
