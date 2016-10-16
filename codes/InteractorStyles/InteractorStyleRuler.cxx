@@ -49,15 +49,15 @@ void InteractorStyleRuler::SetDistanceWidgetEnabled(bool flag)
 			m_distanceWidget->Delete();
 			m_distanceWidget = NULL;
 
-			if (!m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_lineActor)) {
-				m_imageViewer->GetAnnotationRenderer()->AddActor(this->m_lineActor);
+			if (m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_lineActor)) {
+				m_imageViewer->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
 
 			}
-			if (!m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_labelActor)) {
-				m_imageViewer->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
+			if (m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_labelActor)) {
+				m_imageViewer->GetAnnotationRenderer()->RemoveActor(this->m_labelActor);
 			}
+			m_imageViewer->Render();
 		}
-		this->m_distanceWidgetEnabledFlag = false;
 
 	}
 }
@@ -65,6 +65,7 @@ void InteractorStyleRuler::SetDistanceWidgetEnabled(bool flag)
 void InteractorStyleRuler::EnableMaximumWallThickneesLabel(bool flag)
 {
 	m_MaximumWallThickneesLabelFlag = flag;
+	UpdateMaximumWallThicknessLabel();
 }
 
 void InteractorStyleRuler::SetCurrentSlice(int slice)
@@ -76,17 +77,16 @@ void InteractorStyleRuler::SetCurrentSlice(int slice)
 void InteractorStyleRuler::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	InteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
-		it != m_synchronalViewers.end(); ++it) {
-		//InteractorStyleSwitch* _style = InteractorStyleSwitch::SafeDownCast(
-		//	(*it)->GetInteractorStyle());
-		InteractorStyleSwitch* _style = reinterpret_cast<InteractorStyleSwitch*>(
-			(*it)->GetInteractorStyle());
-		cout << (*it)->GetInteractorStyle()->GetClassName() << endl;
-		if (_style != NULL) {
-			_style->GetRuler()->UpdateMaximumWallThicknessLabel();
-		}
-		
+	for (std::list<InteractorStyleRuler*>::const_iterator cit = rulers.cbegin();
+		cit != rulers.cend(); ++cit) {
+		(*cit)->UpdateMaximumWallThicknessLabel();
+	}
+}
+
+void InteractorStyleRuler::AddSynchronalRuler(InteractorStyleRuler * ruler)
+{
+	if (std::find(rulers.cbegin(), rulers.cend(), ruler) == rulers.cend()) {
+		rulers.push_back(ruler);
 	}
 }
 
@@ -110,7 +110,7 @@ InteractorStyleRuler::~InteractorStyleRuler()
 void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY ||
-		!m_MaximumWallThickneesLabelFlag) {
+		!m_MaximumWallThickneesLabelFlag || m_imageViewer->GetAllBlack()) {
 		if (m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_lineActor)) {
 			m_imageViewer->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
 

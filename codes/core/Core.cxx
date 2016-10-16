@@ -137,7 +137,7 @@ void Core::slotAddOverlayToImageViewer() {
 		// Very strange
 		//this->LookupTable->SetTableRange(0, 6);
 		m_2DimageViewer[i]->SetOverlay(m_imageManager->getOverlay());
-		m_2DimageViewer[i]->GetOverlayActor()->SetVisibility(true);
+		//m_2DimageViewer[i]->GetOverlayActor()->SetVisibility(true);
 	}
 	this->m_imageManager->getOverlay()->GetOutput()->Modified();
 }
@@ -509,6 +509,26 @@ void Core::slotGenerateCenterlineBtn()
 
 		return;
 	}
+	catch (Centerline::ERROR_CODE &e) {
+		QString msg("\nCenterline calculations failed. Some functions might not be available. Please select an ROI with cylindrical structures. (Branches are allowed)");
+		this->DisplayErrorMessage((msg).toStdString());
+
+		///Volume Render
+		GPUVolumeRenderingFilter* volumeRenderingFilter =
+			GPUVolumeRenderingFilter::New();
+
+		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
+		volumeRenderingFilter->GetVolume()->SetPickable(1);
+		volumeRenderingFilter->Update();
+
+		this->m_3DDataRenderer->AddVolume(volumeRenderingFilter->GetVolume());
+
+		this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->SetBackground(0.3, 0.3, 0.3);
+		this->m_3DimageViewer->GetRenderers()->GetFirstRenderer()->ResetCamera();
+		this->m_3DimageViewer->Render();
+		this->m_style3D->SetInteractorStyleTo3DDistanceWidget();
+	}
 
 
 	if (m_centerlinePD != NULL) {
@@ -658,6 +678,15 @@ void Core::slotValidatePatientInformation()
 	}
 }
 
+void Core::slotChangeOpacity(int layer, int opacity)
+{
+	double* value = GetLookupTable()->GetTableValue(layer);
+	value[3] = opacity * 0.01;
+	GetLookupTable()->SetTableValue(layer, value);
+	GetLookupTable()->Build();
+	RenderAllViewer();
+}
+
 void Core::slotContourMode()
 {
 	for (int i = 0; i < VIEWER_NUM; i++)
@@ -731,6 +760,9 @@ void Core::slotRulerMode()
 {
 	for (int i = 0; i < VIEWER_NUM; ++i) {
 		m_style[i]->SetInteractorStyleToRuler();
+		for (int j = 0; j < VIEWER_NUM; ++j) {
+			m_style[i]->GetRuler()->AddSynchronalRuler(m_style[j]->GetRuler());
+		}
 	}
 }
 

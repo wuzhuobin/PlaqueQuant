@@ -424,6 +424,12 @@ void MyImageViewer::SetCursorBoundary()
 	Cursor3D->Update();
 }
 
+vtkInteractorStyleImage * MyImageViewer::GetInteractorStyle()
+{
+	return vtkInteractorStyleImage::SafeDownCast(
+		this->Interactor->GetInteractorStyle());
+}
+
 void MyImageViewer::SetAnnotationRenderer(vtkRenderer * arg)
 {
 	if (this->AnnotationRenderer == arg) {
@@ -560,6 +566,11 @@ void MyImageViewer::SetAllBlack(bool flag)
 		}
 	}
 	emit AllBlackAlready(flag);
+}
+
+bool MyImageViewer::GetAllBlack()
+{
+	return AllBlackFlag;
 }
 
 void MyImageViewer::SetBound(double* b)

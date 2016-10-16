@@ -21,6 +21,7 @@ public:
 	void EnableMaximumWallThickneesLabel(bool flag);
 	void SetCurrentSlice(int slice);
 	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+	void AddSynchronalRuler(InteractorStyleRuler* ruler);
 
 protected:
 	InteractorStyleRuler();
@@ -35,6 +36,7 @@ private:
 	vtkDistanceRepresentation3D* m_distanceRepresentation3D = NULL;
 	vtkDistanceWidget* m_distanceWidget = NULL;
 
+	std::list<InteractorStyleRuler*> rulers;
 
 	// Maximun wall thickness stuff
 	vtkSmartPointer<vtkPolyData>					m_displayPD;

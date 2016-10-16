@@ -29,6 +29,7 @@ private:
 
 	void GenerateReport();
 
+	friend class MainWindow;
 	MainWindow* m_mainWnd;
 
 

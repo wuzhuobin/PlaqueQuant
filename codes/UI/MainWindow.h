@@ -12,15 +12,10 @@
 
 #include "ui_MainWindow.h"
 
-#include <vtkActor.h>
 #include <vtkPolyData.h>
 
 //Own Class
-#include "MyImageViewer.h"
-#include "InteractorStyleSwitch.h"
-#include "InteractorStyleSwitch3D.h"
 #include "InfoDialog.h"
-#include "Distance3DWidget.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
 #include "Core.h"
@@ -36,21 +31,10 @@ public:
 	~MainWindow();
 	static MainWindow* GetMainWindow();
 
-	// Get Functions
+	//// Get Functions
 	Core*						GetCore();
 	vtkRenderWindow*			GetRenderWindow(int i);
-	MyImageViewer*				GetMyImageViewer(int i);
-	InteractorStyleSwitch*		GetInteractorStyleImageSwitch(int i);
-	vtkRenderWindowInteractor*	GetVtkRenderWindowInteractor(int i);
-	vtkLookupTable*				GetLookupTable();
-	//QString				GetFileName(int);
-	int					GetVisibleImageNo();
-	vtkPolyData*		GetCenterlinePD();
-	Ui_MainWindow*		GetUI();
-	
-	// Ui Updates
-	void RenderAllViewer();
-	void RenderAll2DViewers();
+	// to be moved
 	void UpdateStenosisValue(double val);
 
 
@@ -74,7 +58,6 @@ public:
 
 	virtual void slotAbout();
 	virtual void slotHelp();
-	virtual void slot3DUpdate();
 	/**
 	 * four viewers and maximum
 	 */
@@ -86,8 +69,6 @@ public:
 	virtual void slotChangeBaseImageUL();
 	virtual void slotChangeBaseImageUR();
 	virtual void slotChangeBaseImageLL();
-
-	virtual void slotChangeROI();
 
 	//Widget running 
 	virtual void slotShowProgressDialog(int value, QString text);
@@ -125,16 +106,10 @@ private:
 	void DisplayErrorMessage(std::string);
 
 	//Data
-	vtkPolyData* m_centerlinePD;
 	MyImageManager* imageManager;
 	IOManager* ioManager;
-
 	// Core
 	Core* m_core;
-
-
-	//Orientation
-	int m_orientation;
 
 	//Dock Widget
 	friend class ModuleWidget;
@@ -142,21 +117,10 @@ private:
 	ModuleWidget* m_moduleWidget;
 	MeasurementWidget* m_measurementWidget;
 
-	//Navigation
-	double m_focalPoint[3];
-
-	int visibleImageNum;
 
 	//Information
-	Dialog* m_InfoDialog;
+	Dialog m_InfoDialog;
 
-	//Segmentation view flag
-	bool segmentationView;
-	bool INITIALIZED_FLAG;
-
-
-	//Overlay
-	//Overlay* SegmentationOverlay;
 	int m_boundingExtent[6];
 
 };

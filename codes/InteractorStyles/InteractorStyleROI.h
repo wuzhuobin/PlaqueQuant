@@ -1,7 +1,6 @@
 #pragma once
 #include "InteractorStyleNavigation.h"
 
-#include "MyBorderWidget.h"
 #include "MyPlaneWidget.h"
 
 class InteractorStyleROI :
@@ -18,6 +17,7 @@ public:
 	void UpdateAllWidget();
 	void UpdateAllWidget(double* bound);
 
+	void AddSynchronalROI(InteractorStyleROI* roi);
 	MyPlaneWidget* GetPlaneWidget();
 
 protected:
@@ -27,7 +27,7 @@ protected:
 
 private:
 
-	vtkSmartPointer<MyBorderWidget> m_borderWidget;
+	std::vector<InteractorStyleROI*> rois;
 
 	MyPlaneWidget* planeWidget;
 	MyPlaneWidgetCallback* planeWidgetCallback;

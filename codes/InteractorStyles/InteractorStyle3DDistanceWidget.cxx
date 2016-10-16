@@ -49,7 +49,7 @@ void InteractorStyle3DDistanceWidget::OnKeyPress()
 		Superclass::OnKeyPress();
 	else {
 		vtkSmartPointer<vtkKdTree> kdtree = vtkSmartPointer<vtkKdTree>::New();
-		kdtree->BuildLocatorFromPoints(mainwnd->GetCenterlinePD());
+		kdtree->BuildLocatorFromPoints(mainwnd->GetCore()->GetCenterlinePD());
 
 		std::string key = this->Interactor->GetKeySym();
 
@@ -62,7 +62,7 @@ void InteractorStyle3DDistanceWidget::OnKeyPress()
 			int* pos = this->Interactor->GetEventPosition();
 
 			vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
-			picker->SetVolumeOpacityIsovalue(mainwnd->GetLookupTable()->GetOpacity(Core::LABEL_LUMEN)); // #LookupTable
+			picker->SetVolumeOpacityIsovalue(mainwnd->GetCore()->GetLookupTable()->GetOpacity(Core::LABEL_LUMEN)); // #LookupTable
 			picker->SetTolerance(0.0005);
 			picker->Pick(pos[0], pos[1], 0, this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
 
@@ -71,7 +71,7 @@ void InteractorStyle3DDistanceWidget::OnKeyPress()
 			// snap the point to the centerline
 			double dist;
 			int id = kdtree->FindClosestPoint(worldPosition, dist);
-			worldPosition = mainwnd->GetCenterlinePD()->GetPoint(id);
+			worldPosition = mainwnd->GetCore()->GetCenterlinePD()->GetPoint(id);
 
 			this->m_ids.push_back(id);
 
@@ -131,7 +131,7 @@ void InteractorStyle3DDistanceWidget::UpdateStenosisValue()
 {
 	MainWindow* mainwnd = MainWindow::GetMainWindow();
 
-	vtkSmartPointer<vtkPolyData> cl = mainwnd->GetCenterlinePD();
+	vtkSmartPointer<vtkPolyData> cl = mainwnd->GetCore()->GetCenterlinePD();
 	vtkDataArray* radiusArray = cl->GetPointData()->GetArray("Radius");
 
 	double A = cl->GetPointData()->GetArray("Radius")->GetComponent(this->m_ids.at(0), 0);

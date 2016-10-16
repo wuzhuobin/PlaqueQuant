@@ -53,7 +53,10 @@ void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
 
 void AbstractInteractorStyleImage::AddSynchronalViewer(MyImageViewer * imageViewer)
 {
-	m_synchronalViewers.push_back( imageViewer);
+	if (std::find(m_synchronalViewers.cbegin(), m_synchronalViewers.cend(), imageViewer)
+		== m_synchronalViewers.cend()) {
+		m_synchronalViewers.push_back(imageViewer);
+	}
 }
 
 void AbstractInteractorStyleImage::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)

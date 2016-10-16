@@ -145,13 +145,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="maximumWallThicknessChkBox">
-        <property name="text">
-         <string>Show Maximum Wall Thickness</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Status:</string>
@@ -468,10 +461,8 @@
      <zorder>measurement2DTableWidget</zorder>
      <zorder>label_3</zorder>
      <zorder>measurement3DTableWidget</zorder>
-     <zorder></zorder>
      <zorder>verticalSpacer</zorder>
      <zorder>label_6</zorder>
-     <zorder>maximumWallThicknessChkBox</zorder>
      <zorder>MWTTextBrowser</zorder>
     </widget>
    </item>

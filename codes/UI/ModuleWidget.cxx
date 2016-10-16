@@ -13,7 +13,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 
 	ui = new Ui::ModuleWidget;
 	m_mainWnd = static_cast<MainWindow*>(parent);
-	Core* core = m_mainWnd->GetCore();
+	Core* core = m_mainWnd->m_core;
     ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
     
@@ -90,8 +90,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotSetPage()));
 
 	/// ROI
-	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					this,		SLOT(slotSelectROI()));
-	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					this,		SLOT(slotResetROI()));
+	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					core,		SLOT(slotSelectROI()));
+	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					core,		SLOT(slotResetROI()));
 	connect(ui->maximumWallThicknessChkBox,		SIGNAL(toggled(bool)),				core,		SLOT(slotEnableMaximumWallThickneesLabel(bool)));
 }
 
@@ -123,29 +123,11 @@ void ModuleWidget::slotSetPage()
 	}
 
 }
-void ModuleWidget::UpdateStenosisValue(double val)
-{
-	//ui->stenosisSpinBox->setValue(val * 100);
-}
-void ModuleWidget::SetBrushSize()
-{
-	ui->BrushSizeSpinBox->setValue((ui->BrushSizeSlider->value()));
-}
-
-void ModuleWidget::slotSegmentationView()
-{
-	m_mainWnd->GetCore()->slotSegmentationView();
-}
 
 void ModuleWidget::slotChangeOpacity(int opacity)
 {
-	 
 	int layer = ui->labelComboBox->currentIndex() + 1;
-	double* value = m_mainWnd->GetLookupTable()->GetTableValue(layer);
-	value[3] = opacity * 0.01;
-	m_mainWnd->GetLookupTable()->SetTableValue(layer, value);
-	m_mainWnd->GetLookupTable()->Build();
-	m_mainWnd->RenderAllViewer();
+	m_mainWnd->m_core->slotChangeOpacity(layer, opacity);
 }
 void ModuleWidget::slotChangeROI(int * bound)
 {
@@ -156,18 +138,6 @@ void ModuleWidget::slotChangeROI(int * bound)
 	ui->sizeSpinBox2->setValue(bound[3] - bound[2]);
 	ui->sizeSpinBox3->setValue(bound[5] - bound[4]);
 
-}
-
-void ModuleWidget::slotSelectROI()
-{
-	 
-	m_mainWnd->GetCore()->slotSelectROI();
-}
-
-void ModuleWidget::slotResetROI()
-{
-	 
-	m_mainWnd->GetCore()->slotResetROI();
 }
 
 void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
@@ -192,13 +162,6 @@ void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
 	}
 }
 
-void ModuleWidget::slotUpdateTableWidget()
-{
-	//QTableWidget* table = ui->measurement2DTableWidget->
-}
 	
-void ModuleWidget::setMainWindow(MainWindow* mainWnd)
-{
-	m_mainWnd = mainWnd;
-}
+
 

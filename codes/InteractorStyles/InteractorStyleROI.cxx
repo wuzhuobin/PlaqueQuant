@@ -1,99 +1,33 @@
 #include "InteractorStyleROI.h"
-#include "MainWindow.h"
-
-#include <vtkExtractVOI.h>
 
 vtkStandardNewMacro(InteractorStyleROI);
 using namespace std;
 void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 {
-	MainWindow *mainWnd = MainWindow::GetMainWindow();
-
-	if (flag) {
-		int int_defaultBound[6];
-		m_imageViewer->GetInput()->GetExtent(int_defaultBound);
-
-		double worldBound[6];
-
-		for (int i = 0; i < 3; ++i) {
-			worldBound[i] = int_defaultBound[i] * GetSpacing()[i] + GetOrigin()[i];
-			worldBound[i + 1] = int_defaultBound[i] * GetSpacing()[i] + GetOrigin()[i];
-		}
-		//int_defaultBound[GetSliceOrientation()] = 0;
-		//int_defaultBound[GetSliceOrientation() + 1] = 0;
-
-		m_borderWidget->SetInteractor(this->Interactor);
-		m_borderWidget->SetImageViewer(m_imageViewer);
-		//m_borderWidget->SetLowerLeft(int_defaultBound[0], int_defaultBound[2], int_defaultBound[3]);
-		//m_borderWidget->SetUpperRight(int_defaultBound[1], int_defaultBound[3], int_defaultBound[5]);
-		switch (GetSliceOrientation())
-		{
-		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XY:
-			m_borderWidget->SetLowerLeft(worldBound[0], worldBound[2], worldBound[4]);
-			m_borderWidget->SetUpperRight(worldBound[1], worldBound[3], worldBound[5]);
-			break;
-		}
-		m_borderWidget->EnabledOn();
-
-
-
-
-
-		//switch (GetSliceOrientation()) {
-		//case vtkImageViewer2::SLICE_ORIENTATION_YZ:
-		//	break;
-		//case vtkImageViewer2::SLICE_ORIENTATION_XZ:
-		//	break;
-		//case vtkImageViewer2::SLICE_ORIENTATION_XY:
-		//	break;
-
-		//}
-
-
+	if (flag && rois.size() == 3) {
 		///
 		planeWidget->initializeCustomFunction();
 		planeWidget->SetInputData(m_imageViewer->GetInput());
 		planeWidget->SetImageViewer(m_imageViewer);
 		planeWidget->SetDefaultBound(m_imageViewer->GetBound());
 		planeWidget->SetInteractor(this->Interactor);
-		//for (list<MyImageViewer*>::const_iterator cit = m_synchronalViewers.cbegin();
-		//	cit != m_synchronalViewers.cend(); ++cit) {
-		//	InteractorStyleSwitch* _switch = 
-		//		dynamic_cast<InteractorStyleSwitch*>((*cit)->GetInteractorStyle());
-		//	if (_switch != NULL) {
-		//		_switch->GetROI()->GetPlaneWidget()
-		//	}
-		//}
-		//qDebug() << "planeWidget:" << planeWidget;
-		//qDebug() << "planeWidgetCallback" << planeWidgetCallback;
 		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
 		planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
+		planeWidgetCallback->SetPlaneWidget(
+			rois[0]->GetPlaneWidget(),
+			rois[1]->GetPlaneWidget(),
+			rois[2]->GetPlaneWidget()
+		);
 
 		switch (GetSliceOrientation())
 		{
-		case 0:
-			planeWidgetCallback->SetPlaneWidget(
-				planeWidget,
-				mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
-				mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget());
+		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
 			planeWidget->NormalToXAxisOn();
 			break;
-		case 1:
-			planeWidgetCallback->SetPlaneWidget(
-				mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
-				planeWidget,
-				mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget());
+		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
 			planeWidget->NormalToYAxisOn();
 			break;
-		case 2:
-			planeWidgetCallback->SetPlaneWidget(
-				mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
-				mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
-				planeWidget);
+		case vtkImageViewer2::SLICE_ORIENTATION_XY:
 			planeWidget->NormalToZAxisOn();
 			break;
 		default:
@@ -193,11 +127,12 @@ void InteractorStyleROI::UpdateAllWidget()
 
 void InteractorStyleROI::UpdateAllWidget(double * bound)
 {
-	MainWindow* mainWnd = MainWindow::GetMainWindow();
+	if (rois.size() != 3)
+		return;
 	MyPlaneWidget* m_planeWidget[3] = {
-		mainWnd->GetInteractorStyleImageSwitch(0)->GetROI()->GetPlaneWidget(),
-		mainWnd->GetInteractorStyleImageSwitch(1)->GetROI()->GetPlaneWidget(),
-		mainWnd->GetInteractorStyleImageSwitch(2)->GetROI()->GetPlaneWidget() };
+		rois[0]->GetPlaneWidget(),
+		rois[1]->GetPlaneWidget(),
+		rois[2]->GetPlaneWidget() };
 	double* currentBound;
 	//Update all PlaneWidget
 	for (int i = 0; i < 3; i++)
@@ -236,6 +171,13 @@ void InteractorStyleROI::UpdateAllWidget(double * bound)
 	}
 }
 
+void InteractorStyleROI::AddSynchronalROI(InteractorStyleROI * roi)
+{
+	if (std::find(rois.cbegin(), rois.cend(), roi) == rois.cend()) {
+		rois.push_back(roi);
+	}
+}
+
 MyPlaneWidget * InteractorStyleROI::GetPlaneWidget()
 {
 	return this->planeWidget;
@@ -245,8 +187,6 @@ InteractorStyleROI::InteractorStyleROI()
 	:InteractorStyleNavigation()
 {
 	//this->m_imageViewer = NULL;
-
-	m_borderWidget = vtkSmartPointer<MyBorderWidget>::New();
 
 	planeWidget = MyPlaneWidget::New();
 	planeWidgetCallback = MyPlaneWidgetCallback::New();

@@ -110,6 +110,8 @@ public slots:
 	// Validation Patient ID and Patien name
 	virtual void slotValidatePatientInformation();
 
+	virtual void slotChangeOpacity(int layer, int opacity);
+
 
 signals:
 	void signalVisualizeAllViewers();
@@ -123,7 +125,6 @@ private:
 	int* ConvertBoundsToExtent(double* bounds);
 	double* CovertExtentToBounds(int* extent);
 
-public:
 
 	// viewer
 	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];

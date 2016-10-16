@@ -114,6 +114,7 @@ public:
 	vtkGetObjectMacro(OverlayActor, vtkImageActor);
 	vtkGetObjectMacro(OverlayWindowLevel, vtkImageMapToWindowLevelColors);
 	vtkGetObjectMacro(AnnotationRenderer, vtkRenderer);
+	vtkInteractorStyleImage* GetInteractorStyle();
 	// Description:
 	// Set your own Annotation Renderer
 	virtual void SetAnnotationRenderer(vtkRenderer *arg);
@@ -162,6 +163,7 @@ public slots:
 	// Description:
 	// Set all Actors' visibility
 	virtual void SetAllBlack(bool flag);
+	virtual bool GetAllBlack();
 
 signals:
 	
