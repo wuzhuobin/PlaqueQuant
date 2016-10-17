@@ -32,6 +32,34 @@ vtkROIBorderWidget::~vtkROIBorderWidget()
 
 }
 
+void vtkROIBorderWidget::SelectRegion(double eventPos[2])
+{
+}
+
+int vtkROIBorderWidget::SubclassSelectAction()
+{
+	if (this->WidgetRep->GetInteractionState() == vtkBorderRepresentation::Inside)
+		return 1;
+	else 
+		return 0;
+}
+
+void vtkROIBorderWidget::SetCursor(int cState)
+{
+	Superclass::SetCursor(cState);
+
+	if (cState == vtkBorderRepresentation::Inside)
+	{
+		if (reinterpret_cast<vtkBorderRepresentation*>(this->WidgetRep)->GetMoving())
+		{
+			this->RequestCursorShape(VTK_CURSOR_DEFAULT);
+		}
+		else
+		{
+			this->RequestCursorShape(VTK_CURSOR_DEFAULT);
+		}
+	}
+}
 void vtkROIBorderWidget::UpdateROIWidget()
 {
 	// if orientation not set
@@ -282,6 +310,7 @@ vtkROIWidget::vtkROIWidget() : vtkBoxWidget2()
 		this->m_borderWidgets[i] = vtkSmartPointer<vtkROIBorderWidget>::New();
 		this->m_borderWidgets[i]->SetROIParent(this);
 		this->m_borderWidgets[i]->SetOrientation(i);
+		this->m_borderWidgets[i]->SelectableOff();
 		this->m_borderRep[i] = vtkSmartPointer<vtkBorderRepresentation>::New();
 		this->m_borderRep[i]->GetBorderProperty()->SetColor(0.8, 0.2, 0.1);
 		this->m_borderRep[i]->GetBorderProperty()->SetLineStipplePattern(0xFCFC); // ------..------..

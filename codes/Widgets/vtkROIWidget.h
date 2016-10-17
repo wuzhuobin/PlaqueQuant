@@ -44,6 +44,11 @@ protected:
 	vtkROIBorderWidget();
 	~vtkROIBorderWidget();
 
+
+	virtual int SubclassSelectAction() override;
+	virtual void SelectRegion(double eventPos[2]) override;
+	virtual void SetCursor(int State) override;
+
 private:
 	ParentType* ROIParent;
 	int Orientation;
