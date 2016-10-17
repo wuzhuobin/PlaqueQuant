@@ -25,6 +25,7 @@ public slots:
 	void slotChangeROI(int* bound);
 	void slotSetPage();
 	void slotEnableAutoLumenSegmentation(bool flag);
+	void slotUpdateROISpinBoxes(double* bounds);
 
 signals:
 	void finished();

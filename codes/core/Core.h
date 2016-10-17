@@ -28,10 +28,21 @@ public:
 	vtkRenderWindow*	GetRenderWindow(int num);
 	IOManager*			GetIOManager();
 	MyImageManager*		GetMyImageManager();
+	MyWidgetManager*	GetMyWidgetManager();
 
 	void RenderAllViewer();
 	void DisplayErrorMessage(std::string str);
 	
+	enum INTERACTION_MODE
+	{
+		NAVIGATION_MODE = 0,
+		BRUSH_MODE = 1,
+		WINDOW_LEVEL_MODE = 2,
+		POLYGON_CONTOUR_MODE = 3,
+		RULER_MODE = 4,
+		ROI_MODE = 5
+	};
+
 	enum VIEW_MODE
 	{
 		MULTIPLANAR_VIEW = 0,
@@ -51,6 +62,8 @@ public:
 	const static int DEFAULT_IMAGE = 0;
 	const static int VIEWER_NUM = 3;
 
+	int* ConvertBoundsToExtent(double* bounds, bool clamping = true);
+	double* ConvertExtentToBounds(int* extent);
 
 public slots:
 
@@ -122,9 +135,7 @@ signals:
 	void signalChangeSliceZ(int);
 
 private:
-	int* ConvertBoundsToExtent(double* bounds);
-	double* CovertExtentToBounds(int* extent);
-
+	void ModeChangeUpdate(INTERACTION_MODE);
 
 	// viewer
 	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];

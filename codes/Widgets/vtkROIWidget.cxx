@@ -286,8 +286,6 @@ void vtkROIBorderWidget::UpdateROIWidget()
 		break;
 	}
 
-
-
 	// Because place widget is affected by place factor, temperally set it to 1
 	double placefactor = parentRep->GetPlaceFactor();
 	parentRep->SetPlaceFactor(1);
@@ -397,6 +395,10 @@ void vtkROIWidget::UpdateBorderWidgets()
 	boxRepPoly->GetPoint(0, corner1);
 	boxRepPoly->GetPoint(6, corner2);
 
+	/// Emit bounds signal
+	double* bounds = this->WidgetRep->GetBounds();
+	emit signalROIBounds(bounds);
+
 	/// Update border Widgets accordingly
 	for (int i = 0; i < 3; i++)
 	{
@@ -410,12 +412,12 @@ void vtkROIWidget::UpdateBorderWidgets()
 			continue;
 		}
 
-		// if user is interacting with that borderwidget
+		// if user is interacting with that borderwidget, skips that particular widget
 		if (this->m_borderWidgets[i]->GetRepresentation()->GetInteractionState() == vtkBorderRepresentation::Inside) {
 			continue;
 		}
 
-		// #vtkROIWidgetModified
+		// Check if the cursor is within the ROI widget#vtkROIWidgetModified
 		if (m_cursorPos[i] < corner1[i] || m_cursorPos[i] > corner2[i]) {
 			this->m_borderRep[i]->GetBorderProperty()->SetOpacity(0.4);
 			this->m_borderRep[i]->SetPickable(false);
@@ -513,6 +515,7 @@ void vtkROIWidget::SetSlicePlane(int index, vtkPlane *plane)
 	this->m_planes[index] = plane;
 }
 
+//////////////////////////////////////////////////////////////////////////
 void vtkROIBroderWidgetCallBack::Execute(vtkObject * caller, unsigned long, void *)
 {
 	vtkROIBorderWidget *borderWidget =

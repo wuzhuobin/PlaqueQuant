@@ -124,6 +124,11 @@ MyImageManager * Core::GetMyImageManager()
 	return m_imageManager;
 }
 
+MyWidgetManager* Core::GetMyWidgetManager()
+{
+	return this->m_widgetManager;
+}
+
 void Core::slotAddOverlayToImageViewer() {
 	int *extent1 = this->m_imageManager->getOverlay()->GetOutput()->GetExtent();
 	int *extent2 = this->m_imageManager->getListOfViewerInputImages()[0]->GetExtent();
@@ -375,6 +380,7 @@ void Core::slotWindowLevelMode()
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
 	//this->slotRuler(false);
+	this->ModeChangeUpdate(WINDOW_LEVEL_MODE);
 }
 
 void Core::slotBrushMode()
@@ -383,6 +389,8 @@ void Core::slotBrushMode()
 	{
 		m_style[i]->SetInteractorStyleToPaintBrush();
 	}
+	
+	this->ModeChangeUpdate(BRUSH_MODE);
 	//Update ui
 	//m_moduleWidget->SetPage(2);
 
@@ -594,7 +602,7 @@ void Core::slotUpdate3DLabelBtn()
 	interacotr->Start();*/
 }
 
-int* Core::ConvertBoundsToExtent(double* bounds)
+int* Core::ConvertBoundsToExtent(double* bounds, bool clampping)
 {
 	// Error check
 	if (this->m_imageManager->getNumberOfImages() == 0)
@@ -607,23 +615,24 @@ int* Core::ConvertBoundsToExtent(double* bounds)
 	this->m_imageManager->getListOfVtkImages().at(0)->GetExtent(imExtent);
 
 	int* extent = (int*)malloc(sizeof(int) * 6);
-	extent[0] = round((bounds[0] - origin[0]) / spacing[0]);
-	extent[1] = round((bounds[1] - origin[0]) / spacing[0]);
-	extent[2] = round((bounds[2] - origin[1]) / spacing[1]);
-	extent[3] = round((bounds[3] - origin[1]) / spacing[1]);
-	extent[4] = round((bounds[4] - origin[2]) / spacing[2]);
-	extent[5] = round((bounds[5] - origin[2]) / spacing[2]);
+	extent[0] = ceil((bounds[0] - origin[0]) / spacing[0]);
+	extent[1] = floor((bounds[1] - origin[0]) / spacing[0]);
+	extent[2] = ceil((bounds[2] - origin[1]) / spacing[1]);
+	extent[3] = floor((bounds[3] - origin[1]) / spacing[1]);
+	extent[4] = ceil((bounds[4] - origin[2]) / spacing[2]);
+	extent[5] = floor((bounds[5] - origin[2]) / spacing[2]);
 
-	for (int i = 0; i < 3;i++)
-	{
-		extent[2*i] = { extent[2*i] < imExtent[2*i] ? imExtent[2*i] : extent[2*i] };
-		extent[2*i+1] = { extent[2*i+1] > imExtent[2*i+1] ? imExtent[2*i+1] : extent[2*i+1] };
-	}
+	if (clampping)
+		for (int i = 0; i < 3;i++)
+		{
+			extent[2*i] = { extent[2*i] < imExtent[2*i] ? imExtent[2*i] : extent[2*i] };
+			extent[2*i+1] = { extent[2*i+1] > imExtent[2*i+1] ? imExtent[2*i+1] : extent[2*i+1] };
+		}
 
 	return extent;
 }
 
-double* Core::CovertExtentToBounds(int* extent)
+double* Core::ConvertExtentToBounds(int* extent)
 {
 	// Error check
 	if (this->m_imageManager->getNumberOfImages() == 0)
@@ -687,16 +696,42 @@ void Core::slotChangeOpacity(int layer, int opacity)
 	RenderAllViewer();
 }
 
+void Core::ModeChangeUpdate(INTERACTION_MODE index)
+{
+	if (index != ROI_MODE)
+	{
+		// turn off ROI widget
+		this->m_widgetManager->DisableROIWidget();
+	}
+
+	if (index != RULER_MODE)
+	{
+		// turn off Ruler widget
+		for (int i = 0; i < 3;i++)
+		{
+			this->m_style[i]->GetRuler()->SetDistanceWidgetEnabled(false);
+		}
+	}
+
+	if (index != POLYGON_CONTOUR_MODE)
+	{
+		// turn off contour widget
+		for (int i = 0; i < 3;i++)
+		{
+			this->m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(false);
+		}
+	}
+
+	this->RenderAllViewer();
+}
+
 void Core::slotContourMode()
 {
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
 		m_style[i]->SetInteractorStyleToPolygonDraw();
-		//m_style[i]->SetMode(4);
 	}
-	//m_moduleWidget->SetPage(1);
-
-	//this->slotRuler(false);
+	this->ModeChangeUpdate(POLYGON_CONTOUR_MODE);
 }
 
 void Core::slotFillContour()
@@ -764,6 +799,8 @@ void Core::slotRulerMode()
 			m_style[i]->GetRuler()->AddSynchronalRuler(m_style[j]->GetRuler());
 		}
 	}
+
+	this->ModeChangeUpdate(RULER_MODE);
 }
 
 void Core::slotEnableMaximumWallThickneesLabel(bool flag)
@@ -775,6 +812,9 @@ void Core::slotEnableMaximumWallThickneesLabel(bool flag)
 
 void Core::slotROIMode()
 {
+	// force user into ROI mode
+	this->slotNavigationMode();
+
 	if (this->m_imageManager->getNumberOfImages() != 0 && !this->m_widgetManager->GetROIWidget()->GetEnabled())
 	{
 		double bounds[6];
@@ -786,10 +826,13 @@ void Core::slotROIMode()
 			this->m_2DimageViewer[0]->GetFocalPointWithWorldCoordinate());
 		this->m_widgetManager->GetROIWidget()->GetRepresentation()->VisibilityOff();
 	}
-	else {
-		this->m_widgetManager->DisableROIWidget();
-		this->RenderAllViewer();
-	}
+	//else {
+	//	this->m_widgetManager->DisableROIWidget();
+	//	this->RenderAllViewer();
+	//	return;
+	//}
+
+	this->ModeChangeUpdate(ROI_MODE);
 }
 
 void Core::slotChangeROI()
@@ -810,7 +853,7 @@ void Core::slotSelectROI()
 	memcpy(newExtent, this->ConvertBoundsToExtent(bounds), sizeof(int) * 6);
 
 	// Convert clamped value back to bounds for ROI widget
-	memcpy(newBounds, this->CovertExtentToBounds(newExtent), sizeof(double) * 6);
+	memcpy(newBounds, this->ConvertExtentToBounds(newExtent), sizeof(double) * 6);
 	this->m_widgetManager->GetROIWidget()->GetRepresentation()->PlaceWidget(newBounds);
 
 	//m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
