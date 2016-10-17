@@ -968,8 +968,8 @@
     </property>
     <addaction name="actionOpenSegmentation"/>
     <addaction name="actionROI"/>
-    <addaction name="actionContour"/>
     <addaction name="actionSmartContour"/>
+    <addaction name="actionContour"/>
     <addaction name="actionRuler"/>
     <addaction name="actionCenterlineAlgorithm"/>
    </widget>
@@ -1004,8 +1004,8 @@
    <addaction name="actionRuler"/>
    <addaction name="separator"/>
    <addaction name="actionROI"/>
-   <addaction name="actionContour"/>
    <addaction name="actionSmartContour"/>
+   <addaction name="actionContour"/>
    <addaction name="actionBrush"/>
    <addaction name="separator"/>
    <addaction name="actionMultiPlanarView"/>

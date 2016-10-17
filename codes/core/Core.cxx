@@ -692,11 +692,7 @@ void Core::slotContourMode()
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{
 		m_style[i]->SetInteractorStyleToPolygonDraw();
-		//m_style[i]->SetMode(4);
 	}
-	//m_moduleWidget->SetPage(1);
-
-	//this->slotRuler(false);
 }
 
 void Core::slotFillContour()
@@ -789,6 +785,14 @@ void Core::slotROIMode()
 	else {
 		this->m_widgetManager->DisableROIWidget();
 		this->RenderAllViewer();
+	}
+}
+
+void Core::slotSmartContourMode()
+{
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		m_style[i]->SetInteractorStyleToSmartContour();
 	}
 }
 

@@ -20,7 +20,6 @@ Copyright (C) 2016
 #include "InteractorStyleNavigation.h"
 
 #include <vtkRenderWindowInteractor.h>
-#include <vtkCamera.h>
 #include <vtkAbstractPicker.h>
 
 
@@ -100,37 +99,6 @@ void InteractorStyleNavigation::CalculateIndex()
 			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
 		SetCurrentFocalPointWithImageCoordinate(index[0], index[1], index[2]);
-		//for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
-		//	it != m_synchronalViewers.end(); ++it) {
-		//	(*it)->SetFocalPointWithImageCoordinate(index[0], index[1], index[2]);
-		//	//if ((*it)->GetSliceOrientation() != GetSliceOrientation()) {
-		//	//	(*it)->SetSlice(index[(*it)->GetSliceOrientation()]);
-		//	//}
-		//	//int slice;
-		//	//switch ((*it)->GetSliceOrientation())
-		//	//{
-		//	//case MyImageViewer::SLICE_ORIENTATION_YZ:
-		//	//	slice = index[0] + 0.5;
-		//	//	(*it)->SetSlice(slice);
-		//	//	(*it)->SetFocalPointWithImageCoordinate(slice,
-		//	//		index[1] + 0.5, index[2] + 0.5);
-		//	//	break;
-		//	//case MyImageViewer::SLICE_ORIENTATION_XZ:
-		//	//	slice = index[1] + 0.5;
-		//	//	(*it)->SetSlice(slice);
-		//	//	(*it)->SetFocalPointWithImageCoordinate(index[0] + 0.5,
-		//	//		slice, index[2] + 0.5);
-		//	//	break;
-		//	//case MyImageViewer::SLICE_ORIENTATION_XY:
-		//	//	slice = index[2] + 0.5;
-		//	//	(*it)->SetSlice(slice);
-		//	//	(*it)->SetFocalPointWithImageCoordinate(index[0] + 0.5,
-		//	//		index[1] + 0.5, slice);
-		//	//	break;
-		//	//default:
-		//	//	break;
-		//	//}
-		//}
 	}
 
 }

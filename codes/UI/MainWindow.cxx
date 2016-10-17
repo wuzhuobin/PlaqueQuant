@@ -67,6 +67,7 @@ MainWindow::MainWindow()
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
+	connect(ui->actionSmartContour, SIGNAL(triggered()), this->m_core, SLOT(slotSmartContourMode()));
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
 	viewGroup.addAction(ui->actionAllAxialView);
