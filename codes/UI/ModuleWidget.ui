@@ -71,7 +71,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -167,42 +167,142 @@
           <item>
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>ROI center position (x, y, z):</string>
+             <string>ROI Volume:</string>
             </property>
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <property name="bottomMargin">
-             <number>0</number>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QDoubleSpinBox" name="volumeDoubleSpinBox">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string> cm3</string>
+              </property>
+              <property name="maximum">
+               <double>65535.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>ROI size (x,y,z)</string>
             </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QSpinBox" name="centerSpinBox1">
+             <widget class="QDoubleSpinBox" name="sizeDoubleSpinBoxX_mm">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
               <property name="buttonSymbols">
                <enum>QAbstractSpinBox::NoButtons</enum>
               </property>
+              <property name="suffix">
+               <string> mm</string>
+              </property>
               <property name="maximum">
-               <number>9999</number>
+               <double>9999.000000000000000</double>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="centerSpinBox2">
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
+             <widget class="QLabel" name="label_5">
+              <property name="maximumSize">
+               <size>
+                <width>5</width>
+                <height>16777215</height>
+               </size>
               </property>
-              <property name="maximum">
-               <number>99999</number>
+              <property name="contextMenuPolicy">
+               <enum>Qt::ActionsContextMenu</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel{
+	text-align: center
+}</string>
+              </property>
+              <property name="text">
+               <string>x</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="centerSpinBox3">
+             <widget class="QDoubleSpinBox" name="sizeDoubleSpinBoxY_mm">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
               <property name="buttonSymbols">
                <enum>QAbstractSpinBox::NoButtons</enum>
               </property>
+              <property name="suffix">
+               <string> mm</string>
+              </property>
               <property name="maximum">
-               <number>99999</number>
+               <double>9999.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="maximumSize">
+               <size>
+                <width>5</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="contextMenuPolicy">
+               <enum>Qt::ActionsContextMenu</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel{
+	text-align: center
+}</string>
+              </property>
+              <property name="text">
+               <string>x</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="sizeDoubleSpinBoxZ_mm">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string> mm</string>
+              </property>
+              <property name="maximum">
+               <double>9999.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -211,17 +311,14 @@
           <item>
            <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>ROI size (x,y,z)</string>
+             <string>ROI size (x,y,z by pixel)</string>
             </property>
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_16">
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <widget class="QSpinBox" name="sizeSpinBox1">
+             <widget class="QSpinBox" name="sizeSpinBoxX">
               <property name="buttonSymbols">
                <enum>QAbstractSpinBox::NoButtons</enum>
               </property>
@@ -231,22 +328,64 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="sizeSpinBox2">
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
+             <widget class="QLabel" name="label_7">
+              <property name="maximumSize">
+               <size>
+                <width>5</width>
+                <height>16777215</height>
+               </size>
               </property>
-              <property name="maximum">
-               <number>9999</number>
+              <property name="contextMenuPolicy">
+               <enum>Qt::ActionsContextMenu</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel{
+	text-align: center
+}</string>
+              </property>
+              <property name="text">
+               <string>x</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="sizeSpinBox3">
+             <widget class="QSpinBox" name="sizeSpinBoxY">
               <property name="buttonSymbols">
                <enum>QAbstractSpinBox::NoButtons</enum>
               </property>
               <property name="maximum">
-               <number>9999</number>
+               <number>99999</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_18">
+              <property name="maximumSize">
+               <size>
+                <width>5</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="contextMenuPolicy">
+               <enum>Qt::ActionsContextMenu</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel{
+	text-align: center
+}</string>
+              </property>
+              <property name="text">
+               <string>x</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="sizeSpinBoxZ">
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="maximum">
+               <number>99999</number>
               </property>
              </widget>
             </item>
@@ -281,12 +420,19 @@
           </item>
          </layout>
          <zorder>label_9</zorder>
-         <zorder></zorder>
          <zorder>label_10</zorder>
          <zorder></zorder>
          <zorder>resetROIPushButton</zorder>
          <zorder>segmentationPushButton</zorder>
          <zorder>verticalSpacer_8</zorder>
+         <zorder>volumeSpinBox</zorder>
+         <zorder>horizontalSpacer</zorder>
+         <zorder>layoutWidget</zorder>
+         <zorder>label_5</zorder>
+         <zorder>label_6</zorder>
+         <zorder>label_7</zorder>
+         <zorder>label_18</zorder>
+         <zorder>label_19</zorder>
         </widget>
        </item>
       </layout>

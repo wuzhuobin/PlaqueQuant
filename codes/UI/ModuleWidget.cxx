@@ -1,5 +1,6 @@
 #include "ui_ModuleWidget.h"
 
+#include <QSpinBox>
 #include <QTextBrowser>
 #include <qtablewidget.h>
 
@@ -90,9 +91,12 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotSetPage()));
 
 	/// ROI
-	connect(ui->segmentationPushButton,			SIGNAL(clicked()),					core,		SLOT(slotSelectROI()));
-	connect(ui->resetROIPushButton,				SIGNAL(clicked()),					core,		SLOT(slotResetROI()));
-	connect(ui->maximumWallThicknessChkBox,		SIGNAL(toggled(bool)),				core,		SLOT(slotEnableMaximumWallThickneesLabel(bool)));
+	connect(this->m_mainWnd->GetCore()->GetMyWidgetManager()->GetROIWidget(), SIGNAL(signalROIBounds(double*)), 
+		this, SLOT(slotUpdateROISpinBoxes(double*)));
+	connect(ui->segmentationPushButton,			SIGNAL(clicked()),		core,		SLOT(slotSelectROI()));
+	connect(ui->resetROIPushButton,				SIGNAL(clicked()),		core,		SLOT(slotResetROI()));
+	connect(ui->maximumWallThicknessChkBox,		SIGNAL(toggled(bool)),	core,		SLOT(slotEnableMaximumWallThickneesLabel(bool)));
+
 }
 
 ModuleWidget::~ModuleWidget()
@@ -131,13 +135,6 @@ void ModuleWidget::slotChangeOpacity(int opacity)
 }
 void ModuleWidget::slotChangeROI(int * bound)
 {
-	ui->centerSpinBox1->setValue((bound[0] + bound[1])*0.5);
-	ui->centerSpinBox2->setValue((bound[2] + bound[3])*0.5);
-	ui->centerSpinBox3->setValue((bound[4] + bound[5])*0.5);
-	ui->sizeSpinBox1->setValue(bound[1] - bound[0]);
-	ui->sizeSpinBox2->setValue(bound[3] - bound[2]);
-	ui->sizeSpinBox3->setValue(bound[5] - bound[4]);
-
 }
 
 void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
@@ -163,5 +160,35 @@ void ModuleWidget::slotEnableAutoLumenSegmentation(bool flag)
 }
 
 	
+void ModuleWidget::slotUpdateROISpinBoxes(double* bounds)
+{
+	Core* core = m_mainWnd->GetCore();
+	int* extent = core->ConvertBoundsToExtent(bounds, false);
 
+	int size[] = { 
+		extent[1] - extent[0] + 1,
+		extent[3] - extent[2] + 1,
+		extent[5] - extent[4] + 1
+	};
+
+	this->ui->sizeSpinBoxX->setValue(size[0]);
+	this->ui->sizeSpinBoxY->setValue(size[1]);
+	this->ui->sizeSpinBoxZ->setValue(size[2]);
+
+	if (this->m_mainWnd->GetCore()->GetMyImageManager()->getNumberOfImages() == 0)
+		return;
+
+	double spacing[3];
+	double realSize[3];
+	this->m_mainWnd->GetCore()->GetMyImageManager()->getListOfViewerInputImages().at(0)->GetSpacing(spacing);
+	for (int i = 0; i < 3;i++)
+	{
+		realSize[i] = spacing[i] * size[i];
+	}
+	this->ui->sizeDoubleSpinBoxX_mm->setValue(realSize[0]);
+	this->ui->sizeDoubleSpinBoxY_mm->setValue(realSize[1]);
+	this->ui->sizeDoubleSpinBoxZ_mm->setValue(realSize[2]);
+
+	this->ui->volumeDoubleSpinBox->setValue(realSize[0] * realSize[1] * realSize[2] / 1000.);
+}
 

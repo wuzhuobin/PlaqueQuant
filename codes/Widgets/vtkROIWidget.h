@@ -1,6 +1,7 @@
 #ifndef VTK_ROI_WIDGET_H
 #define VTK_ROI_WIDGET_H
 
+#include <QObject>
 #include <vtkSetGet.h>
 #include <vtkCallbackCommand.h>
 #include <vtkSmartPointer.h>
@@ -10,7 +11,6 @@
 #include <vtkBoxWidget2.h>
 #include <vtkPlaneCollection.h>
 #include <vtkPlane.h>
-
 #include <vtkSphereSource.h>
 
 class vtkROIWidget;
@@ -44,6 +44,11 @@ protected:
 	vtkROIBorderWidget();
 	~vtkROIBorderWidget();
 
+
+	virtual int SubclassSelectAction() override;
+	virtual void SelectRegion(double eventPos[2]) override;
+	virtual void SetCursor(int State) override;
+
 private:
 	ParentType* ROIParent;
 	int Orientation;
@@ -51,8 +56,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 /// ROI box widget for 3D
-class vtkROIWidget : public vtkBoxWidget2
+class vtkROIWidget : public QObject, public vtkBoxWidget2
 {
+	Q_OBJECT
 public:
 	static vtkROIWidget *New();
 
@@ -68,6 +74,11 @@ public:
 	virtual void EnabledOff();
 
 	virtual void SetSlicePlane(int, vtkPlane*);
+
+public slots:
+
+signals:
+	void signalROIBounds(double*);
 
 protected:
 	vtkROIWidget();

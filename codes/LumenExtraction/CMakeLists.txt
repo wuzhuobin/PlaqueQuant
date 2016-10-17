@@ -58,8 +58,6 @@ add_library(
 add_executable(
     LumenExtraction_test
     main.cpp
-	${LUMENEXTRATION_SRC}
-	${LUMENEXTRATION_INC}
 )
 
 #link libraries
@@ -75,7 +73,7 @@ target_link_libraries(
 	${ITK_LIBRARIES}  
 	${VTK_LIBRARIES}
 	Qt5::Core 
-
+	LumenExtraction
 	)
 #Grouping in MSVC
 SOURCE_GROUP(

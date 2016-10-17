@@ -32,6 +32,34 @@ vtkROIBorderWidget::~vtkROIBorderWidget()
 
 }
 
+void vtkROIBorderWidget::SelectRegion(double eventPos[2])
+{
+}
+
+int vtkROIBorderWidget::SubclassSelectAction()
+{
+	if (this->WidgetRep->GetInteractionState() == vtkBorderRepresentation::Inside)
+		return 1;
+	else 
+		return 0;
+}
+
+void vtkROIBorderWidget::SetCursor(int cState)
+{
+	Superclass::SetCursor(cState);
+
+	if (cState == vtkBorderRepresentation::Inside)
+	{
+		if (reinterpret_cast<vtkBorderRepresentation*>(this->WidgetRep)->GetMoving())
+		{
+			this->RequestCursorShape(VTK_CURSOR_DEFAULT);
+		}
+		else
+		{
+			this->RequestCursorShape(VTK_CURSOR_DEFAULT);
+		}
+	}
+}
 void vtkROIBorderWidget::UpdateROIWidget()
 {
 	// if orientation not set
@@ -258,8 +286,6 @@ void vtkROIBorderWidget::UpdateROIWidget()
 		break;
 	}
 
-
-
 	// Because place widget is affected by place factor, temperally set it to 1
 	double placefactor = parentRep->GetPlaceFactor();
 	parentRep->SetPlaceFactor(1);
@@ -282,6 +308,7 @@ vtkROIWidget::vtkROIWidget() : vtkBoxWidget2()
 		this->m_borderWidgets[i] = vtkSmartPointer<vtkROIBorderWidget>::New();
 		this->m_borderWidgets[i]->SetROIParent(this);
 		this->m_borderWidgets[i]->SetOrientation(i);
+		this->m_borderWidgets[i]->SelectableOff();
 		this->m_borderRep[i] = vtkSmartPointer<vtkBorderRepresentation>::New();
 		this->m_borderRep[i]->GetBorderProperty()->SetColor(0.8, 0.2, 0.1);
 		this->m_borderRep[i]->GetBorderProperty()->SetLineStipplePattern(0xFCFC); // ------..------..
@@ -368,6 +395,10 @@ void vtkROIWidget::UpdateBorderWidgets()
 	boxRepPoly->GetPoint(0, corner1);
 	boxRepPoly->GetPoint(6, corner2);
 
+	/// Emit bounds signal
+	double* bounds = this->WidgetRep->GetBounds();
+	emit signalROIBounds(bounds);
+
 	/// Update border Widgets accordingly
 	for (int i = 0; i < 3; i++)
 	{
@@ -381,12 +412,12 @@ void vtkROIWidget::UpdateBorderWidgets()
 			continue;
 		}
 
-		// if user is interacting with that borderwidget
+		// if user is interacting with that borderwidget, skips that particular widget
 		if (this->m_borderWidgets[i]->GetRepresentation()->GetInteractionState() == vtkBorderRepresentation::Inside) {
 			continue;
 		}
 
-		// #vtkROIWidgetModified
+		// Check if the cursor is within the ROI widget#vtkROIWidgetModified
 		if (m_cursorPos[i] < corner1[i] || m_cursorPos[i] > corner2[i]) {
 			this->m_borderRep[i]->GetBorderProperty()->SetOpacity(0.4);
 			this->m_borderRep[i]->SetPickable(false);
@@ -484,6 +515,7 @@ void vtkROIWidget::SetSlicePlane(int index, vtkPlane *plane)
 	this->m_planes[index] = plane;
 }
 
+//////////////////////////////////////////////////////////////////////////
 void vtkROIBroderWidgetCallBack::Execute(vtkObject * caller, unsigned long, void *)
 {
 	vtkROIBorderWidget *borderWidget =
