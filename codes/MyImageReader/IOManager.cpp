@@ -167,6 +167,7 @@ void IOManager::slotOpenWithWizard(QString dir)
 			this->addToListOfFileNames(*wizard.getFileNamesN(i + 1));
 		}
 	}
+
 	//QStringList* wizardFileNames[5] = {
 	//	wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
 	//	wizard.getFileNames4(), wizard.getFileNames5() };

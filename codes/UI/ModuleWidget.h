@@ -21,6 +21,9 @@ public:
     ~ModuleWidget();
 
 	void UdateTargetImageComboBox();
+	void UpdateSeedList();
+
+	static std::vector<int*> SeedList;
 
 public slots:
 	void slotChangeOpacity(int opactiy);
@@ -34,6 +37,8 @@ public slots:
 	virtual void slotChangeSpinBoxNeighborhoodRadius();
 	virtual void slotChangeSliderVesselWallThickness();
 	virtual void slotChangeSpinBoxVesselWallThickness();
+	virtual void slotUpdateCoordinateLabel();
+
 
 signals:
 	void finished();
@@ -42,6 +47,7 @@ signals:
 protected:
     
 private:
+
     Ui::ModuleWidget *ui;
 
 	QButtonGroup m_contourRadioButtonGroup;
