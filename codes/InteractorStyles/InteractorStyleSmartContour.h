@@ -21,7 +21,47 @@ Copyright (C) 2016
 #include "AbstractInteractorStyleImage.h"
 
 #include <vtkSeedWidget.h>
+#include <vtkSeedRepresentation.h>
+#include <vtkPointHandleRepresentation3D.h>
+#include <vtkImageActorPointPlacer.h>
 
+class MySeedRepresentation : public vtkSeedRepresentation
+{
+public:
+	vtkTypeMacro(MySeedRepresentation, vtkSeedRepresentation);
+	static MySeedRepresentation* New() { return new MySeedRepresentation; }
+	
+	vtkImageActorPointPlacer* GetImagePointPlacer() {
+		return vtkImageActorPointPlacer::SafeDownCast(
+			GetHandleRepresentation()->
+			GetPointPlacer());
+	}
+
+protected:
+	MySeedRepresentation() {
+		SetHandleRepresentation(
+			vtkSmartPointer<vtkPointHandleRepresentation3D>::New());
+		GetHandleRepresentation()->SetPointPlacer(
+			vtkSmartPointer<vtkImageActorPointPlacer>::New());
+	}
+
+
+};
+
+class MySeedWidget : public vtkSeedWidget
+{
+public:
+	vtkTypeMacro(MySeedWidget, vtkSeedWidget);
+	static MySeedWidget* New() { return new MySeedWidget; }
+	void SetProcessEvents(int pe) {
+		if (pe = vtkSeedWidget::MovingSeed) {
+			cout << __FUNCTION__ << endl;
+			return;
+		}
+		Superclass::SetProcessEvents(pe);
+	}
+
+};
 
 class InteractorStyleSmartContour : public AbstractInteractorStyleImage
 {
@@ -30,6 +70,7 @@ public:
 	static InteractorStyleSmartContour* New();
 
 	void SetSmartContourEnable(bool flag);
+	void SetFocalSeed(int i);
 
 protected:
 	InteractorStyleSmartContour();
@@ -41,6 +82,7 @@ protected:
 	virtual void OnRightButtonDown();
 	virtual void OnChar();
 	virtual void OnKeyPress();
+	virtual void OnLeave();
 
 private:
 	//static vtkSmartPointer<vtkPoints> m_seeds;
@@ -49,17 +91,23 @@ private:
 	* InteractorStyleSmartContour instances
 	*/
 	static std::list<int*> m_seeds;
+	vtkSmartPointer<MySeedRepresentation> m_seedRep;
+	vtkSmartPointer<MySeedWidget> m_seedWidget;
 	/**
 	 * Invalide pick or any other error? CalculateIndex() will set m_world[3] = 
-	 * { VTK_INT_MIN };
+	 * { 0 };
 	 */
+	double m_world[3] = { 0 };
+	bool m_renderingFlag = false;
+
+	int m_focalSeed = 2;
+
 	void CalculateIndex();
 	void UpdateSeedWidgetBefore();
 	void UpdateSeedWidgetAfter();
+	void UpdateFocalSeed();
 	void ClearAllSeeds();
-	double m_world[3] = { 0 };
 
-	vtkSmartPointer<vtkSeedWidget> m_seedWidget;
 };
 
 #endif // !INTERACTOR_STYLE__NAVIGATION_H
