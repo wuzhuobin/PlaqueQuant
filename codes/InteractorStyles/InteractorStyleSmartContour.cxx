@@ -34,6 +34,7 @@ void InteractorStyleSmartContour::SetSmartContourEnable(bool flag)
 		m_seedRep->GetImagePointPlacer()->SetImageActor(m_imageViewer->GetImageActor());
 		m_seedWidget->EnabledOn();
 		m_seedWidget->On();
+		UpdateSeedWidgetBefore();
 		m_seedWidget->CompleteInteraction();
 	}
 	else {
@@ -49,6 +50,12 @@ void InteractorStyleSmartContour::SetFocalSeed(int i)
 	}
 	m_focalSeed = i;
 
+}
+
+void InteractorStyleSmartContour::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	Superclass::SetCurrentFocalPointWithImageCoordinate(i, j, k);
+	UpdateSeedWidgetBefore();
 }
 
 InteractorStyleSmartContour::InteractorStyleSmartContour()
@@ -125,7 +132,7 @@ void InteractorStyleSmartContour::OnChar()
 		}
 		break;
 	case'D':
-		ClearAllSeeds();
+		ClearAllSeedWidget();
 		break;
 	default:
 		AbstractInteractorStyleImage::OnChar();
@@ -175,20 +182,21 @@ void InteractorStyleSmartContour::CalculateIndex()
 
 void InteractorStyleSmartContour::UpdateSeedWidgetBefore()
 {
-	while (!m_seeds.empty()) {
-
-		int* imagePos = m_seeds.back();
+	ClearAllSeedWidget();
+	for (list<int*>::const_iterator cit = m_seeds.cbegin();
+		cit != m_seeds.cend(); ++cit) {
+		int* imagePos = (*cit);
 		double worldPos[3];
 		for (int pos = 0; pos < 3; ++pos) {
 			worldPos[pos] = (imagePos[pos] * GetSpacing()[pos]) + GetOrigin()[pos];
 		}
-		vtkHandleWidget* newSeed = m_seedWidget->CreateNewHandle();
-		newSeed->GetHandleRepresentation()->SetWorldPosition(worldPos);
-		newSeed->EnabledOn();
-		m_seeds.pop_back();
-		delete imagePos;
+		if (imagePos[GetSliceOrientation()] == m_imageViewer->GetSlice()) {
+			vtkHandleWidget* newSeed = m_seedWidget->CreateNewHandle();
+			newSeed->GetHandleRepresentation()->SetWorldPosition(worldPos);
+			newSeed->EnabledOn();
+		}
+
 	}
-	UpdateFocalSeed();
 	m_imageViewer->Render();
 }
 
@@ -206,9 +214,7 @@ void InteractorStyleSmartContour::UpdateSeedWidgetAfter()
 		}) == m_seeds.cend()) {
 			m_seeds.push_back(imagePos);
 		}
-		m_seedWidget->DeleteSeed(i);
 	}
-	m_imageViewer->Render();
 }
 
 void InteractorStyleSmartContour::UpdateFocalSeed()
@@ -235,7 +241,7 @@ void InteractorStyleSmartContour::UpdateFocalSeed()
 
 }
 
-void InteractorStyleSmartContour::ClearAllSeeds()
+void InteractorStyleSmartContour::ClearAllSeedWidget()
 {
 	for (int i = m_seedRep->GetNumberOfSeeds() - 1; i >= 0; --i) {
 		m_seedWidget->DeleteSeed(i);

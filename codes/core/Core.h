@@ -95,6 +95,7 @@ public slots:
 	virtual void slotContourMode();
 	virtual void slotROIMode();
 	virtual void slotSmartContourMode();
+	virtual void slotRulerMode();
 
 	// Paint Brush 
 	virtual void slotSetBrushSize(int size);

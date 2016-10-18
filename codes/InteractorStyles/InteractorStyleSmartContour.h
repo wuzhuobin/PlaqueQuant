@@ -24,6 +24,10 @@ Copyright (C) 2016
 #include <vtkSeedRepresentation.h>
 #include <vtkPointHandleRepresentation3D.h>
 #include <vtkImageActorPointPlacer.h>
+#include <vtkWidgetEvent.h>
+#include <vtkWidgetCallbackMapper.h>
+#include <vtkCommand.h>
+
 
 class MySeedRepresentation : public vtkSeedRepresentation
 {
@@ -53,16 +57,16 @@ class MySeedWidget : public vtkSeedWidget
 public:
 	vtkTypeMacro(MySeedWidget, vtkSeedWidget);
 	static MySeedWidget* New() { return new MySeedWidget; }
-	void SetProcessEvents(int pe) {
-		if (pe = vtkSeedWidget::MovingSeed) {
-			cout << __FUNCTION__ << endl;
-			return;
-		}
-		Superclass::SetProcessEvents(pe);
+protected:
+	MySeedWidget() {
+		this->CallbackMapper->SetCallbackMethod(vtkCommand::MouseMoveEvent,
+			vtkWidgetEvent::Move,
+			this, MySeedWidget::MoveAction);
 	}
-
+	static void MoveAction(vtkAbstractWidget *w) {};
 };
 
+/////////////////////////////////////////////////////////////////////////////////////
 class InteractorStyleSmartContour : public AbstractInteractorStyleImage
 {
 public:
@@ -71,6 +75,7 @@ public:
 
 	void SetSmartContourEnable(bool flag);
 	void SetFocalSeed(int i);
+	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 protected:
 	InteractorStyleSmartContour();
@@ -85,7 +90,7 @@ protected:
 	virtual void OnLeave();
 
 private:
-	//static vtkSmartPointer<vtkPoints> m_seeds;
+
 	/**
 	* Using a static list to save all seeds and it will be shared by all other
 	* InteractorStyleSmartContour instances
@@ -106,7 +111,7 @@ private:
 	void UpdateSeedWidgetBefore();
 	void UpdateSeedWidgetAfter();
 	void UpdateFocalSeed();
-	void ClearAllSeeds();
+	void ClearAllSeedWidget();
 
 };
 
