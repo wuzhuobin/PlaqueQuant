@@ -28,6 +28,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
 	Ruler = InteractorStyleRuler::New();
+	SmartContour = InteractorStyleSmartContour::New();
 
 	allStyles.push_back(InteractorStyleTesting);
 	allStyles.push_back(WindowLevel);
@@ -36,6 +37,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	allStyles.push_back(PaintBrush);
 	allStyles.push_back(ROI);
 	allStyles.push_back(Ruler);
+	allStyles.push_back(SmartContour);
 
 	this->CurrentStyle = 0;
 }
@@ -75,6 +77,10 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 		Ruler->Delete();
 		Ruler = NULL;
 	}
+	if (SmartContour != NULL) {
+		SmartContour->Delete();
+		SmartContour = NULL;
+	}
 	/* Do not modifiy the upper code£¡ */
 	//for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 	//	it != allStyles.end(); ++it) {
@@ -95,20 +101,21 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->PolygonDraw->SetPolygonModeEnabled(false);
 	if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
-	
 	if (this->CurrentStyle != this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(false);
-	if(this->CurrentStyle!=this->ROI)
+	if (this->CurrentStyle != this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(false);
-	//if (this->imageViewer->GetRenderWindow()) {
-	//	this->imageViewer->Render();
-	//}
+	if (this->CurrentStyle != this->SmartContour)
+		this->SmartContour->SetSmartContourEnable(false);
 
 
+	// some special cases need to use InternalUpdate() to enabled
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(true);
 	if (this->CurrentStyle == this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(true);
+	if (this->CurrentStyle == this->SmartContour)
+		this->SmartContour->SetSmartContourEnable(true);
 
 }
 
@@ -211,15 +218,6 @@ void InteractorStyleSwitch::SetCurrentFocalPointWithImageCoordinate(int i, int j
 		}
 	}
 }
-
-//void InteractorStyleSwitch::SetOrientation(int index)
-//{
-//	this->Navigation->SetOrientation(index);
-//	this->PaintBrush->SetOrientation(index);
-//	this->PolygonDraw->SetOrientation(index);
-//	this->ROI->SetOrientation(index);
-//	this->WindowLevel->SetOrientation(index);
-//}
 
 void InteractorStyleSwitch::SetEnabled(int i)
 {

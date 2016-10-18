@@ -854,6 +854,14 @@ void Core::slotROIMode()
 	this->ModeChangeUpdate(ROI_MODE);
 }
 
+void Core::slotSmartContourMode()
+{
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		m_style[i]->SetInteractorStyleToSmartContour();
+	}
+}
+
 void Core::slotChangeROI()
 {
 	/// Depricted

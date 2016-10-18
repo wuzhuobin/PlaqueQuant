@@ -92,9 +92,16 @@ public slots:
 	virtual void slotNavigationMode();
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
+	virtual void slotContourMode();
+	virtual void slotROIMode();
+	virtual void slotSmartContourMode();
+
+	// Paint Brush 
 	virtual void slotSetBrushSize(int size);
 	virtual void slotSetBrushShape(int shape);
-	virtual void slotContourMode();
+	virtual void slotSetPaintBrushToEraser(bool flag);
+	// set layer color actually both Contour and paintBrush depend on it
+	virtual void slotSetImageLayerColor(int layer);
 
 	// Semi-Auto Lumen Segmenation 
 	virtual void slotFillContour();
@@ -111,18 +118,14 @@ public slots:
 	virtual void slotSetExtractLumenMultiplier(double);
 
 	// ROI 
-	virtual void slotROIMode();
 	virtual void slotChangeROI();
 	virtual void slotSelectROI();
 	virtual void slotResetROI();
 	
 	// Ruler
-	virtual void slotRulerMode();
 	virtual void slotEnableMaximumWallThickneesLabel(bool flag);
 
-	// set layer color
-	virtual void slotSetImageLayerColor(int layer);
-	virtual void slotSetPaintBrushToEraser(bool flag);
+
 
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();
