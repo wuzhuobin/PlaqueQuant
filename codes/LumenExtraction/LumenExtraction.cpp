@@ -1,5 +1,6 @@
 #include "LumenExtraction.h"
 
+
 LumenExtraction::LumenExtraction()
 {
 	m_input = NULL;

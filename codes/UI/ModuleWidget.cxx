@@ -6,6 +6,8 @@
 
 #include "ModuleWidget.h"
 
+//#define setValueConnection(qtObj, filterName, valueName, dataType) \
+//connect(ui->##qtObj, SIGNAL(valueChanged(##dataType), ##filterName, SIGNAL(slotSet##filterName##valueName(##dataType))
 
 ModuleWidget::ModuleWidget(QWidget *parent) :
 	QWidget(parent),
@@ -33,8 +35,20 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	this->m_contourRadioButtonGroup.addButton(this->ui->polygonRadionButton);
 	this->m_contourRadioButtonGroup.addButton(this->ui->smoothCurveRadioButton);
 	this->m_contourRadioButtonGroup.setExclusive(true);
+	
+	/// UI Linkage
+	connect(ui->sliderInitNeighborhoodRadius,		SIGNAL(valueChanged(int)), 
+		this, SLOT(slotChangeSliderNeighborhoodRadius()));
+	connect(ui->doubleSpinBoxNeighborRadius,		SIGNAL(valueChanged(double)), 
+		this, SLOT(slotChangeSpinBoxNeighborhoodRadius()));
+	connect(ui->sliderVesselWallThickness,			SIGNAL(valueChanged(int)), 
+		this, SLOT(slotChangeSliderVesselWallThickness()));
+	connect(ui->doubleSpinBoxVesselWallThickness,	SIGNAL(valueChanged(double)), 
+		this, SLOT(slotChangeSpinBoxVesselWallThickness()));
+
+
 	/// Polygon segmentation
-	connect(ui->fillContourPushButton, SIGNAL(clicked()), 
+	connect(ui->fillContourPushButton,	SIGNAL(clicked()), 
 		core, SLOT(slotFillContour()));
 	connect(ui->clearContourPushButton, SIGNAL(clicked()),
 		core, SLOT(slotClearContour()));
@@ -54,6 +68,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		SLOT(slotSetLineInterpolatorToPolygon(bool)));
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
 		core,SLOT(slotSetImageLayerColor(int)));
+
+
 
 	/// Paint brush segmentation
 	// set brushSize
@@ -102,6 +118,19 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 ModuleWidget::~ModuleWidget()
 {
     delete ui;
+}
+
+void ModuleWidget::UdateTargetImageComboBox()
+{
+	MyImageManager* imageManager = this->m_mainWnd->GetCore()->GetMyImageManager();
+	if (imageManager->getNumberOfImages() == 0)
+		return;
+
+	this->ui->comboBoxTargeImage->clear();
+	for (int i = 0; i < imageManager->getNumberOfImages();i++)
+	{
+		this->ui->comboBoxTargeImage->addItem(imageManager->getListOfModalityNames()[i]);
+	}
 }
 
 void ModuleWidget::slotSetPage()
@@ -190,5 +219,29 @@ void ModuleWidget::slotUpdateROISpinBoxes(double* bounds)
 	this->ui->sizeDoubleSpinBoxZ_mm->setValue(realSize[2]);
 
 	this->ui->volumeDoubleSpinBox->setValue(realSize[0] * realSize[1] * realSize[2] / 1000.);
+}
+
+void ModuleWidget::slotChangeSliderNeighborhoodRadius()
+{
+	int sliderValue = this->ui->sliderInitNeighborhoodRadius->value();
+	this->ui->doubleSpinBoxNeighborRadius->setValue(sliderValue / 10.);
+}
+
+void ModuleWidget::slotChangeSpinBoxNeighborhoodRadius()
+{
+	double spindboxValue = this->ui->doubleSpinBoxNeighborRadius->value();
+	this->ui->sliderInitNeighborhoodRadius->setValue(floor(spindboxValue * 10));
+}
+
+void ModuleWidget::slotChangeSliderVesselWallThickness()
+{
+	int sliderValue = this->ui->sliderVesselWallThickness->value();
+	this->ui->doubleSpinBoxVesselWallThickness->setValue(sliderValue / 10.);
+}
+
+void ModuleWidget::slotChangeSpinBoxVesselWallThickness()
+{
+	double spindboxValue = this->ui->doubleSpinBoxVesselWallThickness->value();
+	this->ui->sliderVesselWallThickness->setValue(floor(spindboxValue * 10));
 }
 

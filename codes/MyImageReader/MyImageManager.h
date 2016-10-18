@@ -39,6 +39,8 @@ public:
 	const QMap<QString, QString>* getDICOMHeader(itk::Image<float, 3>::Pointer itkImage);
 	Overlay* getOverlay();
 
+	int GetModalityIndex(QString);
+
 private:
 	friend class IOManager;
 	

@@ -122,6 +122,7 @@ set(
 	MaximumWallThickness
 	CenterlineBranching
 	MyImageReader
+	LumenExtraction
 )
 
 include_directories(

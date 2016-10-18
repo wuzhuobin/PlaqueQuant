@@ -15,7 +15,9 @@
 #include "itkImageToVTKImageFilter.h"
 #include "itkOrientImageFilter.h"
 #include "itkImageFileReader.h"
-
+#include "itkBinaryDilateImageFilter.h"
+#include "itkBinaryBallStructuringElement.h"
+#include "itkConfidenceConnectedImageFilter.h"
 #include <itkLabelImageToLabelMapFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
@@ -35,6 +37,7 @@
 #include <itkChangeLabelImageFilter.h>
 #include <itkSubtractImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkConnectedThresholdImageFilter.h>
 
 #include <itkVTKImageToImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -68,6 +71,17 @@ typedef itk::ChangeLabelImageFilter<FloatImageType, FloatImageType>					ChangeLa
 typedef itk::SubtractImageFilter<FloatImageType, FloatImageType>						SubtractImageFilterType;
 typedef itk::ImageToVTKImageFilter<FloatImageType>									ImageToVTKImageType;
 typedef itk::BinaryThresholdImageFilter<FloatImageType, FloatImageType>								BinarThresholdImageFilterType;
+
+// For Lumen extraction
+typedef unsigned char							LabelPixelType;
+typedef itk::Image<LabelPixelType, 3>			LabelImageType;
+typedef itk::VTKImageToImageFilter<ImageType>	VTKImageToImageType;
+typedef itk::BinaryBallStructuringElement<	ImageType::PixelType, 2>                  StructuringElementType;
+typedef itk::CastImageFilter<ImageType, LabelImageType> ImageToLabelImageCastFilterType;
+typedef itk::CastImageFilter<LabelImageType, ImageType> LabelImageToImageCastFilterType;
+typedef itk::ConnectedThresholdImageFilter< ImageType, ImageType > ConnectedThresholdImageFilterType;
+typedef itk::ConfidenceConnectedImageFilter<ImageType, ImageType> ConfidenceConnectedFilterType;
+
 
 //VTK
 #include "vtkImageData.h"

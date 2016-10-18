@@ -20,12 +20,20 @@ public:
     explicit ModuleWidget(QWidget *parent = 0);
     ~ModuleWidget();
 
+	void UdateTargetImageComboBox();
+
 public slots:
 	void slotChangeOpacity(int opactiy);
 	void slotChangeROI(int* bound);
 	void slotSetPage();
 	void slotEnableAutoLumenSegmentation(bool flag);
 	void slotUpdateROISpinBoxes(double* bounds);
+
+	// UI Linking
+	virtual void slotChangeSliderNeighborhoodRadius();
+	virtual void slotChangeSpinBoxNeighborhoodRadius();
+	virtual void slotChangeSliderVesselWallThickness();
+	virtual void slotChangeSpinBoxVesselWallThickness();
 
 signals:
 	void finished();

@@ -16,7 +16,10 @@ Core::Core(QWidget* parent)
 	m_imageManager = new  MyImageManager(this);
 	m_ioManager = new IOManager(this);
 	m_widgetManager = new MyWidgetManager(this);
+	m_lumenExtractionFilter = new LumenExtraction();
 
+	// default parameters for lumen extractions
+	this->m_lumenExtractionFilter->SetNumberOfIterations(50);
 
 	// enable registration
 	m_ioManager->enableRegistration(true);
@@ -188,27 +191,23 @@ void Core::slotChangeModality(QString modalityName, int viewerNum)
 {
 	if (modalityName.isEmpty())
 		return;
-	for (int i = 0; i < m_imageManager->getListOfModalityNames().size(); ++i) {
-		if (modalityName == m_imageManager->getListOfModalityNames()[i]) {
-			if (m_viewMode == MULTIPLANAR_VIEW) {
-				for (int j = 0; j < VIEWER_NUM; ++j) {
-					m_2DimageViewer[j]->SetInputData(
-						this->m_imageManager->getListOfViewerInputImages()[i]);
-					m_2DimageViewer[j]->Render();
-					m_2DimageViewer[j]->InitializeHeader(m_imageManager->getModalityName(i));
-				}
-				break;
-			}
-			else {
-				m_2DimageViewer[viewerNum]->SetInputData(
-					this->m_imageManager->getListOfViewerInputImages()[i]);
-				m_2DimageViewer[viewerNum]->Render();
-				m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager->getModalityName(i));
-				break;
-			}
-		}
 
+	int index = this->m_imageManager->GetModalityIndex(modalityName);
+	if (m_viewMode == MULTIPLANAR_VIEW) {
+		for (int j = 0; j < VIEWER_NUM; ++j) {
+			m_2DimageViewer[j]->SetInputData(
+				this->m_imageManager->getListOfViewerInputImages()[index]);
+			m_2DimageViewer[j]->Render();
+			m_2DimageViewer[j]->InitializeHeader(m_imageManager->getModalityName(index));
+		}
 	}
+	else {
+		m_2DimageViewer[viewerNum]->SetInputData(
+			this->m_imageManager->getListOfViewerInputImages()[index]);
+		m_2DimageViewer[viewerNum]->Render();
+		m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager->getModalityName(index));
+	}
+
 	RenderAllViewer();
 }
 
@@ -789,6 +788,26 @@ void Core::slotSetLineInterpolatorToPolygon(bool flag)
 			m_style[i]->GetPolygonDraw()->SetLineInterpolator(1);
 		}
 	}
+}
+
+void Core::slotExtractLumen()
+{
+
+}
+
+void Core::slotSetExtractLumenDilationValue(double)
+{
+
+}
+
+void Core::slotSetExtractLumenInitialNeighborhoodValue(double)
+{
+
+}
+
+void Core::slotSetExtractLumenMultiplier(double)
+{
+
 }
 
 void Core::slotRulerMode()

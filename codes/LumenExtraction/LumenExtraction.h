@@ -1,3 +1,6 @@
+#ifndef LUMEN_EXTRACTION_H
+#define LUMEN_EXTRACTION_H
+
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
 #include "vtkMarchingCubes.h"
@@ -14,37 +17,19 @@
 #include "itkTriangleCell.h"
 #include "itkTriangleMeshToBinaryImageFilter.h"
 #include <itkVTKImageToImageFilter.h>		
-#include "itkBinaryDilateImageFilter.h"
-#include "itkBinaryBallStructuringElement.h"
-#include <itkImageToVTKImageFilter.h>
 #include <itkCastImageFilter.h>
-#include <itkConnectedThresholdImageFilter.h>
+
 #include <itkIndex.h>
-#include "itkConfidenceConnectedImageFilter.h"
 
 #include <itkImageFileWriter.h>
-
 #include <QList>
+#include "Define.h"
 
 using namespace std;
 
 #ifndef vtkDoubleType
 #define vtkDoubleType double
 #endif
-
-typedef itk::Image<float, 3>					ImageType;
-typedef unsigned char							LabelPixelType;
-typedef itk::LabelObject< LabelPixelType, 3 >	LabelObjectType;
-typedef itk::LabelMap<LabelObjectType>			LabelMapType;
-typedef itk::Image<LabelPixelType, 3>			LabelImageType;
-typedef itk::VTKImageToImageFilter<ImageType>	VTKImageToImageType;
-typedef itk::BinaryBallStructuringElement<	ImageType::PixelType, 2>                  StructuringElementType;
-typedef itk::ImageToVTKImageFilter<ImageType>       ConnectorType;
-typedef itk::CastImageFilter<ImageType, LabelImageType> ImageToLabelImageCastFilterType;
-typedef itk::CastImageFilter<LabelImageType, ImageType> LabelImageToImageCastFilterType;
-typedef itk::ConnectedThresholdImageFilter< ImageType, ImageType > ConnectedThresholdImageFilterType;
-typedef itk::ConfidenceConnectedImageFilter<ImageType, ImageType> ConfidenceConnectedFilterType;
-typedef itk::ImageToVTKImageFilter<ImageType>				ConnectorType;
 
 
 class LumenExtraction
@@ -84,3 +69,5 @@ private:
 
 	void LabelDilation();
 };
+
+#endif

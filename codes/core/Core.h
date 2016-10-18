@@ -8,6 +8,7 @@
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
 #include "InteractorStyleSwitch3D.h"
+#include "LumenExtraction.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
 #include "MyWidgetManager.h"
@@ -95,7 +96,7 @@ public slots:
 	virtual void slotSetBrushShape(int shape);
 	virtual void slotContourMode();
 
-	// Auto Lumen Segmenation 
+	// Semi-Auto Lumen Segmenation 
 	virtual void slotFillContour();
 	virtual void slotClearContour();
 	virtual void slotEnableAutoLumenSegmentation(bool flag);
@@ -103,6 +104,13 @@ public slots:
 	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
 	virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
+	// Region grow segmentation
+	virtual void slotExtractLumen();
+	virtual void slotSetExtractLumenDilationValue(double);
+	virtual void slotSetExtractLumenInitialNeighborhoodValue(double);
+	virtual void slotSetExtractLumenMultiplier(double);
+
+	// ROI 
 	virtual void slotROIMode();
 	virtual void slotChangeROI();
 	virtual void slotSelectROI();
@@ -122,7 +130,6 @@ public slots:
 
 	// Validation Patient ID and Patien name
 	virtual void slotValidatePatientInformation();
-
 	virtual void slotChangeOpacity(int layer, int opacity);
 
 
@@ -154,6 +161,9 @@ private:
 	MyImageManager* m_imageManager;
 	IOManager*		m_ioManager;
 	vtkSmartPointer<vtkPolyData> m_centerlinePD;
+
+	// Filter
+	LumenExtraction* m_lumenExtractionFilter;
 
 
 	bool m_firstInitialize = true;

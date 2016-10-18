@@ -245,6 +245,7 @@ void MainWindow::createRecentImageActions()
 	updateRecentActionList();
 }
 
+/* Visualization and initialize Module widget UI */
 bool MainWindow::slotVisualizeImage()
 {	
 
@@ -284,6 +285,9 @@ bool MainWindow::slotVisualizeImage()
 	connect(&ChangeBaseImageLLMenu, SIGNAL(triggered(QAction*)),
 		this->m_core, SLOT(slotChangeModality(QAction*)));
 
+
+	/// Initialize Module widget ui
+	this->m_moduleWidget->UdateTargetImageComboBox();
 	return 0;
 }
 

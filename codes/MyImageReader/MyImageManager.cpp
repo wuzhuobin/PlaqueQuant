@@ -72,6 +72,18 @@ Overlay* MyImageManager::getOverlay()
 	return this->overlay;
 }
 
+int MyImageManager::GetModalityIndex(QString modalityName)
+{
+	for (int i = 0; i < this->getListOfModalityNames().size(); ++i) {
+		if (modalityName == this->getListOfModalityNames()[i] && this->getListOfViewerInputImages()[i] != NULL) {
+			return i;
+		} else 
+			continue;
+	}
+
+	return -1;
+}
+
 void MyImageManager::allClear()
 {
 
