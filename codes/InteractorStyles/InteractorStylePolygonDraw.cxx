@@ -306,6 +306,9 @@ void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
 		ls->SetVesselWallContourRepresentation(this->m_vesselWallContourRepresentation);
 		ls->Update();
 
+		if (ls->GetOutput() == nullptr)
+			return;
+
 		// This prevent crash when a loop is not found #Issue7
 		if (ls->GetOutput()->GetNumberOfPoints() == 0)
 			return;
