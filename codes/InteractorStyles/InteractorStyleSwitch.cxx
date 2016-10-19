@@ -28,7 +28,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
 	Ruler = InteractorStyleRuler::New();
-	SmartContour = InteractorStyleSmartContour::New();
+	SmartContour = InteractorStyleSmartContour2::New();
 
 	allStyles.push_back(InteractorStyleTesting);
 	allStyles.push_back(WindowLevel);
@@ -106,7 +106,7 @@ void InteractorStyleSwitch::InternalUpdate()
 	if (this->CurrentStyle != this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(false);
 	if (this->CurrentStyle != this->SmartContour)
-		this->SmartContour->SetSmartContourEnable(false);
+		this->SmartContour->SetPolygonModeEnabled(false);
 
 
 	// some special cases need to use InternalUpdate() to enabled
@@ -115,7 +115,7 @@ void InteractorStyleSwitch::InternalUpdate()
 	if (this->CurrentStyle == this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(true);
 	if (this->CurrentStyle == this->SmartContour)
-		this->SmartContour->SetSmartContourEnable(true);
+		this->SmartContour->SetPolygonModeEnabled(true);
 
 }
 

@@ -245,3 +245,7 @@ void ModuleWidget::slotChangeSpinBoxVesselWallThickness()
 	this->ui->sliderVesselWallThickness->setValue(floor(spindboxValue * 10));
 }
 
+void ModuleWidget::slotUpdateCoordinateLabel()
+{
+}
+

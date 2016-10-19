@@ -24,7 +24,7 @@ Copyright (C) 2016
 using namespace std;
 vtkStandardNewMacro(InteractorStyleSmartContour);
 
-list<int*> InteractorStyleSmartContour::m_seeds;
+vector<int*> InteractorStyleSmartContour::m_seeds;
 
 void InteractorStyleSmartContour::SetSmartContourEnable(bool flag)
 {
@@ -95,7 +95,7 @@ void InteractorStyleSmartContour::OnLeftButtonDown()
 	//	return;
 	//}
 
-	//AbstractInteractorStyleImage::OnLeftButtonDown();
+	AbstractInteractorStyleImage::OnLeftButtonDown();
 }
 
 void InteractorStyleSmartContour::OnLeftButtonUp()
@@ -183,7 +183,7 @@ void InteractorStyleSmartContour::CalculateIndex()
 void InteractorStyleSmartContour::UpdateSeedWidgetBefore()
 {
 	ClearAllSeedWidget();
-	for (list<int*>::const_iterator cit = m_seeds.cbegin();
+	for (vector<int*>::const_iterator cit = m_seeds.cbegin();
 		cit != m_seeds.cend(); ++cit) {
 		int* imagePos = (*cit);
 		double worldPos[3];
