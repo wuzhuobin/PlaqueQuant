@@ -115,13 +115,8 @@ void InteractorStyleSmartContour::OnLeftButtonUp()
 
 void InteractorStyleSmartContour::OnRightButtonDown()
 {
-	CalculateIndex();
-	double e[2] = { 10 ,10 };
-
-	//vtkHandleWidget *currentHandle = m_seedWidget->CreateNewHandle();
-	//currentHandle->EnabledOn();
-
-	m_imageViewer->Render();
+	// Do nothing
+	return;
 }
 
 

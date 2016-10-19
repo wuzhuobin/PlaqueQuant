@@ -142,8 +142,10 @@ void ModuleWidget::UdateTargetImageComboBox()
 
 void ModuleWidget::UpdateSeedListView()
 {
-	if (SeedIJKList.size() == 0)
+	if (SeedIJKList.size() == 0) {
+		this->ui->listWidgetSeedList->clear();
 		return;
+	}
 	
 	QListWidget* listWidget = this->ui->listWidgetSeedList;
 	listWidget->clear();
@@ -282,14 +284,16 @@ void ModuleWidget::slotDeleteCurrentSeed()
 
 	SeedIJKList.erase(SeedIJKList.begin() + curIndex);
 	SeedCoordinatesList.erase(SeedCoordinatesList.begin() + curIndex);
-
 	this->slotUpdateSeedListView();
+
 	for (int i = 0; i < 3;i++)
 	{
 		this->m_mainWnd->m_core->Get2DInteractorStyle(i)->GetSmartContour()->ReloadSeedFromList();
 	}
 
-	this->ui->listWidgetSeedList->setCurrentRow({ curIndex > SeedIJKList.size() - 1 ? SeedIJKList.size() - 1 : curIndex });
+
+	int newRow = { curIndex > int(SeedIJKList.size() - 1) ? int(SeedIJKList.size() - 1) : curIndex };
+	this->ui->listWidgetSeedList->setCurrentRow(newRow);
 }
 
 void ModuleWidget::slotUpdateCoordinateLabel()

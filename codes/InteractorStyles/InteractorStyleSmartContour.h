@@ -67,9 +67,13 @@ protected:
 			vtkEvent::NoModifier, 127, 1, "Delete",
 			vtkWidgetEvent::Delete,
 			this, MySeedWidget::DeleteAction);
+		this->CallbackMapper->SetCallbackMethod(vtkCommand::RightButtonPressEvent, 
+			vtkWidgetEvent::Completed,
+			this, MySeedWidget::CompletedAction);
 	}
 	static void MoveAction(vtkAbstractWidget *w);
 	static void DeleteAction(vtkAbstractWidget *w);
+	static void CompletedAction(vtkAbstractWidget *w) {};
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
