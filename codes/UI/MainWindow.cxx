@@ -27,8 +27,8 @@ MainWindow::MainWindow()
 
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
-	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	m_measurementWidget = new MeasurementWidget(this);
+	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	ui->measurementDockWidget->setWidget(m_measurementWidget);
 	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	this->tabifyDockWidget(ui->widgetDockWidget, ui->measurementDockWidget);
@@ -68,6 +68,7 @@ MainWindow::MainWindow()
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
 	connect(ui->actionSmartContour, SIGNAL(triggered()), this->m_core, SLOT(slotSmartContourMode()));
+
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
 	viewGroup.addAction(ui->actionAllAxialView);
@@ -131,7 +132,6 @@ MainWindow::MainWindow()
 		m_core, SLOT(slotUpdate3DLabelBtn()));
 	connect(ui->generateCLBtn, SIGNAL(clicked()), 
 		m_core, SLOT(slotGenerateCenterlineBtn()));
-
 
 	//UI Setting
 	ui->ULBtn2->setHidden(true);
@@ -457,6 +457,11 @@ vtkRenderWindow * MainWindow::GetRenderWindow(int i)
 		break;
 	}
 	return nullptr;
+}
+
+ModuleWidget* MainWindow::GetModuleWidget()
+{
+	return this->m_moduleWidget;
 }
 
 void MainWindow::slotChangeBaseImageUL()

@@ -21,9 +21,10 @@ public:
     ~ModuleWidget();
 
 	void UdateTargetImageComboBox();
-	void UpdateSeedList();
+	void UpdateSeedListView();
 
-	static std::vector<int*> SeedList;
+	static std::vector<int*>		SeedIJKList;
+	static std::vector<double*>		SeedCoordinatesList;
 
 public slots:
 	void slotChangeOpacity(int opactiy);
@@ -37,7 +38,11 @@ public slots:
 	virtual void slotChangeSpinBoxNeighborhoodRadius();
 	virtual void slotChangeSliderVesselWallThickness();
 	virtual void slotChangeSpinBoxVesselWallThickness();
+	
+	// Seeds Operations
 	virtual void slotUpdateCoordinateLabel();
+	virtual void slotUpdateSeedListView();
+	virtual void slotDeleteCurrentSeed();
 
 
 signals:

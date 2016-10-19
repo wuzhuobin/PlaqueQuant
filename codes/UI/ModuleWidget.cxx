@@ -9,6 +9,9 @@
 //#define setValueConnection(qtObj, filterName, valueName, dataType) \
 //connect(ui->##qtObj, SIGNAL(valueChanged(##dataType), ##filterName, SIGNAL(slotSet##filterName##valueName(##dataType))
 
+std::vector<int*>		ModuleWidget::SeedIJKList;
+std::vector<double*>	ModuleWidget::SeedCoordinatesList;
+
 ModuleWidget::ModuleWidget(QWidget *parent) :
 	QWidget(parent),
 	m_contourRadioButtonGroup(this)
@@ -45,7 +48,11 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotChangeSliderVesselWallThickness()));
 	connect(ui->doubleSpinBoxVesselWallThickness,	SIGNAL(valueChanged(double)), 
 		this, SLOT(slotChangeSpinBoxVesselWallThickness()));
-
+	
+	/// Seed operations
+	connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
+		this, SLOT(slotUpdateCoordinateLabel()));
+	connect(ui->pushBtnDeleteSeed,	SIGNAL(clicked()), this, SLOT(slotDeleteCurrentSeed()));
 
 	/// Polygon segmentation
 	connect(ui->fillContourPushButton,	SIGNAL(clicked()), 
@@ -130,6 +137,22 @@ void ModuleWidget::UdateTargetImageComboBox()
 	for (int i = 0; i < imageManager->getNumberOfImages();i++)
 	{
 		this->ui->comboBoxTargeImage->addItem(imageManager->getListOfModalityNames()[i]);
+	}
+}
+
+void ModuleWidget::UpdateSeedListView()
+{
+	if (SeedIJKList.size() == 0)
+		return;
+	
+	QListWidget* listWidget = this->ui->listWidgetSeedList;
+	listWidget->clear();
+
+	for each (int* ijk in SeedIJKList)
+	{
+		char item[100];
+		sprintf_s(item, "Seed Index: [%i, %i, %i]", ijk[0], ijk[1], ijk[2]);
+		listWidget->addItem(QString(item));
 	}
 }
 
@@ -243,5 +266,44 @@ void ModuleWidget::slotChangeSpinBoxVesselWallThickness()
 {
 	double spindboxValue = this->ui->doubleSpinBoxVesselWallThickness->value();
 	this->ui->sliderVesselWallThickness->setValue(floor(spindboxValue * 10));
+}
+
+
+void ModuleWidget::slotUpdateSeedListView()
+{
+	this->UpdateSeedListView();
+}
+
+void ModuleWidget::slotDeleteCurrentSeed()
+{
+	int curIndex = this->ui->listWidgetSeedList->currentRow();
+	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
+		return;
+
+	SeedIJKList.erase(SeedIJKList.begin() + curIndex);
+	SeedCoordinatesList.erase(SeedCoordinatesList.begin() + curIndex);
+
+	this->slotUpdateSeedListView();
+	for (int i = 0; i < 3;i++)
+	{
+		this->m_mainWnd->m_core->Get2DInteractorStyle(i)->GetSmartContour()->ReloadSeedFromList();
+	}
+
+	this->ui->listWidgetSeedList->setCurrentRow({ curIndex > SeedIJKList.size() - 1 ? SeedIJKList.size() - 1 : curIndex });
+}
+
+void ModuleWidget::slotUpdateCoordinateLabel()
+{
+	/// Get current selected seed
+	int curIndex = this->ui->listWidgetSeedList->currentRow();
+	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
+		return;
+	double* currentSeedIJK = SeedCoordinatesList[curIndex];
+
+	char label[60];
+	sprintf_s(label, "(%.3f, %.3f, %.3f)", currentSeedIJK[0], currentSeedIJK[1], currentSeedIJK[2]);
+
+	/// change label text
+	this->ui->labelSeedCoordinate->setText(QString(label));
 }
 

@@ -21,10 +21,11 @@ Copyright (C) 2016
 
 #include <vtkHandleWidget.h>
 
+#include "MainWindow.h"
+#include "ModuleWidget.h"
+
 using namespace std;
 vtkStandardNewMacro(InteractorStyleSmartContour);
-
-list<int*> InteractorStyleSmartContour::m_seeds;
 
 void InteractorStyleSmartContour::SetSmartContourEnable(bool flag)
 {
@@ -35,7 +36,6 @@ void InteractorStyleSmartContour::SetSmartContourEnable(bool flag)
 		m_seedWidget->EnabledOn();
 		m_seedWidget->On();
 		UpdateSeedWidgetBefore();
-		m_seedWidget->CompleteInteraction();
 	}
 	else {
 		m_seedWidget->EnabledOff();
@@ -56,6 +56,11 @@ void InteractorStyleSmartContour::SetCurrentFocalPointWithImageCoordinate(int i,
 {
 	Superclass::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 	UpdateSeedWidgetBefore();
+}
+
+void InteractorStyleSmartContour::ReloadSeedFromList()
+{
+	this->UpdateSeedWidgetBefore();
 }
 
 InteractorStyleSmartContour::InteractorStyleSmartContour()
@@ -101,6 +106,11 @@ void InteractorStyleSmartContour::OnLeftButtonDown()
 void InteractorStyleSmartContour::OnLeftButtonUp()
 {
 	AbstractInteractorStyleImage::OnLeftButtonUp();
+	
+	if (m_renderingFlag) {
+		m_renderingFlag = false;
+		UpdateSeedWidgetAfter();
+	}
 }
 
 void InteractorStyleSmartContour::OnRightButtonDown()
@@ -114,31 +124,6 @@ void InteractorStyleSmartContour::OnRightButtonDown()
 	m_imageViewer->Render();
 }
 
-void InteractorStyleSmartContour::OnChar()
-{
-	char key = this->Interactor->GetKeyCode();
-	cout << __func__ << ' '<< key << endl;
-	AbstractInteractorStyleImage::OnChar();
-	switch (key)
-	{
-	case 'A':
-		m_seedWidget->RestartInteraction();
-		break;
-	case 'P':
-		for (int i = 0; i < m_seedRep->GetNumberOfSeeds(); ++i) {
-			double pos[3];
-			m_seedRep->GetSeedWorldPosition(i, pos);
-			cout << pos[0] << ' ' << pos[1] << ' ' << pos[2] << endl;
-		}
-		break;
-	case'D':
-		ClearAllSeedWidget();
-		break;
-	default:
-		AbstractInteractorStyleImage::OnChar();
-		break;
-	}
-}
 
 void InteractorStyleSmartContour::OnKeyPress()
 {
@@ -152,13 +137,9 @@ void InteractorStyleSmartContour::OnKeyPress()
 	}
 }
 
+
 void InteractorStyleSmartContour::OnLeave()
 {
-	cout << __FUNCTION__ << endl;
-	if (m_renderingFlag) {
-		m_renderingFlag = false;
-		UpdateSeedWidgetAfter();
-	}
 	AbstractInteractorStyleImage::OnLeave();
 }
 
@@ -183,8 +164,8 @@ void InteractorStyleSmartContour::CalculateIndex()
 void InteractorStyleSmartContour::UpdateSeedWidgetBefore()
 {
 	ClearAllSeedWidget();
-	for (list<int*>::const_iterator cit = m_seeds.cbegin();
-		cit != m_seeds.cend(); ++cit) {
+	for (vector<int*>::const_iterator cit = ModuleWidget::SeedIJKList.cbegin();
+	cit != ModuleWidget::SeedIJKList.cend(); ++cit) {
 		int* imagePos = (*cit);
 		double worldPos[3];
 		for (int pos = 0; pos < 3; ++pos) {
@@ -203,18 +184,23 @@ void InteractorStyleSmartContour::UpdateSeedWidgetBefore()
 void InteractorStyleSmartContour::UpdateSeedWidgetAfter()
 {
 	for (int i = m_seedRep->GetNumberOfSeeds() - 1; i >= 0; --i) {
-		double worldPos[3];
+		double* worldPos = new double[3]; // #MemLeakHere
 		m_seedWidget->GetSeedRepresentation()->GetSeedWorldPosition(i, worldPos);
-		int* imagePos = new int[3];
+		int* imagePos = new int[3]; // #MemLeakHere
 		for (int pos = 0; pos < 3; ++pos) {
 			imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos];
 		}
-		if (find_if(m_seeds.cbegin(), m_seeds.cend(), [&imagePos](int* i) -> bool {
-			return (i[0] == imagePos[0] && i[1] == imagePos[1] && i[2] == imagePos[2]);
-		}) == m_seeds.cend()) {
-			m_seeds.push_back(imagePos);
+
+		// Check if seeds already exist
+		if (find_if(ModuleWidget::SeedIJKList.begin(), ModuleWidget::SeedIJKList.end(), [&imagePos](int* index) -> bool {
+			return (index[0] == imagePos[0] && index[1] == imagePos[1] && index[2] == imagePos[2]);
+		}) == ModuleWidget::SeedIJKList.end()) {
+			ModuleWidget::SeedIJKList.push_back(imagePos);
+			ModuleWidget::SeedCoordinatesList.push_back(worldPos);
 		}
 	}
+
+	MainWindow::GetMainWindow()->GetModuleWidget()->UpdateSeedListView();
 }
 
 void InteractorStyleSmartContour::UpdateFocalSeed()
@@ -261,3 +247,35 @@ void InteractorStyleSmartContour::ClearAllSeedWidget()
 	//m_seedActors.clear();
 }
 
+void InteractorStyleSmartContour::OnChar()
+{
+	char key = this->Interactor->GetKeyCode();
+	cout << __func__ << ' ' << key << endl;
+	AbstractInteractorStyleImage::OnChar();
+	switch (key)
+	{
+	case 'P':
+		for (int i = 0; i < m_seedRep->GetNumberOfSeeds(); ++i) {
+			double pos[3];
+			m_seedRep->GetSeedWorldPosition(i, pos);
+			cout << pos[0] << ' ' << pos[1] << ' ' << pos[2] << endl;
+		}
+		break;
+	case'D':
+		ClearAllSeedWidget();
+		break;
+	default:
+		AbstractInteractorStyleImage::OnChar();
+		break;
+	}
+}
+
+void MySeedWidget::DeleteAction(vtkAbstractWidget *w)
+{
+	return;
+}
+
+void MySeedWidget::MoveAction(vtkAbstractWidget *w)
+{
+	w->InvokeEvent(vtkCommand::LeftButtonPressEvent);
+}
