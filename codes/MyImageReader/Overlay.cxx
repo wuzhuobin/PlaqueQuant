@@ -291,6 +291,63 @@ void Overlay::SetPixels(vtkPoints* points, int label)
 	emit signalOverlayUpdated();
 }
 
+void Overlay::ReplacePixels(int* extent, vtkImageData* image)
+{
+	int inImExtent[3];
+	image->GetExtent(inImExtent);
+
+	if (!std::equal(extent, extent + 3, inImExtent)) {
+		// if the extent is different something is wrong
+		return;
+	}
+
+	for (int orientation = 0; orientation < 3; ++orientation) {
+		// find correct orientation
+		for (int x = extent[0]; x <= extent[1]; ++x) {
+			for (int y = extent[2]; y <= extent[3]; ++y) {
+				for (int z = extent[4]; z <= extent[5]; ++z) {
+					int scalerLength = image->GetScalarSize();
+					int pos[3] = { x,y,z };
+					double pixelval = 0;
+
+					if (image->GetScalarType() == VTK_FLOAT)
+					{
+						double val = image->GetScalarComponentAsDouble(pos[0], pos[1], pos[2], 0);
+						SetPixel(pos, val);
+					}
+					else {
+						unsigned char* val = static_cast<unsigned char*>(image->GetScalarPointer(pos));
+						if (val == nullptr)
+							continue;
+
+
+						if (std::max_element(val, val + scalerLength) > 0) {
+							for (int i = 0; i < m_lookupTable->GetNumberOfColors(); ++i) {
+								double rgba[4];
+								uchar rgbaUCHAR[4];
+								m_lookupTable->GetIndexedColor(i, rgba);
+								m_lookupTable->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
+
+								if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] &&
+									val[2] == rgbaUCHAR[2]) {
+									pixelval = i;
+									break;
+								}
+
+							}
+
+						}
+						SetPixel(pos, pixelval);
+					}
+				}
+			}
+		}
+			break;
+	}
+	m_vtkOverlay->Modified();
+	emit signalOverlayUpdated();
+}
+
 void Overlay::Measure3D()
 {
 	m_measurementFor3D.SetInputData(m_vtkOverlay);

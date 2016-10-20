@@ -95,6 +95,8 @@ public:
 	 * replace all the pixels specified by the @param points with the @param label
 	 */
 	void SetPixels(vtkPoints* points, int label);
+	void ReplacePixels(int* extent, vtkImageData* image);
+
 
 
 	vtkImageData* GetOutput();

@@ -19,7 +19,7 @@ Core::Core(QWidget* parent)
 	m_lumenExtractionFilter = new LumenExtraction();
 
 	// default parameters for lumen extractions
-	this->m_lumenExtractionFilter->SetNumberOfIterations(50);
+	this->m_lumenExtractionFilter->SetNumberOfIterations(30);
 
 	// enable registration
 	m_ioManager->enableRegistration(true);
@@ -657,6 +657,15 @@ double* Core::ConvertExtentToBounds(int* extent)
 	return bounds;
 }
 
+void Core::slotSetExtractLumenSeedList(std::vector<int *> seedList)
+{
+	this->m_lumenExtractionFilter->ClearAllSeeds();
+	for each (int* seedIndex in seedList)
+	{
+		this->m_lumenExtractionFilter->AddSeed(seedIndex);
+	}
+}
+
 void Core::slotValidatePatientInformation()
 {
 	if (m_imageManager->getNumberOfImages() == 1) {
@@ -797,22 +806,50 @@ void Core::slotSetLineInterpolatorToPolygon(bool flag)
 
 void Core::slotExtractLumen()
 {
-
+	try
+	{
+		this->m_lumenExtractionFilter->Update();
+		vtkSmartPointer<vtkImageData> lumenImage =
+			vtkSmartPointer<vtkImageData>::New();
+		this->m_lumenExtractionFilter->GetLumenVtkImage(lumenImage);
+		this->m_imageManager->getOverlay()->ReplacePixels(lumenImage->GetExtent(), lumenImage);
+	}
+	catch (...) {
+		this->DisplayErrorMessage("Unknown Error!");
+	}
 }
 
-void Core::slotSetExtractLumenDilationValue(double)
+void Core::slotSetExtractLumenInputImage(vtkImageData* im)
 {
-
+	this->m_lumenExtractionFilter->SetInputData(im);
 }
 
-void Core::slotSetExtractLumenInitialNeighborhoodValue(double)
+void Core::slotSetExtractLumenDilationValue(double val)
 {
-
+	this->m_lumenExtractionFilter->SetDilationValue(val);
 }
 
-void Core::slotSetExtractLumenMultiplier(double)
+void Core::slotSetExtractLumenInitialNeighborhoodRadius(double val)
 {
+	this->m_lumenExtractionFilter->SetInitialNeighborhoodRadius(val);
+}
 
+void Core::slotSetExtractLumenMultiplier(double val)
+{
+	this->m_lumenExtractionFilter->SetMultiplier(val);
+}
+
+void Core::slotExtractLumenDilateLabel(vtkImageData*im)
+{
+	this->m_lumenExtractionFilter->LabelDilation(im);
+	vtkSmartPointer<vtkImageData> vesselWallImage =
+		vtkSmartPointer<vtkImageData>::New();
+
+	this->m_lumenExtractionFilter->GetDilatedVtkImage(vesselWallImage);
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->GetSmartContour2()->SetLumenImage(im);
+		m_style[i]->GetSmartContour2()->SetVesselWallImage(vesselWallImage);
+	}
 }
 
 void Core::slotRulerMode()

@@ -29,14 +29,14 @@ class InteractorStyleSmartContour2 : public AbstractInteractorStyleImage
 {
 public:
 	enum CONTOUR_TYPE {
-		LUMEN = 0,
-		VESSEL_WALL = 1
+		VESSEL_WALL = 0,
+		LUMEN = 1
 	};
 	vtkTypeMacro(InteractorStyleSmartContour2, AbstractInteractorStyleImage);
 	static InteractorStyleSmartContour2* New();
 
-	void SetLumenImage(vtkImageData* lumen);
-	void SetVesselWallImage(vtkImageData* vesslWall);
+	void SetVesselWallImage(vtkSmartPointer<vtkImageData> vesslWall);
+	void SetLumenImage(vtkSmartPointer<vtkImageData> lumen);
 
 	void SetSmartContour2Enable(bool b);
 	void SetVesselWallLabel(int vesselWallLabel);
@@ -69,7 +69,7 @@ private:
 
 	bool m_ContourIsOnFlag = false;
 
-	int vesselWallLabel = 0;
+	int vesselWallLabel = 1;
 	int lumenWallLabel = 0;
 
 	static void ResequenceLumenWallPolyData(vtkPolyData* lumenWallPolyData);
@@ -77,12 +77,13 @@ private:
 
 	/**
 	 * When refering to using index to represnet the image
-	 * Always first lumen than vessel wall
+	 * Always first vessel wall then lumen
 	 */
-	std::list<vtkSmartPointer<vtkContourWidget>> m_lumenWallContourWidgets;
 	std::list<vtkSmartPointer<vtkContourWidget>> m_vesselWallContourWidgets;
+	std::list<vtkSmartPointer<vtkContourWidget>> m_lumenWallContourWidgets;
 
-	vtkImageData* m_lumenImage = nullptr;
-	vtkImageData* m_vesselWallImage = nullptr;
+
+	vtkSmartPointer<vtkImageData> m_vesselWallImage = nullptr;
+	vtkSmartPointer<vtkImageData> m_lumenImage = nullptr;
 
 };

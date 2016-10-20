@@ -22,17 +22,17 @@ int main()
 
 	vtkSmartPointer<vtkImageData> image = reader->GetOutput();
 
-	double seed1[3];
+	int seed1[3];
 	seed1[0] = 33;
 	seed1[1] = 29;
 	seed1[2] = 5;
 
-	double seed2[3];
+	int seed2[3];
 	seed2[0] = 41;
 	seed2[1] = 19;
 	seed2[2] = 47;
 
-	double seed3[3];
+	int seed3[3];
 	seed3[0] = 27;
 	seed3[1] = 59;
 	seed3[2] = 30;

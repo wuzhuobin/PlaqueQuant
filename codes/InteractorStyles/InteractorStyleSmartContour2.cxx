@@ -87,12 +87,12 @@ void InteractorStyleSmartContour2::OnKeyPress()
 	AbstractInteractorStyleImage::OnKeyPress();
 }
 
-void InteractorStyleSmartContour2::SetLumenImage(vtkImageData * lumen)
+void InteractorStyleSmartContour2::SetLumenImage(vtkSmartPointer<vtkImageData> lumen)
 {
 	this->m_lumenImage = lumen;
 }
 
-void InteractorStyleSmartContour2::SetVesselWallImage(vtkImageData * vesslWall)
+void InteractorStyleSmartContour2::SetVesselWallImage(vtkSmartPointer<vtkImageData> vesslWall)
 {
 	this->m_vesselWallImage = vesslWall;
 }
@@ -104,20 +104,20 @@ void InteractorStyleSmartContour2::SetSmartContour2Enable(bool b)
 		GenerateContourWidget();
 	}
 	else {
-		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit1
-			= m_lumenWallContourWidgets.cbegin(); cit1 != m_lumenWallContourWidgets.cend();
-			++cit1) {
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+			= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
+			++cit) {
 
-			(*cit1)->EnabledOff();
+			(*cit)->EnabledOff();
+		}
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+			= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
+			++cit) {
+
+			(*cit)->EnabledOff();
 
 		}
 
-		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit2
-			= m_vesselWallContourWidgets.cbegin(); cit2 != m_vesselWallContourWidgets.cend();
-			++cit2) {
-
-			(*cit2)->EnabledOff();
-		}
 	}
 	m_imageViewer->Render();
 }
@@ -139,11 +139,11 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 	}
 	ClearAllContour();
 	//m_lumenImage = m_imageViewer->GetInputLayer();
-	m_vesselWallImage = m_imageViewer->GetInputLayer();
+	//m_vesselWallImage = m_imageViewer->GetInputLayer();
 
-	vtkImageData* images[2] = { m_lumenImage, m_vesselWallImage };
+	vtkImageData* images[2] = { m_vesselWallImage, m_lumenImage };
 	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
-	{ &m_lumenWallContourWidgets, &m_vesselWallContourWidgets };
+	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
 
 	for (int i = 0; i < 2; ++i)	{
 		if (images[i] == nullptr) {
@@ -196,6 +196,7 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 			newWidget->GetContourRepresentation()->
 				SetRenderer(m_imageViewer->GetAnnotationRenderer());
 			newWidget->Initialize(clearPolyData->GetOutput());
+			newWidget->CloseLoop();
 			newWidget->SetInteractor(this->Interactor);
 			newWidget->EnabledOn();
 			lists[i]->push_back(newWidget);
@@ -207,23 +208,22 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 
 void InteractorStyleSmartContour2::ClearAllContour()
 {
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit1
-		= m_lumenWallContourWidgets.cbegin(); cit1 != m_lumenWallContourWidgets.cend();
-		++cit1) {
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
+		++cit) {
 
-		(*cit1)->EnabledOff();
+		(*cit)->EnabledOff();
+	}
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
+		++cit) {
+
+		(*cit)->EnabledOff();
 
 	}
 
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit2
-		= m_vesselWallContourWidgets.cbegin(); cit2 != m_vesselWallContourWidgets.cend();
-		++cit2) {
-
-		(*cit2)->EnabledOff();
-	}
-
-	m_lumenWallContourWidgets.clear();
 	m_vesselWallContourWidgets.clear();
+	m_lumenWallContourWidgets.clear();
 	m_imageViewer->Render();
 }
 
@@ -428,8 +428,9 @@ void InteractorStyleSmartContour2::SetCurrentFocalPointWithImageCoordinate(int i
 void InteractorStyleSmartContour2::FillPolygon()
 {
 	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
-	{ &m_lumenWallContourWidgets, &m_vesselWallContourWidgets };
-	int label[2] = { lumenWallLabel , vesselWallLabel };
+	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
+
+	int label[2] = { vesselWallLabel , lumenWallLabel };
 	for (int i = 0; i < 2; ++i) {
 		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit = lists[i]->cbegin();
 			cit != lists[i]->cend(); ++cit) {
@@ -537,11 +538,11 @@ vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetF
 	contourRepresentation->AlwaysOnTopOn();
 	switch (type)
 	{
-	case LUMEN:
-		contourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
-		break;
 	case VESSEL_WALL:
 		contourRepresentation->GetLinesProperty()->SetColor(0, 0, 255);
+		break;
+	case LUMEN:
+		contourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
 		break;
 	}
 
@@ -549,15 +550,6 @@ vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetF
 		vtkSmartPointer<vtkContourWidget>::New();
 	newWidget->SetRepresentation(contourRepresentation);
 	newWidget->ContinuousDrawOn();
-	//MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
-	//if (viewer != NULL) {
-	//	cout << "viewer" << endl;
-	//	newWidget->GetContourRepresentation()->SetRenderer(viewer->GetAnnotationRenderer());
-	//}
-	//else {
-	//	newWidget->GetContourRepresentation()->SetRenderer(m_imageViewer->GetRenderer());
-	//}
-
 	contourRepresentation->SetLineInterpolator(
 		vtkSmartPointer<vtkBezierContourLineInterpolator>::New());
 	return newWidget;

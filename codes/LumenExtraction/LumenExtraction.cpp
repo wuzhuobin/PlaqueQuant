@@ -15,7 +15,7 @@ LumenExtraction::LumenExtraction()
 	m_dilatedVtkImage = vtkImageData::New();
 	m_initialNeighborhoodRadius = 3;
 	m_mulitplier = 2.5; //cover 99% of confidence interval
-	m_iterations = 50;
+	m_iterations = 25;
 }
 
 LumenExtraction::~LumenExtraction()
@@ -24,6 +24,11 @@ LumenExtraction::~LumenExtraction()
 	m_dilatedSurface->Delete();
 	m_dilatedVtkImage->Delete();
 	m_itkLumenImage->Delete();
+}
+
+void LumenExtraction::ClearAllSeeds()
+{
+	this->m_seedList.clear();
 }
 
 void LumenExtraction::SetInputData(vtkImageData * image)
@@ -36,9 +41,9 @@ void LumenExtraction::GetInputItkImage(ImageType::Pointer itkImage)
 	itkImage->Graft(m_inputItkImage);
 }
 
-void LumenExtraction::AddSeed(double * seed)
+void LumenExtraction::AddSeed(int* seed)
 {
-	m_seedList.append(seed);
+	m_seedList.push_back(seed);
 }
 
 void LumenExtraction::SetInitialNeighborhoodRadius(double radius)
@@ -73,11 +78,15 @@ void LumenExtraction::SetDilationValue(double dilationVal)
 
 void LumenExtraction::GetDilatedItkImage(ImageType::Pointer dilatedImage)
 {
+	this->LabelDilation();
+
 	dilatedImage->Graft(m_dilatedItkImage);
 }
 
 void LumenExtraction::GetDilatedVtkImage(vtkImageData * dilatedImage)
 {
+	this->LabelDilation();
+
 	dilatedImage->DeepCopy(m_dilatedVtkImage);
 }
 
@@ -105,7 +114,7 @@ void LumenExtraction::Update()
 	confidenceConnectedFilter->SetInput(m_inputItkImage);
 
 	// Set seed
-	for (int i = 0; i < m_seedList.length(); i++)
+	for (int i = 0; i < m_seedList.size(); i++)
 	{
 		itk::Index<3> index;
 		index.SetElement(0,m_seedList.at(i)[0]);
@@ -115,12 +124,12 @@ void LumenExtraction::Update()
 		confidenceConnectedFilter->AddSeed(index);
 	}
 
-	if (m_seedList.length() > 0)
+	if (m_seedList.size() > 0)
 	{
 		confidenceConnectedFilter->Update();
 	}
 	else
-		return;
+		throw std::exception("There are no seeds in list!", ERROR_NO_SEEDS_IN_LIST);
 
 	m_itkLumenImage->Graft(confidenceConnectedFilter->GetOutput());
 
@@ -140,7 +149,6 @@ void LumenExtraction::Update()
 
 	//	m_itkLumenImage->SetPixel(index, 4);
 	//}
-
 	this->LabelDilation();
 }
 
@@ -154,6 +162,35 @@ void LumenExtraction::LabelDilation()
 	typedef itk::BinaryDilateImageFilter <ImageType, ImageType, StructuringElementType> BinaryDilateImageFilterType;
 	BinaryDilateImageFilterType::Pointer dilateFilter = BinaryDilateImageFilterType::New();
 	dilateFilter->SetInput(m_itkLumenImage);
+	dilateFilter->SetKernel(structuringElement);
+	dilateFilter->SetDilateValue(10);
+	dilateFilter->Update();
+
+	m_dilatedItkImage->Graft(dilateFilter->GetOutput());
+
+	// convert dilated itk image to vtk image
+	ConnectorType::Pointer connector = ConnectorType::New();
+	connector->SetInput(m_dilatedItkImage);
+	connector->Update();
+	m_dilatedVtkImage->DeepCopy(connector->GetOutput());
+}
+
+void LumenExtraction::LabelDilation(vtkImageData* input)
+{
+
+	VTKImageToImageType::Pointer vtkImageToImageFilter = VTKImageToImageType::New();
+	vtkImageToImageFilter->SetInput(input);
+	vtkImageToImageFilter->Update();
+
+
+	typedef itk::BinaryBallStructuringElement<ImageType::PixelType, 3>                  StructuringElementType;
+	StructuringElementType structuringElement;
+	structuringElement.SetRadius(m_dilationVal);
+	structuringElement.CreateStructuringElement();
+
+	typedef itk::BinaryDilateImageFilter <ImageType, ImageType, StructuringElementType> BinaryDilateImageFilterType;
+	BinaryDilateImageFilterType::Pointer dilateFilter = BinaryDilateImageFilterType::New();
+	dilateFilter->SetInput(vtkImageToImageFilter->GetOutput());
 	dilateFilter->SetKernel(structuringElement);
 	dilateFilter->SetDilateValue(1);
 	dilateFilter->Update();

@@ -184,7 +184,7 @@ void InteractorStyleSmartContour::UpdateSeedWidgetAfter()
 		m_seedWidget->GetSeedRepresentation()->GetSeedWorldPosition(i, worldPos);
 		int* imagePos = new int[3]; // #MemLeakHere
 		for (int pos = 0; pos < 3; ++pos) {
-			imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos];
+			imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos] + 0.5;
 		}
 
 		// Check if seeds already exist
