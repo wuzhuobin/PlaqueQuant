@@ -22,7 +22,6 @@
 #include <itkIndex.h>
 
 #include <itkImageFileWriter.h>
-#include <QList>
 #include "Define.h"
 
 using namespace std;
@@ -38,9 +37,10 @@ public:
 	LumenExtraction();
 	~LumenExtraction();
 
+	void ClearAllSeeds();
 	void SetInputData(vtkImageData* image);
 	void SetDilationValue(double dilationVal);
-	void AddSeed(double* seed);
+	void AddSeed(int* seed);
 	void SetInitialNeighborhoodRadius(double radius);
 	void SetMultiplier(double multiplier);
 	void SetNumberOfIterations(double itr);
@@ -50,6 +50,11 @@ public:
 	void GetDilatedItkImage(ImageType::Pointer dilatedImage);
 	void GetDilatedVtkImage(vtkImageData* dilatedImage);
 	void Update();
+	void LabelDilation(vtkImageData*);
+
+	enum ERROR_CODE {
+		ERROR_NO_SEEDS_IN_LIST = 0
+	};
 
 private:
 	vtkImageData* m_input;
@@ -62,7 +67,7 @@ private:
 	ImageType::Pointer m_dilatedItkImage;
 	vtkImageData* m_dilatedVtkImage;
 	vtkImageData* m_vtkLumenImage;
-	QList<double*> m_seedList;
+	std::vector<int*> m_seedList;
 	double m_initialNeighborhoodRadius;
 	double m_mulitplier;
 	double m_iterations;

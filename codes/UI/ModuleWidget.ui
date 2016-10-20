@@ -559,6 +559,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="labelSeedCoordinate">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -576,13 +583,6 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_33">
           <item>
-           <widget class="QLabel" name="labelSeedCoordinate">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -597,9 +597,15 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushBtnDeleteSeed">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
-              <width>100</width>
+              <width>150</width>
               <height>16777215</height>
              </size>
             </property>
@@ -691,14 +697,17 @@
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
            <widget class="QSlider" name="sliderInitNeighborhoodRadius">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
-             <number>50</number>
+             <number>10</number>
             </property>
             <property name="value">
-             <number>3</number>
+             <number>1</number>
             </property>
             <property name="sliderPosition">
-             <number>3</number>
+             <number>1</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -706,7 +715,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxNeighborRadius">
+           <widget class="QSpinBox" name="spinBoxNeighborRadius">
             <property name="minimumSize">
              <size>
               <width>50</width>
@@ -719,14 +728,11 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
-             <double>5.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-            <property name="value">
-             <double>3.000000000000000</double>
+             <number>10</number>
             </property>
            </widget>
           </item>
@@ -757,11 +763,17 @@
          <layout class="QHBoxLayout" name="horizontalLayout_16">
           <item>
            <widget class="QSlider" name="sliderVesselWallThickness">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
-             <number>100</number>
+             <number>5</number>
+            </property>
+            <property name="value">
+             <number>4</number>
             </property>
             <property name="sliderPosition">
-             <number>40</number>
+             <number>4</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -769,7 +781,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxVesselWallThickness">
+           <widget class="QSpinBox" name="spinBoxVesselWallThickness">
             <property name="minimumSize">
              <size>
               <width>50</width>
@@ -782,14 +794,14 @@
               <height>16777215</height>
              </size>
             </property>
-            <property name="maximum">
-             <double>10.000000000000000</double>
+            <property name="minimum">
+             <number>1</number>
             </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
+            <property name="maximum">
+             <number>5</number>
             </property>
             <property name="value">
-             <double>4.000000000000000</double>
+             <number>4</number>
             </property>
            </widget>
           </item>

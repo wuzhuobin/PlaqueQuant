@@ -43,6 +43,9 @@ public slots:
 	virtual void slotUpdateCoordinateLabel();
 	virtual void slotUpdateSeedListView();
 	virtual void slotDeleteCurrentSeed();
+	virtual void slotSetExtractLumenTargetImage(QString);
+	virtual void slotGenerateContour();
+
 
 
 signals:

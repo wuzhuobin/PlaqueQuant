@@ -1,13 +1,12 @@
 #include "ui_ModuleWidget.h"
-
 #include <QSpinBox>
 #include <QTextBrowser>
 #include <qtablewidget.h>
 
 #include "ModuleWidget.h"
 
-//#define setValueConnection(qtObj, filterName, valueName, dataType) \
-//connect(ui->##qtObj, SIGNAL(valueChanged(##dataType), ##filterName, SIGNAL(slotSet##filterName##valueName(##dataType))
+#define setValueConnection(qtObj, filterName, valueName, dataType) \
+connect(ui->##qtObj , SIGNAL(valueChanged(##dataType)), core , SLOT(slotSet##filterName##valueName(##dataType)))
 
 std::vector<int*>		ModuleWidget::SeedIJKList;
 std::vector<double*>	ModuleWidget::SeedCoordinatesList;
@@ -42,17 +41,26 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 	/// UI Linkage
 	connect(ui->sliderInitNeighborhoodRadius,		SIGNAL(valueChanged(int)), 
 		this, SLOT(slotChangeSliderNeighborhoodRadius()));
-	connect(ui->doubleSpinBoxNeighborRadius,		SIGNAL(valueChanged(double)), 
+	connect(ui->spinBoxNeighborRadius,				SIGNAL(valueChanged(int)), 
 		this, SLOT(slotChangeSpinBoxNeighborhoodRadius()));
 	connect(ui->sliderVesselWallThickness,			SIGNAL(valueChanged(int)), 
 		this, SLOT(slotChangeSliderVesselWallThickness()));
-	connect(ui->doubleSpinBoxVesselWallThickness,	SIGNAL(valueChanged(double)), 
+	connect(ui->spinBoxVesselWallThickness,			SIGNAL(valueChanged(int)), 
 		this, SLOT(slotChangeSpinBoxVesselWallThickness()));
 	
 	/// Seed operations
+	connect(ui->pushBtnExtractLumen, SIGNAL(clicked()), 
+		core, SLOT(slotExtractLumen()));
 	connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
 		this, SLOT(slotUpdateCoordinateLabel()));
-	connect(ui->pushBtnDeleteSeed,	SIGNAL(clicked()), this, SLOT(slotDeleteCurrentSeed()));
+	connect(ui->pushBtnDeleteSeed,	SIGNAL(clicked()), 
+		this, SLOT(slotDeleteCurrentSeed()));
+	connect(ui->comboBoxTargeImage, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(slotSetExtractLumenTargetImage(QString)));
+	setValueConnection(spinBoxNeighborRadius, ExtractLumen, InitialNeighborhoodRadius, double);
+	setValueConnection(doubleSpinBoxMultiplier, ExtractLumen, Multiplier, double);
+	setValueConnection(spinBoxVesselWallThickness, ExtractLumen, DilationValue, double);
+
 
 	/// Polygon segmentation
 	connect(ui->fillContourPushButton,	SIGNAL(clicked()), 
@@ -134,9 +142,12 @@ void ModuleWidget::UdateTargetImageComboBox()
 		return;
 
 	this->ui->comboBoxTargeImage->clear();
-	for (int i = 0; i < imageManager->getNumberOfImages();i++)
+	for (int i = 0; i < imageManager->getListOfModalityNames().size();i++)
 	{
-		this->ui->comboBoxTargeImage->addItem(imageManager->getListOfModalityNames()[i]);
+		if (imageManager->getListOfViewerInputImages()[i] != NULL)
+		{
+			this->ui->comboBoxTargeImage->addItem(imageManager->getListOfModalityNames()[i]);
+		}
 	}
 }
 
@@ -144,7 +155,6 @@ void ModuleWidget::UpdateSeedListView()
 {
 	if (SeedIJKList.size() == 0) {
 		this->ui->listWidgetSeedList->clear();
-		return;
 	}
 	
 	QListWidget* listWidget = this->ui->listWidgetSeedList;
@@ -156,6 +166,8 @@ void ModuleWidget::UpdateSeedListView()
 		sprintf_s(item, "Seed Index: [%i, %i, %i]", ijk[0], ijk[1], ijk[2]);
 		listWidget->addItem(QString(item));
 	}
+
+	this->m_mainWnd->m_core->slotSetExtractLumenSeedList(SeedIJKList);
 }
 
 void ModuleWidget::slotSetPage()
@@ -249,27 +261,26 @@ void ModuleWidget::slotUpdateROISpinBoxes(double* bounds)
 void ModuleWidget::slotChangeSliderNeighborhoodRadius()
 {
 	int sliderValue = this->ui->sliderInitNeighborhoodRadius->value();
-	this->ui->doubleSpinBoxNeighborRadius->setValue(sliderValue / 10.);
+	this->ui->spinBoxNeighborRadius->setValue(sliderValue);
 }
 
 void ModuleWidget::slotChangeSpinBoxNeighborhoodRadius()
 {
-	double spindboxValue = this->ui->doubleSpinBoxNeighborRadius->value();
-	this->ui->sliderInitNeighborhoodRadius->setValue(floor(spindboxValue * 10));
+	int spindboxValue = this->ui->spinBoxNeighborRadius->value();
+	this->ui->sliderInitNeighborhoodRadius->setValue(spindboxValue);
 }
 
 void ModuleWidget::slotChangeSliderVesselWallThickness()
 {
 	int sliderValue = this->ui->sliderVesselWallThickness->value();
-	this->ui->doubleSpinBoxVesselWallThickness->setValue(sliderValue / 10.);
+	this->ui->spinBoxVesselWallThickness->setValue(sliderValue);
 }
 
 void ModuleWidget::slotChangeSpinBoxVesselWallThickness()
 {
-	double spindboxValue = this->ui->doubleSpinBoxVesselWallThickness->value();
-	this->ui->sliderVesselWallThickness->setValue(floor(spindboxValue * 10));
+	int spindboxValue = this->ui->spinBoxVesselWallThickness->value();
+	this->ui->sliderVesselWallThickness->setValue(spindboxValue);
 }
-
 
 void ModuleWidget::slotUpdateSeedListView()
 {
@@ -280,7 +291,11 @@ void ModuleWidget::slotDeleteCurrentSeed()
 {
 	int curIndex = this->ui->listWidgetSeedList->currentRow();
 	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
+	{
+		SeedIJKList.clear();
+		SeedCoordinatesList.clear();
 		return;
+	}
 
 	SeedIJKList.erase(SeedIJKList.begin() + curIndex);
 	SeedCoordinatesList.erase(SeedCoordinatesList.begin() + curIndex);
@@ -294,6 +309,27 @@ void ModuleWidget::slotDeleteCurrentSeed()
 
 	int newRow = { curIndex > int(SeedIJKList.size() - 1) ? int(SeedIJKList.size() - 1) : curIndex };
 	this->ui->listWidgetSeedList->setCurrentRow(newRow);
+}
+
+void ModuleWidget::slotSetExtractLumenTargetImage(QString modName)
+{
+	MyImageManager* imManager = this->m_mainWnd->m_core->GetMyImageManager();
+	int index = imManager->GetModalityIndex(modName);
+	if (index == -1)
+	{
+		qDebug() << modName << " " << index;
+		return;
+	}
+	this->m_mainWnd->m_core->slotSetExtractLumenInputImage(imManager->getListOfViewerInputImages()[index]);
+}
+
+void ModuleWidget::slotGenerateContour()
+{
+	// Dilate the modified lumen label to get a label with 
+	this->m_mainWnd->m_core->slotExtractLumenDilateLabel(this->m_mainWnd->m_core->GetMyImageManager()->getOverlay()->GetOutput());
+
+	// Generate contour operations
+	/* Modfy here */
 }
 
 void ModuleWidget::slotUpdateCoordinateLabel()

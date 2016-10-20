@@ -67,7 +67,7 @@ public:
 	int* ConvertBoundsToExtent(double* bounds, bool clamping = true);
 	double* ConvertExtentToBounds(int* extent);
 
-public slots:
+	public slots:
 
 	// Initialization
 	virtual void slotVisualizeAll2DViewers();
@@ -113,10 +113,13 @@ public slots:
 	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
 	virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
-	// Region grow segmentation
+	// Lumen Extraction
 	virtual void slotExtractLumen();
+	virtual void slotExtractLumenDilateLabel(vtkImageData*);
+	virtual void slotSetExtractLumenSeedList(std::vector<int *>);
+	virtual void slotSetExtractLumenInputImage(vtkImageData*);
 	virtual void slotSetExtractLumenDilationValue(double);
-	virtual void slotSetExtractLumenInitialNeighborhoodValue(double);
+	virtual void slotSetExtractLumenInitialNeighborhoodRadius(double);
 	virtual void slotSetExtractLumenMultiplier(double);
 
 	// ROI 

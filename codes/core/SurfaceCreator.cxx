@@ -114,8 +114,8 @@ bool SurfaceCreator::Update()
 	m_smoother->FeatureEdgeSmoothingOff();
 	m_smoother->SetFeatureAngle(120.0);
 	m_smoother->SetPassBand(.001);
-	m_smoother->NonManifoldSmoothingOn();
-	m_smoother->NormalizeCoordinatesOn();
+	//m_smoother->NonManifoldSmoothingOn();
+	//m_smoother->NormalizeCoordinatesOn();
 	m_smoother->Update();
 
     m_output = m_smoother->GetOutput();
