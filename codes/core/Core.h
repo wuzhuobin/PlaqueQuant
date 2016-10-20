@@ -84,6 +84,8 @@ public:
 
 	// Viewers's slice position
 	virtual void slotChangeSlice(int slice);
+	virtual void slotChangeSlices(int* ijk);
+	virtual void slotChangeSlices(int, int, int);
 	virtual void slotChangeSliceX(int x);
 	virtual void slotChangeSliceY(int y);
 	virtual void slotChangeSliceZ(int z);

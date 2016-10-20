@@ -313,6 +313,22 @@ void Core::slotChangeView(int viewMode)
 	RenderAllViewer();
 }
 
+void Core::slotChangeSlices(int* ijk) 
+{
+	this->slotChangeSlices(ijk[0], ijk[1], ijk[2]);
+}
+
+
+void Core::slotChangeSlices(int x, int y, int z) 
+{
+	int ijk[3];
+	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+	if (x == ijk[0] && y == ijk[1] && z == ijk[2]) {
+		return;
+	}
+	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(x, y, z);
+}
+
 void Core::slotChangeSliceX(int x) {
 
 	int ijk[3];

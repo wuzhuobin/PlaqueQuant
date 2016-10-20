@@ -49,6 +49,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotChangeSpinBoxVesselWallThickness()));
 	
 	/// Seed operations
+	connect(ui->listWidgetSeedList,  SIGNAL(currentRowChanged(int)),
+		this, SLOT(slotSnapToSeed(int)));
 	connect(ui->pushBtnExtractLumen, SIGNAL(clicked()), 
 		core, SLOT(slotExtractLumen()));
 	connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
@@ -330,6 +332,17 @@ void ModuleWidget::slotGenerateContour()
 
 	// Generate contour operations
 	/* Modfy here */
+}
+
+void ModuleWidget::slotSnapToSeed(int rowIndex)
+{
+	int* seedIJK = ModuleWidget::SeedIJKList[rowIndex];
+
+	this->m_mainWnd->m_core->slotChangeSlices(seedIJK);
+	for (int i = 0; i < 3;i++)
+	{
+		this->m_mainWnd->m_core->Get2DInteractorStyle(i)->GetSmartContour()->ReloadSeedFromList();
+	}
 }
 
 void ModuleWidget::slotUpdateCoordinateLabel()
