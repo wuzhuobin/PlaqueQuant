@@ -49,6 +49,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotChangeSpinBoxVesselWallThickness()));
 	
 	/// Seed operations
+	connect(ui->listWidgetSeedList,  SIGNAL(currentRowChanged(int)),
+		this, SLOT(slotSnapToSeed(int)));
 	connect(ui->pushBtnExtractLumen, SIGNAL(clicked()), 
 		core, SLOT(slotExtractLumen()));
 	connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
@@ -57,9 +59,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotDeleteCurrentSeed()));
 	connect(ui->comboBoxTargeImage, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(slotSetExtractLumenTargetImage(QString)));
-	setValueConnection(spinBoxNeighborRadius, ExtractLumen, InitialNeighborhoodRadius, double);
+	setValueConnection(spinBoxNeighborRadius, ExtractLumen, InitialNeighborhoodRadius, int);
 	setValueConnection(doubleSpinBoxMultiplier, ExtractLumen, Multiplier, double);
-	setValueConnection(spinBoxVesselWallThickness, ExtractLumen, DilationValue, double);
+	setValueConnection(spinBoxVesselWallThickness, ExtractLumen, DilationValue, int);
 
 
 	/// Polygon segmentation
@@ -293,6 +295,9 @@ void ModuleWidget::slotUpdateSeedListView()
 void ModuleWidget::slotDeleteCurrentSeed()
 {
 	int curIndex = this->ui->listWidgetSeedList->currentRow();
+	if (!this->ui->listWidgetSeedList->isItemSelected(this->ui->listWidgetSeedList->item(curIndex)))
+		return;
+
 	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
 	{
 		SeedIJKList.clear();
@@ -335,11 +340,28 @@ void ModuleWidget::slotGenerateContour()
 	m_mainWnd->m_core->slotSmartContour2Mode();
 }
 
+void ModuleWidget::slotSnapToSeed(int rowIndex)
+{
+	if (SeedIJKList.size() == 0 || rowIndex == -1)
+		return;
+
+	int* seedIJK = ModuleWidget::SeedIJKList[rowIndex];
+
+	this->m_mainWnd->m_core->slotChangeSlices(seedIJK);
+	for (int i = 0; i < 3;i++)
+	{
+		this->m_mainWnd->m_core->Get2DInteractorStyle(i)->GetSmartContour()->ReloadSeedFromList();
+	}
+}
+
 void ModuleWidget::slotUpdateCoordinateLabel()
 {
+	if (SeedIJKList.size() == 0)
+		return;
+
 	/// Get current selected seed
 	int curIndex = this->ui->listWidgetSeedList->currentRow();
-	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
+	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1 || curIndex == -1)
 		return;
 	double* currentSeedIJK = SeedCoordinatesList[curIndex];
 

@@ -86,6 +86,8 @@ public:
 
 	// Viewers's slice position
 	virtual void slotChangeSlice(int slice);
+	virtual void slotChangeSlices(int* ijk);
+	virtual void slotChangeSlices(int, int, int);
 	virtual void slotChangeSliceX(int x);
 	virtual void slotChangeSliceY(int y);
 	virtual void slotChangeSliceZ(int z);
@@ -121,8 +123,8 @@ public:
 	virtual void slotExtractLumenDilateLabel(vtkImageData*);
 	virtual void slotSetExtractLumenSeedList(std::vector<int *>);
 	virtual void slotSetExtractLumenInputImage(vtkImageData*);
-	virtual void slotSetExtractLumenDilationValue(double);
-	virtual void slotSetExtractLumenInitialNeighborhoodRadius(double);
+	virtual void slotSetExtractLumenDilationValue(int val);
+	virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
 	virtual void slotSetExtractLumenMultiplier(double);
 
 	// ROI 

@@ -45,6 +45,7 @@ public slots:
 	virtual void slotDeleteCurrentSeed();
 	virtual void slotSetExtractLumenTargetImage(QString);
 	virtual void slotGenerateContour();
+	virtual void slotSnapToSeed(int rowIndex);
 
 
 
