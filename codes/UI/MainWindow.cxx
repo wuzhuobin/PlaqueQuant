@@ -192,6 +192,7 @@ void MainWindow::setActionsEnable( bool b )
 	ui->actionRemoveContour->setEnabled(b);
 	ui->actionRuler->setEnabled(b);
 	ui->actionROI->setEnabled(b);
+	ui->actionSmartContour->setEnabled(b);
 	ui->actionInformation->setEnabled(b);
 	ui->actionImage1->setEnabled(b);
 	ui->actionImage2->setEnabled(b);

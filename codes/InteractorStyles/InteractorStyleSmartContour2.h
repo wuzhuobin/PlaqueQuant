@@ -63,14 +63,21 @@ private:
 	 * @return	the product of vtkCountourWidget
 	 */
 	static vtkSmartPointer<vtkContourWidget> MyContourWidgetFactory(int type);
+	std::vector<std::vector<vtkSmartPointer<vtkPolyData>>*> m_vesselWallPolyData;
+	std::vector<std::vector<vtkSmartPointer<vtkPolyData>>*> m_lumenPolyData;
+	void ClearPolyDataList();
 
-	void GenerateContourWidget();
+
+	void GeneratePolyData();
+	void GeneratePolyData(int slice);
+
+	void GenerateContour();
 	void ClearAllContour();
 
 	bool m_ContourIsOnFlag = false;
 
 	int vesselWallLabel = 2;
-	int lumenWallLabel = 1;
+	int lumenLabel = 1;
 
 	static void ResequenceLumenWallPolyData(vtkPolyData* lumenWallPolyData);
 

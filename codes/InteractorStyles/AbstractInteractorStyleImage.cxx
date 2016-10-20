@@ -225,10 +225,10 @@ void AbstractInteractorStyleImage::OnKeyPress()
 	m_imageViewer->GetFocalPointWithImageCoordinate(coordinate);
 
 	// quite ugly here
-	if (key == "Next") {
+	if (key == "Prior") {
 		MoveSliceForward();
 	}
-	else if (key == "Prior") {
+	else if (key == "Next") {
 		MoveSliceBackward();
 	}
 	else if (key == "Up") {
