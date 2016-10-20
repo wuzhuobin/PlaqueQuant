@@ -293,10 +293,10 @@ void Overlay::SetPixels(vtkPoints* points, int label)
 
 void Overlay::ReplacePixels(int* extent, vtkImageData* image)
 {
-	int inImExtent[3];
+	int inImExtent[6];
 	image->GetExtent(inImExtent);
 
-	if (!std::equal(extent, extent + 3, inImExtent)) {
+	if (!std::equal(extent, extent + 6, inImExtent)) {
 		// if the extent is different something is wrong
 		return;
 	}

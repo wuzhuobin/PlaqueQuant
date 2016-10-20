@@ -840,12 +840,12 @@ void Core::slotSetExtractLumenInputImage(vtkImageData* im)
 	this->m_lumenExtractionFilter->SetInputData(im);
 }
 
-void Core::slotSetExtractLumenDilationValue(double val)
+void Core::slotSetExtractLumenDilationValue(int val)
 {
 	this->m_lumenExtractionFilter->SetDilationValue(val);
 }
 
-void Core::slotSetExtractLumenInitialNeighborhoodRadius(double val)
+void Core::slotSetExtractLumenInitialNeighborhoodRadius(int val)
 {
 	this->m_lumenExtractionFilter->SetInitialNeighborhoodRadius(val);
 }

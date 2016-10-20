@@ -120,8 +120,8 @@ public:
 	virtual void slotExtractLumenDilateLabel(vtkImageData*);
 	virtual void slotSetExtractLumenSeedList(std::vector<int *>);
 	virtual void slotSetExtractLumenInputImage(vtkImageData*);
-	virtual void slotSetExtractLumenDilationValue(double);
-	virtual void slotSetExtractLumenInitialNeighborhoodRadius(double);
+	virtual void slotSetExtractLumenDilationValue(int val);
+	virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
 	virtual void slotSetExtractLumenMultiplier(double);
 
 	// ROI 

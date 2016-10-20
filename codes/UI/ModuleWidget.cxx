@@ -59,9 +59,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotDeleteCurrentSeed()));
 	connect(ui->comboBoxTargeImage, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(slotSetExtractLumenTargetImage(QString)));
-	setValueConnection(spinBoxNeighborRadius, ExtractLumen, InitialNeighborhoodRadius, double);
+	setValueConnection(spinBoxNeighborRadius, ExtractLumen, InitialNeighborhoodRadius, int);
 	setValueConnection(doubleSpinBoxMultiplier, ExtractLumen, Multiplier, double);
-	setValueConnection(spinBoxVesselWallThickness, ExtractLumen, DilationValue, double);
+	setValueConnection(spinBoxVesselWallThickness, ExtractLumen, DilationValue, int);
 
 
 	/// Polygon segmentation
@@ -292,6 +292,9 @@ void ModuleWidget::slotUpdateSeedListView()
 void ModuleWidget::slotDeleteCurrentSeed()
 {
 	int curIndex = this->ui->listWidgetSeedList->currentRow();
+	if (!this->ui->listWidgetSeedList->isItemSelected(this->ui->listWidgetSeedList->item(curIndex)))
+		return;
+
 	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
 	{
 		SeedIJKList.clear();
@@ -336,6 +339,9 @@ void ModuleWidget::slotGenerateContour()
 
 void ModuleWidget::slotSnapToSeed(int rowIndex)
 {
+	if (SeedIJKList.size() == 0 || rowIndex == -1)
+		return;
+
 	int* seedIJK = ModuleWidget::SeedIJKList[rowIndex];
 
 	this->m_mainWnd->m_core->slotChangeSlices(seedIJK);
@@ -347,9 +353,12 @@ void ModuleWidget::slotSnapToSeed(int rowIndex)
 
 void ModuleWidget::slotUpdateCoordinateLabel()
 {
+	if (SeedIJKList.size() == 0)
+		return;
+
 	/// Get current selected seed
 	int curIndex = this->ui->listWidgetSeedList->currentRow();
-	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1)
+	if (curIndex < 0 || curIndex > SeedIJKList.size() - 1 || curIndex == -1)
 		return;
 	double* currentSeedIJK = SeedCoordinatesList[curIndex];
 
