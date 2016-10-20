@@ -826,10 +826,10 @@ void Core::slotExtractLumen()
 	try
 	{
 		this->m_lumenExtractionFilter->Update();
-		vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
-		this->m_lumenExtractionFilter->GetLumenVtkImage(imageData);
-
-		this->m_imageManager->getOverlay()->ReplacePixels(imageData->GetExtent(), imageData);
+		vtkSmartPointer<vtkImageData> lumenImage =
+			vtkSmartPointer<vtkImageData>::New();
+		this->m_lumenExtractionFilter->GetLumenVtkImage(lumenImage);
+		this->m_imageManager->getOverlay()->ReplacePixels(lumenImage->GetExtent(), lumenImage);
 	}
 	catch (...) {
 		this->DisplayErrorMessage("Unknown Error!");
@@ -859,6 +859,14 @@ void Core::slotSetExtractLumenMultiplier(double val)
 void Core::slotExtractLumenDilateLabel(vtkImageData*im)
 {
 	this->m_lumenExtractionFilter->LabelDilation(im);
+	vtkSmartPointer<vtkImageData> vesselWallImage =
+		vtkSmartPointer<vtkImageData>::New();
+
+	this->m_lumenExtractionFilter->GetDilatedVtkImage(vesselWallImage);
+	for (int i = 0; i < VIEWER_NUM; ++i) {
+		m_style[i]->GetSmartContour2()->SetLumenImage(im);
+		m_style[i]->GetSmartContour2()->SetVesselWallImage(vesselWallImage);
+	}
 }
 
 void Core::slotRulerMode()
@@ -911,6 +919,18 @@ void Core::slotSmartContourMode()
 	{
 		m_style[i]->SetInteractorStyleToSmartContour();
 	}
+	this->ModeChangeUpdate(SMARTCONTOUR_MODE);
+
+}
+
+void Core::slotSmartContour2Mode()
+{
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		m_style[i]->SetInteractorStyleToSmartContour2();
+	}
+	this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
+
 }
 
 void Core::slotChangeROI()

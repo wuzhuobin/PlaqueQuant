@@ -30,6 +30,7 @@ Copyright (C) 2016
 #include "InteractorStyleROI.h"
 #include "InteractorStyleRuler.h"
 #include "InteractorStyleSmartContour.h"
+#include "InteractorStyleSmartContour2.h"
 #include "StyleSwitchMacro.h"
 
 class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
@@ -46,6 +47,7 @@ public:
 	vtkGetMacro(ROI, InteractorStyleROI*);
 	vtkGetMacro(Ruler, InteractorStyleRuler*);
 	vtkGetMacro(SmartContour, InteractorStyleSmartContour*);
+	vtkGetMacro(SmartContour2, InteractorStyleSmartContour2*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
@@ -57,6 +59,7 @@ public:
 	SetInteractorStyleMacro(ROI);
 	SetInteractorStyleMacro(Ruler);
 	SetInteractorStyleMacro(SmartContour);
+	SetInteractorStyleMacro(SmartContour2);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
@@ -66,6 +69,7 @@ public:
 	CurrentStyleMacro(ROI);
 	CurrentStyleMacro(Ruler);
 	CurrentStyleMacro(SmartContour);
+	CurrentStyleMacro(SmartContour2);
 
 	//bool CurrentStyleIsNavigation();
 	//bool CurrentStyleIsWindowLevel();
@@ -101,6 +105,7 @@ private:
 	InteractorStyleROI* ROI;
 	InteractorStyleRuler* Ruler;
 	InteractorStyleSmartContour* SmartContour;
+	InteractorStyleSmartContour2* SmartContour2;
 	vtkInteractorStyle*	CurrentStyle;
 	std::list<vtkInteractorStyle*> allStyles;
 };

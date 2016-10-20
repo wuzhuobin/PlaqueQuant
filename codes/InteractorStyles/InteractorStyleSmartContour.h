@@ -76,7 +76,6 @@ protected:
 	static void CompletedAction(vtkAbstractWidget *w) {};
 };
 
-/////////////////////////////////////////////////////////////////////////////////////
 class InteractorStyleSmartContour : public AbstractInteractorStyleImage
 {
 public:
@@ -86,7 +85,6 @@ public:
 	void SetSmartContourEnable(bool flag);
 	void SetFocalSeed(int i);
 	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-
 	void ReloadSeedFromList();
 
 protected:
@@ -103,7 +101,7 @@ protected:
 
 
 private:
-
+	//static vtkSmartPointer<vtkPoints> m_seeds;
 	/**
 	* Using a static list to save all seeds and it will be shared by all other
 	* InteractorStyleSmartContour instances

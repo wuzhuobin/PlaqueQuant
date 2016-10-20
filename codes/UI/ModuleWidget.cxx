@@ -85,6 +85,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		SLOT(slotSetLineInterpolatorToPolygon(bool)));
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
 		core,SLOT(slotSetImageLayerColor(int)));
+	connect(ui->pushBtnGenerateContour, SIGNAL(clicked()), this,
+		SLOT(slotGenerateContour()));
+
 
 
 
@@ -332,9 +335,9 @@ void ModuleWidget::slotGenerateContour()
 {
 	// Dilate the modified lumen label to get a label with 
 	this->m_mainWnd->m_core->slotExtractLumenDilateLabel(this->m_mainWnd->m_core->GetMyImageManager()->getOverlay()->GetOutput());
-
 	// Generate contour operations
 	/* Modfy here */
+	m_mainWnd->m_core->slotSmartContour2Mode();
 }
 
 void ModuleWidget::slotSnapToSeed(int rowIndex)

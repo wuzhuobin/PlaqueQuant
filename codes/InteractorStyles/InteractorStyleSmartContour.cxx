@@ -100,7 +100,7 @@ void InteractorStyleSmartContour::OnLeftButtonDown()
 	//	return;
 	//}
 
-	//AbstractInteractorStyleImage::OnLeftButtonDown();
+	AbstractInteractorStyleImage::OnLeftButtonDown();
 }
 
 void InteractorStyleSmartContour::OnLeftButtonUp()
@@ -159,6 +159,7 @@ void InteractorStyleSmartContour::CalculateIndex()
 void InteractorStyleSmartContour::UpdateSeedWidgetBefore()
 {
 	ClearAllSeedWidget();
+
 	for (vector<int*>::const_iterator cit = ModuleWidget::SeedIJKList.cbegin();
 	cit != ModuleWidget::SeedIJKList.cend(); ++cit) {
 		int* imagePos = (*cit);
@@ -183,7 +184,7 @@ void InteractorStyleSmartContour::UpdateSeedWidgetAfter()
 		m_seedWidget->GetSeedRepresentation()->GetSeedWorldPosition(i, worldPos);
 		int* imagePos = new int[3]; // #MemLeakHere
 		for (int pos = 0; pos < 3; ++pos) {
-			imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos];
+			imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos] + 0.5;
 		}
 
 		// Check if seeds already exist

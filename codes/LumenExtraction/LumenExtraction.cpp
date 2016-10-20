@@ -202,7 +202,7 @@ void LumenExtraction::LabelDilation(vtkImageData* input)
 
 	typedef itk::BinaryDilateImageFilter <ImageType, ImageType, StructuringElementType> BinaryDilateImageFilterType;
 	BinaryDilateImageFilterType::Pointer dilateFilter = BinaryDilateImageFilterType::New();
-	dilateFilter->SetInput(m_itkLumenImage);
+	dilateFilter->SetInput(vtkImageToImageFilter->GetOutput());
 	dilateFilter->SetKernel(structuringElement);
 	dilateFilter->SetDilateValue(1);
 	dilateFilter->Update();
