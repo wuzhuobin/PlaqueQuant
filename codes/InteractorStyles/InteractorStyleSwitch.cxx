@@ -124,7 +124,7 @@ void InteractorStyleSwitch::InternalUpdate()
 	if (this->CurrentStyle == this->SmartContour)
 		this->SmartContour->SetSmartContourEnable(true);
 	if (this->CurrentStyle == this->SmartContour2)
-		this->SmartContour2->SetSmartContour2Enable(false);
+		this->SmartContour2->SetSmartContour2Enable(true);
 
 }
 

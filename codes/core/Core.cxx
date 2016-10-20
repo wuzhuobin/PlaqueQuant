@@ -858,13 +858,18 @@ void Core::slotSetExtractLumenMultiplier(double val)
 	this->m_lumenExtractionFilter->SetMultiplier(val);
 }
 
-void Core::slotExtractLumenDilateLabel(vtkImageData*im)
+void Core::slotExtractLumenDilateLabel(vtkImageData* im)
 {
 	this->m_lumenExtractionFilter->LabelDilation(im);
 	vtkSmartPointer<vtkImageData> vesselWallImage =
 		vtkSmartPointer<vtkImageData>::New();
 
 	this->m_lumenExtractionFilter->GetDilatedVtkImage(vesselWallImage);
+	for (int i = 0; i < 6; i++)
+	{
+		cout << im->GetExtent()[i] << ' ' << vesselWallImage->GetExtent()[i];
+	}
+	cout << endl;
 	for (int i = 0; i < VIEWER_NUM; ++i) {
 		m_style[i]->GetSmartContour2()->SetLumenImage(im);
 		m_style[i]->GetSmartContour2()->SetVesselWallImage(vesselWallImage);

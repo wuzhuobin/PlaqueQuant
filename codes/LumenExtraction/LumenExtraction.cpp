@@ -96,14 +96,12 @@ void LumenExtraction::SetDilationValue(double dilationVal)
 
 void LumenExtraction::GetDilatedItkImage(ImageType::Pointer dilatedImage)
 {
-	this->LabelDilation();
 
 	dilatedImage->Graft(m_dilatedItkImage);
 }
 
 void LumenExtraction::GetDilatedVtkImage(vtkImageData * dilatedImage)
 {
-	this->LabelDilation();
 
 	dilatedImage->DeepCopy(m_dilatedVtkImage);
 }
@@ -175,7 +173,6 @@ void LumenExtraction::Update()
 
 	//	m_itkLumenImage->SetPixel(index, 4);
 	//}
-	this->LabelDilation();
 }
 
 void LumenExtraction::LabelDilation()
