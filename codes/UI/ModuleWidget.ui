@@ -418,13 +418,6 @@
          <zorder>resetROIPushButton</zorder>
          <zorder>segmentationPushButton</zorder>
          <zorder>verticalSpacer_8</zorder>
-         <zorder>volumeSpinBox</zorder>
-         <zorder>horizontalSpacer</zorder>
-         <zorder>layoutWidget</zorder>
-         <zorder>label_5</zorder>
-         <zorder>label_6</zorder>
-         <zorder>label_7</zorder>
-         <zorder>label_18</zorder>
          <zorder>label_19</zorder>
         </widget>
        </item>
@@ -572,14 +565,26 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_33">
             <item>
-             <widget class="QPushButton" name="addSeedBtn">
-              <property name="text">
-               <string>Add Seed</string>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
-             </widget>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="deleteSeedBtn">
+             <widget class="QPushButton" name="pushBtnDeleteSeed">
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
                <string>Delete Seed</string>
               </property>
@@ -766,25 +771,12 @@
            </widget>
           </item>
          </layout>
-         <zorder>sliderInitNeighborhoodRadius</zorder>
-         <zorder>sliderVesselWallThickness</zorder>
-         <zorder>doubleSpinBoxVesselWallThickness</zorder>
-         <zorder>doubleSpinBoxNeighborRadius</zorder>
-         <zorder></zorder>
          <zorder>pushButton</zorder>
-         <zorder></zorder>
          <zorder></zorder>
          <zorder></zorder>
          <zorder>line</zorder>
          <zorder>listWidgetSeedList</zorder>
          <zorder>label_60</zorder>
-         <zorder>addSeedBtn</zorder>
-         <zorder>deleteSeedBtn</zorder>
-         <zorder>label_61</zorder>
-         <zorder>labelSeedCoordinate</zorder>
-         <zorder>horizontalSpacer_4</zorder>
-         <zorder>comboBoxTargeImage</zorder>
-         <zorder>label_62</zorder>
          <zorder>label_3</zorder>
          <zorder>label_2</zorder>
         </widget>
@@ -805,17 +797,6 @@
       </layout>
       <zorder>label_39</zorder>
       <zorder>frame_10</zorder>
-      <zorder>doubleSpinBoxMultiplier</zorder>
-      <zorder>doubleSpinBoxNeighborRadius</zorder>
-      <zorder>doubleSpinBoxDilationValue</zorder>
-      <zorder>label_2</zorder>
-      <zorder>label_3</zorder>
-      <zorder>label_4</zorder>
-      <zorder>label_2</zorder>
-      <zorder>label_2</zorder>
-      <zorder>doubleSpinBoxDilationValue</zorder>
-      <zorder>label_2</zorder>
-      <zorder>sliderVesselWallThickness</zorder>
       <zorder>groupBox_4</zorder>
       <zorder>verticalSpacer_7</zorder>
      </widget>

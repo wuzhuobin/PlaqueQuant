@@ -34,9 +34,10 @@ public:
 	//// Get Functions
 	Core*						GetCore();
 	vtkRenderWindow*			GetRenderWindow(int i);
+	ModuleWidget*				GetModuleWidget();
+
 	// to be moved
 	void UpdateStenosisValue(double val);
-
 
 	enum SLICE_ORIENTATION
 	{
@@ -45,7 +46,7 @@ public:
 		SLICE_ORIENTATION_XY = 2
 	};
 
-	public slots:
+public slots:
 	//GUI
 	virtual void resizeEvent(QResizeEvent * event);
 	virtual void dragEnterEvent(QDragEnterEvent *ev);
@@ -53,11 +54,10 @@ public:
 
 	//Action
 	virtual void slotExit();
-
 	virtual void slotOpenRecentImage();
-
 	virtual void slotAbout();
 	virtual void slotHelp();
+
 	/**
 	 * four viewers and maximum
 	 */

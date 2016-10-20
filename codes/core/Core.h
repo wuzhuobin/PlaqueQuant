@@ -25,6 +25,7 @@ public:
 
 	// Get functions
 	vtkSmartPointer<vtkPolyData> GetCenterlinePD();
+	vtkSmartPointer<InteractorStyleSwitch> Get2DInteractorStyle(int);
 	vtkLookupTable*		GetLookupTable();
 	vtkRenderWindow*	GetRenderWindow(int num);
 	IOManager*			GetIOManager();

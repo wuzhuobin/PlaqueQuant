@@ -20,6 +20,7 @@ Copyright (C) 2016
 
 #include "AbstractInteractorStyleImage.h"
 
+#include <vtkEvent.h>
 #include <vtkSeedWidget.h>
 #include <vtkSeedRepresentation.h>
 #include <vtkPointHandleRepresentation3D.h>
@@ -62,8 +63,17 @@ protected:
 		this->CallbackMapper->SetCallbackMethod(vtkCommand::MouseMoveEvent,
 			vtkWidgetEvent::Move,
 			this, MySeedWidget::MoveAction);
+		this->CallbackMapper->SetCallbackMethod(vtkCommand::KeyPressEvent,
+			vtkEvent::NoModifier, 127, 1, "Delete",
+			vtkWidgetEvent::Delete,
+			this, MySeedWidget::DeleteAction);
+		this->CallbackMapper->SetCallbackMethod(vtkCommand::RightButtonPressEvent, 
+			vtkWidgetEvent::Completed,
+			this, MySeedWidget::CompletedAction);
 	}
-	static void MoveAction(vtkAbstractWidget *w) {};
+	static void MoveAction(vtkAbstractWidget *w);
+	static void DeleteAction(vtkAbstractWidget *w);
+	static void CompletedAction(vtkAbstractWidget *w) {};
 };
 
 class InteractorStyleSmartContour : public AbstractInteractorStyleImage
@@ -74,6 +84,8 @@ public:
 
 	void SetSmartContourEnable(bool flag);
 	void SetFocalSeed(int i);
+	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+	void ReloadSeedFromList();
 
 protected:
 	InteractorStyleSmartContour();
@@ -87,13 +99,13 @@ protected:
 	virtual void OnKeyPress();
 	virtual void OnLeave();
 
+
 private:
 	//static vtkSmartPointer<vtkPoints> m_seeds;
 	/**
 	* Using a static list to save all seeds and it will be shared by all other
 	* InteractorStyleSmartContour instances
 	*/
-	static std::list<int*> m_seeds;
 	vtkSmartPointer<MySeedRepresentation> m_seedRep;
 	vtkSmartPointer<MySeedWidget> m_seedWidget;
 	/**

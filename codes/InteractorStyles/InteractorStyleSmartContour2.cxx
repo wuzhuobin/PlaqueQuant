@@ -33,7 +33,6 @@ Copyright (C) 2016
 vtkStandardNewMacro(InteractorStyleSmartContour2);
 using namespace std;
 
-#include <vtkNIFTIImageReader.h>
 InteractorStyleSmartContour2::InteractorStyleSmartContour2()
 	:AbstractInteractorStyleImage()
 {
@@ -43,22 +42,23 @@ InteractorStyleSmartContour2::InteractorStyleSmartContour2()
 
 
 
-	vtkSmartPointer<vtkNIFTIImageReader> reader =
-		vtkSmartPointer<vtkNIFTIImageReader>::New();
-	reader->SetFileName("C:\\Users\\user\\Desktop\\test_data\\test_data\\lumen.nii");
-	reader->Update();
-	m_lumenImage = vtkImageData::New();
-	m_lumenImage->DeepCopy(reader->GetOutput);
+	//vtkSmartPointer<vtkNIFTIImageReader> reader =
+	//	vtkSmartPointer<vtkNIFTIImageReader>::New();
+	//reader->SetFileName("C:\\Users\\user\\Desktop\\test_data\\test_data\\lumen.nii");
+	//reader->Update();
+	//m_lumenImage = vtkImageData::New();
+	//m_lumenImage->DeepCopy(reader->GetOutput());
 
-	reader->SetFileName("C:\\Users\\user\\Desktop\\test_data\\test_data\\lumen_dilated.nii");
-	reader->Update();
-	m_vesselWallImage = vtkImageData::New();
-	m_vesselWallImage->DeepCopy(reader->GetOutput);
+	//reader->SetFileName("C:\\Users\\user\\Desktop\\test_data\\test_data\\lumen_dilated.nii");
+	//reader->Update();
+	//m_vesselWallImage = vtkImageData::New();
+	//m_vesselWallImage->DeepCopy(reader->GetOutput());
 }
 
 InteractorStyleSmartContour2::~InteractorStyleSmartContour2()
 {
 	ClearAllContour();
+	m_imageViewer->Render();
 }
 
 void InteractorStyleSmartContour2::OnLeftButtonDown()
@@ -132,9 +132,8 @@ void InteractorStyleSmartContour2::SetVesselWallImage(vtkImageData * vesslWall)
 
 void InteractorStyleSmartContour2::SetPolygonModeEnabled(bool b)
 {
-	if (m_ContourIsOnFlag == b) {
-		return;
-	}
+	cout << m_lumenWallContourWidgets.size() << endl;
+	cout << m_vesselWallContourWidgets.size() << endl;
 	m_ContourIsOnFlag = b;
 	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit1
 		= m_lumenWallContourWidgets.cbegin(); cit1 != m_lumenWallContourWidgets.cend();
@@ -154,7 +153,7 @@ void InteractorStyleSmartContour2::SetPolygonModeEnabled(bool b)
 		}
 		(*cit2)->SetEnabled(b);
 	}
-
+	m_imageViewer->Render();
 }
 
 void InteractorStyleSmartContour2::SetVesselWallLabel(int vesselWallLabel)
@@ -172,15 +171,19 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
 		return;
 	}
+	//m_lumenImage = m_imageViewer->GetInputLayer();
+	m_vesselWallImage = m_imageViewer->GetInputLayer();
+
 	vtkImageData* images[2] = { m_lumenImage, m_vesselWallImage };
-	list<vtkSmartPointer<vtkContourWidget>> lists[2] =
-	{ m_lumenWallContourWidgets, m_vesselWallContourWidgets };
+	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
+	{ &m_lumenWallContourWidgets, &m_vesselWallContourWidgets };
 
 	for (int i = 0; i < 2; ++i)	{
 		if (images[i] == nullptr) {
 			continue;
 		}
-		int* extent = images[i]->GetExtent();
+		int extent[6];
+		images[i]->GetExtent(extent);
 		extent[GetSliceOrientation() * 2] = GetSlice();
 		extent[GetSliceOrientation() * 2 + 1] = GetSlice();
 
@@ -192,8 +195,8 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 
 		vtkSmartPointer<vtkContourFilter> contourFilter =
 			vtkSmartPointer<vtkContourFilter>::New();
-		contourFilter->GenerateValues(1, 1, 1);
 		contourFilter->SetInputConnection(extractVOI->GetOutputPort());
+		contourFilter->GenerateValues(1, 1, 1);
 		contourFilter->Update();
 
 		vtkSmartPointer<vtkPolyDataConnectivityFilter> connectivity = 
@@ -213,17 +216,30 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
 				vtkSmartPointer<vtkCleanPolyData>::New();
 			clearPolyData->SetInputConnection(_connectivity->GetOutputPort());
-			clearPolyData->SetTolerance(0.1);
+			//clearPolyData->SetTolerance(0.1);
 			clearPolyData->PointMergingOn();
+			clearPolyData->Update();
 
 			vtkSmartPointer<vtkContourWidget> newWidget = MyContourWidgetFactory(i);
-			newWidget->Initialize(clearPolyData->GetOutput());
+			MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
+			if (viewer != NULL) {
+				cout << "viewer" << endl;
+				newWidget->SetCurrentRenderer(viewer->GetAnnotationRenderer());
+				newWidget->GetContourRepresentation()->
+					SetRenderer(viewer->GetAnnotationRenderer());
+			}
+			else {
+				newWidget->SetCurrentRenderer(m_imageViewer->GetRenderer());
+				newWidget->GetContourRepresentation()->
+					SetRenderer(m_imageViewer->GetRenderer());
+			}
 
-			lists[i].push_back(newWidget);
+			newWidget->Initialize(clearPolyData->GetOutput());
+			lists[i]->push_back(newWidget);
 		}
 
 	}
-
+	SetPolygonModeEnabled(true);
 }
 
 void InteractorStyleSmartContour2::ClearAllContour()
@@ -245,6 +261,7 @@ void InteractorStyleSmartContour2::ClearAllContour()
 
 	m_lumenWallContourWidgets.clear();
 	m_vesselWallContourWidgets.clear();
+	m_imageViewer->Render();
 }
 
 vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetFactory(int type)
@@ -282,20 +299,16 @@ vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetF
 
 void InteractorStyleSmartContour2::FillPolygon()
 {
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit1
-		= m_vesselWallContourWidgets.cbegin(), cit2 = m_lumenWallContourWidgets.cbegin();
-		cit1 != m_vesselWallContourWidgets.cend() && cit2 != m_lumenWallContourWidgets.cend();
-		++cit1, ++cit2) {
-		vtkContourWidget* contourWidget[2] =
-		{ (*cit1), (*cit2) };
+	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
+	{ &m_lumenWallContourWidgets, &m_vesselWallContourWidgets };
+	int label[2] = { lumenWallLabel , vesselWallLabel };
+	for (int i = 0; i < 2; ++i) {
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit = lists[i]->cbegin();
+			cit != lists[i]->cend(); ++cit) {
+			
+			(*cit)->CloseLoop();
 
-		int label[2] = { vesselWallLabel , lumenWallLabel };
-		for (int i = 0; i < 2; ++i) {
-			if (contourWidget[i] == NULL) continue;
-
-			contourWidget[i]->CloseLoop();
-
-			vtkPolyData* polydata = contourWidget[i]->GetContourRepresentation()
+			vtkPolyData* polydata = (*cit)->GetContourRepresentation()
 				->GetContourRepresentationAsPolyData();
 
 			// Check if contour is drawn
@@ -374,8 +387,9 @@ void InteractorStyleSmartContour2::FillPolygon()
 			}
 
 			m_imageViewer->GetOverlay()->SetPixels(points, label[i]);
-
 		}
+		
+		
 
 	}
 

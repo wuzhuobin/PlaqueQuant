@@ -73,6 +73,11 @@ vtkSmartPointer<vtkPolyData> Core::GetCenterlinePD()
 	return this->m_centerlinePD;
 }
 
+vtkSmartPointer<InteractorStyleSwitch> Core::Get2DInteractorStyle(int i)
+{
+	return this->m_style[i];
+}
+
 Core::~Core() 
 {
 
