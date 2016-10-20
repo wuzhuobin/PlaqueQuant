@@ -163,7 +163,7 @@ void LumenExtraction::LabelDilation()
 	BinaryDilateImageFilterType::Pointer dilateFilter = BinaryDilateImageFilterType::New();
 	dilateFilter->SetInput(m_itkLumenImage);
 	dilateFilter->SetKernel(structuringElement);
-	dilateFilter->SetDilateValue(10);
+	dilateFilter->SetDilateValue(1);
 	dilateFilter->Update();
 
 	m_dilatedItkImage->Graft(dilateFilter->GetOutput());

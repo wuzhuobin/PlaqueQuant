@@ -69,8 +69,8 @@ private:
 
 	bool m_ContourIsOnFlag = false;
 
-	int vesselWallLabel = 1;
-	int lumenWallLabel = 0;
+	int vesselWallLabel = 2;
+	int lumenWallLabel = 1;
 
 	static void ResequenceLumenWallPolyData(vtkPolyData* lumenWallPolyData);
 
