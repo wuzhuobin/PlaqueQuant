@@ -1,5 +1,6 @@
 #include "LumenExtraction.h"
 
+#include <itkVotingBinaryIterativeHoleFillingImageFilter.h>
 #include <itkLabelMapToBinaryImageFilter.h>
 #include <itkBinaryImageToLabelMapFilter.h>
 #include <itkBinaryFillholeImageFilter.h>
@@ -114,6 +115,7 @@ void LumenExtraction::Update()
 	confidenceConnectedFilter->SetMultiplier(m_mulitplier);
 	confidenceConnectedFilter->SetNumberOfIterations(m_iterations);
 	confidenceConnectedFilter->SetReplaceValue(1);
+	confidenceConnectedFilter->SetNumberOfThreads(4);
 	confidenceConnectedFilter->SetInput(m_inputItkImage);
 
 	// Set seed
@@ -135,9 +137,10 @@ void LumenExtraction::Update()
 		throw std::exception("There are no seeds in list!", ERROR_NO_SEEDS_IN_LIST);
 
 
-	typedef itk::BinaryFillholeImageFilter<ImageType> FillHoleFilterType;
+	typedef itk::VotingBinaryIterativeHoleFillingImageFilter<ImageType> FillHoleFilterType;
 	FillHoleFilterType::Pointer fillholeFilter = FillHoleFilterType::New();
 	fillholeFilter->SetInput(confidenceConnectedFilter->GetOutput());
+	fillholeFilter->SetForegroundValue(1);
 	fillholeFilter->Update();
 
 	m_itkLumenImage->Graft(fillholeFilter->GetOutput());
