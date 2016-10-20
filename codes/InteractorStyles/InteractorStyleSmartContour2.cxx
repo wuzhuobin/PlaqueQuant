@@ -140,7 +140,7 @@ void InteractorStyleSmartContour2::ClearPolyDataList()
 		m_vesselWallPolyData.begin(); it1 != m_vesselWallPolyData.end(); ++it1) {
 
 		(*it1)->clear();
-		delete[](*it1);
+		delete (*it1);
 
 		//for (vector<vtkSmartPointer<vtkPolyData>>::iterator it2 =
 		//	(*it1)->begin(); it2 != (*it1)->end(); ++it2) {
@@ -152,7 +152,7 @@ void InteractorStyleSmartContour2::ClearPolyDataList()
 		m_lumenPolyData.begin(); it1 != m_lumenPolyData.end(); ++it1) {
 
 		(*it1)->clear();
-		delete[](*it1);
+		delete (*it1);
 
 		//for (vector<vtkSmartPointer<vtkPolyData>>::iterator it2 =
 		//	(*it1)->begin(); it2 != (*it1)->end(); ++it2) {
