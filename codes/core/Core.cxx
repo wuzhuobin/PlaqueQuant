@@ -20,6 +20,7 @@ Core::Core(QWidget* parent)
 
 	// default parameters for lumen extractions
 	this->m_lumenExtractionFilter->SetNumberOfIterations(30);
+	this->m_lumenExtractionFilter->SetDilationValue(4);
 
 	// enable registration
 	m_ioManager->enableRegistration(true);

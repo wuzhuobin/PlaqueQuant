@@ -1,5 +1,8 @@
 #include "LumenExtraction.h"
 
+#include <itkLabelMapToBinaryImageFilter.h>
+#include <itkBinaryImageToLabelMapFilter.h>
+#include <itkBinaryFillholeImageFilter.h>
 
 LumenExtraction::LumenExtraction()
 {
@@ -131,7 +134,13 @@ void LumenExtraction::Update()
 	else
 		throw std::exception("There are no seeds in list!", ERROR_NO_SEEDS_IN_LIST);
 
-	m_itkLumenImage->Graft(confidenceConnectedFilter->GetOutput());
+
+	typedef itk::BinaryFillholeImageFilter<ImageType> FillHoleFilterType;
+	FillHoleFilterType::Pointer fillholeFilter = FillHoleFilterType::New();
+	fillholeFilter->SetInput(confidenceConnectedFilter->GetOutput());
+	fillholeFilter->Update();
+
+	m_itkLumenImage->Graft(fillholeFilter->GetOutput());
 
 	// create lumen vtk image
 	ConnectorType::Pointer connector1 = ConnectorType::New();
