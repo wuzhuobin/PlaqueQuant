@@ -3,25 +3,9 @@
 
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
-#include "vtkMarchingCubes.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataConnectivityFilter.h"
 #include "vtkPoints.h"
-#include "vtkCellArray.h"
-
 #include "itkImage.h"
-#include "itkLabelObject.h"
-#include "itkLabelMap.h"
-#include "itkDefaultDynamicMeshTraits.h"
-#include "itkMesh.h"
-#include "itkTriangleCell.h"
-#include "itkTriangleMeshToBinaryImageFilter.h"
-#include <itkVTKImageToImageFilter.h>		
-#include <itkCastImageFilter.h>
-
-#include <itkIndex.h>
-
-#include <itkImageFileWriter.h>
 #include "Define.h"
 
 using namespace std;

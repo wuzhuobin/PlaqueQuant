@@ -1,9 +1,23 @@
 #include "LumenExtraction.h"
 
-#include <itkVotingBinaryIterativeHoleFillingImageFilter.h>
-#include <itkLabelMapToBinaryImageFilter.h>
-#include <itkBinaryImageToLabelMapFilter.h>
+#include "itkDefaultDynamicMeshTraits.h"
+#include "itkLabelMap.h"
+#include "itkLabelObject.h"
+#include "itkMesh.h"
+#include "itkTriangleCell.h"
+#include "itkTriangleMeshToBinaryImageFilter.h"
+#include "vtkCellArray.h"
+#include "vtkMarchingCubes.h"
+#include "vtkPolyDataConnectivityFilter.h"
 #include <itkBinaryFillholeImageFilter.h>
+#include <itkBinaryImageToLabelMapFilter.h>
+#include <itkCastImageFilter.h>
+#include <itkImageFileWriter.h>
+#include <itkIndex.h>
+#include <itkLabelMapToBinaryImageFilter.h>
+#include <itkVTKImageToImageFilter.h>		
+#include <itkVotingBinaryIterativeHoleFillingImageFilter.h>
+#include <vtkImageCast.h>
 
 LumenExtraction::LumenExtraction()
 {
@@ -189,9 +203,13 @@ void LumenExtraction::LabelDilation()
 
 void LumenExtraction::LabelDilation(vtkImageData* input)
 {
+	vtkSmartPointer<vtkImageCast> imcastFilter = vtkSmartPointer<vtkImageCast>::New();
+	imcastFilter->SetInputData(input);
+	imcastFilter->SetOutputScalarTypeToFloat();
+	imcastFilter->Update();
 
 	VTKImageToImageType::Pointer vtkImageToImageFilter = VTKImageToImageType::New();
-	vtkImageToImageFilter->SetInput(input);
+	vtkImageToImageFilter->SetInput(imcastFilter->GetOutput());
 	vtkImageToImageFilter->Update();
 
 
