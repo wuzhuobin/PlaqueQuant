@@ -75,6 +75,9 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		SLOT(slotSetLineInterpolatorToPolygon(bool)));
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
 		core,SLOT(slotSetImageLayerColor(int)));
+	connect(ui->pushBtnGenerateContour, SIGNAL(clicked()), m_mainWnd->m_core,
+		SLOT(slotSmartContour2Mode()));
+
 
 
 

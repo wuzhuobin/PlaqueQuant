@@ -1,4 +1,4 @@
-/*
+﻿/*
 Author:		Wong, Matthew Lun
 Date:		16th, June 2016
 Occupation:	Chinese University of Hong Kong,
@@ -26,6 +26,11 @@ Copyright (C) 2016
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkOrientedGlyphContourRepresentation.h>
 #include <vtkCleanPolyData.h>
+#include <vtkCenterOfMass.h>
+#include <vtkKdtree.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkLine.h>
 
 #include "InteractorStyleSmartContour2.h"
 #include "MyImageViewer.h"
@@ -36,23 +41,6 @@ using namespace std;
 InteractorStyleSmartContour2::InteractorStyleSmartContour2()
 	:AbstractInteractorStyleImage()
 {
-
-	m_timer.start();
-	m_firstClickTimeStamp = m_timer.elapsed();
-
-
-
-	//vtkSmartPointer<vtkNIFTIImageReader> reader =
-	//	vtkSmartPointer<vtkNIFTIImageReader>::New();
-	//reader->SetFileName("C:\\Users\\user\\Desktop\\test_data\\test_data\\lumen.nii");
-	//reader->Update();
-	//m_lumenImage = vtkImageData::New();
-	//m_lumenImage->DeepCopy(reader->GetOutput());
-
-	//reader->SetFileName("C:\\Users\\user\\Desktop\\test_data\\test_data\\lumen_dilated.nii");
-	//reader->Update();
-	//m_vesselWallImage = vtkImageData::New();
-	//m_vesselWallImage->DeepCopy(reader->GetOutput());
 }
 
 InteractorStyleSmartContour2::~InteractorStyleSmartContour2()
@@ -63,26 +51,18 @@ InteractorStyleSmartContour2::~InteractorStyleSmartContour2()
 
 void InteractorStyleSmartContour2::OnLeftButtonDown()
 {
-	if (this->CheckDoubleClicked() && m_ContourIsOnFlag) {
-	}
-	else if (!m_ContourIsOnFlag){
-	}
 	AbstractInteractorStyleImage::OnLeftButtonDown();
 }
 
 void InteractorStyleSmartContour2::OnRightButtonDown()
 {
-	if (m_ContourIsOnFlag ) {
-
-	}
-
 	AbstractInteractorStyleImage::OnRightButtonDown();
 }
 
 void InteractorStyleSmartContour2::OnMouseMove()
 {
 	if (!this->m_ContourIsOnFlag) {
-		this->SetPolygonModeEnabled(true);
+		this->SetSmartContour2Enable(true);
 		this->m_ContourIsOnFlag = true;
 	}
 }
@@ -97,27 +77,14 @@ void InteractorStyleSmartContour2::OnKeyPress()
 	else if (key == "A") {
 		GenerateContourWidget();
 	}
+	else if (key == "C") {
+		SetSmartContour2Enable(false);
+	}
 	else if (key == "Return" ) {
 		if (m_ContourIsOnFlag)
 			this->FillPolygon();
 	}
 	AbstractInteractorStyleImage::OnKeyPress();
-}
-
-bool InteractorStyleSmartContour2::CheckDoubleClicked()
-{
-	int t = m_timer.elapsed() - m_firstClickTimeStamp;
-
-	if (t < 200 && !m_doubleClickedFlag) {
-		m_doubleClickedFlag = true;
-		m_firstClickTimeStamp = m_timer.elapsed();
-		return true;
-	}
-	else {
-		m_doubleClickedFlag = false;
-		m_firstClickTimeStamp = m_timer.elapsed();
-		return false;
-	}
 }
 
 void InteractorStyleSmartContour2::SetLumenImage(vtkImageData * lumen)
@@ -130,28 +97,27 @@ void InteractorStyleSmartContour2::SetVesselWallImage(vtkImageData * vesslWall)
 	this->m_vesselWallImage = vesslWall;
 }
 
-void InteractorStyleSmartContour2::SetPolygonModeEnabled(bool b)
+void InteractorStyleSmartContour2::SetSmartContour2Enable(bool b)
 {
-	cout << m_lumenWallContourWidgets.size() << endl;
-	cout << m_vesselWallContourWidgets.size() << endl;
 	m_ContourIsOnFlag = b;
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit1
-		= m_lumenWallContourWidgets.cbegin(); cit1 != m_lumenWallContourWidgets.cend();
-		++cit1) {
-		if (b) {
-			(*cit1)->SetInteractor(this->Interactor);
-		}
-		(*cit1)->SetEnabled(b);
-
+	if (b) {
+		GenerateContourWidget();
 	}
+	else {
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit1
+			= m_lumenWallContourWidgets.cbegin(); cit1 != m_lumenWallContourWidgets.cend();
+			++cit1) {
 
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit2
-		= m_vesselWallContourWidgets.cbegin(); cit2 != m_vesselWallContourWidgets.cend();
-		++cit2) {
-		if (b) {
-			(*cit2)->SetInteractor(this->Interactor);
+			(*cit1)->EnabledOff();
+
 		}
-		(*cit2)->SetEnabled(b);
+
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit2
+			= m_vesselWallContourWidgets.cbegin(); cit2 != m_vesselWallContourWidgets.cend();
+			++cit2) {
+
+			(*cit2)->EnabledOff();
+		}
 	}
 	m_imageViewer->Render();
 }
@@ -171,6 +137,7 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
 		return;
 	}
+	ClearAllContour();
 	//m_lumenImage = m_imageViewer->GetInputLayer();
 	m_vesselWallImage = m_imageViewer->GetInputLayer();
 
@@ -213,33 +180,29 @@ void InteractorStyleSmartContour2::GenerateContourWidget()
 			_connectivity->AddSpecifiedRegion(j);
 			_connectivity->Update();
 
+
+			ResequenceLumenWallPolyData(_connectivity->GetOutput());
+
 			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
 				vtkSmartPointer<vtkCleanPolyData>::New();
 			clearPolyData->SetInputConnection(_connectivity->GetOutputPort());
-			//clearPolyData->SetTolerance(0.1);
+			clearPolyData->SetTolerance(0.1);
 			clearPolyData->PointMergingOn();
 			clearPolyData->Update();
 
-			vtkSmartPointer<vtkContourWidget> newWidget = MyContourWidgetFactory(i);
-			MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
-			if (viewer != NULL) {
-				cout << "viewer" << endl;
-				newWidget->SetCurrentRenderer(viewer->GetAnnotationRenderer());
-				newWidget->GetContourRepresentation()->
-					SetRenderer(viewer->GetAnnotationRenderer());
-			}
-			else {
-				newWidget->SetCurrentRenderer(m_imageViewer->GetRenderer());
-				newWidget->GetContourRepresentation()->
-					SetRenderer(m_imageViewer->GetRenderer());
-			}
 
+			vtkSmartPointer<vtkContourWidget> newWidget = MyContourWidgetFactory(i);
+			newWidget->SetCurrentRenderer(m_imageViewer->GetAnnotationRenderer());
+			newWidget->GetContourRepresentation()->
+				SetRenderer(m_imageViewer->GetAnnotationRenderer());
 			newWidget->Initialize(clearPolyData->GetOutput());
+			newWidget->SetInteractor(this->Interactor);
+			newWidget->EnabledOn();
 			lists[i]->push_back(newWidget);
 		}
 
 	}
-	SetPolygonModeEnabled(true);
+	m_imageViewer->Render();
 }
 
 void InteractorStyleSmartContour2::ClearAllContour()
@@ -264,38 +227,203 @@ void InteractorStyleSmartContour2::ClearAllContour()
 	m_imageViewer->Render();
 }
 
-vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetFactory(int type)
+void InteractorStyleSmartContour2::ResequenceLumenWallPolyData(vtkPolyData * lumenWallPolyData)
 {
-	vtkSmartPointer<vtkOrientedGlyphContourRepresentation> contourRepresentation =
-		vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New();
-	contourRepresentation->AlwaysOnTopOn();
-	switch (type)
-	{
-	case LUMEN:
-		contourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
-		break;
-	case VESSEL_WALL:
-		contourRepresentation->GetLinesProperty()->SetColor(0, 0, 255);
-		break;
-	}
 
-	vtkSmartPointer<vtkContourWidget> newWidget =
-		vtkSmartPointer<vtkContourWidget>::New();
-	newWidget->SetRepresentation(contourRepresentation);
-	newWidget->ContinuousDrawOn();
-	//MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
-	//if (viewer != NULL) {
-	//	cout << "viewer" << endl;
-	//	newWidget->GetContourRepresentation()->SetRenderer(viewer->GetAnnotationRenderer());
-	//}
-	//else {
-	//	newWidget->GetContourRepresentation()->SetRenderer(m_imageViewer->GetRenderer());
-	//}
+		//// Restructure lines only so that adjacent point has incremental vtkID
+		double referenceDirection[3] = { 1,2,3 };
 
-	contourRepresentation->SetLineInterpolator(
-		vtkSmartPointer<vtkBezierContourLineInterpolator>::New());
-	return newWidget;
+		vtkSmartPointer<vtkPolyData> tmpHolder = vtkSmartPointer<vtkPolyData>::New();
+		vtkSmartPointer<vtkPoints> tmpPts = vtkSmartPointer<vtkPoints>::New();
+		vtkSmartPointer<vtkCellArray> tmpCellArr = vtkSmartPointer<vtkCellArray>::New();
+
+		// Clean the line before reconstruction to remove duplicated points and cells, which mess with the program
+		vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+		cleaner->SetInputData(lumenWallPolyData);
+		cleaner->PointMergingOn();
+		cleaner->ConvertLinesToPointsOn();
+		cleaner->ConvertPolysToLinesOn();
+		cleaner->Update();
+		lumenWallPolyData->DeepCopy(cleaner->GetOutput());
+		lumenWallPolyData->BuildLinks(); // build link for pushing cells
+
+		int l_nextCell;
+		int l_nextPt;
+		int l_looper = 0;
+		int startID = 0;
+		int l_prevID = -1;
+		// Start from a point that has cell
+		vtkIdList* startPointFinder = vtkIdList::New();
+		lumenWallPolyData->GetCellPoints(0, startPointFinder);
+		l_looper = startPointFinder->GetId(1);
+		startID = l_looper;
+		tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
+
+
+		while (tmpPts->GetNumberOfPoints() < lumenWallPolyData->GetNumberOfPoints()) {
+			vtkIdList* neighborPtID = vtkIdList::New();
+			vtkIdList* neighborCellID = vtkIdList::New();
+			// First point deside direction
+			if (tmpPts->GetNumberOfPoints() == 1) {
+				// Get CenterOfMass
+				vtkSmartPointer<vtkCenterOfMass> comfilter = vtkSmartPointer<vtkCenterOfMass>::New();
+				comfilter->SetInputData(lumenWallPolyData);
+				comfilter->Update();
+				double* com = comfilter->GetCenter();
+
+				// Get neighbor cells
+				lumenWallPolyData->GetPointCells(l_looper, neighborCellID);
+				//cout « "Number of cell for pt " « l_looper « ": " « neighborCellID->GetNumberOfIds() « " "; //DEBUG
+				double *vectorLooper = (double*)malloc(sizeof(double) * 3);
+				double *vector1 = (double*)malloc(sizeof(double) * 3);
+				double *vector2 = (double*)malloc(sizeof(double) * 3);
+				vtkIdType neighborPtId1;
+				vtkIdType neighborPtId2;
+
+				lumenWallPolyData->GetCellPoints(neighborCellID->GetId(0), neighborPtID);
+				if (neighborPtID->GetId(0) != l_looper) {
+					neighborPtId1 = neighborPtID->GetId(0);
+				}
+				else {
+					neighborPtId1 = neighborPtID->GetId(1);
+				}
+				lumenWallPolyData->GetCellPoints(neighborCellID->GetId(1), neighborPtID);
+				if (neighborPtID->GetId(0) != l_looper) {
+					neighborPtId2 = neighborPtID->GetId(0);
+				}
+				else {
+					neighborPtId2 = neighborPtID->GetId(1);
+				}
+
+				memcpy(vectorLooper, lumenWallPolyData->GetPoint(l_looper), sizeof(double) * 3);
+				memcpy(vector1, lumenWallPolyData->GetPoint(neighborPtId1), sizeof(double) * 3);
+				memcpy(vector2, lumenWallPolyData->GetPoint(neighborPtId2), sizeof(double) * 3);
+
+				vtkMath::Subtract(vectorLooper, com, vectorLooper);
+				vtkMath::Subtract(vector1, com, vector1);
+				vtkMath::Subtract(vector2, com, vector2);
+				vtkMath::Normalize(vector1);
+				vtkMath::Normalize(vector2);
+
+				vtkMath::Cross(vector1, vectorLooper, vector1);
+				vtkMath::Cross(vector2, vectorLooper, vector2);
+
+				double d1 = vtkMath::Dot(vector1, referenceDirection);
+				double d2 = vtkMath::Dot(vector2, referenceDirection);
+
+				if (d1 >= d2) {
+					// if d1 follows direction
+					l_prevID = neighborCellID->GetId(1);
+				}
+				else if (d1 < d2) {
+					// if d2 follows direction
+					l_prevID = neighborCellID->GetId(0);
+				}
+				else if (d1*d2 > 0) {
+					// both same sign
+					std::cerr << "Both neighbor has same dot product with direction. Potential error of loop order direction" << endl;
+					l_prevID = neighborCellID->GetId(0);
+				}
+				else {
+					l_prevID = neighborCellID->GetId(0);
+				}
+
+				free(vectorLooper);
+				free(vector1);
+				free(vector2);
+			}
+
+			// Get neighbor cells
+			lumenWallPolyData->GetPointCells(l_looper, neighborCellID);
+			//cout « "Number of cell for pt " « l_looper « ": " « neighborCellID->GetNumberOfIds() « " " « endl; //DEBUG
+			// if it only has one cell
+			if (neighborCellID->GetNumberOfIds() == 1) {
+				// attemps to connect back to the loop
+				std::cerr << "Warning! Your input is not a loop, attempting to connect gap at ptID=" << l_looper << "." << endl;
+
+				// Get other point of the cell
+				vtkIdType l_prevPtID;
+				lumenWallPolyData->GetCellPoints(l_looper, neighborPtID);
+				if (neighborPtID->GetId(0) != l_looper) {
+					l_prevPtID = neighborPtID->GetId(0);
+				}
+				else {
+					l_prevPtID = neighborPtID->GetId(1);
+				}
+
+				vtkSmartPointer<vtkKdTree> l_kd = vtkSmartPointer<vtkKdTree>::New();
+				l_kd->BuildLocatorFromPoints(lumenWallPolyData);
+				l_kd->FindClosestNPoints(3, lumenWallPolyData->GetPoint(l_looper), neighborPtID);
+				// Get points of neighbor cells
+				vtkIdType l_tempLink[2];
+				l_tempLink[0] = l_looper;
+				for (int i = 0; i < 3; i++)
+				{
+					if (neighborPtID->GetId(i) != l_looper && neighborPtID->GetId(i) != l_prevPtID) {
+						l_looper = neighborPtID->GetId(i);
+						tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
+					}
+				}
+
+				l_tempLink[1] = l_looper;
+				l_prevID = lumenWallPolyData->InsertNextLinkedCell(VTK_LINE, 2, l_tempLink);
+			}
+			else {
+				if (neighborCellID->GetId(0) != l_prevID) {
+					l_nextCell = neighborCellID->GetId(0);
+					l_prevID = l_nextCell;
+				}
+				else {
+					l_nextCell = neighborCellID->GetId(1);
+					l_prevID = l_nextCell;
+				}
+				// Get points of neighbor cells
+				lumenWallPolyData->GetCellPoints(l_nextCell, neighborPtID);
+				//cout « "Number of pt for cell " « l_nextCell « ": " « neighborPtID->GetNumberOfIds() « "\n"; //DEBUG
+				if (neighborPtID->GetId(0) != l_looper) {
+					l_looper = neighborPtID->GetId(0);
+					tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
+				}
+				else
+				{
+					l_looper = neighborPtID->GetId(1);
+					tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
+				}
+			}
+
+			// Push the line into the new polydata
+			vtkSmartPointer<vtkLine> l_line = vtkSmartPointer<vtkLine>::New();
+			l_line->GetPointIds()->SetId(0, tmpPts->GetNumberOfPoints() - 2);
+			l_line->GetPointIds()->SetId(1, tmpPts->GetNumberOfPoints() - 1);
+			tmpCellArr->InsertNextCell(l_line);
+
+			neighborPtID->Delete();
+			neighborCellID->Delete();
+
+			if (l_looper == startID) {
+				// Break if reaching the end
+				break;
+			}
+		}
+		vtkSmartPointer<vtkLine> tmpline = vtkSmartPointer<vtkLine>::New();
+		tmpline->GetPointIds()->SetId(0, tmpPts->GetNumberOfPoints() - 1);
+		tmpline->GetPointIds()->SetId(1, 0);
+		tmpCellArr->InsertNextCell(tmpline);
+
+		tmpHolder->SetPoints(tmpPts);
+		tmpHolder->SetLines(tmpCellArr);
+
+		// Copy result to lumenWallPolyData
+		lumenWallPolyData->DeepCopy(tmpHolder);
+
 }
+
+void InteractorStyleSmartContour2::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	Superclass::SetCurrentFocalPointWithImageCoordinate(i, j, k);
+	GenerateContourWidget();
+}
+
 
 void InteractorStyleSmartContour2::FillPolygon()
 {
@@ -402,3 +530,35 @@ void InteractorStyleSmartContour2::FillPolygon()
 
 }
 
+vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetFactory(int type)
+{
+	vtkSmartPointer<vtkOrientedGlyphContourRepresentation> contourRepresentation =
+		vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New();
+	contourRepresentation->AlwaysOnTopOn();
+	switch (type)
+	{
+	case LUMEN:
+		contourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
+		break;
+	case VESSEL_WALL:
+		contourRepresentation->GetLinesProperty()->SetColor(0, 0, 255);
+		break;
+	}
+
+	vtkSmartPointer<vtkContourWidget> newWidget =
+		vtkSmartPointer<vtkContourWidget>::New();
+	newWidget->SetRepresentation(contourRepresentation);
+	newWidget->ContinuousDrawOn();
+	//MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
+	//if (viewer != NULL) {
+	//	cout << "viewer" << endl;
+	//	newWidget->GetContourRepresentation()->SetRenderer(viewer->GetAnnotationRenderer());
+	//}
+	//else {
+	//	newWidget->GetContourRepresentation()->SetRenderer(m_imageViewer->GetRenderer());
+	//}
+
+	contourRepresentation->SetLineInterpolator(
+		vtkSmartPointer<vtkBezierContourLineInterpolator>::New());
+	return newWidget;
+}

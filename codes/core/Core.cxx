@@ -865,6 +865,18 @@ void Core::slotSmartContourMode()
 	{
 		m_style[i]->SetInteractorStyleToSmartContour();
 	}
+	this->ModeChangeUpdate(SMARTCONTOUR_MODE);
+
+}
+
+void Core::slotSmartContour2Mode()
+{
+	for (int i = 0; i < VIEWER_NUM; i++)
+	{
+		m_style[i]->SetInteractorStyleToSmartContour2();
+	}
+	this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
+
 }
 
 void Core::slotChangeROI()

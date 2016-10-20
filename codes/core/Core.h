@@ -42,7 +42,9 @@ public:
 		WINDOW_LEVEL_MODE = 2,
 		POLYGON_CONTOUR_MODE = 3,
 		RULER_MODE = 4,
-		ROI_MODE = 5
+		ROI_MODE = 5,
+		SMARTCONTOUR_MODE = 6,
+		SMARTCONTOUR2_MODE = 7
 	};
 
 	enum VIEW_MODE
@@ -96,6 +98,7 @@ public slots:
 	virtual void slotContourMode();
 	virtual void slotROIMode();
 	virtual void slotSmartContourMode();
+	virtual void slotSmartContour2Mode();
 	virtual void slotRulerMode();
 
 	// Paint Brush 

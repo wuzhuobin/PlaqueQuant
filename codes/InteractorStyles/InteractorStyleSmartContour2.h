@@ -19,8 +19,6 @@ Copyright (C) 2016
 
 #pragma once
 
-#include <QTime>
-
 #include "AbstractInteractorStyleImage.h"
 
 #include <vtkContourWidget.h>
@@ -40,12 +38,11 @@ public:
 	void SetLumenImage(vtkImageData* lumen);
 	void SetVesselWallImage(vtkImageData* vesslWall);
 
-
-	void SetPolygonModeEnabled(bool b);
+	void SetSmartContour2Enable(bool b);
 	void SetVesselWallLabel(int vesselWallLabel);
 	void SetLumenWallLabel(int lumenWallLabel);
-	void GenerateContourWidget();
 	void FillPolygon();
+	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 protected:
 	InteractorStyleSmartContour2();
@@ -67,19 +64,15 @@ private:
 	 */
 	static vtkSmartPointer<vtkContourWidget> MyContourWidgetFactory(int type);
 
-	bool CheckDoubleClicked();
-	
-	QTime m_timer;
-	int m_firstClickTimeStamp;
-	int m_generateValue = 60;
+	void GenerateContourWidget();
+	void ClearAllContour();
 
-	bool m_doubleClickedFlag = false;
 	bool m_ContourIsOnFlag = false;
 
-	int vesselWallLabel = 1;
+	int vesselWallLabel = 0;
 	int lumenWallLabel = 0;
 
-	void ClearAllContour();
+	static void ResequenceLumenWallPolyData(vtkPolyData* lumenWallPolyData);
 
 
 	/**
