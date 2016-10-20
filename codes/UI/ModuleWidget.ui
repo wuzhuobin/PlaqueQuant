@@ -790,11 +790,22 @@
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="pushBtnGenerateContour">
-            <property name="text">
-             <string>Generate Contour</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <item>
+             <widget class="QPushButton" name="pushBtnGenerateContour">
+              <property name="text">
+               <string>Generate Contour</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushBtnDrawSegmentation">
+              <property name="text">
+               <string>Draw Segmentation</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
          <zorder>pushBtnExtractLumen</zorder>
@@ -805,6 +816,7 @@
          <zorder>label_2</zorder>
          <zorder>line_3</zorder>
          <zorder>pushBtnGenerateContour</zorder>
+         <zorder>pushBtnDrawSegmentation</zorder>
         </widget>
        </item>
        <item>
