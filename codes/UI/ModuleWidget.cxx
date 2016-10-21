@@ -49,6 +49,8 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotChangeSpinBoxVesselWallThickness()));
 	
 	/// Seed operations
+	connect(ui->pushBtnDrawSegmentation, SIGNAL(clicked()),
+		core, SLOT(slotDrawSegmentation()));
 	connect(ui->listWidgetSeedList,  SIGNAL(currentRowChanged(int)),
 		this, SLOT(slotSnapToSeed(int)));
 	connect(ui->pushBtnExtractLumen, SIGNAL(clicked()), 

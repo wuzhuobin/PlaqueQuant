@@ -333,18 +333,28 @@ void MainWindow::updateRecentActionList()
 
 void MainWindow::slotAbout()
 {
-	QMessageBox::about(	NULL, 
-						"About", 
-                       QString("It is a program of displaying multi-modality images made by Andy Li (2016)")
-					   );
+	QMessageBox msgBox;
+	msgBox.setIconPixmap(QPixmap(":/icons/PlaqueQuant_logo.png"));
+	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", this->m_version) +
+		QString("<br>This software is a analytical tool designed to diagnose the condition of plaque and blood vessels."));
+	msgBox.setWindowTitle("About");
+	msgBox.exec();
 }
 
 void MainWindow::slotHelp()
 {
-	//Info Dialog
-	m_InfoDialog.show();
-	m_InfoDialog.setModal(true);
-
+	QString msg = "";
+	msg += QString("<h3>Instructions</h3>") +
+		QString("<table>") +
+		QString("<tr><td><b>Step 1  </b></td><td>Load images.</td></tr>") +
+		QString("<tr><td><b>Step 2  </b></td><td>Segment images</td></tr>") +
+		QString("<tr><td><b>Step 3  </b></td><td>Press 'Update' function to view 3D. Adjust opacity of layer with the widget at the bottom right corner.</td></tr>") +
+		QString("<tr><td><b>Step 4  </b></td><td>Point the cursor and press 'Enter' to select stenosis reference point and blockage point. Press 'Delete' to clear selections.</td></tr>") +
+		QString("<tr><td><b>Step 5  </b></td><td>Follow the instructions on the control panel at the right-hand-side.</td></tr>") +
+		QString("</table>");
+	QMessageBox::information(NULL,
+		"Help",
+		msg);
 }
 
 void MainWindow::slotImage(int image)
@@ -463,6 +473,11 @@ vtkRenderWindow * MainWindow::GetRenderWindow(int i)
 ModuleWidget* MainWindow::GetModuleWidget()
 {
 	return this->m_moduleWidget;
+}
+
+void MainWindow::SetVersion(QString version)
+{
+	this->m_version = version;
 }
 
 void MainWindow::slotChangeBaseImageUL()

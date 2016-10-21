@@ -70,6 +70,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/MyImageReader
 	${PROJECT_BINARY_DIR}/codes/Managers
 	${PROJECT_BINARY_DIR}/codes/LumenExtraction
+	${PROJECT_BINARY_DIR}/codes/License
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
@@ -92,6 +93,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
 	${PROJECT_SOURCE_DIR}/codes/MyImageReader
 	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
+	${PROJECT_SOURCE_DIR}/codes/License
 	)
 
 SET(
@@ -122,6 +124,7 @@ set(
 	MaximumWallThickness
 	CenterlineBranching
 	MyImageReader
+	Widget_License
 	LumenExtraction
 )
 

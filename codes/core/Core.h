@@ -126,6 +126,7 @@ public:
 	virtual void slotSetExtractLumenDilationValue(int val);
 	virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
 	virtual void slotSetExtractLumenMultiplier(double);
+	virtual void slotDrawSegmentation();
 
 	// ROI 
 	virtual void slotChangeROI();

@@ -858,6 +858,11 @@ void Core::slotSetExtractLumenMultiplier(double val)
 	this->m_lumenExtractionFilter->SetMultiplier(val);
 }
 
+void Core::slotDrawSegmentation()
+{
+	this->m_style[2]->GetSmartContour2()->FillAllPolygons();
+}
+
 void Core::slotExtractLumenDilateLabel(vtkImageData* im)
 {
 	this->m_lumenExtractionFilter->LabelDilation(im);

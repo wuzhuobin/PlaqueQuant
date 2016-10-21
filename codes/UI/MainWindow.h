@@ -36,6 +36,9 @@ public:
 	vtkRenderWindow*			GetRenderWindow(int i);
 	ModuleWidget*				GetModuleWidget();
 
+	// Titile
+	void SetVersion(QString);
+
 	// to be moved
 	void UpdateStenosisValue(double val);
 
@@ -104,10 +107,12 @@ private:
 
 	// UI related
 	void DisplayErrorMessage(std::string);
+	QString m_version;
 
 	//Data
 	MyImageManager* imageManager;
 	IOManager* ioManager;
+
 	// Core
 	Core* m_core;
 
