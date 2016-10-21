@@ -573,8 +573,8 @@ void InteractorStyleSmartContour2::FillPolygon()
 
 			vtkSmartPointer<vtkPoints> points =
 				vtkSmartPointer<vtkPoints>::New();
-			bounds_int[GetSliceOrientation() * 2] = 0;
-			bounds_int[GetSliceOrientation() * 2 + 1] = 0;
+			//bounds_int[GetSliceOrientation() * 2] = 0;
+			//bounds_int[GetSliceOrientation() * 2 + 1] = 0;
 
 			for (int x = bounds_int[0]; x <= bounds_int[1]; x++) {
 				for (int y = bounds_int[2]; y <= bounds_int[3]; y++) {
@@ -603,6 +603,24 @@ void InteractorStyleSmartContour2::FillPolygon()
 	}
 
 
+}
+
+void InteractorStyleSmartContour2::FillAllPolygons()
+{
+	// Only do for z-axis
+	if (this->m_imageViewer->GetSliceOrientation() != 2)
+		return;
+
+	this->m_imageViewer->SetSlice(0);
+	int numOfSliceToProcess = { this->m_vesselWallPolyData.size() > this->m_lumenPolyData.size() ?
+						int(this->m_vesselWallPolyData.size()) : int(this->m_lumenPolyData.size()) };
+
+	for (int i = 0; i < numOfSliceToProcess;i++)
+	{
+		this->FillPolygon();
+		this->OnMouseWheelForward();
+	}
+	this->FillPolygon();
 }
 
 vtkSmartPointer<vtkContourWidget> InteractorStyleSmartContour2::MyContourWidgetFactory(int type)

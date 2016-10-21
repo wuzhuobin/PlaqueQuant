@@ -42,6 +42,7 @@ public:
 	void SetVesselWallLabel(int vesselWallLabel);
 	void SetLumenWallLabel(int lumenWallLabel);
 	void FillPolygon();
+	void FillAllPolygons();
 	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 protected:
