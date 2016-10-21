@@ -1,4 +1,5 @@
 #Add module to the project
+add_subdirectory(License)
 add_subdirectory(UI)
 add_subdirectory(Widgets)
 add_subdirectory(Main)

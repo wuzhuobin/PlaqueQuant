@@ -141,6 +141,7 @@ add_subdirectory(codes/MaximumWallThickness)
 add_subdirectory(codes/CenterlineBranching)
 add_subdirectory(codes/MyImageReader)
 add_subdirectory(codes/LumenExtraction)
+add_subdirectory(codes/License)
 
 # Add_subdirectory(codes)
 
