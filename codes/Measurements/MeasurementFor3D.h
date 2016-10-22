@@ -15,6 +15,7 @@ public:
 	void SetLookupTable(vtkLookupTable* lookupTable);
 	void Update();
 	double*  GetVolumes();
+	void GetVolumes(double* volumes);
 
 private:
 

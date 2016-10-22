@@ -34,15 +34,8 @@ link_directories(
 	)
 
 include_directories(
-	${PROJECT_BINARY_DIR}
 	${MAIN_INCLUDE_DIRS}
 	)
-
-SET(
-	LIBRARY_OUTPUT_PATH
-	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
-)
 
 set(
 	MEASUREMENTFOR3D_SRC

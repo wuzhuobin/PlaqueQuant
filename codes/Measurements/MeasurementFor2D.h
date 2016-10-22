@@ -18,7 +18,7 @@ public:
 		double LumenArea;
 		double VesselWallArea;
 		double NMI;
-		double MaximumWallThickness;
+		//double MaximumWallThickness;
 	};
 
 
@@ -46,7 +46,7 @@ private:
 	int CountCluster(int, int);
 	bool CheckCoordIndexInList(CoordIndex);
 
-	vtkSmartPointer<vtkImageData> SliceImage;
+	vtkSmartPointer<vtkImageData> SliceImage = NULL;
 
 	int SliceNumber;
 	int ImageExtent[6];

@@ -36,8 +36,9 @@ void MeasurementFor3D::Update()
 	double pixelSize = 1;
 	int num = lookupTable->GetNumberOfColors();
 	int* numberOfPixels = new int[num];
-	volumes = new double[num];
-
+	if (volumes == NULL) {
+		volumes = new double[num];
+	}
 	overlay->GetSpacing(spacing);
 	overlay->GetExtent(extent);
 	// calculate the volume of a single pixel
@@ -62,12 +63,12 @@ void MeasurementFor3D::Update()
 	vtkSmartPointer<vtkImageAccumulate> imageAccumulate =
 		vtkSmartPointer<vtkImageAccumulate>::New();
 	imageAccumulate->SetInputData(overlay);
-	imageAccumulate->SetComponentExtent(0, num-1, 0, 0, 0, 0); // #LookupTable
+	imageAccumulate->SetComponentExtent(0, num, 0, 0, 0, 0); // #LookupTable
 	imageAccumulate->SetComponentOrigin(0, 0, 0);
 	imageAccumulate->SetComponentSpacing(1, 0, 0);
 	imageAccumulate->Update();
 	cerr << "numberOfPixels" << endl;
-	for (int i = 0; i < num - 1; ++i) {
+	for (int i = 0; i < num ; ++i) {
 		numberOfPixels[i] = *static_cast<int*>(
 			imageAccumulate->GetOutput()->GetScalarPointer(i, 0, 0));
 		cerr << numberOfPixels[i];
@@ -89,5 +90,15 @@ void MeasurementFor3D::Update()
 double* MeasurementFor3D::GetVolumes()
 {
 	return this->volumes;
+}
+
+void MeasurementFor3D::GetVolumes(double * volumes)
+{
+	if (this->volumes == NULL || this->overlay == NULL || this->lookupTable == NULL) {
+		volumes = NULL;
+	}
+	else {
+		memcpy(volumes, this->volumes, sizeof(double)*this->lookupTable->GetNumberOfColors());
+	}
 }
 

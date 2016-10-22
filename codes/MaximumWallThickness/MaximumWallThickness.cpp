@@ -20,7 +20,12 @@ Copyright (C) 2016
 #include <vtkGeometryFilter.h>
 #include <vtkSplineFilter.h>
 #include <vtkParametricSpline.h>
-#include "MainWindow.h"
+#include <vtkObjectFactory.h>
+
+
+//#include "MainWindow.h"
+
+
 #include "MaximumWallThickness.h"
 #include "vtkKdTree.h"
 
@@ -29,10 +34,10 @@ vtkStandardNewMacro(MaximumWallThickness);
 MaximumWallThickness::MaximumWallThickness()
 {
 	this->m_image = NULL;
-	
+
 	this->m_contourFilter = vtkSmartPointer<vtkContourFilter>::New();
 	this->m_sliceImage = NULL;
-	
+
 }
 
 MaximumWallThickness::~MaximumWallThickness()
@@ -46,14 +51,19 @@ std::vector<MaximumWallThickness::DistanceLoopPair> MaximumWallThickness::GetDis
 	return this->m_distanceVect;
 }
 
+void MaximumWallThickness::SetLumemIntensity(int i)
+{
+	m_lumenIntensity = i;
+}
+
+void MaximumWallThickness::SetVesselIntensity(int i)
+{
+	m_vesselIntensity = i;
+}
+
 void MaximumWallThickness::SetImage(vtkImageData *im)
 {
-	if (this->m_image) {
-		this->m_image->Delete();
-	}
-
-	this->m_image = vtkSmartPointer<vtkImageData>::New();
-	this->m_image->DeepCopy(im);
+	this->m_image = im;
 	this->m_image->GetExtent(this->m_extent);
 }
 
@@ -64,19 +74,11 @@ void MaximumWallThickness::SetSliceNumber(int i)
 
 void MaximumWallThickness::SetSliceImage(vtkImageData *im)
 {
-	if (this->m_sliceImage != NULL) {
-		this->m_sliceImage->Delete();
-		this->m_sliceImage = NULL;
-	}
-
-	this->m_sliceImage = vtkSmartPointer<vtkImageData>::New();
-	this->m_sliceImage->DeepCopy(im);
+	this->m_sliceImage = im;
 
 	// check extent
 	this->m_sliceImage->GetExtent(this->m_extent);
 	if (this->m_extent[4] != this->m_extent[5]) {
-		this->m_sliceImage->Delete();
-		this->m_sliceImage = NULL;
 		throw ERROR_INPUT_NOT_A_SLICE;
 	}
 	else {
@@ -86,6 +88,8 @@ void MaximumWallThickness::SetSliceImage(vtkImageData *im)
 
 void MaximumWallThickness::Update()
 {
+	m_loopPairVect.clear();
+	m_distanceVect.clear();
 	//if (!this->ExtractSlice()) {
 	//	throw ERROR_EXTRACT_SLICE;
 	//	return;
@@ -121,7 +125,7 @@ void MaximumWallThickness::Update()
 int MaximumWallThickness::CheckNumberOfBranches()
 {
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
-	thres->ThresholdBetween(MainWindow::LABEL_LUMEN - 0.1, MainWindow::LABEL_LUMEN + 0.1);
+	thres->ThresholdBetween(m_lumenIntensity - 0.1, m_lumenIntensity+ 0.1);
 	thres->SetInputData(this->m_sliceImage);
 	thres->SetOutValue(0);
 	thres->SetInValue(1);
@@ -168,7 +172,7 @@ bool MaximumWallThickness::ValueTransform()
 	castFilter->SetOutputScalarType(VTK_DOUBLE);
 	castFilter->Update();
 
-	this->m_sliceImage->DeepCopy(castFilter->GetOutput());
+	this->m_sliceImage = castFilter->GetOutput();
 
 	return true;
 }
@@ -184,10 +188,10 @@ bool MaximumWallThickness::ExtractSlice()
 		return true;
 	}
 
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-	mainwnd->GetOverlay()->GetDisplayExtent(m_extent); // Extent is obtained from distplayed extent of overlay
+	//MainWindow* mainwnd = MainWindow::GetMainWindow();
+	//mainwnd->GetOverlay()->GetDisplayExtent(m_extent); // Extent is obtained from distplayed extent of overlay
 
-	// Set the extent to the slice being handled only
+													   // Set the extent to the slice being handled only
 	this->m_extent[4] = this->m_sliceNumber;
 	this->m_extent[5] = this->m_sliceNumber;
 
@@ -209,10 +213,10 @@ bool MaximumWallThickness::ExtractLoops()
 		throw ERROR_NO_SEGMENTATION_FOUND;
 	}
 
-	int vesselWallLabel = MainWindow::LABEL_CALCIFICATION;
+	//int vesselWallLabel = Core::LABEL_CALCIFICATION;
 
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
-	thres->ThresholdBetween(MainWindow::LABEL_LUMEN - 0.1, MainWindow::LABEL_LUMEN + 0.1);
+	thres->ThresholdBetween(m_lumenIntensity - 0.1, m_lumenIntensity + 0.1);
 	thres->SetInputData(this->m_sliceImage);
 	thres->SetOutValue(0);
 	thres->SetInValue(1);
@@ -248,14 +252,14 @@ bool MaximumWallThickness::ExtractLoops()
 		vtkSmartPointer<vtkThreshold> l_thresFilter = vtkSmartPointer<vtkThreshold>::New();
 		vtkSmartPointer<vtkConnectivityFilter>l_connectivityFilter = vtkSmartPointer<vtkConnectivityFilter>::New();
 		vtkSmartPointer<vtkGeometryFilter> l_geoFilter = vtkSmartPointer<vtkGeometryFilter>::New();
-		
+
 		// For vessel wall, seperate each loops from the original polydata
 		l_connectivityFilter->SetInputData(vesselWallLoops);
 		l_connectivityFilter->SetExtractionModeToAllRegions();
 		l_connectivityFilter->ColorRegionsOn();
 		l_connectivityFilter->Update();
 		l_thresFilter->SetInputConnection(l_connectivityFilter->GetOutputPort());
-		for (int i = 0; i < l_connectivityFilter->GetNumberOfExtractedRegions();i++)
+		for (int i = 0; i < l_connectivityFilter->GetNumberOfExtractedRegions(); i++)
 		{
 			l_thresFilter->ThresholdBetween(double(i) - 0.1, double(i) + 0.1);
 			l_thresFilter->Update();
@@ -264,7 +268,7 @@ bool MaximumWallThickness::ExtractLoops()
 			l_geoFilter->Update();
 
 			vtkPolyData* l_newPD = vtkPolyData::New();
-			l_newPD->DeepCopy(l_geoFilter->GetOutput());	
+			l_newPD->DeepCopy(l_geoFilter->GetOutput());
 			l_loopsVesselVect.push_back(l_newPD);
 		}
 
@@ -292,7 +296,7 @@ bool MaximumWallThickness::ExtractLoops()
 
 		// match loops by comparing center distance
 		vtkSmartPointer<vtkCenterOfMass> com = vtkSmartPointer<vtkCenterOfMass>::New();
-		for (int i = 0; i < l_loopsVesselVect.size();i++)
+		for (int i = 0; i < l_loopsVesselVect.size(); i++)
 		{
 			int l_partner;
 			double l_d = VTK_DOUBLE_MAX;
@@ -311,7 +315,7 @@ bool MaximumWallThickness::ExtractLoops()
 				com->SetInputData(l_loopsLumenVect.at(j));
 				com->SetUseScalarsAsWeights(false);
 				com->Update();
-				memcpy(com2, com->GetCenter(),sizeof(double)*3);
+				memcpy(com2, com->GetCenter(), sizeof(double) * 3);
 
 				double l_l_d = vtkMath::Distance2BetweenPoints(com1, com2);
 				if (l_l_d < l_d) {
@@ -337,7 +341,7 @@ bool MaximumWallThickness::ExtractLoops()
 
 		this->m_loopPairVect.push_back(*loopPair);
 	}
-	
+
 	return true;
 }
 
@@ -353,38 +357,38 @@ bool MaximumWallThickness::EdgeDetection()
 		//Euclidean distance
 		// using imageMathematics
 		/*vtkSmartPointer<vtkImageExtractComponents> extractXFilter =
-			vtkSmartPointer<vtkImageExtractComponents>::New();
+		vtkSmartPointer<vtkImageExtractComponents>::New();
 		extractXFilter->SetComponents(0);
 		extractXFilter->SetInputConnection(sobelFilter->GetOutputPort());
 		extractXFilter->Update();
 
 		vtkSmartPointer<vtkImageMathematics> xImageSquare =
-			vtkSmartPointer<vtkImageMathematics>::New();
+		vtkSmartPointer<vtkImageMathematics>::New();
 		xImageSquare->SetOperationToSquare();
 		xImageSquare->SetInputConnection(extractXFilter->GetOutputPort());
 		xImageSquare->Update();
 
 		vtkSmartPointer<vtkImageExtractComponents> extractYFilter =
-			vtkSmartPointer<vtkImageExtractComponents>::New();
+		vtkSmartPointer<vtkImageExtractComponents>::New();
 		extractYFilter->SetComponents(1);
 		extractYFilter->SetInputConnection(sobelFilter->GetOutputPort());
 		extractYFilter->Update();
 
 		vtkSmartPointer<vtkImageMathematics> yImageSquare =
-			vtkSmartPointer<vtkImageMathematics>::New();
+		vtkSmartPointer<vtkImageMathematics>::New();
 		yImageSquare->SetOperationToSquare();
 		yImageSquare->SetInputConnection(extractYFilter->GetOutputPort());
 		yImageSquare->Update();
 
 		vtkSmartPointer<vtkImageMathematics> imageAdd =
-			vtkSmartPointer<vtkImageMathematics>::New();
+		vtkSmartPointer<vtkImageMathematics>::New();
 		imageAdd->SetOperationToAdd();
 		imageAdd->SetInput1Data(xImageSquare->GetOutput());
 		imageAdd->SetInput2Data(yImageSquare->GetOutput());
 		imageAdd->Update();
 
 		vtkSmartPointer<vtkImageMathematics> imageSqrt =
-			vtkSmartPointer<vtkImageMathematics>::New();
+		vtkSmartPointer<vtkImageMathematics>::New();
 		imageSqrt->SetOperationToSquareRoot();
 		imageSqrt->SetInputConnection(imageAdd->GetOutputPort());
 		imageSqrt->Update();*/
@@ -422,74 +426,74 @@ bool MaximumWallThickness::EdgeDetection()
 
 	// canny detector
 	/*for (int num = 0; num < EDGENUM; ++num) {
-		vtkSmartPointer<vtkImageGaussianSmooth> gaussianFilter =
-			vtkSmartPointer<vtkImageGaussianSmooth>::New();
-		gaussianFilter->SetInputData(edgeImage[num]);
-		gaussianFilter->SetRadiusFactors(1, 1, 0);
-		gaussianFilter->Update();
+	vtkSmartPointer<vtkImageGaussianSmooth> gaussianFilter =
+	vtkSmartPointer<vtkImageGaussianSmooth>::New();
+	gaussianFilter->SetInputData(edgeImage[num]);
+	gaussianFilter->SetRadiusFactors(1, 1, 0);
+	gaussianFilter->Update();
 
-		vtkSmartPointer<vtkImageGradient> gradientFilter =
-			vtkSmartPointer<vtkImageGradient>::New();
-		gradientFilter->SetInputConnection(gaussianFilter->GetOutputPort());
-		gradientFilter->Update();
+	vtkSmartPointer<vtkImageGradient> gradientFilter =
+	vtkSmartPointer<vtkImageGradient>::New();
+	gradientFilter->SetInputConnection(gaussianFilter->GetOutputPort());
+	gradientFilter->Update();
 
-		vtkSmartPointer<vtkImageMagnitude> magnitudeFilter =
-			vtkSmartPointer<vtkImageMagnitude>::New();
-		magnitudeFilter->SetInputConnection(gradientFilter->GetOutputPort());
-		magnitudeFilter->Update();
+	vtkSmartPointer<vtkImageMagnitude> magnitudeFilter =
+	vtkSmartPointer<vtkImageMagnitude>::New();
+	magnitudeFilter->SetInputConnection(gradientFilter->GetOutputPort());
+	magnitudeFilter->Update();
 
-		vtkSmartPointer<vtkImageNonMaximumSuppression> nonMaximumSuppressionFilter =
-			vtkSmartPointer<vtkImageNonMaximumSuppression>::New();
-		nonMaximumSuppressionFilter->SetMagnitudeInputData(magnitudeFilter->GetOutput());
-		nonMaximumSuppressionFilter->SetVectorInputData(gradientFilter->GetOutput());
-		nonMaximumSuppressionFilter->Update();
+	vtkSmartPointer<vtkImageNonMaximumSuppression> nonMaximumSuppressionFilter =
+	vtkSmartPointer<vtkImageNonMaximumSuppression>::New();
+	nonMaximumSuppressionFilter->SetMagnitudeInputData(magnitudeFilter->GetOutput());
+	nonMaximumSuppressionFilter->SetVectorInputData(gradientFilter->GetOutput());
+	nonMaximumSuppressionFilter->Update();
 
-		vtkSmartPointer<vtkImageConstantPad> constantPadFilter =
-			vtkSmartPointer<vtkImageConstantPad>::New();
-		constantPadFilter->SetInputConnection(gradientFilter->GetOutputPort());
-		constantPadFilter->SetOutputNumberOfScalarComponents(3);
-		constantPadFilter->SetConstant(0);
-		constantPadFilter->Update();
+	vtkSmartPointer<vtkImageConstantPad> constantPadFilter =
+	vtkSmartPointer<vtkImageConstantPad>::New();
+	constantPadFilter->SetInputConnection(gradientFilter->GetOutputPort());
+	constantPadFilter->SetOutputNumberOfScalarComponents(3);
+	constantPadFilter->SetConstant(0);
+	constantPadFilter->Update();
 
-		vtkSmartPointer<vtkImageToStructuredPoints> i2sp1 =
-			vtkSmartPointer<vtkImageToStructuredPoints>::New();
-		i2sp1->SetInputConnection(nonMaximumSuppressionFilter->GetOutputPort());
-		i2sp1->SetVectorInputData(constantPadFilter->GetOutput());
-		i2sp1->Update();
+	vtkSmartPointer<vtkImageToStructuredPoints> i2sp1 =
+	vtkSmartPointer<vtkImageToStructuredPoints>::New();
+	i2sp1->SetInputConnection(nonMaximumSuppressionFilter->GetOutputPort());
+	i2sp1->SetVectorInputData(constantPadFilter->GetOutput());
+	i2sp1->Update();
 
-		vtkSmartPointer<vtkLinkEdgels> imgLink =
-			vtkSmartPointer<vtkLinkEdgels>::New();
-		imgLink->SetInputConnection(i2sp1->GetOutputPort());
-		imgLink->SetGradientThreshold(2);
-		imgLink->Update();
+	vtkSmartPointer<vtkLinkEdgels> imgLink =
+	vtkSmartPointer<vtkLinkEdgels>::New();
+	imgLink->SetInputConnection(i2sp1->GetOutputPort());
+	imgLink->SetGradientThreshold(2);
+	imgLink->Update();
 
-		vtkSmartPointer<vtkThreshold> thresholdEdgels =
-			vtkSmartPointer<vtkThreshold>::New();
-		thresholdEdgels->SetInputConnection(imgLink->GetOutputPort());
-		thresholdEdgels->ThresholdByUpper(10);
-		thresholdEdgels->AllScalarsOff();
-		thresholdEdgels->Update();
+	vtkSmartPointer<vtkThreshold> thresholdEdgels =
+	vtkSmartPointer<vtkThreshold>::New();
+	thresholdEdgels->SetInputConnection(imgLink->GetOutputPort());
+	thresholdEdgels->ThresholdByUpper(10);
+	thresholdEdgels->AllScalarsOff();
+	thresholdEdgels->Update();
 
-		vtkSmartPointer<vtkGeometryFilter> gf =
-			vtkSmartPointer<vtkGeometryFilter>::New();
-		gf->SetInputConnection(thresholdEdgels->GetOutputPort());
-		gf->Update();
+	vtkSmartPointer<vtkGeometryFilter> gf =
+	vtkSmartPointer<vtkGeometryFilter>::New();
+	gf->SetInputConnection(thresholdEdgels->GetOutputPort());
+	gf->Update();
 
-		vtkSmartPointer<vtkImageToStructuredPoints> i2sp =
-			vtkSmartPointer<vtkImageToStructuredPoints>::New();
-		i2sp->SetInputConnection(magnitudeFilter->GetOutputPort());
-		i2sp->SetVectorInputData(constantPadFilter->GetOutput());
-		i2sp->Update();
-		
-		vtkSmartPointer<vtkSubPixelPositionEdgels> spe =
-			vtkSmartPointer<vtkSubPixelPositionEdgels>::New();
-		spe->SetInputConnection(gf->GetOutputPort());
-		spe->SetGradMapsData(i2sp->GetStructuredPointsOutput());
-		spe->Update();
+	vtkSmartPointer<vtkImageToStructuredPoints> i2sp =
+	vtkSmartPointer<vtkImageToStructuredPoints>::New();
+	i2sp->SetInputConnection(magnitudeFilter->GetOutputPort());
+	i2sp->SetVectorInputData(constantPadFilter->GetOutput());
+	i2sp->Update();
 
-		vtkSmartPointer<vtkStripper> strip =
-			vtkSmartPointer<vtkStripper>::New();
-		strip->SetInputConnection(spe->GetOutputPort());
+	vtkSmartPointer<vtkSubPixelPositionEdgels> spe =
+	vtkSmartPointer<vtkSubPixelPositionEdgels>::New();
+	spe->SetInputConnection(gf->GetOutputPort());
+	spe->SetGradMapsData(i2sp->GetStructuredPointsOutput());
+	spe->Update();
+
+	vtkSmartPointer<vtkStripper> strip =
+	vtkSmartPointer<vtkStripper>::New();
+	strip->SetInputConnection(spe->GetOutputPort());
 
 	}*/
 
@@ -507,7 +511,7 @@ bool MaximumWallThickness::ThicknessCal()
 	vtkSmartPointer<vtkParametricSpline> spline = vtkSmartPointer<vtkParametricSpline>::New();
 
 	vtkSmartPointer<vtkSplineFilter> splineFilter = vtkSmartPointer<vtkSplineFilter>::New();
-	for (int i = 0; i < this->m_loopPairVect.size();i++)
+	for (int i = 0; i < this->m_loopPairVect.size(); i++)
 	{
 		std::pair<int, int> pids;
 		vtkSmartPointer<vtkPolyData> vesselLoop, lumenLoop;
@@ -520,7 +524,7 @@ bool MaximumWallThickness::ThicknessCal()
 		splineFilter->SetNumberOfSubdivisions(5);
 		splineFilter->Update();
 		vesselLoop->DeepCopy(splineFilter->GetOutput());
-		cout << "Vessel: " << vesselLoop->GetNumberOfPoints() << endl;
+		//cout << "Vessel: " << vesselLoop->GetNumberOfPoints() << endl;
 
 		// for lumen
 		spline->SetPoints(lumenLoop->GetPoints());
@@ -528,7 +532,7 @@ bool MaximumWallThickness::ThicknessCal()
 		splineFilter->SetNumberOfSubdivisions(5);
 		splineFilter->Update();
 		lumenLoop->DeepCopy(splineFilter->GetOutput());
-		cout << "Lumen: " << lumenLoop->GetNumberOfPoints() << endl;
+		//cout << "Lumen: " << lumenLoop->GetNumberOfPoints() << endl;
 
 		// Build kd tree
 		double d = VTK_DOUBLE_MIN;
@@ -556,4 +560,3 @@ bool MaximumWallThickness::ThicknessCal()
 
 	return true;
 }
-

@@ -216,7 +216,7 @@ vtkImageData* Overlay::GetOutput()
 		return this->m_vtkOverlay;
 }
 
-vtkImageData * Overlay::GetVTKImageData()
+vtkImageData * Overlay::GetVTKOutput()
 {
 	if (!m_vtkOverlay)
 		return NULL;

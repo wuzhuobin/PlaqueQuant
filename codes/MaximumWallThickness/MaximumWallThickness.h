@@ -64,10 +64,12 @@ public:
 	/* Do not modify the value, read only! */
 	std::vector<DistanceLoopPair>	GetDistanceLoopPairVect();
 
-	/* Two ways to specify the region of interest 
-		1. Set image slice number, then default extent is extracted from SegmentationOverlay of mainwnd
-		2. Directly set slice image
+	/* Two ways to specify the region of interest
+	1. Set image slice number, then default extent is extracted from SegmentationOverlay of mainwnd
+	2. Directly set slice image
 	*/
+	void SetLumemIntensity(int i);
+	void SetVesselIntensity(int i);
 	void SetImage(vtkImageData*);
 	void SetSliceNumber(int);
 	void SetSliceImage(vtkImageData*);
@@ -104,8 +106,8 @@ private:
 
 	int m_sliceNumber;
 	int m_extent[6];
+	int m_lumenIntensity = 1;
+	int m_vesselIntensity = 2;
 
 };
-
-#endif // !MAXIUMWALLTHICKNESS_H
 

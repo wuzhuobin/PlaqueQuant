@@ -25,10 +25,8 @@ void Centerline::SetSurface(vtkPolyData* surface)
 	vtkSmartPointer<vtkIdList> CapCenterIds = vtkSmartPointer<vtkIdList>::New();
 	this->CapSurface(surface, m_cappedSurface, CapCenterIds);
 
-	// if no points are returned
-	if (CapCenterIds->GetNumberOfIds() < 1) {
-		throw ERROR_SURFACE_CAPPED;
-	}
+	if (CapCenterIds->GetNumberOfIds() == 0)
+		throw ERROR_CANNOT_FIND_SURFACE_TO_CAP;
 
 	vtkSmartPointer<vtkIdList> sourceIds = vtkSmartPointer<vtkIdList>::New();
 	sourceIds->SetNumberOfIds(1);
@@ -71,11 +69,15 @@ void Centerline::SetTargetIds(vtkIdList* targetIds)
 void Centerline::CapSurface(vtkPolyData* inputSurface, vtkPolyData* cappedSurface, vtkIdList* CapCenterIds)
 {
 	// calculate centerlines of lumen and vessl outer wall
-	vtkSmartPointer<vtkvmtkCapPolyData> capper = vtkSmartPointer<vtkvmtkCapPolyData>::New();
-	capper->SetInputData(inputSurface);
-	capper->Update();
-	cappedSurface->DeepCopy(capper->GetOutput());
-	CapCenterIds->DeepCopy(capper->GetCapCenterIds());
+		vtkSmartPointer<vtkvmtkCapPolyData> capper = vtkSmartPointer<vtkvmtkCapPolyData>::New();
+		capper->SetInputData(inputSurface);
+		capper->Update();
+
+		if (capper->GetCapCenterIds() == nullptr)
+			throw std::exception("Cannot find surface to cap! Segmentation should be chosen such that the upper and the lower surface cut through the blood vessels!\n", ERROR_CANNOT_FIND_SURFACE_TO_CAP);
+
+		cappedSurface->DeepCopy(capper->GetOutput());
+		CapCenterIds->DeepCopy(capper->GetCapCenterIds());
 }
 
 void Centerline::Update()

@@ -51,12 +51,14 @@ SET(
 	### Directories for MOC Sources ###
 	${PROJECT_BINARY_DIR}
 	${PROJECT_BINARY_DIR}/include
-	${PROJECT_BINARY_DIR}/codes/Module
+	${PROJECT_BINARY_DIR}/resources
+	${PROJECT_BINARY_DIR}/codes/UI
 	${PROJECT_BINARY_DIR}/codes/Core
+	${PROJECT_BINARY_DIR}/codes/Main
 	# AbstractInteractorStyles
-	${PROJECT_BINARY_DIR}/codes/AbstractInteractorStyles
+	${PROJECT_BINARY_DIR}/codes/InteractorStyles
 	# Abstract Data structure
-	${PROJECT_BINARY_DIR}/codes/AbstractData
+	# ${PROJECT_BINARY_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
@@ -65,36 +67,85 @@ SET(
 	# Source for maximum wall thickness
 	${PROJECT_BINARY_DIR}/codes/MaximumWallThickness
 	${PROJECT_BINARY_DIR}/codes/CenterlineBranching
-	#Source for license 
+	${PROJECT_BINARY_DIR}/codes/MyImageReader
+	${PROJECT_BINARY_DIR}/codes/Managers
+	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/License
 
-
 	### Directories for headers ###
+	${PROJECT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/codes/Module
+	${PROJECT_SOURCE_DIR}/resources
+	${PROJECT_SOURCE_DIR}/codes/UI
 	${PROJECT_SOURCE_DIR}/codes/Core
-	${PROJECT_SOURCE_DIR}/codes/AbstractInteractorStyles
-	${PROJECT_SOURCE_DIR}/codes/AbstractData
+	${PROJECT_SOURCE_DIR}/codes/Main
+	# AbstractInteractorStyles
+	${PROJECT_SOURCE_DIR}/codes/InteractorStyles
+	# Abstract Data structure
+	# ${PROJECT_SOURCE_DIR}/codes/AbstractData
+	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	${PROJECT_SOURCE_DIR}/codes/GPURenderWithLUT
 	${PROJECT_SOURCE_DIR}/codes/Measurements 
+	# Source for maximum wall thickness
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
+	${PROJECT_SOURCE_DIR}/codes/MyImageReader
+	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/License
-)
+	)
 
 SET(
 	LIBRARY_OUTPUT_PATH
 	${CMAKE_SOURCE_DIR}/lib
-	${EXECUTABLE_OUTPUT_PATH}
+)
+SET(
+	EXECUTABLE_OUTPUT_PATH 
+	${CMAKE_SOURCE_DIR}/bin
+)
+
+set(
+	LINK_LIBRARIE
+	${ITK_LIBRARIES}  
+	${VTK_LIBRARIES}
+	${VMTK_LIBRARIES} 
+	Qt5::Widgets 
+	Qt5::PrintSupport
+	UI
+	Core
+	# Managers
+	Widgets
+	InteractorStyles
+	# AbstractData
+	Widgets 
+	GPURenderWithLUT
+	Measurements
+	MaximumWallThickness
+	CenterlineBranching
+	MyImageReader
+	Widget_License
+	LumenExtraction
 )
 
 include_directories(
 	${MAIN_INCLUDE_DIRS}
 )
+add_subdirectory(codes/UI)
+add_subdirectory(codes/Widgets)
+add_subdirectory(codes/Main)
+add_subdirectory(codes/InteractorStyles)
+# add_subdirectory(codes/AbstractData)
+add_subdirectory(codes/GPURenderWithLUT)
+add_subdirectory(codes/Core)
+add_subdirectory(codes/Measurements)
+add_subdirectory(codes/MaximumWallThickness)
+# add_subdirectory(codes/Managers)
+add_subdirectory(codes/CenterlineBranching)
+add_subdirectory(codes/MyImageReader)
+add_subdirectory(codes/LumenExtraction)
+add_subdirectory(codes/License)
 
-
-Add_subdirectory(codes)
+# Add_subdirectory(codes)
 
 
 

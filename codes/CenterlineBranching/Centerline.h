@@ -35,7 +35,7 @@ public:
 	void GetLookupTable(vtkLookupTable* LUT);
 
 	enum ERROR_CODE {
-		ERROR_SURFACE_CAPPED = 1
+		ERROR_CANNOT_FIND_SURFACE_TO_CAP = 2
 	};
 
 private:
