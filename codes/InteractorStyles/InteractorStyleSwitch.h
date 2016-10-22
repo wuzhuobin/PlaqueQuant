@@ -71,10 +71,6 @@ public:
 	CurrentStyleMacro(SmartContour);
 	CurrentStyleMacro(SmartContour2);
 
-	//bool CurrentStyleIsNavigation();
-	//bool CurrentStyleIsWindowLevel();
-	//bool CurrentStyleIsTransform();
-
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
@@ -83,7 +79,6 @@ public:
 	virtual void SetCurrentSlice(int slice);
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
-	//virtual void SetOrientation(int);
 	virtual void SetEnabled(int);
 	virtual void SetEnabledOn();
 	virtual void SetEnabledOff();

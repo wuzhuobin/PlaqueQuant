@@ -9,7 +9,7 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		planeWidget->initializeCustomFunction();
 		planeWidget->SetInputData(m_imageViewer->GetInput());
 		planeWidget->SetImageViewer(m_imageViewer);
-		planeWidget->SetDefaultBound(m_imageViewer->GetBound());
+		planeWidget->SetDefaultBound(m_imageViewer->GetCursorBoundWithWorldCoordinate());
 		planeWidget->SetInteractor(this->Interactor);
 		planeWidget->AddObserver(vtkCommand::InteractionEvent, planeWidgetCallback);
 		planeWidget->AddObserver(vtkCommand::EndInteractionEvent, planeWidgetCallback);
@@ -33,7 +33,7 @@ void InteractorStyleROI::SetPlaneWidgetEnabled(bool flag)
 		default:
 			break;
 		}
-		double* bound = m_imageViewer->GetBound();
+		double* bound = m_imageViewer->GetCursorBoundWithWorldCoordinate();
 		//double displayBound[6];
 		double	m_currentBound[6];
 		double* m_focalPoint = planeWidget->GetImageViewer()->GetFocalPointWithWorldCoordinate();

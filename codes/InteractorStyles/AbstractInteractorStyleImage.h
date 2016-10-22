@@ -37,9 +37,6 @@ public:
 	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
 	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	virtual void SynchronizedZooming();
-	//virtual void SetSliceSpinBox(QSpinBox* x, QSpinBox* y, QSpinBox* z);
-	//virtual void SetOrientation(int m_orientation);
-	//virtual int GetOrientation();
 	virtual vtkActor* PickActor(int x, int y);
 	virtual void SetCurrentSlice(int slice);
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
@@ -74,16 +71,6 @@ protected:
 	virtual double* GetOrigin();
 	virtual double* GetSpacing();
 	virtual int* GetExtent();
-	/**
-	 * @deprecated
-	 */
-	//int m_minSlice;
-	//int m_maxSlice;
-	//int m_orientation;
-	//double m_origin[3];
-	//double m_spacing[3];
-	//int m_extent[6];
-	//int m_slice;
 
 	bool m_rightFunctioning;
 	bool m_leftFunctioning;

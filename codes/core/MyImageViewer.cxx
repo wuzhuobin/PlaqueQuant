@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkLeaderActor2D.h>
 
 #include <QList>
-
+using namespace std;
 vtkStandardNewMacro(MyImageViewer);
 
 //----------------------------------------------------------------------------
@@ -51,9 +51,6 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	vtkRenderer *ren = vtkRenderer::New();
 	this->SetAnnotationRenderer(ren);
 	ren->Delete();
-	// Widget 
-	//this->//distancewidget = vtk//distancewidget::New();
-	this->AngleWidget = vtkAngleWidget::New();
 
 	// OrientationTextActor 
 	this->IntTextActor = vtkTextActor::New();
@@ -131,22 +128,6 @@ MyImageViewer::~MyImageViewer()
 		this->CursorActor->Delete();
 		this->CursorActor = NULL;
 	}
-
-	//Widget
-	//if (this->distancewidget != NULL)
-		//this->distancewidget->Delete();
-	if (this->AngleWidget != NULL)
-		this->AngleWidget->Delete();
-
-
-	//if (this->SliceImplicitPlane) {
-	//	this->SliceImplicitPlane->Delete();
-	//}
-	////lookupTable
-	//if (this->LookupTable != NULL) {
-	//	this->LookupTable->Delete();
-	//}
-
 
 }
 
@@ -307,21 +288,13 @@ void MyImageViewer::Render()
 	{
 		this->InitializeOrientationText();
 		this->InitializeIntensityText("");
-		this->InitializeHeader("");
-		//SetSlice((GetSliceMax() + GetSliceMin()) * 0.5);
+		this->InitializeHeader(string());
 	}
 	vtkImageViewer2::Render();
 	if (this->AnnotationRenderer) {
 		this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
 	}
-	// update cursor3d
-	//double ijk[3];
-	//Cursor3D->GetFocalPoint(ijk);
-	//double sliceWorldCoordinate = 
-	//	Slice * GetInput()->GetSpacing()[SliceOrientation] + GetInput()->GetOrigin()[SliceOrientation];
-	//ijk[SliceOrientation] = sliceWorldCoordinate;
-	//SetFocalPointWithWorldCoordinate(ijk[0], ijk[1], ijk[2]);
-	// update orientationText
+	// update orientation and header text
 	ResizeHeaderAndOrientationText();
 	if (this->GetInput())
 	{
@@ -342,7 +315,7 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 	DefaultWindowLevel[1] = this->GetColorLevel();
 
 	//Cursor
-	this->SetCursorBoundary();
+	this->InitializeCursorBoundary();
 
 }
 
@@ -406,28 +379,22 @@ void MyImageViewer::PrintSelf(ostream& os, vtkIndent indent)
 	}
 }
 
-void MyImageViewer::SetCursorBoundary()
+void MyImageViewer::InitializeCursorBoundary()
 {
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
 	int* extent = GetInput()->GetExtent();
-
-	Bound[0] = origin[0] + extent[0] * spacing[0];
-	Bound[1] = origin[0] + extent[1] * spacing[0];
-	Bound[2] = origin[1] + extent[2] * spacing[1];
-	Bound[3] = origin[1] + extent[3] * spacing[1];
-	Bound[4] = origin[2] + extent[4] * spacing[2];
-	Bound[5] = origin[2] + extent[5] * spacing[2];
+	double bound[6];
+	bound[0] = origin[0] + extent[0] * spacing[0];
+	bound[1] = origin[0] + extent[1] * spacing[0];
+	bound[2] = origin[1] + extent[2] * spacing[1];
+	bound[3] = origin[1] + extent[3] * spacing[1];
+	bound[4] = origin[2] + extent[4] * spacing[2];
+	bound[5] = origin[2] + extent[5] * spacing[2];
 
 	Cursor3D->SetTranslationMode(false);
-	Cursor3D->SetModelBounds(Bound);
+	Cursor3D->SetModelBounds(bound);
 	Cursor3D->Update();
-}
-
-vtkInteractorStyleImage * MyImageViewer::GetInteractorStyle()
-{
-	return vtkInteractorStyleImage::SafeDownCast(
-		this->Interactor->GetInteractorStyle());
 }
 
 void MyImageViewer::SetAnnotationRenderer(vtkRenderer * arg)
@@ -471,19 +438,13 @@ void MyImageViewer::SetLookupTable(vtkLookupTable * LookupTable)
 
 void MyImageViewer::SetFocalPointWithWorldCoordinate(double x, double y, double z)
 {
-	//Cursor3D->SetFocalPoint(x, y, z);
-	//Cursor3D->Update();
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
 	int i = (x - origin[0])/spacing[0];
 	int j = (y - origin[1])/spacing[1];
 	int k = (z - origin[2])/spacing[2];
 	SetFocalPointWithImageCoordinate(i, j, k);
-	//int ijk[3] = { i, j, k };
-	//SetSlice(ijk[this->SliceOrientation]);
-	//InitializeIntensityText(QString::number(
-	//	(GetInput()->GetScalarComponentAsDouble(i, j ,k, 0))));
-	//this->Render();
+
 }
 
 void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
@@ -528,8 +489,6 @@ void MyImageViewer::GetFocalPointWithImageCoordinate(int * coordinate)
 	for (int i = 0; i < 3; ++i) {
 		coordinate[i] = (point[i] - origin[i]) / spacing[i];
 	}
-
-	return;
 }
 
 void MyImageViewer::GetFocalPointWithWorldCoordinate(double * coordinate)
@@ -540,6 +499,11 @@ void MyImageViewer::GetFocalPointWithWorldCoordinate(double * coordinate)
 double * MyImageViewer::GetFocalPointWithWorldCoordinate()
 {
 	return Cursor3D->GetFocalPoint();
+}
+
+double * MyImageViewer::GetCursorBoundWithWorldCoordinate()
+{
+	return this->Cursor3D->GetModelBounds();
 }
 
 void MyImageViewer::SetAllBlack(bool flag)
@@ -573,24 +537,12 @@ bool MyImageViewer::GetAllBlack()
 	return AllBlackFlag;
 }
 
-void MyImageViewer::SetBound(double* b)
-{
-	memcpy(this->Bound, b, sizeof(this->Bound));
-	//Cursor
-	this->SetCursorBoundary();
-}
-
-double* MyImageViewer::GetBound()
-{
-	return this->Bound;
-}
-
 double* MyImageViewer::GetDefaultWindowLevel()
 {
 	return DefaultWindowLevel;
 }
 
-void MyImageViewer::InitializeHeader(QString File)
+void MyImageViewer::InitializeHeader(string file)
 {
 
 	const int* size = Renderer->GetSize();
@@ -604,11 +556,16 @@ void MyImageViewer::InitializeHeader(QString File)
 	}
 
 	if (GetInput() != NULL)
-		HeaderActor->SetInput(File.toStdString().c_str());
+		HeaderActor->SetInput(file.c_str());
 	else {
 		HeaderActor->SetInput("");
 		cout << "Error in setting text, file not found" << endl;
 	}
+}
+
+void MyImageViewer::InitializeHeader(QString file)
+{
+	InitializeHeader(file.toStdString());
 }
 
 void MyImageViewer::InitializeIntensityText(QString IntText)
@@ -692,69 +649,6 @@ void MyImageViewer::ResizeHeaderAndOrientationText()
 		OrientationTextActor[i]->SetDisplayPosition(position[i][0], position[i][1]);
 	}
 	HeaderActor->SetDisplayPosition(coord[0], coord[1]);
-}
-
-void MyImageViewer::SetRulerEnabled(bool b)
-{
-	if (b)
-	{
-		//if (//distancewidget)
-			//distancewidget->Delete();
-
-		//distancewidget = vtk//distancewidget::New();
-		//distancewidget->SetInteractor(RenderWindow->GetInteractor());
-		//distancewidget->SetPriority(RenderWindow->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
-
-		vtkSmartPointer< vtkPointHandleRepresentation2D > rulerHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
-		vtkSmartPointer< vtkDistanceRepresentation2D > distanceRep = vtkSmartPointer< vtkDistanceRepresentation2D >::New();
-		distanceRep->SetHandleRepresentation(rulerHandleRep);
-		//distancewidget->SetRepresentation(distanceRep);
-		distanceRep->InstantiateHandleRepresentation();
-		distanceRep->SetLabelFormat("%-#11.2f mm");
-		distanceRep->GetAxis()->GetProperty()->SetColor(0, 1, 0);
-
-		//distancewidget->CreateDefaultRepresentation();
-		//distancewidget->On();
-	}
-	else
-	{
-		//distancewidget->Off();
-
-	}
-
-	RenderWindow->Render();
-}
-
-
-
-void MyImageViewer::SetProtractorEnabled(bool b)
-{
-	if (b)
-	{
-		if (AngleWidget)
-			AngleWidget->Delete();
-		AngleWidget = vtkAngleWidget::New();
-		AngleWidget->SetInteractor(RenderWindow->GetInteractor());
-		AngleWidget->SetPriority(RenderWindow->GetInteractor()->GetInteractorStyle()->GetPriority() + 0.1);
-		vtkSmartPointer< vtkPointHandleRepresentation2D > angleHandleRep = vtkSmartPointer< vtkPointHandleRepresentation2D >::New();
-		vtkSmartPointer< vtkAngleRepresentation2D > angleRep = vtkSmartPointer< vtkAngleRepresentation2D >::New();
-		angleRep->SetHandleRepresentation(angleHandleRep);
-		AngleWidget->SetRepresentation(angleRep);
-		angleRep->InstantiateHandleRepresentation();
-		angleRep->SetLabelFormat("%-#11.2f mm");
-		angleRep->GetRay1()->GetProperty()->SetColor(0, 1, 0);
-		angleRep->GetRay2()->GetProperty()->SetColor(0, 1, 0);
-
-		AngleWidget->CreateDefaultRepresentation();
-		AngleWidget->On();
-	}
-	else
-	{
-		AngleWidget->Off();
-
-	}
-
-	RenderWindow->Render();
 }
 
 void MyImageViewer::SetSlice(int s)
