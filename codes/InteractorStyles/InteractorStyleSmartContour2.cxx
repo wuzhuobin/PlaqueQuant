@@ -41,6 +41,7 @@ using namespace std;
 InteractorStyleSmartContour2::InteractorStyleSmartContour2()
 	:AbstractInteractorStyleImage()
 {
+	this->m_lastSlice = -1;
 }
 
 InteractorStyleSmartContour2::~InteractorStyleSmartContour2()
@@ -105,13 +106,13 @@ void InteractorStyleSmartContour2::SetSmartContour2Enable(bool b)
 		GenerateContour();
 	}
 	else {
-		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
 			= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
 			++cit) {
 
 			(*cit)->EnabledOff();
 		}
-		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
 			= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
 			++cit) {
 
@@ -179,7 +180,7 @@ void InteractorStyleSmartContour2::GeneratePolyData(int slice)
 
 	cout << slice << endl;
 	vtkImageData* images[2] = { m_vesselWallImage, m_lumenImage };
-	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
+	vector<vtkSmartPointer<vtkContourWidget>>* lists[2] =
 	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
 	vector<vector<vtkSmartPointer<vtkPolyData>>*>* polydataList[2] =
 	{&m_vesselWallPolyData, &m_lumenPolyData};
@@ -251,12 +252,28 @@ void InteractorStyleSmartContour2::GenerateContour()
 		return;
 	}
 	vtkImageData* images[2] = { m_vesselWallImage, m_lumenImage };
-	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
+	vector<vtkSmartPointer<vtkContourWidget>>* lists[2] =
 	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
 	vector<vector<vtkSmartPointer<vtkPolyData>>*>* polydataList[2] =
 	{ &m_vesselWallPolyData, &m_lumenPolyData };
-	ClearAllContour();
+
+	// Save current slice contour widget to polydatalist
+	if (this->m_lastSlice != -1) 
+	{
+		for (int i = 0; i < 2; ++i) {
+
+			for (int j = 0; j < lists[i]->size(); j++) {
+				vtkContourRepresentation* rep = 
+					vtkContourRepresentation::SafeDownCast(lists[i]->at(j));
+				(*polydataList[i])[this->m_lastSlice]->at(j)->DeepCopy(rep->GetContourRepresentationAsPolyData());
+			}
+		}
+	}
+
+
+	this->ClearAllContour();
 	int realSlice = GetSlice() - GetExtent()[4];
+	// build the contour with current polydata
 	for (int i = 0; i < 2; ++i) {
 
 		for (vector<vtkSmartPointer<vtkPolyData>>::const_iterator cit =
@@ -271,24 +288,26 @@ void InteractorStyleSmartContour2::GenerateContour()
 			newWidget->CloseLoop();
 			newWidget->SetInteractor(this->Interactor);
 			newWidget->EnabledOn();
+			newWidget->SetReferenceCount(10);
 			lists[i]->push_back(newWidget);
 		}
 
 
 	}
+	this->m_lastSlice = realSlice;
 	m_imageViewer->Render();
 
 }
 
 void InteractorStyleSmartContour2::ClearAllContour()
 {
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+	for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
 		= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
 		++cit) {
 
 		(*cit)->EnabledOff();
 	}
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+	for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
 		= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
 		++cit) {
 
@@ -501,12 +520,12 @@ void InteractorStyleSmartContour2::SetCurrentFocalPointWithImageCoordinate(int i
 
 void InteractorStyleSmartContour2::FillPolygon()
 {
-	list<vtkSmartPointer<vtkContourWidget>>* lists[2] =
+	vector<vtkSmartPointer<vtkContourWidget>>* lists[2] =
 	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
 
 	int label[2] = { vesselWallLabel , lumenLabel };
 	for (int i = 0; i < 2; ++i) {
-		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit = lists[i]->cbegin();
+		for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit = lists[i]->cbegin();
 			cit != lists[i]->cend(); ++cit) {
 			
 			(*cit)->CloseLoop();
