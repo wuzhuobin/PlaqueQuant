@@ -16,13 +16,7 @@ Core::Core(QWidget* parent)
 	m_imageManager = new  MyImageManager(this);
 	m_ioManager = new IOManager(this);
 	m_widgetManager = new MyWidgetManager(this);
-	m_lumenExtractionFilter = new LumenExtraction();
 
-	// default parameters for lumen extractions
-	this->m_lumenExtractionFilter->SetNumberOfIterations(30);
-	this->m_lumenExtractionFilter->SetDilationValue(4);
-	this->m_lumenExtractionFilter->SetMultiplier(2.3);
-	this->m_lumenExtractionFilter->SetInitialNeighborhoodRadius(1);
 
 	// enable registration
 	m_ioManager->enableRegistration(true);
@@ -74,11 +68,6 @@ void Core::Initialization()
 vtkSmartPointer<vtkPolyData> Core::GetCenterlinePD()
 {
 	return this->m_centerlinePD;
-}
-
-vtkSmartPointer<InteractorStyleSwitch> Core::Get2DInteractorStyle(int i)
-{
-	return this->m_style[i];
 }
 
 Core::~Core() 
@@ -199,23 +188,27 @@ void Core::slotChangeModality(QString modalityName, int viewerNum)
 {
 	if (modalityName.isEmpty())
 		return;
-
-	int index = this->m_imageManager->GetModalityIndex(modalityName);
-	if (m_viewMode == MULTIPLANAR_VIEW) {
-		for (int j = 0; j < VIEWER_NUM; ++j) {
-			m_2DimageViewer[j]->SetInputData(
-				this->m_imageManager->getListOfViewerInputImages()[index]);
-			m_2DimageViewer[j]->Render();
-			m_2DimageViewer[j]->InitializeHeader(m_imageManager->getModalityName(index));
+	for (int i = 0; i < m_imageManager->getListOfModalityNames().size(); ++i) {
+		if (modalityName == m_imageManager->getListOfModalityNames()[i]) {
+			if (m_viewMode == MULTIPLANAR_VIEW) {
+				for (int j = 0; j < VIEWER_NUM; ++j) {
+					m_2DimageViewer[j]->SetInputData(
+						this->m_imageManager->getListOfViewerInputImages()[i]);
+					m_2DimageViewer[j]->Render();
+					m_2DimageViewer[j]->InitializeHeader(m_imageManager->getModalityName(i));
+				}
+				break;
+			}
+			else {
+				m_2DimageViewer[viewerNum]->SetInputData(
+					this->m_imageManager->getListOfViewerInputImages()[i]);
+				m_2DimageViewer[viewerNum]->Render();
+				m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager->getModalityName(i));
+				break;
+			}
 		}
-	}
-	else {
-		m_2DimageViewer[viewerNum]->SetInputData(
-			this->m_imageManager->getListOfViewerInputImages()[index]);
-		m_2DimageViewer[viewerNum]->Render();
-		m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager->getModalityName(index));
-	}
 
+	}
 	RenderAllViewer();
 }
 
@@ -314,22 +307,6 @@ void Core::slotChangeView(int viewMode)
 	slotChangeFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 
 	RenderAllViewer();
-}
-
-void Core::slotChangeSlices(int* ijk) 
-{
-	this->slotChangeSlices(ijk[0], ijk[1], ijk[2]);
-}
-
-
-void Core::slotChangeSlices(int x, int y, int z) 
-{
-	int ijk[3];
-	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	if (x == ijk[0] && y == ijk[1] && z == ijk[2]) {
-		return;
-	}
-	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(x, y, z);
 }
 
 void Core::slotChangeSliceX(int x) {
@@ -676,15 +653,6 @@ double* Core::ConvertExtentToBounds(int* extent)
 	return bounds;
 }
 
-void Core::slotSetExtractLumenSeedList(std::vector<int *> seedList)
-{
-	this->m_lumenExtractionFilter->ClearAllSeeds();
-	for each (int* seedIndex in seedList)
-	{
-		this->m_lumenExtractionFilter->AddSeed(seedIndex);
-	}
-}
-
 void Core::slotValidatePatientInformation()
 {
 	if (m_imageManager->getNumberOfImages() == 1) {
@@ -753,8 +721,6 @@ void Core::ModeChangeUpdate(INTERACTION_MODE index)
 			this->m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(false);
 		}
 	}
-
-	this->RenderAllViewer();
 }
 
 void Core::slotContourMode()
@@ -823,65 +789,6 @@ void Core::slotSetLineInterpolatorToPolygon(bool flag)
 	}
 }
 
-void Core::slotExtractLumen()
-{
-	try
-	{
-		this->m_lumenExtractionFilter->Update();
-		vtkSmartPointer<vtkImageData> lumenImage =
-			vtkSmartPointer<vtkImageData>::New();
-		this->m_lumenExtractionFilter->GetLumenVtkImage(lumenImage);
-		this->m_imageManager->getOverlay()->ReplacePixels(lumenImage->GetExtent(), lumenImage);
-		this->RenderAllViewer();
-	}
-	catch (...) {
-		this->DisplayErrorMessage("Unknown Error!");
-	}
-}
-
-void Core::slotSetExtractLumenInputImage(vtkImageData* im)
-{
-	this->m_lumenExtractionFilter->SetInputData(im);
-}
-
-void Core::slotSetExtractLumenDilationValue(int val)
-{
-	this->m_lumenExtractionFilter->SetDilationValue(val);
-}
-
-void Core::slotSetExtractLumenInitialNeighborhoodRadius(int val)
-{
-	this->m_lumenExtractionFilter->SetInitialNeighborhoodRadius(val);
-}
-
-void Core::slotSetExtractLumenMultiplier(double val)
-{
-	this->m_lumenExtractionFilter->SetMultiplier(val);
-}
-
-void Core::slotDrawSegmentation()
-{
-	this->m_style[2]->GetSmartContour2()->FillAllPolygons();
-}
-
-void Core::slotExtractLumenDilateLabel(vtkImageData* im)
-{
-	this->m_lumenExtractionFilter->LabelDilation(im);
-	vtkSmartPointer<vtkImageData> vesselWallImage =
-		vtkSmartPointer<vtkImageData>::New();
-
-	this->m_lumenExtractionFilter->GetDilatedVtkImage(vesselWallImage);
-	for (int i = 0; i < 6; i++)
-	{
-		cout << im->GetExtent()[i] << ' ' << vesselWallImage->GetExtent()[i];
-	}
-	cout << endl;
-	for (int i = 0; i < VIEWER_NUM; ++i) {
-		m_style[i]->GetSmartContour2()->SetLumenImage(im);
-		m_style[i]->GetSmartContour2()->SetVesselWallImage(vesselWallImage);
-	}
-}
-
 void Core::slotRulerMode()
 {
 	for (int i = 0; i < VIEWER_NUM; ++i) {
@@ -924,26 +831,6 @@ void Core::slotROIMode()
 	//}
 
 	this->ModeChangeUpdate(ROI_MODE);
-}
-
-void Core::slotSmartContourMode()
-{
-	for (int i = 0; i < VIEWER_NUM; i++)
-	{
-		m_style[i]->SetInteractorStyleToSmartContour();
-	}
-	this->ModeChangeUpdate(SMARTCONTOUR_MODE);
-
-}
-
-void Core::slotSmartContour2Mode()
-{
-	for (int i = 0; i < VIEWER_NUM; i++)
-	{
-		m_style[i]->SetInteractorStyleToSmartContour2();
-	}
-	this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
-
 }
 
 void Core::slotChangeROI()
