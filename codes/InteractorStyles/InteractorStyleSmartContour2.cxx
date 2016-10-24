@@ -263,9 +263,10 @@ void InteractorStyleSmartContour2::GenerateContour()
 		for (int i = 0; i < 2; ++i) {
 
 			for (int j = 0; j < lists[i]->size(); j++) {
-				vtkContourRepresentation* rep = 
-					vtkContourRepresentation::SafeDownCast(lists[i]->at(j));
-				(*polydataList[i])[this->m_lastSlice]->at(j)->DeepCopy(rep->GetContourRepresentationAsPolyData());
+				vtkSmartPointer<vtkContourRepresentation> rep = lists[i]->at(j)->GetContourRepresentation();
+				vtkSmartPointer<vtkPolyData> repPD = vtkSmartPointer<vtkPolyData>::New();
+				rep->GetNodePolyData(repPD);
+				(*polydataList[i])[this->m_lastSlice]->at(j)->DeepCopy(repPD);
 			}
 		}
 	}
