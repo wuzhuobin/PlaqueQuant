@@ -948,7 +948,7 @@ void Core::slotSmartContour2Mode()
 
 void Core::slotChangeROI()
 {
-	/// Depricted
+	/// Depicted
 
 	//int extent[6];
 	//m_style[0]->GetROI()->SelectROI(extent);
@@ -984,7 +984,7 @@ void Core::slotSelectROI()
 		}
 	}
 	slotChangeView(MULTIPLANAR_VIEW);
-	//this->m_imageManager->getOverlay().SetDisplayExtent(newExtent);
+	this->m_imageManager->getOverlay()->SetDisplayExtent(newExtent);
 
 	for (int i = 0; i < VIEWER_NUM; i++)
 	{

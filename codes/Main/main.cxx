@@ -4,7 +4,7 @@
 
 ////Hide the cmd
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
  
 #define PLAQUEQUANT_VERSION "2.0"
 

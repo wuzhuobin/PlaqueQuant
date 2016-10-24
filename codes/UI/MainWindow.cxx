@@ -334,7 +334,7 @@ void MainWindow::updateRecentActionList()
 void MainWindow::slotAbout()
 {
 	QMessageBox msgBox;
-	msgBox.setIconPixmap(QPixmap(":/icons/PlaqueQuant_logo.png"));
+	msgBox.setIconPixmap(QPixmap(":/icons/plaqueQuant.png"));
 	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", this->m_version) +
 		QString("<br>This software is a analytical tool designed to diagnose the condition of plaque and blood vessels."));
 	msgBox.setWindowTitle("About");
