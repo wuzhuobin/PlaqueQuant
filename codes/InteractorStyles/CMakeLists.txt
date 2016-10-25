@@ -17,7 +17,6 @@ include(${VTK_USE_FILE})
 if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
   # Instruct CMake to run moc automatically when needed.
   # set(CMAKE_AUTOMOC ON)
-  find_package(Qt5PrintSupport REQUIRED)
   find_package(Qt5Widgets REQUIRED QUIET)
   # add_definitions(-DQT5_IS_LOADED)
 else()
@@ -67,17 +66,33 @@ file(
 	${PROJECT_SOURCE_DIR}/MyBorderWidget.h
 	PARENT_SCOPE
 	)
+file(
+	QINTERACTORS_SRC
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.cxx
+	)
+file(
+	QINTERACTORS_INC
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.h
+	)
+qt5_wrap_cpp(
+	QINTERACTORS_INC_MOC
+	${QINTERACTORS_INC}
+	)
 add_library(
 	InteractorStyles
 	${ABSTRACT_INTERACTORS_SRC}
 	${ABSTRACT_INTERACTORS_H}
 	${INTERACTORS_INC}
 	${INTERACTORS_SRC}
+	${QINTERACTORS_INC}
+	${QINTERACTORS_SRC}
+	${QINTERACTORS_INC_MOC}
 )
 
 target_link_libraries(
 	InteractorStyles
 	${VTK_LIBRARIES}
+	Qt5::Widgets
 )
 
 source_group(
@@ -92,3 +107,8 @@ source_group(
 	${ABSTRACT_INTERACTORS_SRC}
 	${INTERACTORS_SRC}
 	)
+SOURCE_GROUP(
+	"Generated FIles" 
+	FILES
+	${QINTERACTORS_INC_MOC}
+)

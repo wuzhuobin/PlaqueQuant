@@ -25,9 +25,9 @@ vtkStandardNewMacro(AbstractInteractorStyleImage);
 
 AbstractInteractorStyleImage::AbstractInteractorStyleImage() : vtkInteractorStyleImage()
 {
-	m_rightFunctioning = false;
-	m_leftFunctioning = false;
-	m_middleFunctioning = false;
+	//m_rightFunctioning = false;
+	//m_leftFunctioning = false;
+	//m_middleFunctioning = false;
 }
 
 AbstractInteractorStyleImage::~AbstractInteractorStyleImage()
@@ -64,19 +64,19 @@ void AbstractInteractorStyleImage::SynchronizedZooming()
 	}
 }
 
-vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
-{
-	vtkSmartPointer<vtkPropPicker> picker = vtkSmartPointer<vtkPropPicker>::New();
-	if (this->m_imageViewer->GetRenderer()) {
-		picker->Pick(x, y, 0, this->m_imageViewer->GetRenderer());
-	}
-	if (picker->GetActor()) {
-		return picker->GetActor();
-	}
-	else {
-		return nullptr;
-	}
-}
+//vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
+//{
+//	vtkSmartPointer<vtkPropPicker> picker = vtkSmartPointer<vtkPropPicker>::New();
+//	if (this->m_imageViewer->GetRenderer()) {
+//		picker->Pick(x, y, 0, this->m_imageViewer->GetRenderer());
+//	}
+//	if (picker->GetActor()) {
+//		return picker->GetActor();
+//	}
+//	else {
+//		return nullptr;
+//	}
+//}
 
 int AbstractInteractorStyleImage::GetSlice()
 {
@@ -133,48 +133,48 @@ void AbstractInteractorStyleImage::SetCurrentFocalPointWithImageCoordinate(int i
 void AbstractInteractorStyleImage::OnMouseWheelForward()
 {
 	this->MoveSliceForward();
-	//vtkInteractorStyleImage::OnMouseWheelForward();
+	vtkInteractorStyleImage::OnMouseWheelForward();
 }
 
 void AbstractInteractorStyleImage::OnMouseWheelBackward()
 {
 	this->MoveSliceBackward();
-	//vtkInteractorStyleImage::OnMouseWheelBackward();
+	vtkInteractorStyleImage::OnMouseWheelBackward();
 }
 
 void AbstractInteractorStyleImage::OnLeftButtonDown()
 {
-	m_leftFunctioning = true;
+	AbstractInteractorStyle::OnLeftButtonDown();
 	vtkInteractorStyleImage::OnLeftButtonDown();
 }
 
 void AbstractInteractorStyleImage::OnLeftButtonUp()
 {
-	m_leftFunctioning = false;
+	AbstractInteractorStyle::OnLeftButtonUp();
 	vtkInteractorStyleImage::OnLeftButtonUp();
 }
 
 void AbstractInteractorStyleImage::OnRightButtonDown()
 {
-	m_rightFunctioning = true;
+	AbstractInteractorStyle::OnRightButtonDown();
 	vtkInteractorStyleImage::OnRightButtonDown();
 }
 
 void AbstractInteractorStyleImage::OnRightButtonUp()
 {
-	m_rightFunctioning = false;
+	AbstractInteractorStyle::OnRightButtonUp();
 	vtkInteractorStyleImage::OnRightButtonUp();
 }
 
 void AbstractInteractorStyleImage::OnMiddleButtonDown()
 {
-	m_middleFunctioning = true;
+	AbstractInteractorStyle::OnMiddleButtonDown();
 	vtkInteractorStyleImage::OnMiddleButtonDown();
 }
 
 void AbstractInteractorStyleImage::OnMiddleButtonUp()
 {
-	m_middleFunctioning = false;
+	AbstractInteractorStyle::OnMiddleButtonUp();
 	vtkInteractorStyleImage::OnMiddleButtonUp();
 }
 

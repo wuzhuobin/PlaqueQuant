@@ -21,13 +21,13 @@ Copyright (C) 2016
 
 /// VTK
 #include <vtkInteractorStyleImage.h>
-#include <vtkObjectFactory.h>
+#include <AbstractInteractorStyle.h>
 
 #include <list>
 
 #include "MyImageViewer.h"
 
-class AbstractInteractorStyleImage : public vtkInteractorStyleImage
+class AbstractInteractorStyleImage : public vtkInteractorStyleImage, public AbstractInteractorStyle
 {
 public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
@@ -37,7 +37,7 @@ public:
 	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
 	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	virtual void SynchronizedZooming();
-	virtual vtkActor* PickActor(int x, int y);
+	//virtual vtkActor* PickActor(int x, int y);
 	virtual void SetCurrentSlice(int slice);
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
@@ -72,9 +72,9 @@ protected:
 	virtual double* GetSpacing();
 	virtual int* GetExtent();
 
-	bool m_rightFunctioning;
-	bool m_leftFunctioning;
-	bool m_middleFunctioning;
+	//bool m_rightFunctioning;
+	//bool m_leftFunctioning;
+	//bool m_middleFunctioning;
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_IMAGE_H

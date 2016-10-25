@@ -20,9 +20,9 @@ Copyright (C) 2016
 
 
 AbstractInteractorStyle::AbstractInteractorStyle() {
-	m_rightFunctioning = false;
-	m_leftFunctioning = false;
-	m_middleFunctioning = false;
+	//m_rightFunctioning = false;
+	//m_leftFunctioning = false;
+	//m_middleFunctioning = false;
 }
 
 AbstractInteractorStyle::~AbstractInteractorStyle() {
@@ -30,15 +30,15 @@ AbstractInteractorStyle::~AbstractInteractorStyle() {
 }
 
 
-int AbstractInteractorStyle::GetOrientation()
-{
-	return m_orientation;
-}
-
-void AbstractInteractorStyle::SetOrientation(int i)
-{
-	m_orientation = i;
-}
+//int AbstractInteractorStyle::GetOrientation()
+//{
+//	return m_orientation;
+//}
+//
+//void AbstractInteractorStyle::SetOrientation(int i)
+//{
+//	m_orientation = i;
+//}
 
 void AbstractInteractorStyle::OnLeftButtonDown()
 {
@@ -70,7 +70,7 @@ void AbstractInteractorStyle::OnMiddleButtonUp()
 	m_middleFunctioning = false;
 }
 
-vtkActor * AbstractInteractorStyle::PickActor(int x, int y)
-{
-	return NULL;
-}
+//vtkActor * AbstractInteractorStyle::PickActor(int x, int y)
+//{
+//	return NULL;
+//}

@@ -17,16 +17,16 @@ Copyright (C) 2016
 #ifndef ABSTRACT_INTERACTOR_STYLE_H
 #define ABSTRACT_INTERACTOR_STYLE_H
 
-#include <vtkActor.h>
+//#include <vtkActor.h>
 
 class AbstractInteractorStyle
 {
 public:
-	virtual void SetOrientation(int);
-	
-	int GetOrientation();
+	//virtual void SetOrientation(int);
+	//
+	//int GetOrientation();
 
-	vtkActor* PickActor(int x, int y);
+	//vtkActor* PickActor(int x, int y);
 
 protected:
 	AbstractInteractorStyle();
@@ -40,11 +40,11 @@ protected:
 	virtual void OnMiddleButtonUp();
 
 	
-	int			m_orientation;
+	//int			m_orientation;
 
-	bool m_rightFunctioning;
-	bool m_leftFunctioning;
-	bool m_middleFunctioning;
+	bool m_rightFunctioning = false;
+	bool m_leftFunctioning = false;
+	bool m_middleFunctioning = false;
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_H
