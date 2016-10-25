@@ -3,6 +3,8 @@
 #include "SurfaceCreator.h"
 #include "Centerline.h"
 #include <GPUVolumeRenderingFilter.h>
+#include <itkBinaryBallStructuringElement.h>
+#include <itkBinaryDilateImageFilter.h>
 #include <vtkClipPolyData.h>
 #include <vtkExtractVOI.h>
 #include <vtkRendererCollection.h>
@@ -474,14 +476,38 @@ void Core::slotGenerateCenterlineBtn()
 	thres->SetInputData(voi->GetOutput());
 	thres->ThresholdBetween(LABEL_LUMEN - 0.1, LABEL_LUMEN + 0.1);
 	thres->SetOutValue(0);
-	thres->SetInValue(10);
+	thres->SetInValue(VTK_SHORT_MAX);
+	thres->SetOutputScalarTypeToUnsignedShort();
 	thres->Update();
 
 	/// Obtain centerline
+	// Dilate the image fisrst
+	typedef itk::Image<ushort, 3> ImageTypeForDilation;
+	typedef itk::BinaryBallStructuringElement<ImageTypeForDilation::PixelType, 3>  StructuringElementType;
+	typedef itk::BinaryDilateImageFilter<ImageTypeForDilation, ImageTypeForDilation, StructuringElementType> DilateFilterType;
+	typedef itk::VTKImageToImageFilter<ImageTypeForDilation> Vtk2ItkConnectorType;
+	typedef itk::ImageToVTKImageFilter<ImageTypeForDilation> Itk2VtkConnectorType;
+	Vtk2ItkConnectorType::Pointer v2i = Vtk2ItkConnectorType::New();
+	Itk2VtkConnectorType::Pointer i2v = Itk2VtkConnectorType::New();
+	StructuringElementType structuringElement;
+	structuringElement.SetRadius(2);
+	structuringElement.CreateStructuringElement();
+	v2i->SetInput(thres->GetOutput());
+	v2i->Update();
+	//  Dilation
+	DilateFilterType::Pointer dilationFilter = DilateFilterType::New();
+	dilationFilter->SetInput(v2i->GetOutput());
+	dilationFilter->SetKernel(structuringElement);
+	dilationFilter->SetDilateValue(1);
+	dilationFilter->Update();
+	i2v->SetInput(dilationFilter->GetOutput());
+	i2v->Update();
+	
+	// Generate surface for centerline calculation
 	SurfaceCreator* surfaceCreator = new SurfaceCreator();
-	surfaceCreator->SetInput(thres->GetOutput());
-	surfaceCreator->SetValue(10);
-	surfaceCreator->SetSmoothIteration(15);
+	surfaceCreator->SetInput(i2v->GetOutput());
+	surfaceCreator->SetValue(15);
+	surfaceCreator->SetSmoothIteration(5);
 	surfaceCreator->SetDiscrete(false);
 	surfaceCreator->SetResamplingFactor(1.0);
 	surfaceCreator->Update();
