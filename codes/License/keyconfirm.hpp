@@ -37,6 +37,11 @@ public:
 	 *         false if incorrect
 	 */
 	bool checkLicence();
+
+public slots:
+	void slotSelectLicenseFile();
+
+
 private:
 	// ui
 	Ui::keyConfirm* ui;
