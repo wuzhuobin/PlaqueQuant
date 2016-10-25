@@ -273,6 +273,7 @@ void InteractorStyleSmartContour2::GenerateContour()
 				if (repPD->GetNumberOfPoints() == 0) 
 				{
 					(*polydataList[i])[this->m_lastSlice]->erase((*polydataList[i])[this->m_lastSlice]->begin() + j);
+					lists[i]->at(j)->EnabledOff();
 					lists[i]->erase(lists[i]->begin() + j);
 				}
 				else {
