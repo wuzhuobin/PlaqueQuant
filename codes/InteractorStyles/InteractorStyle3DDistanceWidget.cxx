@@ -138,6 +138,6 @@ void InteractorStyle3DDistanceWidget::UpdateStenosisValue()
 	double B = cl->GetPointData()->GetArray("Radius")->GetComponent(this->m_ids.at(1), 0);
 
 	double stenosisVal = { A > B ? 1. - B / A : 1 - A / B };
-	mainwnd->UpdateStenosisValue(stenosisVal * 100);
+	mainwnd->UpdateStenosisValue(stenosisVal * 100); 
 }
 
