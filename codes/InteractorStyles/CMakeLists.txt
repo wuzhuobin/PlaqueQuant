@@ -67,10 +67,12 @@ file(
 	PARENT_SCOPE
 	)
 file(
+	GLOB
 	QINTERACTORS_SRC
 	${PROJECT_SOURCE_DIR}/QInteractorStyle*.cxx
 	)
 file(
+	GLOB
 	QINTERACTORS_INC
 	${PROJECT_SOURCE_DIR}/QInteractorStyle*.h
 	)
@@ -78,6 +80,15 @@ qt5_wrap_cpp(
 	QINTERACTORS_INC_MOC
 	${QINTERACTORS_INC}
 	)
+file(
+	GLOB
+	QINTERACTORS_UI
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.ui
+)
+qt5_wrap_ui(
+	QINTERACTORS_UI_SRC
+	${QINTERACTORS_UI}
+)
 add_library(
 	InteractorStyles
 	${ABSTRACT_INTERACTORS_SRC}
@@ -87,6 +98,8 @@ add_library(
 	${QINTERACTORS_INC}
 	${QINTERACTORS_SRC}
 	${QINTERACTORS_INC_MOC}
+	${QINTERACTORS_UI}
+	${QINTERACTORS_UI_SRC}
 )
 
 target_link_libraries(
@@ -111,4 +124,10 @@ SOURCE_GROUP(
 	"Generated FIles" 
 	FILES
 	${QINTERACTORS_INC_MOC}
+	${QINTERACTORS_UI_SRC}
 )
+SOURCE_GROUP(
+	"Forms FIles" 	
+	FILES 
+	${QINTERACTORS_UI}
+	)
