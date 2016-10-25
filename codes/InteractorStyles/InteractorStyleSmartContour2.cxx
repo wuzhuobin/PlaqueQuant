@@ -102,23 +102,26 @@ void InteractorStyleSmartContour2::SetSmartContour2Enable(bool b)
 {
 	m_ContourIsOnFlag = b;
 	if (b) {
+		ClearAllContour();
 		GeneratePolyData();
 		GenerateContour();
 	}
 	else {
-		for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
-			= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
-			++cit) {
+		//for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		//	= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
+		//	++cit) {
 
-			(*cit)->EnabledOff();
-		}
-		for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
-			= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
-			++cit) {
+		//	(*cit)->EnabledOff();
+		//}
+		//for (vector<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		//	= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
+		//	++cit) {
 
-			(*cit)->EnabledOff();
+		//	(*cit)->EnabledOff();
 
-		}
+		//}
+
+		ClearAllContour();
 
 	}
 	m_imageViewer->Render();
@@ -148,6 +151,7 @@ void InteractorStyleSmartContour2::ClearPolyDataList()
 
 		//}
 	}
+	m_vesselWallPolyData.clear();
 
 	for (vector<vector<vtkSmartPointer<vtkPolyData>>*>::iterator it1 =
 		m_lumenPolyData.begin(); it1 != m_lumenPolyData.end(); ++it1) {
@@ -160,6 +164,7 @@ void InteractorStyleSmartContour2::ClearPolyDataList()
 
 		//}
 	}
+	m_lumenPolyData.clear();
 }
 
 void InteractorStyleSmartContour2::GeneratePolyData()
@@ -266,7 +271,7 @@ void InteractorStyleSmartContour2::GenerateContour()
 				vtkSmartPointer<vtkContourRepresentation> rep = lists[i]->at(j)->GetContourRepresentation();
 				vtkSmartPointer<vtkPolyData> repPD = vtkSmartPointer<vtkPolyData>::New();
 				rep->GetNodePolyData(repPD);
-				(*polydataList[i])[this->m_lastSlice]->at(j)->DeepCopy(repPD);
+				(*polydataList[i])[this->m_lastSlice]->at(j) = (repPD);
 			}
 		}
 	}
