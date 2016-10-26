@@ -250,7 +250,7 @@ void MainWindow::createRecentImageActions()
 /* Visualization and initialize Module widget UI */
 bool MainWindow::slotVisualizeImage()
 {	
-
+	adjustForCurrentFile(ioManager->getFilePath());
 	//Enable Actions 
 	setActionsEnable(true);
 
@@ -295,7 +295,7 @@ bool MainWindow::slotVisualizeImage()
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)
 {
-	QSettings settings("DIIR","Project");
+	QSettings settings("DIIR","PlaqueQuant");
 	QStringList recentFilePaths = settings.value("recentFiles").toStringList();
 	
 	recentFilePaths.removeAll(filePath);
@@ -310,7 +310,7 @@ void MainWindow::adjustForCurrentFile(const QString &filePath)
 
 void MainWindow::updateRecentActionList()
 {
-	QSettings settings("DIIR","Project");
+	QSettings settings("DIIR","PlaqueQuant");
 	QStringList recentFilePaths =
 		settings.value("recentFiles").toStringList();
 

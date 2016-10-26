@@ -176,6 +176,7 @@ private:
 	IOManager*		m_ioManager;
 	vtkSmartPointer<vtkPolyData> m_centerlinePD;
 
+
 	// Filter
 	LumenExtraction* m_lumenExtractionFilter;
 
