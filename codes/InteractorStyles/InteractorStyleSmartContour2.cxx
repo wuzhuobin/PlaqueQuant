@@ -183,7 +183,6 @@ void InteractorStyleSmartContour2::GeneratePolyData(int slice)
 		return;
 	}
 
-	cout << slice << endl;
 	vtkImageData* images[2] = { m_vesselWallImage, m_lumenImage };
 	vector<vtkSmartPointer<vtkContourWidget>>* lists[2] =
 	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
@@ -237,7 +236,8 @@ void InteractorStyleSmartContour2::GeneratePolyData(int slice)
 			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
 				vtkSmartPointer<vtkCleanPolyData>::New();
 			clearPolyData->SetInputConnection(_connectivity->GetOutputPort());
-			clearPolyData->SetTolerance(0.1);
+			clearPolyData->ToleranceIsAbsoluteOn();
+			clearPolyData->SetAbsoluteTolerance(1);
 			clearPolyData->PointMergingOn();
 			clearPolyData->Update();
 			(*polydataList[i])[slice]->push_back(clearPolyData->GetOutput());
