@@ -21,19 +21,6 @@ keyConfirm::~keyConfirm() {
 
 bool keyConfirm::checkLicence()
 {
-//	// obtain executable path
-//#ifdef _WIN64 || _WIN32
-//	// The following dosen't work for linux system
-//	HMODULE hModule = GetModuleHandleW(NULL);
-//	WCHAR path[MAX_PATH];
-//	GetModuleFileNameW(hModule, path, MAX_PATH);
-//
-//	QString qpath = QString::fromStdWString(path);
-//	QString fileName = qpath.split(QString("\\")).last();
-//
-//#else 
-//	WCHAR path = "./license.dat";
-//#endif
 	QString path = QCoreApplication::applicationDirPath();
 	QFile licence(path + QString("/license.dat"));
 	if(!licence.exists())	return false;
