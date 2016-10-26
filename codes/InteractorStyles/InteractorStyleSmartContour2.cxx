@@ -183,7 +183,6 @@ void InteractorStyleSmartContour2::GeneratePolyData(int slice)
 		return;
 	}
 
-	cout << slice << endl;
 	vtkImageData* images[2] = { m_vesselWallImage, m_lumenImage };
 	vector<vtkSmartPointer<vtkContourWidget>>* lists[2] =
 	{ &m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
@@ -234,15 +233,24 @@ void InteractorStyleSmartContour2::GeneratePolyData(int slice)
 
 			ResequenceLumenWallPolyData(_connectivity->GetOutput());
 
+			double toleranceInitial = 1;
+			int loopBreaker = 0;
 			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
 				vtkSmartPointer<vtkCleanPolyData>::New();
 			clearPolyData->SetInputConnection(_connectivity->GetOutputPort());
-			clearPolyData->SetTolerance(0.1);
+			clearPolyData->ToleranceIsAbsoluteOn();
+			clearPolyData->SetAbsoluteTolerance(toleranceInitial);
 			clearPolyData->PointMergingOn();
 			clearPolyData->Update();
-			(*polydataList[i])[slice]->push_back(clearPolyData->GetOutput());
+			while (clearPolyData->GetOutput()->GetNumberOfPoints() < 3 && loopBreaker < 10) {
+				toleranceInitial *= 0.75;
+				clearPolyData->SetAbsoluteTolerance(toleranceInitial);
+				clearPolyData->Update();
+				loopBreaker += 1;
+			}
 
-
+			if (clearPolyData->GetOutput()->GetNumberOfPoints() >= 3)
+				(*polydataList[i])[slice]->push_back(clearPolyData->GetOutput());
 		}
 
 	}
@@ -644,6 +652,7 @@ void InteractorStyleSmartContour2::FillAllPolygons()
 		return;
 
 	this->m_imageViewer->SetSlice(0);
+	this->GenerateContour();
 	int numOfSliceToProcess = { this->m_vesselWallPolyData.size() > this->m_lumenPolyData.size() ?
 						int(this->m_vesselWallPolyData.size()) : int(this->m_lumenPolyData.size()) };
 
