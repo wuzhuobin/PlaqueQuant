@@ -87,9 +87,11 @@ private:
 	 * When refering to using index to represnet the image
 	 * Always first vessel wall then lumen
 	 */
-	std::list<vtkSmartPointer<vtkContourWidget>> m_vesselWallContourWidgets;
-	std::list<vtkSmartPointer<vtkContourWidget>> m_lumenWallContourWidgets;
+	std::vector<vtkSmartPointer<vtkContourWidget>> m_vesselWallContourWidgets;
+	std::vector<vtkSmartPointer<vtkContourWidget>> m_lumenWallContourWidgets;
 
+	/* This saves the contour widget of the last slice*/
+	int m_lastSlice;
 
 	vtkSmartPointer<vtkImageData> m_vesselWallImage = nullptr;
 	vtkSmartPointer<vtkImageData> m_lumenImage = nullptr;

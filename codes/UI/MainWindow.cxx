@@ -250,7 +250,7 @@ void MainWindow::createRecentImageActions()
 /* Visualization and initialize Module widget UI */
 bool MainWindow::slotVisualizeImage()
 {	
-
+	adjustForCurrentFile(ioManager->getFilePath());
 	//Enable Actions 
 	setActionsEnable(true);
 
@@ -295,7 +295,7 @@ bool MainWindow::slotVisualizeImage()
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)
 {
-	QSettings settings("DIIR","Project");
+	QSettings settings("DIIR","PlaqueQuant");
 	QStringList recentFilePaths = settings.value("recentFiles").toStringList();
 	
 	recentFilePaths.removeAll(filePath);
@@ -310,7 +310,7 @@ void MainWindow::adjustForCurrentFile(const QString &filePath)
 
 void MainWindow::updateRecentActionList()
 {
-	QSettings settings("DIIR","Project");
+	QSettings settings("DIIR","PlaqueQuant");
 	QStringList recentFilePaths =
 		settings.value("recentFiles").toStringList();
 
@@ -334,7 +334,7 @@ void MainWindow::updateRecentActionList()
 void MainWindow::slotAbout()
 {
 	QMessageBox msgBox;
-	msgBox.setIconPixmap(QPixmap(":/icons/PlaqueQuant_logo.png"));
+	msgBox.setIconPixmap(QPixmap(":/icons/plaqueQuant.png"));
 	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", this->m_version) +
 		QString("<br>This software is a analytical tool designed to diagnose the condition of plaque and blood vessels."));
 	msgBox.setWindowTitle("About");

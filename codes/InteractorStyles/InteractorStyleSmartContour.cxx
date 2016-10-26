@@ -72,6 +72,8 @@ InteractorStyleSmartContour::InteractorStyleSmartContour()
 
 InteractorStyleSmartContour::~InteractorStyleSmartContour()
 {
+	this->m_seedWidget->EnabledOff();
+	this->m_seedWidget->SetInteractor(NULL);
 }
 
 void InteractorStyleSmartContour::OnMouseMove()
