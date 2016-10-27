@@ -28,7 +28,7 @@ AbstractInteractorStyle::AbstractInteractorStyle() {
 }
 
 AbstractInteractorStyle::~AbstractInteractorStyle() {
-
+	m_abstractInteractorStyles.remove(this);
 }
 
 

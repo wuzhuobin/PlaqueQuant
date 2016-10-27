@@ -22,6 +22,7 @@ Copyright (C) 2016
 #include <vtkRenderWindowInteractor.h>
 
 vtkStandardNewMacro(AbstractInteractorStyleImage);
+std::list<MyImageViewer*> AbstractInteractorStyleImage::m_synchronalViewers;
 
 AbstractInteractorStyleImage::AbstractInteractorStyleImage() : vtkInteractorStyleImage()
 {
@@ -48,15 +49,9 @@ void AbstractInteractorStyleImage::AddSynchronalViewer(MyImageViewer * imageView
 	}
 }
 
-void AbstractInteractorStyleImage::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)
-{
-	m_synchronalViewers = synchronalViewers;
-}
-
 void AbstractInteractorStyleImage::SynchronizedZooming()
 {
 	double scale = m_imageViewer->GetRenderer()->GetActiveCamera()->GetParallelScale();
-
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		(*it)->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);

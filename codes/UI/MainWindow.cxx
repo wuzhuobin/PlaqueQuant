@@ -138,8 +138,6 @@ MainWindow::MainWindow()
 	ui->URBtn2->setHidden(true);
 	ui->LLBtn2->setHidden(true);
 	ui->LRBtn2->setHidden(true);
-	ui->viewGridLayout->removeWidget(ui->windowlevelwidget);
-	ui->windowlevelwidget->setHidden(true);
 
 	//Recent Image
 	createRecentImageActions();

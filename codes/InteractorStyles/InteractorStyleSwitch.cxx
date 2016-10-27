@@ -23,7 +23,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 {
 	InteractorStyleTesting = vtkInteractorStyleImage::New();
 	WindowLevel = InteractorStyleWindowLevel::New();
-	Navigation = InteractorStyleNavigation::New();
+	Navigation = QInteractorStyleNavigation::New();
 	PolygonDraw = InteractorStylePolygonDraw::New();
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
@@ -187,18 +187,6 @@ void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
 			dynamic_cast<AbstractInteractorStyleImage*>(*it);
 		if (_style != NULL) {
 			_style->AddSynchronalViewer(imageViewer);
-		}
-	}
-}
-
-void InteractorStyleSwitch::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)
-{
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
-		if (_style != NULL) {
-			_style->SetSynchronalViewers(synchronalViewers);
 		}
 	}
 }

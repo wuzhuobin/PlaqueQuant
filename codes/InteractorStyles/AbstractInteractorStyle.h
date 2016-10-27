@@ -18,16 +18,17 @@ Copyright (C) 2016
 #ifndef ABSTRACT_INTERACTOR_STYLE_H
 #define ABSTRACT_INTERACTOR_STYLE_H
 
-#ifndef STYLE_DOWN_CAST_CONSTITERATOR(styleName, method)
-#define STYLE_DOWN_CAST_CONSTITERATOR(styleName, method) \
+#ifndef STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD)
+#define STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD) \
 for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
 	m_abstractInteractorStyles.cbegin(); cit != m_abstractInteractorStyles.cend(); ++cit){\
-	styleName* _style = dynamic_cast<##styleName*>(*cit); \
+	STYLE_NAME* _style = dynamic_cast<##STYLE_NAME*>(*cit); \
 	if (_style != nullptr) { \
-		_style->##method; \
+		_style->##METHOD; \
 	} \
 }
-#endif // !STYLE_DOWN_CAST_CONSTITERATOR(styleName, method)
+#endif // !STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD)
+
 //#include <vtkActor.h>
 #include <list>
 

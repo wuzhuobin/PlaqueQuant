@@ -27,7 +27,17 @@ Copyright (C) 2016
 
 #include "MyImageViewer.h"
 
-class AbstractInteractorStyleImage : public vtkInteractorStyleImage, public AbstractInteractorStyle
+
+#ifndef VIEWER_CONSTITERATOR(METHOD)
+#define VIEWER_CONSTITERATOR(METHOD) \
+for(std::list<MyImageViewer*>::const_iterator cit = \
+	m_synchronalViewers.cbegin(); cit != m_synchronalViewers.cend(); ++cit){\
+		(*cit)->##METHOD; \
+}
+#endif // !VIEWER_CONSTITERATOR(METHOD)
+
+class AbstractInteractorStyleImage : public virtual vtkInteractorStyleImage, 
+	public virtual AbstractInteractorStyle
 {
 public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
@@ -35,7 +45,6 @@ public:
 	
 	virtual void SetImageViewer(MyImageViewer* imageViewer);
 	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
-	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	virtual void SynchronizedZooming();
 	//virtual vtkActor* PickActor(int x, int y);
 	virtual void SetCurrentSlice(int slice);
@@ -58,12 +67,6 @@ protected:
 	virtual void OnChar();
 	virtual void OnKeyPress();
 
-	void MoveSliceForward();
-	void MoveSliceBackward();
-
-	MyImageViewer* m_imageViewer;
-	std::list<MyImageViewer*> m_synchronalViewers;
-
 	virtual int GetSlice();
 	virtual int GetMinSlice();
 	virtual int GetMaxSlice();
@@ -71,6 +74,15 @@ protected:
 	virtual double* GetOrigin();
 	virtual double* GetSpacing();
 	virtual int* GetExtent();
+
+	void MoveSliceForward();
+	void MoveSliceBackward();
+
+
+	static std::list<MyImageViewer*> m_synchronalViewers;
+	MyImageViewer* m_imageViewer;
+
+
 
 	//bool m_rightFunctioning;
 	//bool m_leftFunctioning;

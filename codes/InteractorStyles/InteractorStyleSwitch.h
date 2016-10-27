@@ -23,7 +23,7 @@ Copyright (C) 2016
 
 #include <list>
 
-#include "InteractorStyleNavigation.h"
+#include "QInteractorStyleNavigation.hpp"
 #include "InteractorStyleWindowLevel.h"
 #include "InteractorStylePolygonDraw.h"
 #include "InteractorStylePaintBrush.h"
@@ -41,7 +41,7 @@ public:
 
 	vtkGetMacro(InteractorStyleTesting, vtkInteractorStyleImage*);
 	vtkGetMacro(WindowLevel, InteractorStyleWindowLevel*);
-	vtkGetMacro(Navigation, InteractorStyleNavigation*);
+	vtkGetMacro(Navigation, QInteractorStyleNavigation*);
 	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
 	vtkGetMacro(ROI, InteractorStyleROI*);
@@ -75,7 +75,6 @@ public:
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
 	virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
-	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
 	virtual void SetCurrentSlice(int slice);
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
@@ -93,7 +92,7 @@ protected:
 private:
 
 	vtkInteractorStyleImage* InteractorStyleTesting;
-	InteractorStyleNavigation*	Navigation;
+	QInteractorStyleNavigation*	Navigation;
 	InteractorStyleWindowLevel* WindowLevel;
 	InteractorStylePolygonDraw* PolygonDraw;
 	InteractorStylePaintBrush*	PaintBrush;

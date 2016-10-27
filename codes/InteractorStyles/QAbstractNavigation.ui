@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QInteractorStyleNavigation</class>
+ <widget class="QAbstractInteractorStyle" name="QInteractorStyleNavigation">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QInteractorStyleNavigation</string>
+  </property>
+  <widget class="QSlider" name="sliceHorizontalSliderY">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>140</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>9999</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QSlider" name="sliceHorizontalSliderZ">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>220</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>99999</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QSlider" name="sliceHorizontalSliderX">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>70</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>9999</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sliceSpinBoxY">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>150</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>9999</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sliceSpinBoxX">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>70</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>9999</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sliceSpinBoxZ">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>220</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>9999</number>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QAbstractInteractorStyle</class>
+   <extends>QWidget</extends>
+   <header>qabstractinteractorstyle.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>sliceSpinBoxX</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliceHorizontalSliderX</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>78</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliceHorizontalSliderX</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliceSpinBoxX</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>212</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>81</x>
+     <y>83</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliceSpinBoxY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliceHorizontalSliderY</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>265</x>
+     <y>151</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliceHorizontalSliderY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliceSpinBoxY</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>278</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>102</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliceSpinBoxZ</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliceHorizontalSliderZ</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>298</x>
+     <y>225</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliceHorizontalSliderZ</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliceSpinBoxZ</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>102</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

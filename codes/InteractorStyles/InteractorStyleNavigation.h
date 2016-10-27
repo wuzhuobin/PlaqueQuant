@@ -37,9 +37,6 @@ protected:
 	virtual void OnLeftButtonUp();
 	virtual void OnChar();
 private:
-
-
-
 	void SynchronizedZooming();
 	void CalculateIndex();
 	

@@ -36,45 +36,47 @@ include_directories(
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_SRC 
-	${PROJECT_SOURCE_DIR}/Abstract*.cxx
+	${PROJECT_SOURCE_DIR}/Abstract*.c*
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_H 
-	${PROJECT_SOURCE_DIR}/Abstract*.h
+	${PROJECT_SOURCE_DIR}/Abstract*.h*
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	INTERACTORS_SRC  
-	${PROJECT_SOURCE_DIR}/InteractorStyle*.cxx 
-	${PROJECT_SOURCE_DIR}/LumenSegmentation.cxx
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.cxx
-	${PROJECT_SOURCE_DIR}/MyBorderWidget.cxx
+	${PROJECT_SOURCE_DIR}/InteractorStyle*.c* 
+	${PROJECT_SOURCE_DIR}/LumenSegmentation.c*
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.c*
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.c*
+	${PROJECT_SOURCE_DIR}/MyBorderWidget.c*
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	INTERACTORS_INC  
-	${PROJECT_SOURCE_DIR}/InteractorStyle*.h 
-	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h 
-	${PROJECT_SOURCE_DIR}/LumenSegmentation.h
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.h
-	${PROJECT_SOURCE_DIR}/MyBorderWidget.h
+	${PROJECT_SOURCE_DIR}/InteractorStyle*.h*
+	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h*
+	${PROJECT_SOURCE_DIR}/LumenSegmentation.h*
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h*
+	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.h*
+	${PROJECT_SOURCE_DIR}/MyBorderWidget.h*
 	PARENT_SCOPE
 	)
 file(
 	GLOB
 	QINTERACTORS_SRC
-	${PROJECT_SOURCE_DIR}/QInteractorStyle*.cxx
+	${PROJECT_SOURCE_DIR}/QAbstract*.c*
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.c*
 	)
 file(
 	GLOB
 	QINTERACTORS_INC
-	${PROJECT_SOURCE_DIR}/QInteractorStyle*.h
+	${PROJECT_SOURCE_DIR}/QAbstract*.h*
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.h*
 	)
 qt5_wrap_cpp(
 	QINTERACTORS_INC_MOC
@@ -83,6 +85,7 @@ qt5_wrap_cpp(
 file(
 	GLOB
 	QINTERACTORS_UI
+	${PROJECT_SOURCE_DIR}/QAbstract*.ui
 	${PROJECT_SOURCE_DIR}/QInteractorStyle*.ui
 )
 qt5_wrap_ui(
