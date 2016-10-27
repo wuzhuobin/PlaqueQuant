@@ -14,10 +14,22 @@ Wong Matthew Lun
 Copyright (C) 2016
 */
 
+
 #ifndef ABSTRACT_INTERACTOR_STYLE_H
 #define ABSTRACT_INTERACTOR_STYLE_H
 
+#ifndef STYLE_DOWN_CAST_CONSTITERATOR(styleName, method)
+#define STYLE_DOWN_CAST_CONSTITERATOR(styleName, method) \
+for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
+	m_abstractInteractorStyles.cbegin(); cit != m_abstractInteractorStyles.cend(); ++cit){\
+	styleName* _style = dynamic_cast<##styleName*>(*cit); \
+	if (_style != nullptr) { \
+		_style->##method; \
+	} \
+}
+#endif // !STYLE_DOWN_CAST_CONSTITERATOR(styleName, method)
 //#include <vtkActor.h>
+#include <list>
 
 class AbstractInteractorStyle
 {
@@ -45,6 +57,8 @@ protected:
 	bool m_rightFunctioning = false;
 	bool m_leftFunctioning = false;
 	bool m_middleFunctioning = false;
+
+	static std::list<AbstractInteractorStyle*> m_abstractInteractorStyles;
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_H
