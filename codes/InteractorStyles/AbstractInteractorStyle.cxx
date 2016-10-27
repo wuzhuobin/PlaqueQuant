@@ -18,11 +18,13 @@ Copyright (C) 2016
 
 #include <vtkSmartPointer.h>
 
+std::list<AbstractInteractorStyle*> AbstractInteractorStyle::m_abstractInteractorStyles;
 
 AbstractInteractorStyle::AbstractInteractorStyle() {
 	//m_rightFunctioning = false;
 	//m_leftFunctioning = false;
 	//m_middleFunctioning = false;
+	m_abstractInteractorStyles.push_back(this);
 }
 
 AbstractInteractorStyle::~AbstractInteractorStyle() {
