@@ -1,14 +1,22 @@
 ﻿#include "QInteractorStyleNavigation.hpp"
+#include "ui_qinteractorstylenavigation.h"
+
 
 vtkStandardNewMacro(QInteractorStyleNavigation);
-SETUP_UI_LIST(QInteractorStyleNavigation);
+QSETUP_UI_SRC(QInteractorStyleNavigation);
+
+
+void QInteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	InteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
+	QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
+}
 
 QInteractorStyleNavigation::QInteractorStyleNavigation(int uiType, QWidget * parent)
 {
-	setupUi();
-	show();
+	QNEW_UI();
 }
 
 QInteractorStyleNavigation::~QInteractorStyleNavigation() {
-	DELETE_UI();
+	QDELETE_UI();
 }

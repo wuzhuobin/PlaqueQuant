@@ -6,12 +6,9 @@
 #include <QDir>
 #include <QButtonGroup>
 
-#include "MainWindow.h"
 
-
-namespace Ui {
-	class ModuleWidget;
-}
+class MainWindow;
+namespace Ui { class ModuleWidget; }
 class ModuleWidget: public QWidget
 {
     Q_OBJECT

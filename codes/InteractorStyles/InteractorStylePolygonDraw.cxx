@@ -39,7 +39,7 @@ Copyright (C) 2016
 vtkStandardNewMacro(InteractorStylePolygonDraw);
 
 InteractorStylePolygonDraw::InteractorStylePolygonDraw()
-	:AbstractInteractorStyleImage()
+	:AbstractNavigation()
 {
 	DOUBLE_CLICKED_FLAG = false;
 	CONTOUR_IS_ON_FLAG = false;
@@ -94,7 +94,7 @@ void InteractorStylePolygonDraw::OnLeftButtonDown()
 		this->SetPolygonModeEnabled(true);
 		this->CONTOUR_IS_ON_FLAG = true;
 	}
-	AbstractInteractorStyleImage::OnLeftButtonDown();
+	AbstractNavigation::OnLeftButtonDown();
 }
 
 void InteractorStylePolygonDraw::OnRightButtonDown()
@@ -103,7 +103,7 @@ void InteractorStylePolygonDraw::OnRightButtonDown()
 		this->GenerateLumenWallContourWidget();
 	}
 
-	AbstractInteractorStyleImage::OnRightButtonDown();
+	AbstractNavigation::OnRightButtonDown();
 }
 
 void InteractorStylePolygonDraw::OnMouseMove()
@@ -125,7 +125,7 @@ void InteractorStylePolygonDraw::OnKeyPress()
 		if (CONTOUR_IS_ON_FLAG)
 			this->FillPolygon();
 	}
-	AbstractInteractorStyleImage::OnKeyPress();
+	AbstractNavigation::OnKeyPress();
 }
 
 bool InteractorStylePolygonDraw::CheckDoubleClicked()

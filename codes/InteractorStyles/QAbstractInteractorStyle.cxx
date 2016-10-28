@@ -1,22 +1,24 @@
 ﻿#include "QAbstractInteractorStyle.h"
+#include "ui_qabstractinteractorstyle.h"
 
-SETUP_UI_LIST(QAbstractInteractorStyle);
+QSETUP_UI_SRC(QAbstractInteractorStyle);
 
 QAbstractInteractorStyle::QAbstractInteractorStyle(int uiType, QWidget * parent)
 	:m_uiType(uiType), QWidget(parent) {
+	QNEW_UI();
+	if (numOfMyself == 1) {
+		// Connect for UNIQUE_UI
+	}
+	else if (numOfMyself > 1){
+		// connect for MULTIPLE_UI
+	}
+	else {
+		// connect fot NO_UI
+	}
+
 
 }
 
 QAbstractInteractorStyle::~QAbstractInteractorStyle() {
-	DELETE_UI();
-}
-
-void QAbstractInteractorStyle::setUiType(int uiType)
-{
-	m_uiType = uiType;
-}
-
-int QAbstractInteractorStyle::getUiType()
-{
-	return m_uiType;
+	QDELETE_UI();
 }

@@ -10,6 +10,7 @@
 #include "Overlay.h"
 #include "ReportGenerator.h"
 #include "MainWindow.h"
+#include "ui_MainWindow.h"
 
 MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent) 
 {

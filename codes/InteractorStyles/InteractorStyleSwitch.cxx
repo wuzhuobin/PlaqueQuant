@@ -171,32 +171,32 @@ void InteractorStyleSwitch::SetImageViewer(MyImageViewer* imageViewer)
 	//this->imageViewer = imageViewer;
 	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style = 
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		AbstractNavigation* _style = 
+			AbstractNavigation::SafeDownCast(*it);
 		if (_style != NULL) {
 			_style->SetImageViewer(imageViewer);
 		}
 	}
 }
 
-void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
-{
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
-		if (_style != NULL) {
-			_style->AddSynchronalViewer(imageViewer);
-		}
-	}
-}
+//void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
+//{
+//	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+//		it != allStyles.end(); ++it) {
+//		AbstractNavigation* _style =
+//			AbstractNavigation::SafeDownCast(*it);
+//		if (_style != NULL) {
+//			_style->AddSynchronalViewer(imageViewer);
+//		}
+//	}
+//}
 
 void InteractorStyleSwitch::SetCurrentSlice(int slice)
 {
 	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		AbstractNavigation* _style =
+			dynamic_cast<AbstractNavigation*>(*it);
 		if (_style != NULL) {
 			_style->SetCurrentSlice(slice);
 		}
@@ -207,8 +207,8 @@ void InteractorStyleSwitch::SetCurrentFocalPointWithImageCoordinate(int i, int j
 {
 	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		AbstractNavigation* _style =
+			dynamic_cast<AbstractNavigation*>(*it);
 		if (_style != NULL) {
 			_style->SetCurrentFocalPointWithImageCoordinate(i, j, k);
 		}
@@ -260,4 +260,19 @@ void InteractorStyleSwitch::SetInteractor(vtkRenderWindowInteractor *iren)
 	}
 }
 
+void InteractorStyleSwitch::SetInteractorStyleToNavigation()
+{
+
+	if (!this->CurrentStyleIsNavigation()) {
+		if (this->CurrentStyle) {
+			this->CurrentStyle->SetInteractor(0);
+		}
+		this->CurrentStyle = (vtkInteractorStyle*) this->Navigation;
+	}
+	if (this->CurrentStyle) {
+		this->CurrentStyle->SetInteractor(this->Interactor);
+		this->CurrentStyle->SetTDxStyle(this->TDxStyle);
+	}
+	this->InternalUpdate();
+}
 

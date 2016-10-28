@@ -19,10 +19,14 @@ Copyright (C) 2016
 
 #include <vtkCamera.h>
 #include <vtkPropPicker.h>
+#include <vtkRenderer.h>
+#include <vtkImageData.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkObjectFactory.h>
+
 
 vtkStandardNewMacro(AbstractInteractorStyleImage);
-std::list<MyImageViewer*> AbstractInteractorStyleImage::m_synchronalViewers;
+std::list<vtkImageViewer2*> AbstractInteractorStyleImage::m_synchronalViewers;
 
 AbstractInteractorStyleImage::AbstractInteractorStyleImage() : vtkInteractorStyleImage()
 {
@@ -35,13 +39,13 @@ AbstractInteractorStyleImage::~AbstractInteractorStyleImage()
 {
 }
 
-void AbstractInteractorStyleImage::SetImageViewer(MyImageViewer * imageViewer)
+void AbstractInteractorStyleImage::SetImageViewer(vtkImageViewer2 * imageViewer)
 {
 	this->m_imageViewer = imageViewer;
 	AddSynchronalViewer(imageViewer);
 }
 
-void AbstractInteractorStyleImage::AddSynchronalViewer(MyImageViewer * imageViewer)
+void AbstractInteractorStyleImage::AddSynchronalViewer(vtkImageViewer2 * imageViewer)
 {
 	if (std::find(m_synchronalViewers.cbegin(), m_synchronalViewers.cend(), imageViewer)
 		== m_synchronalViewers.cend()) {
@@ -49,10 +53,18 @@ void AbstractInteractorStyleImage::AddSynchronalViewer(MyImageViewer * imageView
 	}
 }
 
-void AbstractInteractorStyleImage::SynchronizedZooming()
+void AbstractInteractorStyleImage::EnableSynchronalZooming(bool flag)
 {
+	this->m_synchronalZoomingFlag = flag;
+	SynchronalZooming();
+}
+
+void AbstractInteractorStyleImage::SynchronalZooming()
+{
+	if (!m_synchronalZoomingFlag)
+		return;
 	double scale = m_imageViewer->GetRenderer()->GetActiveCamera()->GetParallelScale();
-	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
+	for (std::list<vtkImageViewer2*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		(*it)->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
 		(*it)->Render();
@@ -108,32 +120,13 @@ int * AbstractInteractorStyleImage::GetExtent()
 	return m_imageViewer->GetInput()->GetExtent();
 }
 
-void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
-{
-	int ijk[3];
-	m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
-	ijk[GetSliceOrientation()] = slice;
-	SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-}
-
-void AbstractInteractorStyleImage::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
-{
-	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
-		it != m_synchronalViewers.end(); ++it) {
-		(*it)->SetFocalPointWithImageCoordinate(i, j, k);
-		(*it)->Render();
-	}
-}
-
 void AbstractInteractorStyleImage::OnMouseWheelForward()
 {
-	this->MoveSliceForward();
 	vtkInteractorStyleImage::OnMouseWheelForward();
 }
 
 void AbstractInteractorStyleImage::OnMouseWheelBackward()
 {
-	this->MoveSliceBackward();
 	vtkInteractorStyleImage::OnMouseWheelBackward();
 }
 
@@ -185,102 +178,6 @@ void AbstractInteractorStyleImage::OnChar()
 
 void AbstractInteractorStyleImage::OnKeyPress()
 {
-	std::string key = this->Interactor->GetKeySym();
-	cout << key << endl;
-	int coordinate[3];
-	m_imageViewer->GetFocalPointWithImageCoordinate(coordinate);
-
-	// quite ugly here
-	if (key == "Prior") {
-		MoveSliceForward();
-	}
-	else if (key == "Next") {
-		MoveSliceBackward();
-	}
-	else if (key == "Up") {
-		switch (GetSliceOrientation())
-		{
-		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], coordinate[1], ++coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], coordinate[1], ++coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XY:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], --coordinate[1], coordinate[2]);
-			break;
-		}
-	}
-	else if (key == "Down") {
-		switch (GetSliceOrientation())
-		{
-		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], coordinate[1], --coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], coordinate[1], --coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XY:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], ++coordinate[1], coordinate[2]);
-			break;
-		}
-	}
-	else if (key == "Left") {
-		switch (GetSliceOrientation())
-		{
-		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], --coordinate[1], coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				--coordinate[0], coordinate[1], coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XY:
-			SetCurrentFocalPointWithImageCoordinate(
-				--coordinate[0], coordinate[1], coordinate[2]);
-			break;
-		}
-	}
-	else if (key == "Right") {
-		switch (GetSliceOrientation())
-		{
-		case vtkImageViewer2::SLICE_ORIENTATION_YZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				coordinate[0], ++coordinate[1], coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XZ:
-			SetCurrentFocalPointWithImageCoordinate(
-				++coordinate[0], coordinate[1], coordinate[2]);
-			break;
-		case vtkImageViewer2::SLICE_ORIENTATION_XY:
-			SetCurrentFocalPointWithImageCoordinate(
-				++coordinate[0], coordinate[1], coordinate[2]);
-			break;
-		}
-	}
 	vtkInteractorStyleImage::OnKeyPress();
-}
-
-void AbstractInteractorStyleImage::MoveSliceForward()
-{
-	if (GetSlice() < GetMaxSlice())
-	{
-		SetCurrentSlice(GetSlice() + 1);
-	}
-}
-
-void AbstractInteractorStyleImage::MoveSliceBackward()
-{
-	if (GetSlice() > GetMinSlice())
-	{
-		SetCurrentSlice(GetSlice() - 1);
-	}
 }
 

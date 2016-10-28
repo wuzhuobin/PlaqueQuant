@@ -170,9 +170,9 @@ void Core::slotVisualizeAll2DViewers()
 		for (int i = 0; i < VIEWER_NUM; ++i) {
 			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-			for (int j = 0; j < VIEWER_NUM; ++j) {
-				m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
-			}
+			//for (int j = 0; j < VIEWER_NUM; ++j) {
+			//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
+			//}
 			m_interactor[i]->SetInteractorStyle(m_style[i]);
 		}
 		slotAddOverlayToImageViewer();

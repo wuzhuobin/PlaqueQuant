@@ -1,10 +1,8 @@
-<UI version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>QAbstractInteractorStyle</class>
- <widget class="QWidget" name="QAbstractInteractorStyle" >
-  <property name="objectName" >
-   <string notr="true">QAbstractInteractorStyle</string>
-  </property>
-  <property name="geometry" >
+ <widget class="QWidget" name="QAbstractInteractorStyle">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -12,12 +10,24 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>QAbstractInteractorStyle</string>
   </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>110</y>
+     <width>111</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
-</UI>
+</ui>

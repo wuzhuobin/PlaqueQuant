@@ -78,7 +78,7 @@ void InteractorStyleWindowLevel::SetWindowLevel(double window, double level)
 }
 
 InteractorStyleWindowLevel::InteractorStyleWindowLevel()
-	:AbstractInteractorStyleImage()
+	:AbstractNavigation()
 {
 
 }
@@ -93,7 +93,7 @@ void InteractorStyleWindowLevel::OnMouseMove()
 	if (m_leftFunctioning) {
 		this->WindowLevel();
 	}
-	//AbstractInteractorStyleImage::OnMouseMove();
+	//AbstractNavigation::OnMouseMove();
 }
 
 void InteractorStyleWindowLevel::OnKeyPress()
@@ -104,7 +104,7 @@ void InteractorStyleWindowLevel::OnKeyPress()
 		SetWindowLevel(windowLevel[0], windowLevel[1]);
 		return;
 	}
-	AbstractInteractorStyleImage::OnKeyPress();
+	AbstractNavigation::OnKeyPress();
 }
 
 void InteractorStyleWindowLevel::OnChar()

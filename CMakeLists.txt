@@ -11,6 +11,11 @@ SET(
   CMAKE_PREFIX_PATH
   "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
   )
+# multi-processor build
+set(
+	CMAKE_CXX_FLAGS 
+	"${CMAKE_CXX_FLAGS} /MP"
+)
 
 #ITK
 find_package(ITK REQUIRED)

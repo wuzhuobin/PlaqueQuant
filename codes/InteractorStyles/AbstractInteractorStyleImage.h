@@ -21,39 +21,37 @@ Copyright (C) 2016
 
 /// VTK
 #include <vtkInteractorStyleImage.h>
-#include <AbstractInteractorStyle.h>
+#include <vtkImageViewer2.h>
 
-#include <list>
+#include "AbstractInteractorStyle.h"
 
-#include "MyImageViewer.h"
 
 
 #ifndef VIEWER_CONSTITERATOR(METHOD)
 #define VIEWER_CONSTITERATOR(METHOD) \
-for(std::list<MyImageViewer*>::const_iterator cit = \
+for(std::list<vtkImageViewer2*>::const_iterator cit = \
 	m_synchronalViewers.cbegin(); cit != m_synchronalViewers.cend(); ++cit){\
-		(*cit)->##METHOD; \
+	(*cit)->##METHOD; \
 }
 #endif // !VIEWER_CONSTITERATOR(METHOD)
 
-class AbstractInteractorStyleImage : public virtual vtkInteractorStyleImage, 
-	public virtual AbstractInteractorStyle
+class AbstractInteractorStyleImage : public vtkInteractorStyleImage, 
+	public AbstractInteractorStyle
 {
 public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
 	static AbstractInteractorStyleImage *New();
 	
-	virtual void SetImageViewer(MyImageViewer* imageViewer);
-	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
-	virtual void SynchronizedZooming();
+	virtual void SetImageViewer(vtkImageViewer2* imageViewer);
+	virtual void AddSynchronalViewer(vtkImageViewer2* imageViewer);
 	//virtual vtkActor* PickActor(int x, int y);
-	virtual void SetCurrentSlice(int slice);
-	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-
+	virtual void EnableSynchronalZooming(bool flag);
 
 protected:
 	AbstractInteractorStyleImage();
 	~AbstractInteractorStyleImage();
+
+	virtual void SynchronalZooming();
 	
 	virtual void OnMouseWheelForward();
 	virtual void OnMouseWheelBackward();
@@ -75,18 +73,12 @@ protected:
 	virtual double* GetSpacing();
 	virtual int* GetExtent();
 
-	void MoveSliceForward();
-	void MoveSliceBackward();
+	static std::list<vtkImageViewer2*> m_synchronalViewers;
+	vtkImageViewer2* m_imageViewer;
 
+private:
+	bool m_synchronalZoomingFlag = true;
 
-	static std::list<MyImageViewer*> m_synchronalViewers;
-	MyImageViewer* m_imageViewer;
-
-
-
-	//bool m_rightFunctioning;
-	//bool m_leftFunctioning;
-	//bool m_middleFunctioning;
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_IMAGE_H

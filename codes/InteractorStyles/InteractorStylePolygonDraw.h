@@ -24,13 +24,13 @@ Copyright (C) 2016
 #include <vtkContourWidget.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkOrientedGlyphContourRepresentation.h>
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 
-class InteractorStylePolygonDraw : public AbstractInteractorStyleImage
+class InteractorStylePolygonDraw : public AbstractNavigation
 {
 public:
-	vtkTypeMacro(InteractorStylePolygonDraw, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStylePolygonDraw, AbstractNavigation);
 	static InteractorStylePolygonDraw* New();
 
 	void SetPolygonModeEnabled(bool b);

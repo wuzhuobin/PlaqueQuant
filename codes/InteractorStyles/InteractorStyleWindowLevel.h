@@ -21,13 +21,13 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_WINDOW_LEVEL_H
 #define INTERACTOR_STYLE_WINDOW_LEVEL_H
 #include <vtkInteractorStyleImage.h>
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 
-class InteractorStyleWindowLevel : public AbstractInteractorStyleImage
+class InteractorStyleWindowLevel : public AbstractNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleWindowLevel, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStyleWindowLevel, AbstractNavigation);
 	static InteractorStyleWindowLevel* New();
 	//void SetWindowLevelSpinBox(QDoubleSpinBox* w, QDoubleSpinBox* l);
 

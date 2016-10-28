@@ -1,23 +1,24 @@
 ﻿#pragma once
-#include "QAbstractInteractorStyle.h"
+#include "QAbstractNavigation.hpp"
 #include "InteractorStyleNavigation.h"
-#include "ui_qinteractorstylenavigation.h"
 
 namespace Ui { class QInteractorStyleNavigation;}
 
-class QInteractorStyleNavigation : public QAbstractInteractorStyle, 
+class QInteractorStyleNavigation : public QAbstractNavigation, 
 	public InteractorStyleNavigation
 {
-	Q_OBJECT
+	Q_OBJECT;
+	QSETUP_UI_HEAD(QInteractorStyleNavigation);
 
 public:
 	vtkTypeMacro(QInteractorStyleNavigation, InteractorStyleNavigation);
 	static QInteractorStyleNavigation* New();
-	QSETUP_UI(QInteractorStyleNavigation);
+
+	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 
 protected:
-	QInteractorStyleNavigation(int uiType = 0, QWidget * parent = Q_NULLPTR);
+	QInteractorStyleNavigation(int uiType = -1, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleNavigation();
 private:
 	Ui::QInteractorStyleNavigation* ui = nullptr;

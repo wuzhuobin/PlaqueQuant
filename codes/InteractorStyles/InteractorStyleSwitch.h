@@ -52,7 +52,8 @@ public:
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
 	SetInteractorStyleMacro(InteractorStyleTesting);
-	SetInteractorStyleMacro(Navigation);
+	//SetInteractorStyleMacro(Navigation);
+	void SetInteractorStyleToNavigation();
 	SetInteractorStyleMacro(WindowLevel);
 	SetInteractorStyleMacro(PolygonDraw);
 	SetInteractorStyleMacro(PaintBrush);
@@ -74,7 +75,7 @@ public:
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
-	virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
+	//virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
 	virtual void SetCurrentSlice(int slice);
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 

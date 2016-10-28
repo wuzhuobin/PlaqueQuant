@@ -1,13 +1,59 @@
 ﻿#include "QInteractorStyleNavigation.hpp"
+#include "QAbstractNavigation.hpp"
 
-vtkStandardNewMacro(QInteractorStyleNavigation);
-SETUP_UI_LIST(QInteractorStyleNavigation);
+QSETUP_UI_SRC(QAbstractNavigation);
+#include <qdebug.h>
 
-QInteractorStyleNavigation::QInteractorStyleNavigation(int uiType, QWidget * parent)
+QAbstractNavigation::QAbstractNavigation(int uiType, QWidget * parent)
+	:m_uiType(uiType)
 {
-	setupUi();
+	QNEW_UI();
+	if (numOfMyself == 1) {
+		connect(ui->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(ui->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(ui->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+	}
 }
 
-QInteractorStyleNavigation::~QInteractorStyleNavigation() {
-	DELETE_UI();
+QAbstractNavigation::~QAbstractNavigation()
+{
+	QDELETE_UI();
 }
+
+void QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(int * ijk)
+{
+	SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+}
+
+void QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
+{
+	if (ui->sliceSpinBoxX->value() != i) {
+		ui->sliceSpinBoxX->setValue(i);
+	}
+	if (ui->sliceSpinBoxY->value() != j) {
+		ui->sliceSpinBoxY->setValue(j);
+	}
+	if (ui->sliceSpinBoxZ->value() != k) {
+		ui->sliceSpinBoxZ->setValue(k);
+	}
+}
+
+void QAbstractNavigation::Initialization()
+{
+
+}
+
+void QAbstractNavigation::slotChangeSlice()
+{
+	SetCurrentFocalPointWithImageCoordinate(ui->sliceSpinBoxX->value(),
+		ui->sliceSpinBoxY->value(),
+		ui->sliceSpinBoxZ->value());
+}
+
+

@@ -291,9 +291,9 @@ void MyImageViewer::Render()
 		this->InitializeHeader(string());
 	}
 	vtkImageViewer2::Render();
-	if (this->AnnotationRenderer) {
-		this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
-	}
+	//if (this->AnnotationRenderer) {
+	//	this->AnnotationRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
+	//}
 	// update orientation and header text
 	ResizeHeaderAndOrientationText();
 	if (this->GetInput())

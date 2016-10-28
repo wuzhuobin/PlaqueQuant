@@ -64,6 +64,7 @@ void InteractorStyleSmartContour::ReloadSeedFromList()
 }
 
 InteractorStyleSmartContour::InteractorStyleSmartContour()
+	:AbstractNavigation()
 {
 	m_seedWidget = vtkSmartPointer<MySeedWidget>::New();
 	m_seedRep = vtkSmartPointer<MySeedRepresentation>::New();
@@ -83,7 +84,7 @@ void InteractorStyleSmartContour::OnMouseMove()
 		UpdateSeedWidgetBefore();
 	}
 
-	AbstractInteractorStyleImage::OnMouseMove();
+	AbstractNavigation::OnMouseMove();
 }
 
 void InteractorStyleSmartContour::OnLeftButtonDown()
@@ -102,12 +103,12 @@ void InteractorStyleSmartContour::OnLeftButtonDown()
 	//	return;
 	//}
 
-	AbstractInteractorStyleImage::OnLeftButtonDown();
+	AbstractNavigation::OnLeftButtonDown();
 }
 
 void InteractorStyleSmartContour::OnLeftButtonUp()
 {
-	AbstractInteractorStyleImage::OnLeftButtonUp();
+	AbstractNavigation::OnLeftButtonUp();
 	
 	if (m_renderingFlag) {
 		m_renderingFlag = false;
@@ -130,14 +131,14 @@ void InteractorStyleSmartContour::OnKeyPress()
 
 	}
 	else {
-		AbstractInteractorStyleImage::OnKeyPress();
+		AbstractNavigation::OnKeyPress();
 	}
 }
 
 
 void InteractorStyleSmartContour::OnLeave()
 {
-	AbstractInteractorStyleImage::OnLeave();
+	AbstractNavigation::OnLeave();
 }
 
 void InteractorStyleSmartContour::CalculateIndex()
@@ -249,7 +250,7 @@ void InteractorStyleSmartContour::OnChar()
 {
 	char key = this->Interactor->GetKeyCode();
 	cout << __func__ << ' ' << key << endl;
-	AbstractInteractorStyleImage::OnChar();
+	AbstractNavigation::OnChar();
 	switch (key)
 	{
 	case 'P':
@@ -263,7 +264,7 @@ void InteractorStyleSmartContour::OnChar()
 		ClearAllSeedWidget();
 		break;
 	default:
-		AbstractInteractorStyleImage::OnChar();
+		AbstractNavigation::OnChar();
 		break;
 	}
 }

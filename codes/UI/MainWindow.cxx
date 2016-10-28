@@ -79,12 +79,12 @@ MainWindow::MainWindow()
 	connect(this->m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
 	// slice 
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceX(int)),ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceY(int)),ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceZ(int)),ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
+	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
+	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
+	//connect(this->m_core, SIGNAL(signalChangeSliceX(int)),ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	//connect(this->m_core, SIGNAL(signalChangeSliceY(int)),ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	//connect(this->m_core, SIGNAL(signalChangeSliceZ(int)),ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
 
 	// UI
 	connect(ui->actionExit,		SIGNAL(triggered()), this, SLOT(slotExit()));

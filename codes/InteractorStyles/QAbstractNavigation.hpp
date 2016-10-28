@@ -1,19 +1,20 @@
 ﻿#pragma once
 #include "QAbstractInteractorStyle.h"
-#include "InteractorStyleNavigation.h"
 #include "ui_QAbstractNavigation.h"
 
 namespace Ui { class QAbstractNavigation;}
 
-class QAbstractNavigation : public QAbstractInteractorStyle, 
-	public InteractorStyleNavigation
+class QAbstractNavigation : public QAbstractInteractorStyle
 {
-	Q_OBJECT
-
+	Q_OBJECT;
+	QSETUP_UI_HEAD(QAbstractNavigation);
 public:
-	vtkTypeMacro(QAbstractNavigation, InteractorStyleNavigation);
-	static QAbstractNavigation* New();
-	QSETUP_UI(QAbstractNavigation);
+	virtual void SetCurrentFocalPointWithImageCoordinate(int* ijk);
+	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+	virtual void Initialization();
+public slots:
+	virtual void slotChangeSlice();
+
 
 
 protected:

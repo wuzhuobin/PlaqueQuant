@@ -2,7 +2,8 @@
 #include <QSpinBox>
 #include <QTextBrowser>
 #include <qtablewidget.h>
-
+#include "MainWindow.h"
+#include "ui_MainWindow.h"
 #include "ModuleWidget.h"
 
 #define setValueConnection(qtObj, filterName, valueName, dataType) \

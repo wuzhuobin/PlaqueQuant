@@ -20,13 +20,13 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_NAVIGATION_H
 #define INTERACTOR_STYLE_NAVIGATION_H
 
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 
-class InteractorStyleNavigation : public AbstractInteractorStyleImage
+class InteractorStyleNavigation : public AbstractNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleNavigation, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStyleNavigation, AbstractNavigation);
 	static InteractorStyleNavigation* New();
 
 protected:

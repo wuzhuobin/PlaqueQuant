@@ -16,8 +16,6 @@ Copyright (C) 2016
 
 #include "AbstractInteractorStyle.h"
 
-#include <vtkSmartPointer.h>
-
 std::list<AbstractInteractorStyle*> AbstractInteractorStyle::m_abstractInteractorStyles;
 
 AbstractInteractorStyle::AbstractInteractorStyle() {

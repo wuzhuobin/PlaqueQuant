@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QInteractorStyleNavigation</class>
- <widget class="QAbstractInteractorStyle" name="QInteractorStyleNavigation">
+ <class>QAbstractNavigation</class>
+ <widget class="QAbstractInteractorStyle" name="QAbstractNavigation">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QInteractorStyleNavigation</string>
+   <string>QAbstractNavigation</string>
   </property>
   <widget class="QSlider" name="sliceHorizontalSliderY">
    <property name="geometry">
