@@ -145,6 +145,7 @@ add_subdirectory(codes/CenterlineBranching)
 add_subdirectory(codes/MyImageReader)
 add_subdirectory(codes/LumenExtraction)
 add_subdirectory(codes/License)
+add_subdirectory(codes/Testing)
 
 # Add_subdirectory(codes)
 

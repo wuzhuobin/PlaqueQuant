@@ -39,6 +39,8 @@ private:
 	std::list<InteractorStyleRuler*> rulers;
 
 	// Maximun wall thickness stuff
+	//vtkSmartPointer<vtkPolyDataMapper>				m_contourMapper[2]; // #Debug
+	//vtkSmartPointer<vtkActor>						m_contourActors[2]; // #Debug
 	vtkSmartPointer<vtkPolyData>					m_displayPD;
 	vtkSmartPointer<vtkActor>						m_lineActor;
 	vtkSmartPointer<vtkActor2D>						m_labelActor;
@@ -49,6 +51,7 @@ private:
 	vtkSmartPointer<vtkLabelPlacementMapper> m_labelMapper;
 	vtkSmartPointer<vtkPolyDataMapper> m_mapper;
 };
+
 
 #endif // !__INTERACTORSTYLERULER_H
 

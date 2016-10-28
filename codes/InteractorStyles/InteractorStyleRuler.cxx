@@ -1,16 +1,18 @@
 #include "InteractorStyleRuler.h"
 
+#include <vtkAppendPolyData.h>
 #include <vtkAxisActor2D.h>
 #include <vtkCellArray.h>
 #include <vtkProperty2D.h>
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkProperty.h>
 #include <InteractorStyleSwitch.h>
 //#include <vtkPointHandleRepresentation2D.h>
 //#include <vtkDistanceRepresentation2D.h>
 
-
+vtkActor* GetActor2(vtkPolyData*, double, double, double);
 
 vtkStandardNewMacro(InteractorStyleRuler);
 
@@ -143,6 +145,12 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 	std::vector<MaximumWallThickness::DistanceLoopPair> looppairs = maximumWallThickness->GetDistanceLoopPairVect();
+	//// #Debug //
+	//vtkSmartPointer<vtkPolyData> vessDisplayPD = vtkSmartPointer<vtkPolyData>::New();
+	//vtkSmartPointer<vtkPolyData> lumenDisplayPD = vtkSmartPointer<vtkPolyData>::New();
+	//vtkSmartPointer<vtkAppendPolyData> vessAdder = vtkSmartPointer<vtkAppendPolyData>::New();
+	//vtkSmartPointer<vtkAppendPolyData> lumenAdder = vtkSmartPointer<vtkAppendPolyData>::New();
+	//// Debug //
 	for (int i = 0; i < looppairs.size(); i++)
 	{
 		MaximumWallThickness::DistanceLoopPair l_lp = looppairs.at(i);
@@ -164,6 +172,15 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 		l_lp.LoopPair.first->GetPoint(l_lp.PIDs.first, p1);
 		l_lp.LoopPair.second->GetPoint(l_lp.PIDs.second, p2);
 
+		// #Debug //
+		//l_lp.LoopPair.first->GetPointData()->RemoveArray("RegionId");
+		//l_lp.LoopPair.second->GetPointData()->RemoveArray("RegionId");
+		//l_lp.LoopPair.first->GetCellData()->RemoveArray("RegionId");
+		//l_lp.LoopPair.second->GetCellData()->RemoveArray("RegionId");
+		//vessAdder->AddInputData(l_lp.LoopPair.first);
+		//lumenAdder->AddInputData(l_lp.LoopPair.second);
+		// Debug //
+
 		points->InsertNextPoint(p1);
 		points->InsertNextPoint(p2);
 
@@ -181,6 +198,17 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 		this->m_labelArray->InsertNextValue(" ");
 
 	}
+
+	// #Debug //
+	//vessAdder->Update();
+	//lumenAdder->Update();
+	//this->m_contourMapper[0]->SetInputData(vessAdder->GetOutput());
+	//this->m_contourMapper[1]->SetInputData(lumenAdder->GetOutput());
+
+	//this->m_contourActors[0]->SetMapper(this->m_contourMapper[0]);
+	//this->m_contourActors[1]->SetMapper(this->m_contourMapper[1]);
+	// Debug //
+
 
 	this->m_displayPD->SetPoints(points);
 	this->m_displayPD->SetLines(cells);
@@ -205,6 +233,13 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 	if (!m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_labelActor)) {
 		m_imageViewer->GetAnnotationRenderer()->AddActor2D(this->m_labelActor);
 	}
+	// #Debug //
+	//if (!m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_contourActors[0]))
+	//	this->m_imageViewer->GetAnnotationRenderer()->AddActor(this->m_contourActors[0]);
+	//if (!m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_contourActors[1]))
+	//	this->m_imageViewer->GetAnnotationRenderer()->AddActor(this->m_contourActors[1]);
+	// Debug
+
 	m_imageViewer->Render();
 }
 
@@ -228,9 +263,35 @@ InteractorStyleRuler::InteractorStyleRuler()
 	this->m_p2labelfilter->SetPriorityArrayName("Sizes");
 	this->m_labelMapper = vtkSmartPointer<vtkLabelPlacementMapper>::New();
 	this->m_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-
+	// #Debug //
+	//this->m_contourActors[0] = vtkSmartPointer<vtkActor>::New();
+	//this->m_contourActors[1] = vtkSmartPointer<vtkActor>::New();
+	//this->m_contourMapper[0] = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//this->m_contourMapper[1] = vtkSmartPointer<vtkPolyDataMapper>::New();
+	//this->m_contourActors[0]->GetProperty()->SetColor(1, 1, 0);
+	//this->m_contourActors[1]->GetProperty()->SetColor(0, 1, 1);
+	//this->m_contourActors[0]->GetProperty()->SetLineWidth(2);
+	//this->m_contourActors[1]->GetProperty()->SetLineWidth(2);
+	// Debug //
 
 	this->m_lineActor->GetProperty()->SetColor(0, 1, 0);
 	this->m_lineActor->GetProperty()->SetLineWidth(2);
 }
 
+////////////////////////////////////////////////////////////////////////////
+//// #Debug //
+//#include <vtkPolyDataMapper.h>
+//#include <vtkProperty.h>
+//
+//vtkActor* GetActor2(vtkPolyData* inPD, double r, double g, double b) {
+//	vtkActor* outActor = vtkActor::New();
+//
+//	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//	mapper->SetInputData(inPD);
+//	mapper->Update();
+//
+//	outActor->SetMapper(mapper);
+//	outActor->GetProperty()->SetColor(r, g, b);
+//	outActor->GetProperty()->SetLineWidth(2);
+//	return outActor;
+//}

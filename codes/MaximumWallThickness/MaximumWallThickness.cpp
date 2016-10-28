@@ -5,10 +5,11 @@
 #include <vtkMath.h>
 #include <vtkGeometryFilter.h>
 #include <vtkSplineFilter.h>
+#include <vtkIdList.h>
 #include <vtkParametricSpline.h>
 #include <vtkObjectFactory.h>
-
-
+#include <vtkOBBTree.h>
+#include <vtkCellArray.h>
 //#include "MainWindow.h"
 
 
@@ -218,18 +219,18 @@ bool MaximumWallThickness::ExtractLoops()
 	this->m_contourFilter->Update();
 
 	/// Extract loops
-	// extract loops representing vessel wall
-	vtkSmartPointer<vtkPolyData> vesselWallLoops = vtkSmartPointer<vtkPolyData>::New();
-	vesselWallLoops->DeepCopy(m_contourFilter->GetOutput());
-
 	// extract loops representing lumen
+	vtkSmartPointer<vtkPolyData> lumenWallLoops = vtkSmartPointer<vtkPolyData>::New();
+	lumenWallLoops->DeepCopy(this->m_contourFilter->GetOutput());
+
+	// extract loops representing vessel wall
 	thres->ThresholdByLower(0.1);
 	thres->Update();
 	this->m_contourFilter->SetInputData(thres->GetOutput());
 	this->m_contourFilter->Update();
 
-	vtkSmartPointer<vtkPolyData> lumenWallLoops = vtkSmartPointer<vtkPolyData>::New();
-	lumenWallLoops->DeepCopy(this->m_contourFilter->GetOutput());
+	vtkSmartPointer<vtkPolyData> vesselWallLoops = vtkSmartPointer<vtkPolyData>::New();
+	vesselWallLoops->DeepCopy(m_contourFilter->GetOutput());
 
 	/// Pair loops
 	// push each loops into the vector
@@ -504,6 +505,13 @@ bool MaximumWallThickness::ThicknessCal()
 		vesselLoop = this->m_loopPairVect.at(i).first;
 		lumenLoop = this->m_loopPairVect.at(i).second;
 
+
+		double com[3];
+		vtkSmartPointer<vtkCenterOfMass> comFilter = vtkSmartPointer<vtkCenterOfMass>::New();
+		comFilter->SetInputData(lumenLoop);
+		comFilter->Update();
+		comFilter->GetCenter(com);
+
 		// Up-sample the lines for vessel wall
 		spline->SetPoints(vesselLoop->GetPoints());
 		splineFilter->SetInputData(vesselLoop);
@@ -520,18 +528,70 @@ bool MaximumWallThickness::ThicknessCal()
 		lumenLoop->DeepCopy(splineFilter->GetOutput());
 		//cout << "Lumen: " << lumenLoop->GetNumberOfPoints() << endl;
 
-		// Build kd tree
+		// This uses the center of mass of lumen to identify the distance
+		//double d = VTK_DOUBLE_MIN;
+		//for (int j = 0; j < vesselLoop->GetNumberOfPoints(); j++)
+		//{
+		//	int index;
+		//	double p1[3], p2[3], line1[3];
+		//	memcpy(p2, com, sizeof(double) * 3);
+		//	vesselLoop->GetPoint(j, p1);
+		//	vtkMath::Subtract(p2, p1, line1);
+		//	vtkCellArray* cellsssss = lumenLoop->GetLines();
+		//	cellsssss->InitTraversal();
+		//	for (int k = 0; k < lumenLoop->GetNumberOfCells(); k++)
+		//	{
+		//		vtkIdList* pointIds = vtkIdList::New();
+		//		cellsssss->GetNextCell(pointIds);
+
+		//		//cout << lumenLoop->GetLines()->GetNumberOfCells() << endl;
+		//		//cout << cellsssss->GetTraversalLocation() << " " << id1 << " " << id2<< endl;
+		//		double p3[3], p4[3], line2[3];
+		//		lumenLoop->GetPoint(pointIds->GetId(0), p3);
+		//		lumenLoop->GetPoint(pointIds->GetId(1), p4);
+		//		vtkMath::Subtract(p4, p3, line2);
+
+
+
+		//		double a[3], b[3], nb[3], c[3];
+		//		vtkMath::Subtract(p4, p1, a);
+		//		vtkMath::Subtract(p3, p1, b);
+		//		vtkMath::Subtract(p1, p3, nb);
+		//		vtkMath::Subtract(p2, p3, c);
+
+		//		double norm1 = vtkMath::Norm(line1);
+		//		double norm2 = vtkMath::Norm(line2);
+		//		double val1 = vtkMath::Dot(a, line1) / norm1;
+		//		double val2 = vtkMath::Dot(b, line1) / norm1;
+		//		double val3 = vtkMath::Dot(nb, line2) / norm2;
+		//		double val4 = vtkMath::Dot(c, line2) / norm2;
+
+		//		if (val1 > 0 && val2 > 0 && val3 > 0 && val4 > 0 &&
+		//			val1 < norm1 && val2 < norm1 && val3 < norm2 && val4 < norm2)
+		//		{
+		//			double l_d = vtkMath::Distance2BetweenPoints(p3, p1);
+		//			if (l_d > d)
+		//			{
+		//				d = l_d;
+		//				pids.first = j;
+		//				pids.second = pointIds->GetId(0);
+		//			}
+		//		}
+		//	}
+		//}
+
+		// Build kd tree, this dosen't use center of mass
 		double d = VTK_DOUBLE_MIN;
 		vtkSmartPointer<vtkKdTree> kdtree = vtkSmartPointer<vtkKdTree>::New();
-		kdtree->BuildLocatorFromPoints(vesselLoop->GetPoints());
-		for (int j = 0; j < lumenLoop->GetNumberOfPoints(); j++)
+		kdtree->BuildLocatorFromPoints(lumenLoop->GetPoints());
+		for (int j = 0; j < vesselLoop->GetNumberOfPoints(); j++)
 		{
 			double l_d;
-			int index = kdtree->FindClosestPoint(lumenLoop->GetPoint(j), l_d);
+			int index = kdtree->FindClosestPoint(vesselLoop->GetPoint(j), l_d);
 			if (l_d > d) {
 				d = l_d;
-				pids.first = index;
-				pids.second = j;
+				pids.first = j;
+				pids.second = index;
 			}
 		}
 
