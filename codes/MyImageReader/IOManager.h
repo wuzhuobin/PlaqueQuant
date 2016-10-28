@@ -31,6 +31,10 @@ public:
 	void setListOfFileNames(QList<QStringList> listOfFileNames);
 	void addToListOfFileNames(QStringList fineNames);
 	const QList<QStringList> getListOfFileNames();
+
+	void setFilePath(QString filePath);
+	const QString getFilePath();
+
 public slots:
 
 	virtual void slotOpenWithWizard();
@@ -77,6 +81,7 @@ protected:
 
 private:
 	QList<QStringList> listOfFileNames;
+	QString filePath;
 	QStringList uniqueKeys; 
 	MyImageManager* myImageManager;
 	bool registrationFlag = false;

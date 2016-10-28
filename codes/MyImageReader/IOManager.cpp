@@ -45,6 +45,16 @@ const QList<QStringList> IOManager::getListOfFileNames()
 	return this->listOfFileNames;
 }
 
+void IOManager::setFilePath(QString filePath)
+{
+	this->filePath = filePath;
+}
+
+const QString IOManager::getFilePath()
+{
+	return this->filePath;
+}
+
 bool IOManager::LoadImageData(QStringList fileNames)
 {
 	ImageType::Pointer _itkImage = NULL;
@@ -152,12 +162,13 @@ void IOManager::slotOpenWithWizard()
 {
 	this->slotOpenWithWizard("");
 }
-
+#include <qdebug.h>
 void IOManager::slotOpenWithWizard(QString dir)
 {
 	RegistrationWizard wizard(dir);
 	if (wizard.exec() == QWizard::Rejected)
 		return;
+	filePath = wizard.getDirectory();
 	this->listOfFileNames.clear();
 	for (int i = 0; i < 5; ++i) {
 		if (wizard.getFileNamesN(i + 1) == NULL) {
