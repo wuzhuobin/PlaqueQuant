@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <QWidget>
 #include <qlist.h>
+#include <qdebug.h>
 
 namespace Ui { class QAbstractInteractorStyle; }
 

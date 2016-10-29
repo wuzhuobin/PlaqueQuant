@@ -133,13 +133,13 @@ void AbstractInteractorStyleImage::OnMouseWheelBackward()
 void AbstractInteractorStyleImage::OnLeftButtonDown()
 {
 	AbstractInteractorStyle::OnLeftButtonDown();
-	vtkInteractorStyleImage::OnLeftButtonDown();
+	//vtkInteractorStyleImage::OnLeftButtonDown();
 }
 
 void AbstractInteractorStyleImage::OnLeftButtonUp()
 {
 	AbstractInteractorStyle::OnLeftButtonUp();
-	vtkInteractorStyleImage::OnLeftButtonUp();
+	//vtkInteractorStyleImage::OnLeftButtonUp();
 }
 
 void AbstractInteractorStyleImage::OnRightButtonDown()

@@ -14,6 +14,7 @@
 Core::Core(QWidget* parent)
 	:Core(parent, parent)
 {
+	
 }
 
 Core::Core(QObject* parent, QWidget* mainWindow)
@@ -83,7 +84,7 @@ vtkSmartPointer<vtkPolyData> Core::GetCenterlinePD()
 	return this->m_centerlinePD;
 }
 
-vtkSmartPointer<InteractorStyleSwitch> Core::Get2DInteractorStyle(int i)
+InteractorStyleSwitch* Core::Get2DInteractorStyle(int i)
 {
 	return this->m_style[i];
 }
@@ -187,10 +188,10 @@ void Core::slotVisualizeAll2DViewers()
 
 	// reset slice to all viewer
 	const int* extent = m_2DimageViewer[DEFAULT_IMAGE]->GetInput()->GetExtent();
-	slotChangeFocalPointWithImageCoordinate(
-		(extent[1] - extent[0]) / 2,
-		(extent[3] - extent[2]) / 2,
-		(extent[5] - extent[4]) / 2);
+	//slotChangeFocalPointWithImageCoordinate(
+	//	(extent[1] - extent[0]) / 2,
+	//	(extent[3] - extent[2]) / 2,
+	//	(extent[5] - extent[4]) / 2);
 
 	emit signalVisualizeAllViewers();
 }
@@ -243,25 +244,25 @@ void Core::slotMultiPlanarView() {
 
 }
 
-void Core::slotChangeSlice(int slice) {
-	MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(sender());
-	if (viewer != NULL) {
-		switch (viewer->GetSliceOrientation())
-		{
-		case MyImageViewer::SLICE_ORIENTATION_YZ:
-			emit signalChangeSliceX(slice);
-			break;
-		case MyImageViewer::SLICE_ORIENTATION_XZ:
-			emit signalChangeSliceY(slice);
-			break;
-		case MyImageViewer::SLICE_ORIENTATION_XY:
-			emit signalChangeSliceZ(slice);
-		default:
-			break;
-		}
-	}
-
-}
+//void Core::slotChangeSlice(int slice) {
+//	MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(sender());
+//	if (viewer != NULL) {
+//		switch (viewer->GetSliceOrientation())
+//		{
+//		case MyImageViewer::SLICE_ORIENTATION_YZ:
+//			emit signalChangeSliceX(slice);
+//			break;
+//		case MyImageViewer::SLICE_ORIENTATION_XZ:
+//			emit signalChangeSliceY(slice);
+//			break;
+//		case MyImageViewer::SLICE_ORIENTATION_XY:
+//			emit signalChangeSliceZ(slice);
+//		default:
+//			break;
+//		}
+//	}
+//
+//}
 
 void Core::slotChangeView(int viewMode)
 {
@@ -318,79 +319,79 @@ void Core::slotChangeView(int viewMode)
 	// reset slice to all viewer
 	int ijk[3];
 	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	slotChangeFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+	//slotChangeFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 
 	RenderAllViewer();
 }
 
-void Core::slotChangeSlices(int* ijk) 
-{
-	this->slotChangeSlices(ijk[0], ijk[1], ijk[2]);
-}
-
-
-void Core::slotChangeSlices(int x, int y, int z) 
-{
-	int ijk[3];
-	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	if (x == ijk[0] && y == ijk[1] && z == ijk[2]) {
-		return;
-	}
-	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(x, y, z);
-}
-
-void Core::slotChangeSliceX(int x) {
-
-	int ijk[3];
-	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	if (x == ijk[0]) {
-		return;
-	}
-	ijk[0] = x;
-	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-
-	emit signalChangeSliceX(x);
-
-}
-
-void Core::slotChangeSliceY(int y) {
-
-
-	int ijk[3];
-	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	if (y == ijk[1]) {
-		return;
-	}
-	ijk[1] = y;
-	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-
-
-	emit signalChangeSliceY(y);
-
-}
-
-void Core::slotChangeSliceZ(int z) {
-
-
-	int ijk[3];
-	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	if (z == ijk[2]) {
-		return;
-	}
-	ijk[2] = z;
-	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-
-
-	emit signalChangeSliceZ(z);
-}
-
-void Core::slotChangeFocalPointWithImageCoordinate(int i, int j, int k)
-{
-	emit signalChangeSliceX(i);
-	emit signalChangeSliceY(j);
-	emit signalChangeSliceZ(k);
-
-}
+//void Core::slotChangeSlices(int* ijk) 
+//{
+//	this->slotChangeSlices(ijk[0], ijk[1], ijk[2]);
+//}
+//
+//
+//void Core::slotChangeSlices(int x, int y, int z) 
+//{
+//	int ijk[3];
+//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+//	if (x == ijk[0] && y == ijk[1] && z == ijk[2]) {
+//		return;
+//	}
+//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(x, y, z);
+//}
+//
+//void Core::slotChangeSliceX(int x) {
+//
+//	int ijk[3];
+//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+//	if (x == ijk[0]) {
+//		return;
+//	}
+//	ijk[0] = x;
+//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+//
+//	emit signalChangeSliceX(x);
+//
+//}
+//
+//void Core::slotChangeSliceY(int y) {
+//
+//
+//	int ijk[3];
+//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+//	if (y == ijk[1]) {
+//		return;
+//	}
+//	ijk[1] = y;
+//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+//
+//
+//	emit signalChangeSliceY(y);
+//
+//}
+//
+//void Core::slotChangeSliceZ(int z) {
+//
+//
+//	int ijk[3];
+//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
+//	if (z == ijk[2]) {
+//		return;
+//	}
+//	ijk[2] = z;
+//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
+//
+//
+//	emit signalChangeSliceZ(z);
+//}
+//
+//void Core::slotChangeFocalPointWithImageCoordinate(int i, int j, int k)
+//{
+//	emit signalChangeSliceX(i);
+//	emit signalChangeSliceY(j);
+//	emit signalChangeSliceZ(k);
+//
+//}
 
 void Core::slotNavigationMode()
 {
@@ -398,8 +399,6 @@ void Core::slotNavigationMode()
 	{
 		m_style[i]->SetInteractorStyleToNavigation();
 	}
-
-	//this->slotRuler(false);
 }
 
 void Core::slotWindowLevelMode()
@@ -409,7 +408,6 @@ void Core::slotWindowLevelMode()
 	{
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
-	//this->slotRuler(false);
 	this->ModeChangeUpdate(WINDOW_LEVEL_MODE);
 }
 
@@ -421,10 +419,6 @@ void Core::slotBrushMode()
 	}
 	
 	this->ModeChangeUpdate(BRUSH_MODE);
-	//Update ui
-	//m_moduleWidget->SetPage(2);
-
-	//this->slotRuler(false);
 }
 
 void Core::slotSetBrushSize(int size)

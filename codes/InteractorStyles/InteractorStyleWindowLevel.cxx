@@ -21,6 +21,7 @@ Copyright (C) 2016
 #include "InteractorStyleWindowLevel.h"
 
 #include <vtkRenderWindowInteractor.h>
+#include <vtkImageProperty.h>
 
 vtkStandardNewMacro(InteractorStyleWindowLevel);
 
@@ -30,6 +31,15 @@ vtkStandardNewMacro(InteractorStyleWindowLevel);
 //	m_wlDoubleSpinBox[1] = l;
 //}
 
+void InteractorStyleWindowLevel::SetWindowLevelModeEnabled(bool flag)
+{
+	// only using windowlevel to the lowest layer image
+	m_windowLevelEnabledFlag = flag;
+	if (flag) {
+
+	}
+}
+
 void InteractorStyleWindowLevel::SetWindow(double window)
 {
 	m_window = window;
@@ -37,8 +47,10 @@ void InteractorStyleWindowLevel::SetWindow(double window)
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
 		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
-			(*it)->SetColorWindow(m_window);
-			(*it)->SetColorLevel(m_level);
+			(*it)->GetImageActor()->GetProperty()->SetColorWindow(
+				m_window);
+			(*it)->GetImageActor()->GetProperty()->SetColorLevel(
+				m_level);
 			(*it)->Render();
 		}
 
@@ -52,8 +64,10 @@ void InteractorStyleWindowLevel::SetLevel(double level)
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
 		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
-			(*it)->SetColorWindow(m_window);
-			(*it)->SetColorLevel(m_level);
+			(*it)->GetImageActor()->GetProperty()->SetColorWindow(
+				m_window);
+			(*it)->GetImageActor()->GetProperty()->SetColorLevel(
+				m_level);
 			(*it)->Render();
 		}
 
@@ -62,14 +76,16 @@ void InteractorStyleWindowLevel::SetLevel(double level)
 
 void InteractorStyleWindowLevel::SetWindowLevel(double window, double level)
 {
-	m_level = level;
 	m_window = window;
+	m_level = level;
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
 		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
-			(*it)->SetColorWindow(m_window);
-			(*it)->SetColorLevel(m_level);
+			(*it)->GetImageActor()->GetProperty()->SetColorWindow(
+				m_window);
+			(*it)->GetImageActor()->GetProperty()->SetColorLevel(
+				m_level);
 			(*it)->Render();
 		}
 
@@ -80,7 +96,6 @@ void InteractorStyleWindowLevel::SetWindowLevel(double window, double level)
 InteractorStyleWindowLevel::InteractorStyleWindowLevel()
 	:AbstractNavigation()
 {
-
 }
 
 InteractorStyleWindowLevel::~InteractorStyleWindowLevel()
@@ -88,92 +103,134 @@ InteractorStyleWindowLevel::~InteractorStyleWindowLevel()
 
 }
 
+//void InteractorStyleWindowLevel::OnMouseMove()
+//{
+//	//if (m_leftFunctioning) {
+//	//	this->WindowLevel();
+//	//}
+//	AbstractNavigation::OnMouseMove();
+//}
+
 void InteractorStyleWindowLevel::OnMouseMove()
 {
-	if (m_leftFunctioning) {
-		this->WindowLevel();
-	}
-	//AbstractNavigation::OnMouseMove();
+	AbstractNavigation::OnMouseMove();
+}
+
+void InteractorStyleWindowLevel::OnLeftButtonDown()
+{
+	vtkInteractorStyleImage::OnLeftButtonDown();
+	this->WindowLevelInitial[0] = m_imageViewer->GetImageActor()->
+		GetProperty()->GetColorWindow();
+	this->WindowLevelInitial[1] = m_imageViewer->GetImageActor()->
+		GetProperty()->GetColorLevel();
+}
+
+void InteractorStyleWindowLevel::OnLeftButtonUp()
+{
+	vtkInteractorStyleImage::OnLeftButtonUp();
 }
 
 void InteractorStyleWindowLevel::OnKeyPress()
 {
 	std::string key = this->Interactor->GetKeySym();
 	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
-	if (key == "r") {
-		SetWindowLevel(windowLevel[0], windowLevel[1]);
-		return;
+	if (key == "r" || key == "R") {
+		SetWindowLevel(255,	127.5);
+		AbstractNavigation::OnKeyPress();
+
 	}
-	AbstractNavigation::OnKeyPress();
+	else {
+		AbstractNavigation::OnKeyPress();
+	}
+
 }
 
 void InteractorStyleWindowLevel::OnChar()
 {
+	char key = this->Interactor->GetKeyCode();
+	switch (key)
+	{
+	case 'r':
+	case 'R':
+		SynchronalZooming();
+		break;
+	default:
+		AbstractNavigation::OnChar();
+		break;
+	}
+
+
 }
-
-
 void InteractorStyleWindowLevel::WindowLevel()
 {
-	this->WindowLevelCurrentPosition[0] = this->GetInteractor()->GetEventPosition()[0];
-	this->WindowLevelCurrentPosition[1] = this->GetInteractor()->GetEventPosition()[1];
+	vtkImageProperty* _property = this->CurrentImageProperty;
+	this->CurrentImageProperty = m_imageViewer->GetImageActor()->GetProperty();
+	vtkInteractorStyleImage::WindowLevel();
+	SetWindowLevel(CurrentImageProperty->GetColorWindow(), 
+		CurrentImageProperty->GetColorLevel());
+	this->CurrentImageProperty = _property;
 
-	int *size = this->GetCurrentRenderer()->GetSize();
 
-	double window = 0.0, level = 0.0;
-	if (m_imageViewer->GetInput() != NULL) {
-		window = m_imageViewer->GetDefaultWindowLevel()[0];
-		level = m_imageViewer->GetDefaultWindowLevel()[1];
-		//window = m_window;
-		//level = m_level;
-	}
+	//this->WindowLevelCurrentPosition[0] = this->GetInteractor()->GetEventPosition()[0];
+	//this->WindowLevelCurrentPosition[1] = this->GetInteractor()->GetEventPosition()[1];
 
-	// Compute normalized delta
+	//int *size = this->GetCurrentRenderer()->GetSize();
 
-	double dx = (this->WindowLevelCurrentPosition[0] -
-		this->WindowLevelStartPosition[0]) * 4.0 / size[0];
-	double dy = (this->WindowLevelStartPosition[1] -
-		this->WindowLevelCurrentPosition[1]) * 4.0 / size[1];
+	//double window = 0.0, level = 0.0;
+	//if (m_imageViewer->GetInput() != NULL) {
+	//	window = m_imageViewer->GetDefaultWindowLevel()[0];
+	//	level = m_imageViewer->GetDefaultWindowLevel()[1];
+	//	//window = m_window;
+	//	//level = m_level;
+	//}
 
-	// Scale by current values
+	//// Compute normalized delta
 
-	if (fabs(window) > 0.01)
-	{
-		dx = dx * window;
-	}
-	else
-	{
-		dx = dx * (window < 0 ? -0.01 : 0.01);
-	}
-	if (fabs(level) > 0.01)
-	{
-		dy = dy * level;
-	}
-	else
-	{
-		dy = dy * (level < 0 ? -0.01 : 0.01);
-	}
+	//double dx = (this->WindowLevelCurrentPosition[0] -
+	//	this->WindowLevelStartPosition[0]) * 4.0 / size[0];
+	//double dy = (this->WindowLevelStartPosition[1] -
+	//	this->WindowLevelCurrentPosition[1]) * 4.0 / size[1];
 
-	// Abs so that direction does not flip
+	//// Scale by current values
 
-	if (window < 0.0)
-	{
-		dx = -1 * dx;
-	}
-	if (level < 0.0)
-	{
-		dy = -1 * dy;
-	}
+	//if (fabs(window) > 0.01)
+	//{
+	//	dx = dx * window;
+	//}
+	//else
+	//{
+	//	dx = dx * (window < 0 ? -0.01 : 0.01);
+	//}
+	//if (fabs(level) > 0.01)
+	//{
+	//	dy = dy * level;
+	//}
+	//else
+	//{
+	//	dy = dy * (level < 0 ? -0.01 : 0.01);
+	//}
 
-	// Compute new window level
+	//// Abs so that direction does not flip
 
-	double newWindow = dx + window;
-	double newLevel = level - dy;
+	//if (window < 0.0)
+	//{
+	//	dx = -1 * dx;
+	//}
+	//if (level < 0.0)
+	//{
+	//	dy = -1 * dy;
+	//}
 
-	if (newWindow < 0.01)
-	{
-		newWindow = 0.01;
-	}
-	SetWindowLevel(newWindow, newLevel);
+	//// Compute new window level
+
+	//double newWindow = dx + window;
+	//double newLevel = level - dy;
+
+	//if (newWindow < 0.01)
+	//{
+	//	newWindow = 0.01;
+	//}
+	//SetWindowLevel(newWindow, newLevel);
 
 	
 }

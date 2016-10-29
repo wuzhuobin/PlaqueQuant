@@ -24,7 +24,7 @@ Copyright (C) 2016
 #include <list>
 
 #include "QInteractorStyleNavigation.hpp"
-#include "InteractorStyleWindowLevel.h"
+#include "QInteractorStyleWindowLevel.hpp"
 #include "InteractorStylePolygonDraw.h"
 #include "InteractorStylePaintBrush.h"
 #include "InteractorStyleROI.h"
@@ -40,7 +40,7 @@ public:
 	static InteractorStyleSwitch* New();
 
 	vtkGetMacro(InteractorStyleTesting, vtkInteractorStyleImage*);
-	vtkGetMacro(WindowLevel, InteractorStyleWindowLevel*);
+	vtkGetMacro(WindowLevel, QInteractorStyleWindowLevel*);
 	vtkGetMacro(Navigation, QInteractorStyleNavigation*);
 	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
@@ -76,8 +76,8 @@ public:
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
 	//virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
-	virtual void SetCurrentSlice(int slice);
-	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+	//virtual void SetCurrentSlice(int slice);
+	//virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 	virtual void SetEnabled(int);
 	virtual void SetEnabledOn();
@@ -94,7 +94,7 @@ private:
 
 	vtkInteractorStyleImage* InteractorStyleTesting;
 	QInteractorStyleNavigation*	Navigation;
-	InteractorStyleWindowLevel* WindowLevel;
+	QInteractorStyleWindowLevel* WindowLevel;
 	InteractorStylePolygonDraw* PolygonDraw;
 	InteractorStylePaintBrush*	PaintBrush;
 	InteractorStyleROI* ROI;

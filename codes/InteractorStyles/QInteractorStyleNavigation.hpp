@@ -13,13 +13,15 @@ class QInteractorStyleNavigation : public QAbstractNavigation,
 public:
 	vtkTypeMacro(QInteractorStyleNavigation, InteractorStyleNavigation);
 	static QInteractorStyleNavigation* New();
+	virtual void Initialization();
+	virtual void SetNavigationModeEnabled(bool flag);
 
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-
 
 protected:
 	QInteractorStyleNavigation(int uiType = -1, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleNavigation();
 private:
 	Ui::QInteractorStyleNavigation* ui = nullptr;
+	int m_oldExtent[6] = { -1 };
 };

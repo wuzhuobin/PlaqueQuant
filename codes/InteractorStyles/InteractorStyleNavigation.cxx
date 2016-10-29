@@ -25,6 +25,11 @@ Copyright (C) 2016
 
 vtkStandardNewMacro(InteractorStyleNavigation);
 
+void InteractorStyleNavigation::SetNavigationModeEnabled(bool flag)
+{
+	m_navigationModeEnableFlag = flag;
+}
+
 InteractorStyleNavigation::InteractorStyleNavigation()
 	:AbstractNavigation()
 {
@@ -36,17 +41,13 @@ InteractorStyleNavigation::~InteractorStyleNavigation()
 
 void InteractorStyleNavigation::OnMouseMove()
 {
-	//if (m_rightFunctioning) {
-	//	this->SynchronalZooming();
-	//}
 	if (m_leftFunctioning) {
 		this->CalculateIndex();
 		return;
 	}
 	AbstractNavigation::OnMouseMove();
-
 	if (m_rightFunctioning) {
-		SynchronizedZooming();
+		SynchronalZooming();
 	}
 }
 
@@ -64,16 +65,12 @@ void InteractorStyleNavigation::OnChar()
 	case 'R':
 	case 'r':
 		AbstractNavigation::OnChar();
-		SynchronizedZooming();
+		SynchronalZooming();
 		break;
 	default:
+		AbstractNavigation::OnChar();
 		break;
 	}
-}
-
-void InteractorStyleNavigation::SynchronizedZooming()
-{
-	AbstractNavigation::SynchronalZooming();
 }
 
 void InteractorStyleNavigation::CalculateIndex()

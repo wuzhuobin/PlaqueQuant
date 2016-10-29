@@ -26,7 +26,7 @@ public:
 
 	// Get functions
 	vtkSmartPointer<vtkPolyData> GetCenterlinePD();
-	vtkSmartPointer<InteractorStyleSwitch> Get2DInteractorStyle(int);
+	InteractorStyleSwitch* Get2DInteractorStyle(int);
 	vtkLookupTable*		GetLookupTable();
 	vtkRenderWindow*	GetRenderWindow(int num);
 	IOManager*			GetIOManager();
@@ -86,13 +86,13 @@ public:
 	virtual void slotChangeView(int viewMode);
 
 	// Viewers's slice position
-	virtual void slotChangeSlice(int slice);
-	virtual void slotChangeSlices(int* ijk);
-	virtual void slotChangeSlices(int, int, int);
-	virtual void slotChangeSliceX(int x);
-	virtual void slotChangeSliceY(int y);
-	virtual void slotChangeSliceZ(int z);
-	virtual void slotChangeFocalPointWithImageCoordinate(int i, int j, int k);
+	//virtual void slotChangeSlice(int slice);
+	//virtual void slotChangeSlices(int* ijk);
+	//virtual void slotChangeSlices(int, int, int);
+	//virtual void slotChangeSliceX(int x);
+	//virtual void slotChangeSliceY(int y);
+	//virtual void slotChangeSliceZ(int z);
+	//virtual void slotChangeFocalPointWithImageCoordinate(int i, int j, int k);
 
 	// mode stuff
 	virtual void slotNavigationMode();
@@ -152,9 +152,9 @@ signals:
 	void signalVisualizeAllViewers();
 	void signalMultiPlanarView();
 	void signalSegmentationView();
-	void signalChangeSliceX(int);
-	void signalChangeSliceY(int);
-	void signalChangeSliceZ(int);
+	//void signalChangeSliceX(int);
+	//void signalChangeSliceY(int);
+	//void signalChangeSliceZ(int);
 
 private:
 	void ModeChangeUpdate(INTERACTION_MODE);

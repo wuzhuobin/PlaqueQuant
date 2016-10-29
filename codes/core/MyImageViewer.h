@@ -123,6 +123,7 @@ public slots:
      */
 	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
 	/**
+	 * @deprecated
 	 * @slot
 	 * set the window level and window width of the image
 	 * or the same saying image contrast
@@ -130,6 +131,7 @@ public slots:
 	 */
 	virtual void SetColorLevel(double level);
 	/**
+     * @deprecated
 	 * @slot
 	 * set the window level and window width of the image
 	 * or the same saying image contrast

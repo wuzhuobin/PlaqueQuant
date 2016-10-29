@@ -67,7 +67,7 @@ void MeasurementWidget::slotUpdate3DMeasurements()
 
 void MeasurementWidget::slotUpdate2DMeasurements()
 {
-	slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
+	//slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
 }
 
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)

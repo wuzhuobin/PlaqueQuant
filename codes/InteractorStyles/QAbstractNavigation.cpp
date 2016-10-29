@@ -2,11 +2,11 @@
 #include "QAbstractNavigation.hpp"
 
 QSETUP_UI_SRC(QAbstractNavigation);
-#include <qdebug.h>
 
 QAbstractNavigation::QAbstractNavigation(int uiType, QWidget * parent)
 	:m_uiType(uiType)
 {
+	// The first instance of QAbstractNavigation will have control of the UI widget
 	QNEW_UI();
 	if (numOfMyself == 1) {
 		connect(ui->sliceSpinBoxX, SIGNAL(valueChanged(int)),
@@ -46,7 +46,7 @@ void QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, 
 
 void QAbstractNavigation::Initialization()
 {
-
+	this->setEnabled(true);
 }
 
 void QAbstractNavigation::slotChangeSlice()

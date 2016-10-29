@@ -350,7 +350,7 @@ void ModuleWidget::slotSnapToSeed(int rowIndex)
 
 	int* seedIJK = ModuleWidget::SeedIJKList[rowIndex];
 
-	this->m_mainWnd->m_core->slotChangeSlices(seedIJK);
+	//this->m_mainWnd->m_core->slotChangeSlices(seedIJK);
 	for (int i = 0; i < 3;i++)
 	{
 		this->m_mainWnd->m_core->Get2DInteractorStyle(i)->GetSmartContour()->ReloadSeedFromList();

@@ -28,7 +28,7 @@ class InteractorStyleNavigation : public AbstractNavigation
 public:
 	vtkTypeMacro(InteractorStyleNavigation, AbstractNavigation);
 	static InteractorStyleNavigation* New();
-
+	void SetNavigationModeEnabled(bool flag);
 protected:
 	InteractorStyleNavigation();
 	~InteractorStyleNavigation();
@@ -37,9 +37,8 @@ protected:
 	virtual void OnLeftButtonUp();
 	virtual void OnChar();
 private:
-	void SynchronizedZooming();
 	void CalculateIndex();
-	
+	bool m_navigationModeEnableFlag = false;
 };
 
 

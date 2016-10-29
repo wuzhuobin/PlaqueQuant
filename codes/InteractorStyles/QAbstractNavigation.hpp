@@ -18,6 +18,9 @@ public slots:
 
 
 protected:
+	/**
+	 * 
+	 */
 	QAbstractNavigation(int uiType = 0, QWidget * parent = Q_NULLPTR);
 	~QAbstractNavigation();
 private:
