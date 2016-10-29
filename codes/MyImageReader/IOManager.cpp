@@ -16,8 +16,12 @@
 #include "RegistrationWizard.h"
 
 using namespace itk;
-IOManager::IOManager(QWidget* parent) 
-	:registration(parent), QWidget(parent)
+IOManager::IOManager(QObject* parent, QWidget* mainWindow)
+	:registration(mainWindow), QObject(parent)
+{
+}
+IOManager::IOManager(QWidget* parent)
+	: IOManager(parent, parent)
 {
 }
 
@@ -227,8 +231,8 @@ void IOManager::slotOpenOneImage(QStringList fileNames)
 
 void IOManager::slotOpenSegmentationWithDiaglog()
 {
-	QString path = QFileDialog::getOpenFileName(this, QString(tr("Open Segmentation")), 
-		".", tr("NlFTI Images (*.nii)"));
+	QString path = QFileDialog::getOpenFileName(dynamic_cast<QWidget*>(this->parent()),
+		QString(tr("Open Segmentation")), ".", tr("NlFTI Images (*.nii)"));
 	if (path.isEmpty()) return;
 	this->slotOpenSegmentation(path);
 	emit finishOpenSegmentation();
@@ -266,8 +270,8 @@ void IOManager::slotOpenSegmentation(QString fileName)
 
 void IOManager::slotSaveSegmentaitonWithDiaglog()
 {
-	QString path = QFileDialog::getSaveFileName(this, QString(tr("Save Segmentation")),
-		".", tr("NlFTI Images (*.nii)"));
+	QString path = QFileDialog::getSaveFileName(dynamic_cast<QWidget*>(this->parent()), 
+		QString(tr("Save Segmentation")), ".", tr("NlFTI Images (*.nii)"));
 	if (path.isEmpty())	return;
 	slotSaveSegmentation(path);
 	

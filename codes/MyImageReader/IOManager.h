@@ -1,7 +1,7 @@
 #ifndef IO_MANAGER_H
 #define IO_MANAGER_H
 
-#include <QWidget>
+#include <QObject>
 #include <QString>
 #include <QList>
 #include <QStringList>
@@ -16,12 +16,13 @@ class MyImageManager;
 
 typedef itk::Image<float, 3> ImageType;
 
-class IOManager:public QWidget
+class IOManager:public QObject
 {
 	Q_OBJECT
 public:
 
-	IOManager(QWidget* parent = NULL);
+	IOManager(QWidget* parent = nullptr);
+	IOManager(QObject* parent = nullptr, QWidget* mainWindow = nullptr);
 	~IOManager();
 
 	void enableRegistration(bool flag);

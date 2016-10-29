@@ -11,12 +11,16 @@
 #include <vtkImageThreshold.h>
 #include <QMessageBox>
 #include <QAction>
-
 Core::Core(QWidget* parent)
-	:QWidget(parent)
+	:Core(parent, parent)
+{
+}
+
+Core::Core(QObject* parent, QWidget* mainWindow)
+	:QObject(parent)
 {
 	m_imageManager = new  MyImageManager(this);
-	m_ioManager = new IOManager(this);
+	m_ioManager = new IOManager(mainWindow);
 	m_widgetManager = new MyWidgetManager(this);
 	m_lumenExtractionFilter = new LumenExtraction();
 
@@ -43,6 +47,7 @@ Core::Core(QWidget* parent)
 
 	this->m_centerlinePD = NULL;
 }
+
 
 void Core::Initialization()
 {

@@ -18,10 +18,10 @@
 MainWindow::MainWindow() 
 	:widgetGroup(this), viewerGroup(this), viewGroup(this), m_InfoDialog(this)
 {
-	m_core = new Core(this);
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
 
+	m_core = new Core(this);
 	this->imageManager = m_core->GetMyImageManager();
 	this->ioManager = m_core->GetIOManager();
 

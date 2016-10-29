@@ -1,7 +1,7 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
-#include <QWidget>
+#include <qobject.h>
 
 #include <vtkSmartPointer.h>
 
@@ -14,11 +14,12 @@
 #include "MyWidgetManager.h"
 
 
-class Core:public QWidget
+class Core:public QObject
 {
 	Q_OBJECT
 public:
 	Core(QWidget* parent = nullptr);
+	Core(QObject* parent = nullptr, QWidget* mainWindow = nullptr);
 	~Core();
 
 	void Initialization();
