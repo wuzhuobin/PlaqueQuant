@@ -38,6 +38,7 @@ protected:
 	virtual void OnChar();
 private:
 	void CalculateIndex();
+	int m_index[3];
 	bool m_navigationModeEnableFlag = false;
 };
 

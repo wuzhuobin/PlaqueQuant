@@ -43,18 +43,19 @@ void InteractorStyleNavigation::OnMouseMove()
 {
 	if (m_leftFunctioning) {
 		this->CalculateIndex();
-		return;
+		SetCurrentFocalPointWithImageCoordinate(m_index[0], m_index[1], m_index[2]);
 	}
-	AbstractNavigation::OnMouseMove();
 	if (m_rightFunctioning) {
 		SynchronalZooming();
 	}
+	AbstractNavigation::OnMouseMove();
 }
 
 
 void InteractorStyleNavigation::OnLeftButtonUp()
 {
 	this->CalculateIndex();
+	SetCurrentFocalPointWithImageCoordinate(m_index[0], m_index[1], m_index[2]);
 	AbstractNavigation::OnLeftButtonUp();
 }
 
@@ -87,15 +88,13 @@ void InteractorStyleNavigation::CalculateIndex()
 	//Check if valid pick
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
-	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
 		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] +
 			GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
+			m_index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
-		SetCurrentFocalPointWithImageCoordinate(index[0], index[1], index[2]);
 	}
 
 }

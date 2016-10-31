@@ -176,9 +176,6 @@ void Core::slotVisualizeAll2DViewers()
 		for (int i = 0; i < VIEWER_NUM; ++i) {
 			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
-			//for (int j = 0; j < VIEWER_NUM; ++j) {
-			//	m_style[i]->AddSynchronalViewer(m_2DimageViewer[j]);
-			//}
 			m_interactor[i]->SetInteractorStyle(m_style[i]);
 		}
 		slotAddOverlayToImageViewer();
@@ -188,10 +185,10 @@ void Core::slotVisualizeAll2DViewers()
 
 	// reset slice to all viewer
 	const int* extent = m_2DimageViewer[DEFAULT_IMAGE]->GetInput()->GetExtent();
-	//slotChangeFocalPointWithImageCoordinate(
-	//	(extent[1] - extent[0]) / 2,
-	//	(extent[3] - extent[2]) / 2,
-	//	(extent[5] - extent[4]) / 2);
+	m_style[DEFAULT_IMAGE]->GetNavigation()->SetCurrentFocalPointWithImageCoordinate(
+		(extent[1] - extent[0]) / 2,
+		(extent[3] - extent[2]) / 2,
+		(extent[5] - extent[4]) / 2);
 
 	emit signalVisualizeAllViewers();
 }

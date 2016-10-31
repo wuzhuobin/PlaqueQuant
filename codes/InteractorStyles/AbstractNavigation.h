@@ -40,7 +40,6 @@ public:
 	vtkTypeMacro(AbstractNavigation, vtkInteractorStyleImage);
 	static AbstractNavigation *New();
 	
-	//virtual void SynchronalZooming();
 	virtual void SetImageViewer(MyImageViewer* imageViewer);
 	//virtual vtkActor* PickActor(int x, int y);
 	virtual void SetCurrentSlice(int slice);

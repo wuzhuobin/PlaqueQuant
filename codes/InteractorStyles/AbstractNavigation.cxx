@@ -83,7 +83,7 @@ void AbstractNavigation::SetCurrentSlice(int slice)
 		SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
 	}
 	else {
-		m_imageViewer->SetSlice(slice);
+		AbstractInteractorStyleImage::SetCurrentSlice(slice);
 	}
 }
 

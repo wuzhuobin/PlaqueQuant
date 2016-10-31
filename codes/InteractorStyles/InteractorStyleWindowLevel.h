@@ -29,15 +29,13 @@ class InteractorStyleWindowLevel : public AbstractNavigation
 public:
 	vtkTypeMacro(InteractorStyleWindowLevel, AbstractNavigation);
 	static InteractorStyleWindowLevel* New();
-	//void SetWindowLevelSpinBox(QDoubleSpinBox* w, QDoubleSpinBox* l);
 
 	virtual void SetWindowLevelModeEnabled(bool flag);
 
 	virtual void SetWindow(double window);
-
 	virtual void SetLevel(double level);
-	virtual void WindowLevel();
 	virtual void SetWindowLevel(double window, double level);
+	virtual void WindowLevel();
 
 protected:
 	InteractorStyleWindowLevel();
@@ -47,6 +45,9 @@ protected:
 	virtual void OnLeftButtonDown();
 	virtual void OnLeftButtonUp();
 	virtual void OnKeyPress();
+	virtual void OnKeyDown();
+	virtual void OnKeyRelease();
+	virtual void OnKeyUp();
 	virtual void OnChar();
 
 private:
@@ -54,7 +55,6 @@ private:
 	double m_level;
 	
 	bool m_windowLevelEnabledFlag = false;
-	//QDoubleSpinBox* m_wlDoubleSpinBox[2];
 	vtkImageProperty* propertyTMP = nullptr;
 
 };

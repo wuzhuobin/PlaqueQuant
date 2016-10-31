@@ -53,6 +53,11 @@ void AbstractInteractorStyleImage::AddSynchronalViewer(vtkImageViewer2 * imageVi
 	}
 }
 
+void AbstractInteractorStyleImage::SetCurrentSlice(int slice)
+{
+	VIEWER_CONSTITERATOR(SetSlice(slice));
+}
+
 void AbstractInteractorStyleImage::EnableSynchronalZooming(bool flag)
 {
 	this->m_synchronalZoomingFlag = flag;
@@ -64,11 +69,14 @@ void AbstractInteractorStyleImage::SynchronalZooming()
 	if (!m_synchronalZoomingFlag)
 		return;
 	double scale = m_imageViewer->GetRenderer()->GetActiveCamera()->GetParallelScale();
-	for (std::list<vtkImageViewer2*>::iterator it = m_synchronalViewers.begin();
-		it != m_synchronalViewers.end(); ++it) {
-		(*it)->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
-		(*it)->Render();
-	}
+	VIEWER_CONSTITERATOR(GetRenderer()->GetActiveCamera()->SetParallelScale(scale));
+	VIEWER_CONSTITERATOR(Render());
+
+	//for (std::list<vtkImageViewer2*>::iterator it = m_synchronalViewers.begin();
+	//	it != m_synchronalViewers.end(); ++it) {
+	//	(*it)->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
+	//	(*it)->Render();
+	//}
 }
 
 //vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)

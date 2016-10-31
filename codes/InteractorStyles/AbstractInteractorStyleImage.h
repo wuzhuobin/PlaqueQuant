@@ -43,14 +43,15 @@ public:
 	static AbstractInteractorStyleImage *New();
 	
 	virtual void SetImageViewer(vtkImageViewer2* imageViewer);
-	virtual void AddSynchronalViewer(vtkImageViewer2* imageViewer);
 	//virtual vtkActor* PickActor(int x, int y);
+	virtual void SetCurrentSlice(int slice);
 	virtual void EnableSynchronalZooming(bool flag);
 
 protected:
 	AbstractInteractorStyleImage();
 	~AbstractInteractorStyleImage();
 
+	virtual void AddSynchronalViewer(vtkImageViewer2* imageViewer);
 	virtual void SynchronalZooming();
 	
 	virtual void OnMouseWheelForward();

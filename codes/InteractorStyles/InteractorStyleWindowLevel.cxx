@@ -103,14 +103,6 @@ InteractorStyleWindowLevel::~InteractorStyleWindowLevel()
 
 }
 
-//void InteractorStyleWindowLevel::OnMouseMove()
-//{
-//	//if (m_leftFunctioning) {
-//	//	this->WindowLevel();
-//	//}
-//	AbstractNavigation::OnMouseMove();
-//}
-
 void InteractorStyleWindowLevel::OnMouseMove()
 {
 	AbstractNavigation::OnMouseMove();
@@ -136,13 +128,52 @@ void InteractorStyleWindowLevel::OnKeyPress()
 	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r" || key == "R") {
 		SetWindowLevel(255,	127.5);
-		AbstractNavigation::OnKeyPress();
+		//AbstractNavigation::OnKeyPress();
 
 	}
 	else {
 		AbstractNavigation::OnKeyPress();
 	}
 
+}
+
+void InteractorStyleWindowLevel::OnKeyDown()
+{
+	std::string key = this->Interactor->GetKeySym();
+	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+	if (key == "r" || key == "R") {
+		//AbstractNavigation::OnKeyPress();
+
+	}
+	else {
+		AbstractNavigation::OnKeyDown();
+	}
+}
+
+void InteractorStyleWindowLevel::OnKeyRelease()
+{
+	std::string key = this->Interactor->GetKeySym();
+	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+	if (key == "r" || key == "R") {
+		//AbstractNavigation::OnKeyPress();
+
+	}
+	else {
+		AbstractNavigation::OnKeyRelease();
+	}
+}
+
+void InteractorStyleWindowLevel::OnKeyUp()
+{
+	std::string key = this->Interactor->GetKeySym();
+	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+	if (key == "r" || key == "R") {
+		//AbstractNavigation::OnKeyPress();
+
+	}
+	else {
+		AbstractNavigation::OnKeyUp();
+	}
 }
 
 void InteractorStyleWindowLevel::OnChar()
@@ -152,6 +183,7 @@ void InteractorStyleWindowLevel::OnChar()
 	{
 	case 'r':
 	case 'R':
+		//AbstractNavigation::OnChar();
 		SynchronalZooming();
 		break;
 	default:
@@ -163,6 +195,9 @@ void InteractorStyleWindowLevel::OnChar()
 }
 void InteractorStyleWindowLevel::WindowLevel()
 {
+	// for using the WindowLevel of vtkInteractorStyleImage
+	// it seem to be the vtkInteractorStyleImage have better performance
+
 	vtkImageProperty* _property = this->CurrentImageProperty;
 	this->CurrentImageProperty = m_imageViewer->GetImageActor()->GetProperty();
 	vtkInteractorStyleImage::WindowLevel();
