@@ -126,6 +126,8 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->Navigation->SetNavigationModeEnabled(true);
 	if (this->CurrentStyle == this->WindowLevel)
 		this->WindowLevel->SetWindowLevelModeEnabled(true);
+	if (this->CurrentStyle == this->PolygonDraw)
+		this->PolygonDraw->SetPolygonModeEnabled(true);
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(true);
 	if (this->CurrentStyle == this->Ruler)

@@ -85,6 +85,7 @@ void Overlay::SetInputImageData(vtkImageData* imageData)
 		m_vtkOverlay = imageCast->GetOutput();
 	}
 	Measure2D();
+	Measure3D();
 	emit signalOverlayUpdated();
 }
 
@@ -377,20 +378,21 @@ void Overlay::Measure2D(int slice)
 	_2DMeasurements += "Undefined";
 	_2DMeasurements += "Undefined";
 	_2DMeasurements += "Normal";
-	// to ensure it won't be out of index
-	while (slice >= m_2DMeasurements.size()) {
-		m_2DMeasurements += _2DMeasurements;
-	}
-	while (slice >= m_measurementFor2D.size()) {
-		m_measurementFor2D += new MeasurementFor2DIntegrated();
-	}
-
+	//// to ensure it won't be out of index
+	//while (slice >= m_2DMeasurements.size()) {
+	//	m_2DMeasurements += _2DMeasurements;
+	//}
+	//while (slice >= m_measurementFor2D.size()) {
+	//	m_measurementFor2D += new MeasurementFor2DIntegrated();
+	//}
+	m_2DMeasurements[slice] = _2DMeasurements;
+	m_measurementFor2D[slice] = new MeasurementFor2DIntegrated();
 	// Extract slice image
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
 	voi->SetInputData(m_vtkOverlay);
 	voi->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
 	voi->Update();
-	slice = slice - extent[4];
+	//slice = slice - extent[4];
 	// Calculate areas
 	m_measurementFor2D[slice]->m2d->SetSliceImage(voi->GetOutput());
 
@@ -530,14 +532,35 @@ QStringList Overlay::Get2DMeasurementsStrings(int slice)
 	const int* extent = m_vtkOverlay->GetExtent();
 	if (slice < extent[4]) {
 		//Measure2D(extent[4]);
-		return m_2DMeasurements[0];
+		return m_2DMeasurements[extent[4]];
 	}
 	else if (slice > extent[5]) {
 		//Measure2D(extent[5]);
-		return m_2DMeasurements[m_2DMeasurements.size() - 1];
+		return m_2DMeasurements[slice];
 	}
 	else {
 		//Measure2D(slice);
-		return m_2DMeasurements[slice - extent[4]];
+		return m_2DMeasurements[extent[5]];
 	}
 }
+
+QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* Overlay::GetVesselWallPolyData()
+{
+	return &m_vesselWallPolyData;
+}
+
+QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* Overlay::GetLumenPolyData()
+{
+	return &m_lumenPolyData;
+}
+
+std::map<int, QList<vtkSmartPointer<vtkPolyData>>*>* Overlay::GetVesselWallPolyDataSTD()
+{
+	return &(m_vesselWallPolyData.toStdMap());
+}
+
+std::map<int, QList<vtkSmartPointer<vtkPolyData>>*>* Overlay::GetLumenPolyDataSTD()
+{
+	return &(m_lumenPolyData.toStdMap());
+}
+

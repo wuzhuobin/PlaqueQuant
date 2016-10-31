@@ -82,7 +82,6 @@ vtkOrientedGlyphContourRepresentation * LumenSegmentaiton::GetLumenWallContourRe
 {
 	return this->lumenWallContourRepresentation;
 }
-#include <vtkXMLPolyDataWriter.h>
 
 void LumenSegmentaiton::Update()
 {

@@ -36,6 +36,7 @@ Copyright (C) 2016
 #include "LumenSegmentation.h"
 #include "MyImageViewer.h"
 
+using namespace std;
 vtkStandardNewMacro(InteractorStylePolygonDraw);
 
 InteractorStylePolygonDraw::InteractorStylePolygonDraw()
@@ -45,13 +46,10 @@ InteractorStylePolygonDraw::InteractorStylePolygonDraw()
 	CONTOUR_IS_ON_FLAG = false;
 	AUTO_LUMEN_SEGMENTATION_ENABLE_FLAG = false;
 
-	m_timer.start();
-	m_firstClickTimeStamp = m_timer.elapsed();
-	m_vesselWallContourWidget = NULL;
-	m_lumenWallContourWidget = NULL;
-	m_vesselWallContourRepresentation = NULL;
-	m_lumenWallContourRepresentation = NULL;
-	this->m_interpolator = vtkBezierContourLineInterpolator::New();
+	//m_timer.start();
+	//m_firstClickTimeStamp = m_timer.elapsed();
+	this->m_interpolator = 
+		vtkSmartPointer<vtkBezierContourLineInterpolator>::New();
 	vesselWallLabel = 1;
 	this->m_generateValue = 60;
 }
@@ -76,24 +74,20 @@ InteractorStylePolygonDraw::~InteractorStylePolygonDraw()
 		m_lumenWallContourWidget->Delete();
 		m_lumenWallContourWidget = NULL;
 	}
-	if (m_interpolator) {
-		m_interpolator->Delete();
-		m_interpolator = NULL;
-	}
 }
 
 void InteractorStylePolygonDraw::OnLeftButtonDown()
 {
-	if (this->CheckDoubleClicked() && CONTOUR_IS_ON_FLAG) {
-		this->m_vesselWallContourWidget->CloseLoop();
-		this->FillPolygon();
-		this->SetPolygonModeEnabled(false);
-		this->CONTOUR_IS_ON_FLAG = false;
-	}
-	else if (!CONTOUR_IS_ON_FLAG){
-		this->SetPolygonModeEnabled(true);
-		this->CONTOUR_IS_ON_FLAG = true;
-	}
+	//if (this->CheckDoubleClicked() && CONTOUR_IS_ON_FLAG) {
+	//	this->m_vesselWallContourWidget->CloseLoop();
+	//	this->FillPolygon();
+	//	this->SetPolygonModeEnabled(false);
+	//	this->CONTOUR_IS_ON_FLAG = false;
+	//}
+	//else if (!CONTOUR_IS_ON_FLAG){
+	//	this->SetPolygonModeEnabled(true);
+	//	this->CONTOUR_IS_ON_FLAG = true;
+	//}
 	AbstractNavigation::OnLeftButtonDown();
 }
 
@@ -108,9 +102,12 @@ void InteractorStylePolygonDraw::OnRightButtonDown()
 
 void InteractorStylePolygonDraw::OnMouseMove()
 {
-	if (!this->CONTOUR_IS_ON_FLAG) {
-		this->SetPolygonModeEnabled(true);
-		this->CONTOUR_IS_ON_FLAG = true;
+	//if (!this->CONTOUR_IS_ON_FLAG) {
+	//	this->SetPolygonModeEnabled(true);
+	//	this->CONTOUR_IS_ON_FLAG = true;
+	//}
+	if (m_polygonDrawEnabledFlag) {
+		SetPolygonModeEnabled(m_polygonDrawEnabledFlag);
 	}
 }
 
@@ -119,7 +116,7 @@ void InteractorStylePolygonDraw::OnKeyPress()
 	std::string key = this->Interactor->GetKeySym();
 	
 	if (key == "Escape") {
-		this->SetPolygonModeEnabled(false);
+		//this->SetPolygonModeEnabled(false);
 	}
 	if (key == "Return" && m_vesselWallContourWidget) {
 		if (CONTOUR_IS_ON_FLAG)
@@ -130,93 +127,140 @@ void InteractorStylePolygonDraw::OnKeyPress()
 
 bool InteractorStylePolygonDraw::CheckDoubleClicked()
 {
-	int t = m_timer.elapsed() - m_firstClickTimeStamp;
+	//int t = m_timer.elapsed() - m_firstClickTimeStamp;
+	int t = 100;
 
 	if (t < 200 && !DOUBLE_CLICKED_FLAG) {
 		DOUBLE_CLICKED_FLAG = true;
-		m_firstClickTimeStamp = m_timer.elapsed();
+		//m_firstClickTimeStamp = m_timer.elapsed();
 		return true;
 	}
 	else {
 		DOUBLE_CLICKED_FLAG = false;
-		m_firstClickTimeStamp = m_timer.elapsed();
+		//m_firstClickTimeStamp = m_timer.elapsed();
 		return false;
 	}
 }
 
 void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 {
-
-	if (m_vesselWallContourWidget) {
-		m_vesselWallContourWidget->Off();
-		m_vesselWallContourWidget->SetRepresentation(NULL);
-		m_vesselWallContourWidget->EnabledOff();
-		m_vesselWallContourWidget->Delete();
-		m_vesselWallContourWidget = NULL;
+	m_polygonDrawEnabledFlag = b;
+	if (!m_polygonDrawEnabledFlag) {
+		ClearAllConoturs();
+		m_currentContour = nullptr;
 	}
+	else if (m_currentContour == nullptr ||
+		m_currentContour->GetWidgetState() == vtkContourWidget::Manipulate) {
+		m_currentContour->CloseLoop();
+		switch (m_contourType)
+		{
+		case NO_SEG:
+			m_noSegmentation.push_back(vtkSmartPointer<vtkContourWidget>::New());
+			m_currentContour = m_noSegmentation.back();
+			m_currentContour->SetRepresentation(
+				vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New());
 
+			m_currentContourRep = vtkOrientedGlyphContourRepresentation::SafeDownCast(
+				m_currentContour->GetContourRepresentation());
+			m_currentContourRep->GetLinesProperty()->SetColor(0, 255, 0);
+			break;
+		case VESSEL_WALL:
+			m_noSegmentation.push_back(vtkSmartPointer<vtkContourWidget>::New());
+			m_currentContour = m_noSegmentation.back();
+			m_currentContour->SetRepresentation(
+				vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New());
 
-	if (m_vesselWallContourRepresentation) {
-		m_vesselWallContourRepresentation->Delete();
-		m_vesselWallContourRepresentation = NULL;
-	}
-	if (m_lumenWallContourWidget) {
-		m_lumenWallContourWidget->Off();
-		m_lumenWallContourWidget->SetRepresentation(NULL);
-		m_lumenWallContourWidget->EnabledOff();
-		m_lumenWallContourWidget->Delete();
-		m_lumenWallContourWidget = NULL;
-	}
-
-
-	if (m_lumenWallContourRepresentation) {
-		m_lumenWallContourRepresentation->Delete();
-		m_lumenWallContourRepresentation = NULL;
-	}
-
-	if (b)
-	{
-		m_vesselWallContourRepresentation = vtkOrientedGlyphContourRepresentation::New();
-
-		MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
-		if (viewer != NULL) {
-			cout << "viewer" << endl;
-			m_vesselWallContourRepresentation->SetRenderer(viewer->GetAnnotationRenderer());
+			m_currentContourRep = vtkOrientedGlyphContourRepresentation::SafeDownCast(
+				m_currentContour->GetContourRepresentation());
+			m_currentContourRep->GetLinesProperty()->SetColor(0, 255, 0);
+			break;
+		default:
+			break;
 		}
-		else {
-			m_vesselWallContourRepresentation->SetRenderer(m_imageViewer->GetRenderer());
-		}
+		m_currentContour->SetInteractor(this->Interactor);
+		m_currentContour->ContinuousDrawOn();
+		m_currentContour->FollowCursorOn();
 
-		m_vesselWallContourRepresentation->SetNeedToRender(true);
-		m_vesselWallContourRepresentation->GetLinesProperty()->SetColor(0, 0, 255);
-		m_vesselWallContourRepresentation->SetLineInterpolator(this->m_interpolator);
-		m_vesselWallContourRepresentation->AlwaysOnTopOn();
-		m_vesselWallContourRepresentation->BuildRepresentation();
+		m_currentContourRep->SetLineInterpolator(m_interpolator);
+		m_currentContourRep->AlwaysOnTopOn();
+		m_currentContour->EnabledOn();
 
-		m_vesselWallContourWidget = vtkContourWidget::New();
-		m_vesselWallContourWidget->SetInteractor(this->Interactor);
-		m_vesselWallContourWidget->SetRepresentation(m_vesselWallContourRepresentation);
-		if (viewer != NULL) {
-			cout << "viewer" << endl;
-
-			m_vesselWallContourWidget->SetDefaultRenderer(viewer->GetAnnotationRenderer());
-		}
-		else {
-			m_vesselWallContourWidget->SetDefaultRenderer(m_imageViewer->GetRenderer());
-		}
-		m_vesselWallContourWidget->FollowCursorOn();
-		m_vesselWallContourWidget->ContinuousDrawOn();
-		m_vesselWallContourWidget->On();
-		m_vesselWallContourWidget->EnabledOn();
-
-
-
-		this->m_imageViewer->Render();
-		this->CONTOUR_IS_ON_FLAG = true;
 	}
 	else {
-		this->CONTOUR_IS_ON_FLAG = false;
+		/*if (m_vesselWallContourWidget) {
+			m_vesselWallContourWidget->Off();
+			m_vesselWallContourWidget->SetRepresentation(NULL);
+			m_vesselWallContourWidget->EnabledOff();
+			m_vesselWallContourWidget->Delete();
+			m_vesselWallContourWidget = NULL;
+		}
+
+
+		if (m_vesselWallContourRepresentation) {
+			m_vesselWallContourRepresentation->Delete();
+			m_vesselWallContourRepresentation = NULL;
+		}
+		if (m_lumenWallContourWidget) {
+			m_lumenWallContourWidget->Off();
+			m_lumenWallContourWidget->SetRepresentation(NULL);
+			m_lumenWallContourWidget->EnabledOff();
+			m_lumenWallContourWidget->Delete();
+			m_lumenWallContourWidget = NULL;
+		}
+
+
+		if (m_lumenWallContourRepresentation) {
+			m_lumenWallContourRepresentation->Delete();
+			m_lumenWallContourRepresentation = NULL;
+		}
+
+		if (b)
+		{
+			m_vesselWallContourRepresentation = vtkOrientedGlyphContourRepresentation::New();
+
+			MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(m_imageViewer);
+			if (viewer != NULL) {
+				cout << "viewer" << endl;
+				m_vesselWallContourRepresentation->SetRenderer(viewer->GetAnnotationRenderer());
+			}
+			else {
+				m_vesselWallContourRepresentation->SetRenderer(m_imageViewer->GetRenderer());
+			}
+
+			m_vesselWallContourRepresentation->SetNeedToRender(true);
+			m_vesselWallContourRepresentation->GetLinesProperty()->SetColor(0, 0, 255);
+			m_vesselWallContourRepresentation->SetLineInterpolator(this->m_interpolator);
+			m_vesselWallContourRepresentation->AlwaysOnTopOn();
+			m_vesselWallContourRepresentation->BuildRepresentation();
+
+			m_vesselWallContourWidget = vtkContourWidget::New();
+			m_vesselWallContourWidget->SetInteractor(this->Interactor);
+			m_vesselWallContourWidget->SetRepresentation(m_vesselWallContourRepresentation);
+			if (viewer != NULL) {
+				cout << "viewer" << endl;
+
+				m_vesselWallContourWidget->SetDefaultRenderer(viewer->GetAnnotationRenderer());
+			}
+			else {
+				m_vesselWallContourWidget->SetDefaultRenderer(m_imageViewer->GetRenderer());
+			}
+			m_vesselWallContourWidget->FollowCursorOn();
+			m_vesselWallContourWidget->ContinuousDrawOn();
+			m_vesselWallContourWidget->On();
+			m_vesselWallContourWidget->EnabledOn();
+
+
+
+			this->m_imageViewer->Render();
+			this->CONTOUR_IS_ON_FLAG = true;
+		}
+		else {
+			this->CONTOUR_IS_ON_FLAG = false;
+		}*/
 	}
+
+
+
 }
 
 void InteractorStylePolygonDraw::SetVesselWallLabel(int vesselWallLabel)
@@ -227,6 +271,11 @@ void InteractorStylePolygonDraw::SetVesselWallLabel(int vesselWallLabel)
 void InteractorStylePolygonDraw::SetLumenWallLabel(int lumenWallLabel)
 {
 	this->lumenWallLabel = lumenWallLabel;
+}
+
+void InteractorStylePolygonDraw::SetNoSegLabel(int noSegLabel)
+{
+	this->noSegLabel = noSegLabel;
 }
 
 void InteractorStylePolygonDraw::EnableAutoLumenSegmentation(bool flag)
@@ -243,6 +292,45 @@ void InteractorStylePolygonDraw::DisplayPolygon(vtkObject* caller, long unsigned
 {
 
 	m_imageViewer->Render();
+}
+
+void InteractorStylePolygonDraw::ClearCurrentContour()
+{
+	list<vtkSmartPointer<vtkContourWidget>>* _contours[] = {
+		&m_noSegmentation,
+		&m_vesselWallContourWidgets,
+		&m_noSegmentation
+	};
+	_contours[m_contourType]->back()->EnabledOff();
+	_contours[m_contourType]->pop_back();
+
+}
+
+void InteractorStylePolygonDraw::ClearAllConoturs()
+{
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
+		++cit) {
+
+		(*cit)->EnabledOff();
+	}
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
+		++cit) {
+
+		(*cit)->EnabledOff();
+
+	}
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		= m_noSegmentation.cbegin(); cit != m_noSegmentation.cend();
+		++cit) {
+
+		(*cit)->EnabledOff();
+
+	}
+	m_noSegmentation.clear();
+	m_vesselWallContourWidgets.clear();
+	m_lumenWallContourWidgets.clear();
 }
 
 void InteractorStylePolygonDraw::GenerateLumenWallContourWidget()
