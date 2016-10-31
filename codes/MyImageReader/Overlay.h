@@ -6,6 +6,7 @@
 #include <vtkLookupTable.h>
 
 #include <QObject>
+#include <qmap.h>
 
 #include <itkImage.h>
 
@@ -15,7 +16,13 @@
 
 typedef itk::Image<float, 3> ImageType;
 
-
+/**
+ * @class Overlay
+ * @author WUZHUOBIN
+ * @version
+ * @since
+ * A very important part of element for using other InteractorStyle
+ */
 class Overlay : public QObject
 {
 	Q_OBJECT
@@ -55,6 +62,7 @@ public:
 	void Initialize(vtkImageData* img);
 	/**
 	 * @deprecated
+	 * don't use it
 	 */
 	void Initialize(ImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
 
@@ -137,25 +145,41 @@ public:
 	MeasurementFor2DIntegrated GetMeasurementFor2D(int slice);
 	QStringList Get2DMeasurementsStrings(int slice);
 
+	// Get contour PolyData*
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetVesselWallPolyData();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetLumenPolyData();
+	std::map<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetVesselWallPolyDataSTD();
+	std::map<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetLumenPolyDataSTD();
+
+
 signals:
 	void signalOverlayUpdated();
 
 private:
 
+	// ImageData
 	vtkSmartPointer<vtkImageData> m_vtkOverlay;
 	ImageType::Pointer m_itkOverlay;
+
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
 
 	int DisplayExtent[6];
 
 	// 3D parts data
+	// volumeofTotalPlaque, volumeOfLumen, volumeOfVesselWall, volumeOfCalcification
+	// volumeOfHemorrhage, volumeOfLRNC, volumeOfLM
 	MeasurementFor3D m_measurementFor3D;
 
-	QList<MeasurementFor2DIntegrated*> m_measurementFor2D;
-
+	// 2D parts data
+	// using QMap for the case that the extent do not begin at 0
 	// lumen area, vessel area, NMI, distance, distance error imfo
-	QList<QStringList> m_2DMeasurements;
+	QMap<int, MeasurementFor2DIntegrated*> m_measurementFor2D;
+	QMap<int, QStringList> m_2DMeasurements;
 	QStringList m_volumeStrings;
+
+	// contour parts
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*> m_vesselWallPolyData;
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*> m_lumenPolyData;
 
 };
 

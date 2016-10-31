@@ -166,7 +166,7 @@ void IOManager::slotOpenWithWizard()
 {
 	this->slotOpenWithWizard("");
 }
-#include <qdebug.h>
+
 void IOManager::slotOpenWithWizard(QString dir)
 {
 	RegistrationWizard wizard(dir);
