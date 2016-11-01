@@ -36,7 +36,9 @@ public:
 	virtual void NewContour();
 
 	virtual void SetContourLabel(int contourLabel);
-
+	
+	virtual void SetSmoothCurveEnable();
+	virtual void SetPolygonEnable();
 	virtual void SetLineInterpolator(int i);
 	virtual void FillPolygon();
 	virtual void FillPolygon(std::list<vtkSmartPointer<vtkContourWidget>>* contour, int label);

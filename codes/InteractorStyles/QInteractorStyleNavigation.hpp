@@ -19,7 +19,7 @@ public:
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 protected:
-	QInteractorStyleNavigation(int uiType = -1, QWidget * parent = Q_NULLPTR);
+	QInteractorStyleNavigation(int uiType = NO_UI, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleNavigation();
 private:
 	Ui::QInteractorStyleNavigation* ui = nullptr;

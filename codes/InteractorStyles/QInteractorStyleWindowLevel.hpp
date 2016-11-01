@@ -17,10 +17,8 @@ public:
 
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 protected:
-	QInteractorStyleWindowLevel(int uiType = -1, QWidget * parent = Q_NULLPTR);
+	QInteractorStyleWindowLevel(int uiType = NO_UI, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleWindowLevel();
-
-
 
 private:
 	Ui::QInteractorStyleWindowLevel *ui = nullptr;

@@ -2,13 +2,13 @@
 
 using namespace itk;
 MyImageManager::MyImageManager(QObject* parent)
-	:overlay(new Overlay(parent)), QObject(parent)
+	:QObject(parent)
 {
+	overlay = new Overlay(parent);
 }
 
 MyImageManager::~MyImageManager()
 {
-	delete overlay;
 	allClear();
 }
 

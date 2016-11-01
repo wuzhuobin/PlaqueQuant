@@ -76,7 +76,7 @@ public slots:
 	//Visualization
 	bool slotVisualizeImage();
 
-	virtual void slotContourMode();
+	virtual void slotChangeMode(QAction* action);
 
 
 

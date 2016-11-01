@@ -159,6 +159,16 @@ void InteractorStylePolygonDraw::ClearAllConoturs()
 	m_imageViewer->Render();
 }
 
+void InteractorStylePolygonDraw::SetSmoothCurveEnable()
+{
+	SetLineInterpolator(0);
+}
+
+void InteractorStylePolygonDraw::SetPolygonEnable()
+{
+	SetLineInterpolator(1);
+}
+
 void InteractorStylePolygonDraw::SetLineInterpolator(int i)
 {
 	switch (i)
@@ -193,7 +203,7 @@ void InteractorStylePolygonDraw::FillPolygon(std::list<vtkSmartPointer<vtkContou
 			continue;
 		}
 		_polyData = (*cit)->GetContourRepresentation()->GetContourRepresentationAsPolyData();
-		if (_polyData == nullptr || _polyData->GetNumberOfPoints() < 5) {
+		if (_polyData == nullptr || _polyData->GetNumberOfPoints() < 3) {
 			continue;
 		}
 		(*cit)->CloseLoop();

@@ -61,12 +61,10 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionROI);
 	widgetGroup.addAction(ui->actionSmartContour);
 	widgetGroup.setExclusive(true);
+	connect(&widgetGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotChangeMode(QAction*)));
 	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel,	SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
-	//
-	connect(ui->actionContour,		SIGNAL(triggered()), this, SLOT(slotContourMode()));
 	connect(ui->actionContour,		SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
-	//
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
@@ -295,10 +293,19 @@ bool MainWindow::slotVisualizeImage()
 	return 0;
 }
 
-void MainWindow::slotContourMode()
+void MainWindow::slotChangeMode(QAction* action)
 {
-	ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
-		Core::DEFAULT_IMAGE)->GetPolygonDraw());
+	ui->widgetDockWidget->setEnabled(true);
+	if (action == ui->actionContour) {
+		ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetPolygonDraw());
+	}
+	//else if (action == ui->actionBrush) {
+
+	//}
+	else {
+		ui->widgetDockWidget->setEnabled(false);
+	}
 }
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)

@@ -90,13 +90,13 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 	//	SmartContour2 = NULL;
 	//}
 	/* Do not modifiy the lower code£¡ */
-	//for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-	//	it != allStyles.end(); ++it) {
-	//	if ((*it) != NULL) {
-	//		(*it)->Delete();
-	//		(*it) = NULL;
-	//	}
-	//}
+	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+		it != allStyles.end(); ++it) {
+		if ((*it) != NULL) {
+			(*it)->Delete();
+			(*it) = NULL;
+		}
+	}
 	allStyles.clear();
 
 }

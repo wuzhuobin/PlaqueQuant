@@ -21,7 +21,7 @@ protected:
 	/**
 	 * 
 	 */
-	QAbstractNavigation(int uiType = 0, QWidget * parent = Q_NULLPTR);
+	QAbstractNavigation(int uiType = UNIQUE_UI, QWidget * parent = Q_NULLPTR);
 	~QAbstractNavigation();
 private:
 	Ui::QAbstractNavigation* ui = nullptr;

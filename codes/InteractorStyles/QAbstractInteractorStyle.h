@@ -96,10 +96,15 @@ class QAbstractInteractorStyle : public QWidget {
 public:
 	enum UI_TYPE
 	{
-		NO_UI = -1,
-		UNIQUE_UI = 0,
-		MULTIPLE_UI = 1
+		NO_UI = 0X00,
+		UNIQUE_UI = 0X01,
+		MULTIPLE_UI = 0X02
 	};
+
+	/**
+	 * The Initialization method will run multiple times although there is only 
+	 * one UI, which should only run one time. It is still not robust enough
+	 */
 	virtual void Initialization() = 0;
 //protected:
 //	static QList<Ui::QAbstractInteractorStyle*> m_uis;
@@ -129,7 +134,7 @@ public:
 //virtual int getUiType();
 //int m_uiType = -1;
 protected:
-	QAbstractInteractorStyle(int uiType = -1, QWidget * parent = Q_NULLPTR);
+	QAbstractInteractorStyle(int uiType = NO_UI, QWidget * parent = Q_NULLPTR);
 	~QAbstractInteractorStyle();
 
 

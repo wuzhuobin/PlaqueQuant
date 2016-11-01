@@ -119,15 +119,9 @@ void InteractorStyleVesselSegmentation::ClearAllConoturs()
 		(*cit)->EnabledOff();
 
 	}
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
-		= m_contours.cbegin(); cit != m_contours.cend();
-		++cit) {
-		(*cit)->EnabledOff();
-
-	}
-	m_contours.clear();
 	m_vesselWallContourWidgets.clear();
 	m_lumenWallContourWidgets.clear();
+	InteractorStylePolygonDraw::ClearAllConoturs();
 	m_imageViewer->Render();
 }
 

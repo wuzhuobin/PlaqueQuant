@@ -176,7 +176,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton">
+       <widget class="QRadioButton" name="lumenSegmentationRadioButton">
         <property name="text">
          <string>Lumen Segmentation</string>
         </property>
@@ -186,7 +186,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_2">
+       <widget class="QRadioButton" name="vesselWallSegmentationRadioButton">
         <property name="text">
          <string>Vessel Wall Segmentation</string>
         </property>
@@ -196,7 +196,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_3">
+       <widget class="QRadioButton" name="noSegmentationRadioButton">
         <property name="text">
          <string>No Segmentation</string>
         </property>
@@ -585,9 +585,9 @@
      <zorder>polygonRadionButton</zorder>
      <zorder>groupBox_6</zorder>
      <zorder>groupBox</zorder>
-     <zorder>radioButton</zorder>
-     <zorder>radioButton_2</zorder>
-     <zorder>radioButton_3</zorder>
+     <zorder>lumenSegmentationRadioButton</zorder>
+     <zorder>vesselWallSegmentationRadioButton</zorder>
+     <zorder>noSegmentationRadioButton</zorder>
      <zorder>vesselFrame</zorder>
      <zorder>groupBox_3</zorder>
      <zorder>frame_6</zorder>
@@ -677,7 +677,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton</sender>
+   <sender>lumenSegmentationRadioButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>groupBox_6</receiver>
    <slot>setEnabled(bool)</slot>
@@ -693,7 +693,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_2</sender>
+   <sender>vesselWallSegmentationRadioButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>groupBox</receiver>
    <slot>setEnabled(bool)</slot>
@@ -709,7 +709,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_3</sender>
+   <sender>noSegmentationRadioButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>groupBox_3</receiver>
    <slot>setDisabled(bool)</slot>
@@ -725,7 +725,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_3</sender>
+   <sender>noSegmentationRadioButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>frame_6</receiver>
    <slot>setVisible(bool)</slot>
@@ -741,7 +741,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_3</sender>
+   <sender>noSegmentationRadioButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>vesselFrame</receiver>
    <slot>setHidden(bool)</slot>
@@ -758,7 +758,7 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

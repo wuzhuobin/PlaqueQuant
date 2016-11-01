@@ -20,7 +20,12 @@ public:
 
 public slots:
 	virtual void FillPolygon();
-
+	virtual void SetSmoothCurveEnable(bool flag);
+	virtual void SetPolygonEnable(bool flag);
+	virtual void EnableNoSegmentation(bool flag);
+	virtual void EnableLumenSegmentation(bool flag);
+	virtual void EnableVesselWallSegmentation(bool flag);
+	virtual void SetContourLabel(int label);
 
 protected:
 	QInteractorStyleVesselSegmentation(int uiType = UNIQUE_UI, QWidget * parent = Q_NULLPTR);
