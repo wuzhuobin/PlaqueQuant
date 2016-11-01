@@ -25,7 +25,7 @@ Copyright (C) 2016
 
 #include "QInteractorStyleNavigation.hpp"
 #include "QInteractorStyleWindowLevel.hpp"
-#include "InteractorStylePolygonDraw.h"
+#include "QInteractorStyleVesselSegmentation.hpp"
 #include "InteractorStylePaintBrush.h"
 #include "InteractorStyleROI.h"
 #include "InteractorStyleRuler.h"
@@ -42,7 +42,7 @@ public:
 	vtkGetMacro(InteractorStyleTesting, vtkInteractorStyleImage*);
 	vtkGetMacro(WindowLevel, QInteractorStyleWindowLevel*);
 	vtkGetMacro(Navigation, QInteractorStyleNavigation*);
-	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
+	vtkGetMacro(PolygonDraw, QInteractorStyleVesselSegmentation*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
 	vtkGetMacro(ROI, InteractorStyleROI*);
 	vtkGetMacro(Ruler, InteractorStyleRuler*);
@@ -95,7 +95,7 @@ private:
 	vtkInteractorStyleImage* InteractorStyleTesting;
 	QInteractorStyleNavigation*	Navigation;
 	QInteractorStyleWindowLevel* WindowLevel;
-	InteractorStylePolygonDraw* PolygonDraw;
+	QInteractorStyleVesselSegmentation* PolygonDraw;
 	InteractorStylePaintBrush*	PaintBrush;
 	InteractorStyleROI* ROI;
 	InteractorStyleRuler* Ruler;

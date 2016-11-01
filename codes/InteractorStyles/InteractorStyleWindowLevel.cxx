@@ -111,6 +111,7 @@ void InteractorStyleWindowLevel::OnMouseMove()
 void InteractorStyleWindowLevel::OnLeftButtonDown()
 {
 	vtkInteractorStyleImage::OnLeftButtonDown();
+	AbstractNavigation::OnLeftButtonDown();
 	this->WindowLevelInitial[0] = m_imageViewer->GetImageActor()->
 		GetProperty()->GetColorWindow();
 	this->WindowLevelInitial[1] = m_imageViewer->GetImageActor()->
@@ -120,6 +121,7 @@ void InteractorStyleWindowLevel::OnLeftButtonDown()
 void InteractorStyleWindowLevel::OnLeftButtonUp()
 {
 	vtkInteractorStyleImage::OnLeftButtonUp();
+	AbstractNavigation::OnLeftButtonUp();
 }
 
 void InteractorStyleWindowLevel::OnKeyPress()

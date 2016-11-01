@@ -55,15 +55,24 @@ protected:
 	virtual void OnLeftButtonUp();
 	virtual void OnRightButtonUp();
 	virtual void OnMiddleButtonUp();
-
 	
 	//int			m_orientation;
 
 	bool m_rightFunctioning = false;
 	bool m_leftFunctioning = false;
 	bool m_middleFunctioning = false;
+	bool m_rightDoubleClick = false;
+	bool m_leftDoubleClick = false;
+	bool m_middleDoubleClick = false;
+
+
+	unsigned short NumberOfLeftClicks = 0;
+	unsigned short NumberOfRightClicks = 0;
+	unsigned short NumberOfMiddleClicks = 0;
 
 	static std::list<AbstractInteractorStyle*> m_abstractInteractorStyles;
+
+
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_H

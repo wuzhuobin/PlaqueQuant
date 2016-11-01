@@ -14,8 +14,8 @@ static QList<Ui::##STYLE_NAME*> m_uis; \
 void setupUi();\
 void setUiType(int uiType);\
 int getUiType();\
-int m_uiType = -1;\
 private:\
+int m_uiType = -1;\
 static int numOfMyself;
 #endif // !QSETUP_UI_HEAD(STYLE_NAME)
 
@@ -61,7 +61,7 @@ Ui::##STYLE_NAME* STYLE_NAME::getUi(){\
 
 #ifndef QNEW_UI()
 #define QNEW_UI()\
-this->setupUi();this->setEnabled(false);
+this->m_uiType = uiType;this->setupUi();this->setEnabled(false);
 #endif // !QNEW_UI()
 
 #ifndef QDELETE_UI()

@@ -30,8 +30,6 @@ std::list<vtkImageViewer2*> AbstractInteractorStyleImage::m_synchronalViewers;
 
 AbstractInteractorStyleImage::AbstractInteractorStyleImage() : vtkInteractorStyleImage()
 {
-	//m_rightFunctioning = false;
-	//m_leftFunctioning = false;
 	//m_middleFunctioning = false;
 }
 
@@ -128,6 +126,22 @@ int * AbstractInteractorStyleImage::GetExtent()
 	return m_imageViewer->GetInput()->GetExtent();
 }
 
+bool AbstractInteractorStyleImage::CheckMoveDistance()
+{
+	int pickPosition[2];
+	this->GetInteractor()->GetEventPosition(pickPosition);
+
+	int xdist = pickPosition[0] - this->PreviousPosition[0];
+	int ydist = pickPosition[1] - this->PreviousPosition[1];
+
+	this->PreviousPosition[0] = pickPosition[0];
+	this->PreviousPosition[1] = pickPosition[1];
+
+	int moveDistance = (int)sqrt((double)(xdist*xdist + ydist*ydist));
+
+	return (moveDistance <= RESET_PIXEL_DISTANCE);
+}
+
 void AbstractInteractorStyleImage::OnMouseWheelForward()
 {
 	vtkInteractorStyleImage::OnMouseWheelForward();
@@ -140,6 +154,18 @@ void AbstractInteractorStyleImage::OnMouseWheelBackward()
 
 void AbstractInteractorStyleImage::OnLeftButtonDown()
 {
+	this->NumberOfLeftClicks++;
+
+	// Reset numClicks - If mouse moved further than resetPixelDistance
+	if (CheckMoveDistance())
+	{
+		this->NumberOfLeftClicks = 1;
+	}
+	if (this->NumberOfLeftClicks == 2)
+	{
+		m_leftDoubleClick = true;
+		this->NumberOfLeftClicks = 0;
+	}
 	AbstractInteractorStyle::OnLeftButtonDown();
 	//vtkInteractorStyleImage::OnLeftButtonDown();
 }
@@ -152,6 +178,21 @@ void AbstractInteractorStyleImage::OnLeftButtonUp()
 
 void AbstractInteractorStyleImage::OnRightButtonDown()
 {
+	this->NumberOfRightClicks++;
+
+	// Reset numClicks - If mouse moved further than resetPixelDistance
+	if (CheckMoveDistance())
+	{
+		this->NumberOfRightClicks = 1;
+	}
+
+
+	if (this->NumberOfRightClicks == 2)
+	{
+		m_rightDoubleClick = true;
+		this->NumberOfRightClicks = 0;
+	}
+
 	AbstractInteractorStyle::OnRightButtonDown();
 	vtkInteractorStyleImage::OnRightButtonDown();
 }
@@ -164,6 +205,20 @@ void AbstractInteractorStyleImage::OnRightButtonUp()
 
 void AbstractInteractorStyleImage::OnMiddleButtonDown()
 {
+	this->NumberOfMiddleClicks++;
+
+	// Reset numClicks - If mouse moved further than resetPixelDistance
+	if (CheckMoveDistance())
+	{
+		this->NumberOfMiddleClicks = 1;
+	}
+
+
+	if (this->NumberOfMiddleClicks == 2)
+	{
+		m_middleDoubleClick = true;
+		this->NumberOfMiddleClicks = 0;
+	}
 	AbstractInteractorStyle::OnMiddleButtonDown();
 	vtkInteractorStyleImage::OnMiddleButtonDown();
 }

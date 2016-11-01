@@ -41,6 +41,7 @@ InteractorStyleNavigation::~InteractorStyleNavigation()
 
 void InteractorStyleNavigation::OnMouseMove()
 {
+	AbstractNavigation::OnMouseMove();
 	if (m_leftFunctioning) {
 		this->CalculateIndex();
 		SetCurrentFocalPointWithImageCoordinate(m_index[0], m_index[1], m_index[2]);
@@ -48,15 +49,14 @@ void InteractorStyleNavigation::OnMouseMove()
 	if (m_rightFunctioning) {
 		SynchronalZooming();
 	}
-	AbstractNavigation::OnMouseMove();
 }
 
 
 void InteractorStyleNavigation::OnLeftButtonUp()
 {
+	AbstractInteractorStyle::OnLeftButtonUp();
 	this->CalculateIndex();
 	SetCurrentFocalPointWithImageCoordinate(m_index[0], m_index[1], m_index[2]);
-	AbstractNavigation::OnLeftButtonUp();
 }
 
 void InteractorStyleNavigation::OnChar()

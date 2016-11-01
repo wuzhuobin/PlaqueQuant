@@ -63,7 +63,10 @@ MainWindow::MainWindow()
 	widgetGroup.setExclusive(true);
 	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel,	SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
+	//
+	connect(ui->actionContour,		SIGNAL(triggered()), this, SLOT(slotContourMode()));
 	connect(ui->actionContour,		SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
+	//
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
@@ -290,6 +293,12 @@ bool MainWindow::slotVisualizeImage()
 	/// Initialize Module widget ui
 	this->m_moduleWidget->UdateTargetImageComboBox();
 	return 0;
+}
+
+void MainWindow::slotContourMode()
+{
+	ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
+		Core::DEFAULT_IMAGE)->GetPolygonDraw());
 }
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)

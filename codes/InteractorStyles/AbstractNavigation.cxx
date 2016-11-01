@@ -200,10 +200,10 @@ void AbstractNavigation::OnKeyPress()
 		}
 	}
 	else {
-		return;
+		vtkInteractorStyleImage::OnKeyPress();
 	}
 
-	vtkInteractorStyleImage::OnKeyPress();
+
 }
 
 void AbstractNavigation::MoveSliceForward()

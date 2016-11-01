@@ -58,17 +58,21 @@ void AbstractInteractorStyle::OnMiddleButtonDown()
 void AbstractInteractorStyle::OnLeftButtonUp()
 {
 	m_leftFunctioning = false;
+	m_leftDoubleClick = false;
 }
 
 void AbstractInteractorStyle::OnRightButtonUp()
 {
 	m_rightFunctioning = false;
+	m_rightDoubleClick = false;
 }
 
 void AbstractInteractorStyle::OnMiddleButtonUp()
 {
 	m_middleFunctioning = false;
+	m_middleDoubleClick = false;
 }
+
 
 //vtkActor * AbstractInteractorStyle::PickActor(int x, int y)
 //{

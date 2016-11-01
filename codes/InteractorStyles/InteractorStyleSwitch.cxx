@@ -26,7 +26,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	// of the ui
 	Navigation = QInteractorStyleNavigation::New();
 	WindowLevel = QInteractorStyleWindowLevel::New();
-	PolygonDraw = InteractorStylePolygonDraw::New();
+	PolygonDraw = QInteractorStyleVesselSegmentation::New();
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
 	Ruler = InteractorStyleRuler::New();
@@ -90,13 +90,13 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 	//	SmartContour2 = NULL;
 	//}
 	/* Do not modifiy the lower code£¡ */
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		if ((*it) != NULL) {
-			(*it)->Delete();
-			(*it) = NULL;
-		}
-	}
+	//for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
+	//	it != allStyles.end(); ++it) {
+	//	if ((*it) != NULL) {
+	//		(*it)->Delete();
+	//		(*it) = NULL;
+	//	}
+	//}
 	allStyles.clear();
 
 }

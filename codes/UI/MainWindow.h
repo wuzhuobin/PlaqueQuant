@@ -76,6 +76,8 @@ public slots:
 	//Visualization
 	bool slotVisualizeImage();
 
+	virtual void slotContourMode();
+
 
 
 private:

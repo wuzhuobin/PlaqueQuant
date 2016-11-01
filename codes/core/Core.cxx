@@ -443,7 +443,7 @@ void Core::slotSetImageLayerColor(int layer) {
 	{
 		if (m_style[i] != NULL) {
 			m_style[i]->GetPaintBrush()->SetPaintBrushLabel(layer + 1);
-			m_style[i]->GetPolygonDraw()->SetVesselWallLabel(layer + 1);
+			//m_style[i]->GetPolygonDraw()->SetVesselWallLabel(layer + 1);
 		}
 	}
 }
@@ -810,17 +810,17 @@ void Core::slotEnableAutoLumenSegmentation(bool flag)
 {
 	for (int i = 0; i < 3; i++)
 	{
-		m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
+		//m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
 	}
 }
 
 void Core::slotSetContourFilterGenerateValues(int generateValues)
 {
 	for (int i = 0; i < 3; ++i) {
-		m_style[i]->GetPolygonDraw()->
-			SetContourFilterGenerateValues(generateValues);
-		m_style[i]->GetPolygonDraw()->
-			GenerateLumenWallContourWidget();
+		//m_style[i]->GetPolygonDraw()->
+		//	SetContourFilterGenerateValues(generateValues);
+		//m_style[i]->GetPolygonDraw()->
+		//	GenerateLumenWallContourWidget();
 
 	}
 }

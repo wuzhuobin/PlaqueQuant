@@ -4,7 +4,6 @@
 QSETUP_UI_SRC(QAbstractNavigation);
 
 QAbstractNavigation::QAbstractNavigation(int uiType, QWidget * parent)
-	:m_uiType(uiType)
 {
 	// The first instance of QAbstractNavigation will have control of the UI widget
 	QNEW_UI();

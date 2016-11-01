@@ -80,6 +80,11 @@ protected:
 private:
 	bool m_synchronalZoomingFlag = true;
 
+	int PreviousPosition[2];
+
+	bool CheckMoveDistance();
+	const static int RESET_PIXEL_DISTANCE = 5;
+
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_IMAGE_H
