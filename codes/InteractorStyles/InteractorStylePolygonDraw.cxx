@@ -114,6 +114,7 @@ void InteractorStylePolygonDraw::NewContour()
 	m_currentContourRep->GetLinesProperty()->SetColor(0, 255, 0);
 
 	m_currentContour->SetInteractor(this->Interactor);
+	m_currentContour->SetCurrentRenderer(m_imageViewer->GetAnnotationRenderer());
 	m_currentContour->ContinuousDrawOn();
 	m_currentContour->FollowCursorOn();
 

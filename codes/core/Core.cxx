@@ -190,12 +190,6 @@ void Core::slotVisualizeAll2DViewers()
 		(extent[3] - extent[2]) / 2,
 		(extent[5] - extent[4]) / 2);
 
-	int extent1[6] = { 400,500,400,500,30,100 };
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
-		m_2DimageViewer[i]->SetImageVOI(extent1);
-		m_2DimageViewer[i]->SetOverlayVOI(extent1);
-	}
-
 	emit signalVisualizeAllViewers();
 }
 
@@ -246,26 +240,6 @@ void Core::slotMultiPlanarView() {
 	emit signalMultiPlanarView();
 
 }
-
-//void Core::slotChangeSlice(int slice) {
-//	MyImageViewer* viewer = dynamic_cast<MyImageViewer*>(sender());
-//	if (viewer != NULL) {
-//		switch (viewer->GetSliceOrientation())
-//		{
-//		case MyImageViewer::SLICE_ORIENTATION_YZ:
-//			emit signalChangeSliceX(slice);
-//			break;
-//		case MyImageViewer::SLICE_ORIENTATION_XZ:
-//			emit signalChangeSliceY(slice);
-//			break;
-//		case MyImageViewer::SLICE_ORIENTATION_XY:
-//			emit signalChangeSliceZ(slice);
-//		default:
-//			break;
-//		}
-//	}
-//
-//}
 
 void Core::slotChangeView(int viewMode)
 {
@@ -319,82 +293,9 @@ void Core::slotChangeView(int viewMode)
 		}
 
 	}
-	// reset slice to all viewer
-	int ijk[3];
-	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-	//slotChangeFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-
 	RenderAllViewer();
 }
 
-//void Core::slotChangeSlices(int* ijk) 
-//{
-//	this->slotChangeSlices(ijk[0], ijk[1], ijk[2]);
-//}
-//
-//
-//void Core::slotChangeSlices(int x, int y, int z) 
-//{
-//	int ijk[3];
-//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-//	if (x == ijk[0] && y == ijk[1] && z == ijk[2]) {
-//		return;
-//	}
-//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(x, y, z);
-//}
-//
-//void Core::slotChangeSliceX(int x) {
-//
-//	int ijk[3];
-//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-//	if (x == ijk[0]) {
-//		return;
-//	}
-//	ijk[0] = x;
-//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-//
-//	emit signalChangeSliceX(x);
-//
-//}
-//
-//void Core::slotChangeSliceY(int y) {
-//
-//
-//	int ijk[3];
-//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-//	if (y == ijk[1]) {
-//		return;
-//	}
-//	ijk[1] = y;
-//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-//
-//
-//	emit signalChangeSliceY(y);
-//
-//}
-//
-//void Core::slotChangeSliceZ(int z) {
-//
-//
-//	int ijk[3];
-//	m_2DimageViewer[DEFAULT_IMAGE]->GetFocalPointWithImageCoordinate(ijk);
-//	if (z == ijk[2]) {
-//		return;
-//	}
-//	ijk[2] = z;
-//	m_style[DEFAULT_IMAGE]->SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);
-//
-//
-//	emit signalChangeSliceZ(z);
-//}
-//
-//void Core::slotChangeFocalPointWithImageCoordinate(int i, int j, int k)
-//{
-//	emit signalChangeSliceX(i);
-//	emit signalChangeSliceY(j);
-//	emit signalChangeSliceZ(k);
-//
-//}
 
 void Core::slotNavigationMode()
 {
@@ -945,11 +846,6 @@ void Core::slotROIMode()
 			this->m_2DimageViewer[0]->GetFocalPointWithWorldCoordinate());
 		this->m_widgetManager->GetROIWidget()->GetRepresentation()->VisibilityOff();
 	}
-	//else {
-	//	this->m_widgetManager->DisableROIWidget();
-	//	this->RenderAllViewer();
-	//	return;
-	//}
 
 	this->ModeChangeUpdate(ROI_MODE);
 }
@@ -978,9 +874,7 @@ void Core::slotChangeROI()
 {
 	/// Depicted
 
-	//int extent[6];
-	//m_style[0]->GetROI()->SelectROI(extent);
-	//m_moduleWidget->slotChangeROI(extent);
+
 }
 
 void Core::slotSelectROI()
@@ -995,53 +889,24 @@ void Core::slotSelectROI()
 	memcpy(newBounds, this->ConvertExtentToBounds(newExtent), sizeof(double) * 6);
 	this->m_widgetManager->GetROIWidget()->GetRepresentation()->PlaceWidget(newBounds);
 
-	//m_style[0]->GetROI()->SelectROI(this->m_boundingExtent);
-	// Extract VOI of the overlay Image data
-
-	// Extract VOI of the vtkImage data
-	for (int i = 0; i < this->m_imageManager->getListOfViewerInputImages().size(); ++i) {
-		if (m_imageManager->getListOfViewerInputImages()[i] != NULL) {
-			vtkSmartPointer<vtkExtractVOI> extractVOIFilter =
-				vtkSmartPointer<vtkExtractVOI>::New();
-			extractVOIFilter->SetInputData(m_imageManager->getListOfViewerInputImages()[i]);
-			extractVOIFilter->SetVOI(newExtent);
-			extractVOIFilter->Update();
-			this->m_imageManager->getListOfViewerInputImages()[i]->DeepCopy(
-				extractVOIFilter->GetOutput());
-
-		}
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
+		m_2DimageViewer[i]->SetImageVOI(newExtent);
+		m_2DimageViewer[i]->SetOverlayVOI(newExtent);
+		m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 	}
-	slotChangeView(MULTIPLANAR_VIEW);
-	this->m_imageManager->getOverlay()->SetDisplayExtent(newExtent);
+	m_style[DEFAULT_IMAGE]->GetNavigation()->Initialization();
 
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
-	{
-		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
-		this->m_2DimageViewer[i]->GetInputLayer()->Modified();
-		this->m_2DimageViewer[i]->Render();
 
-	}
-
-	//ui->actionMultiPlanarView->trigger();
-	//ui->actionNavigation->trigger();
-
-	//this->slotChangeSlice(0, 0, 0);
 }
 void Core::slotResetROI()
 {
-	for (int i = 0; i < m_imageManager->getListOfViewerInputImages().size(); ++i)
-	{
-		if (m_imageManager->getListOfViewerInputImages()[i] != NULL) {
-			m_imageManager->getListOfViewerInputImages()[i]->DeepCopy(
-				m_imageManager->getListOfVtkImages()[i]);
-		}
+
+	// Extract VOI of the vtkImage data
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
+		m_2DimageViewer[i]->ResetImageVOI();
+		m_2DimageViewer[i]->ResetOverlayVOI();
+		m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 	}
-	slotChangeView(MULTIPLANAR_VIEW);
-	//this->imageManager.getOverlay().DisplayExtentOff();
+	m_style[DEFAULT_IMAGE]->GetNavigation()->Initialization();
 
-
-	//ui->actionMultiPlanarView->trigger();
-	//ui->actionNavigation->trigger();
-
-	//this->slotChangeSlice(0, 0, 0);
 }

@@ -53,6 +53,14 @@ Overlay::~Overlay()
 	for (int i = 0; i < m_measurementFor2D.size(); ++i) {
 		delete m_measurementFor2D[i];
 	}
+	for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::iterator it = m_vesselWallPolyData.begin();
+		it != m_vesselWallPolyData.end(); ++it) {
+		delete *it;
+	}
+	for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::iterator it = m_lumenPolyData.begin();
+		it != m_lumenPolyData.end(); ++it) {
+		delete *it;
+	}
 }
 
 void Overlay::SetInputImageData(ImageType::Pointer imageData)

@@ -80,13 +80,8 @@ MainWindow::MainWindow()
 	connect(this->m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
 	// slice 
-	ui->sliceScrollArea->setWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetNavigation());
-	//connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
-	//connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
-	//connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
-	//connect(this->m_core, SIGNAL(signalChangeSliceX(int)),ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	//connect(this->m_core, SIGNAL(signalChangeSliceY(int)),ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	//connect(this->m_core, SIGNAL(signalChangeSliceZ(int)),ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	ui->sliceScrollArea->setWidget(
+		m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetNavigation());
 
 	// UI
 	connect(ui->actionExit,		SIGNAL(triggered()), this, SLOT(slotExit()));
@@ -127,7 +122,6 @@ MainWindow::MainWindow()
 	connect(ui->LLBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 	connect(ui->LRBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 
-	//connect(ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(addOverlay2ImageViewer()));
 
 	//3D view
 	connect(ui->updateBtn, SIGNAL(clicked()), 
@@ -304,7 +298,7 @@ void MainWindow::slotChangeMode(QAction* action)
 
 	//}
 	else {
-		ui->widgetDockWidget->setEnabled(false);
+		//ui->widgetDockWidget->setEnabled(false);
 	}
 }
 

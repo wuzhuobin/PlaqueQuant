@@ -21,7 +21,7 @@ void QInteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate
 
 void QInteractorStyleVesselSegmentation::FillPolygon()
 {
-	InteractorStylePolygonDraw::FillPolygon();
+	InteractorStyleVesselSegmentation::FillPolygon();
 }
 
 void QInteractorStyleVesselSegmentation::SetSmoothCurveEnable(bool flag)

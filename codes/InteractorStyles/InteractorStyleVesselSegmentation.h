@@ -36,10 +36,15 @@ public:
 	vtkTypeMacro(InteractorStyleVesselSegmentation, AbstractNavigation);
 	static InteractorStyleVesselSegmentation* New();
 
-	void SetPolygonModeEnabled(bool b);
+	virtual void SetPolygonModeEnabled(bool b);
+
+	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+
 	virtual void NewContour();
-
-
+	virtual void NewContour(int type, QList<vtkSmartPointer<vtkPolyData>>* list);
+	
+	virtual void ReadFromPolydata();
+	virtual void WriteToPolydata();
 
 	void SetVesselWallLabel(int vesselWallLabel);
 	void SetLumenWallLabel(int lumenWallLabel);
@@ -58,6 +63,11 @@ public:
 protected:
 	InteractorStyleVesselSegmentation();
 	~InteractorStyleVesselSegmentation();
+
+	virtual void OnLeftButtonUp();
+	virtual void OnMouseMove();
+	virtual void OnKeyPress();
+
 
 	virtual void ClearAllConoturs();
 
