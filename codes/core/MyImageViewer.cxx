@@ -14,7 +14,6 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "MyImageViewer.h"
 
-#include <vtkVersion.h>
 #include <vtkInformation.h>
 #include <vtkCamera.h>
 #include <vtkImageProperty.h>
@@ -23,13 +22,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkCachedStreamingDemandDrivenPipeline.h>
 #include <vtkImageMapper3D.h>
 #include <vtkTextProperty.h>
-#include <vtkPointHandleRepresentation2D.h>
-#include <vtkDistanceRepresentation2D.h>
-#include <vtkAngleRepresentation2D.h>
-#include <vtkAxisActor2D.h>
 #include <vtkProperty2D.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkLeaderActor2D.h>
+#include <vtkInteractorStyleImage.h>
 
 #include <QList>
 using namespace std;
@@ -43,6 +38,8 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	this->AnnotationRenderer = NULL;
 	this->OverlayActor = vtkImageActor::New();
 	this->OverlayWindowLevel = vtkImageMapToWindowLevelColors::New();
+	this->OverlayExtractVOI = vtkExtractVOI::New();
+	this->ImageExtractVOI = vtkExtractVOI::New();
 
 
 	//Setup the pipeline again because of Annotation
@@ -62,8 +59,9 @@ MyImageViewer::MyImageViewer(QObject* parent)
 
 	//Cursor
 	Cursor3D = vtkCursor3D::New();
-	Cursor3D->AllOff();
-	Cursor3D->AxesOn();
+	Cursor3D->SetTranslationMode(false);
+	//Cursor3D->AllOff();
+	//Cursor3D->AxesOn();
 	Cursor3D->SetModelBounds(0, 0, 0, 0, 0, 0);
 	Cursor3D->Update();
 
@@ -87,6 +85,10 @@ MyImageViewer::MyImageViewer(QObject* parent)
 //----------------------------------------------------------------------------
 MyImageViewer::~MyImageViewer()
 {
+	if (this->OverlayExtractVOI) {
+		this->OverlayExtractVOI->Delete();
+		this->OverlayExtractVOI = NULL;
+	}
 	if (this->OverlayWindowLevel) {
 		this->OverlayWindowLevel->Delete();
 		this->OverlayWindowLevel = NULL;
@@ -296,15 +298,16 @@ void MyImageViewer::Render()
 	//}
 	// update orientation and header text
 	ResizeHeaderAndOrientationText();
-	if (this->GetInput())
-	{
-		this->RenderWindow->Render();
-	}
 }
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)
 {
-	Superclass::SetInputData(in);
+	ImageExtractVOI->SetInputData(in);
+	ImageExtractVOI->SetVOI(in->GetExtent());
+	ImageExtractVOI->Update();
+
+	Superclass::SetInputConnection(ImageExtractVOI->GetOutputPort());
+	//Superclass::SetInputData(in);
 
 	//Color Map
 	double* range = in->GetScalarRange();
@@ -321,7 +324,11 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 
 void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 {
-	this->OverlayWindowLevel->SetInputData(in);
+	OverlayExtractVOI->SetInputData(in);
+	OverlayExtractVOI->SetVOI(in->GetExtent());
+	OverlayExtractVOI->Update();
+
+	OverlayWindowLevel->SetInputConnection(OverlayExtractVOI->GetOutputPort());
 	// in case when LookupTable has not been set
 	if (this->LookupTable != NULL) {
 		int num = this->LookupTable->GetNumberOfTableValues();
@@ -339,14 +346,51 @@ vtkImageData* MyImageViewer::GetInputLayer()
 //----------------------------------------------------------------------------
 void MyImageViewer::SetOverlay(Overlay * overlay)
 {
-	SegmentationOverlay = overlay;
-	SetLookupTable(overlay->GetLookupTable());
-	SetInputDataLayer(overlay->GetOutput());
+	this->SegmentationOverlay = overlay;
+	SetLookupTable(SegmentationOverlay->GetLookupTable());
+	SetInputDataLayer(SegmentationOverlay->GetOutput());
 }
 
 Overlay * MyImageViewer::GetOverlay()
 {
 	return this->SegmentationOverlay;
+}
+void MyImageViewer::SetImageVOI(int * extent)
+{
+	const int* originalExtent = 
+		vtkImageData::SafeDownCast(ImageExtractVOI->GetInput())->GetExtent();
+	extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
+	extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
+	extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
+	extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
+	extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
+	extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
+	ImageExtractVOI->SetVOI(extent);
+	InitializeCursorBoundary();
+}
+void MyImageViewer::ResetImageVOI()
+{
+	int* originalExtent =
+		vtkImageData::SafeDownCast(ImageExtractVOI->GetInput())->GetExtent();
+	SetImageVOI(originalExtent);
+}
+void MyImageViewer::SetOverlayVOI(int * extent)
+{
+	const int* originalExtent =
+		vtkImageData::SafeDownCast(OverlayExtractVOI->GetInput())->GetExtent();
+	extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
+	extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
+	extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
+	extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
+	extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
+	extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
+	OverlayExtractVOI->SetVOI(extent);
+}
+void MyImageViewer::ResetOverlayVOI()
+{
+	int* originalExtent =
+		vtkImageData::SafeDownCast(OverlayExtractVOI->GetInput())->GetExtent();
+	SetOverlayVOI(originalExtent);
 }
 //----------------------------------------------------------------------------
 
@@ -381,9 +425,13 @@ void MyImageViewer::PrintSelf(ostream& os, vtkIndent indent)
 
 void MyImageViewer::InitializeCursorBoundary()
 {
+	// uncomment the following code will lead the cursor boundary updated normally
+	// but it will lead to the canvas source behaviour very strange.
+
+	//this->GetInputAlgorithm()->Update();
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
-	int* extent = GetInput()->GetExtent();
+	const int* extent = GetInput()->GetExtent();
 	double bound[6];
 	bound[0] = origin[0] + extent[0] * spacing[0];
 	bound[1] = origin[0] + extent[1] * spacing[0];
@@ -392,7 +440,6 @@ void MyImageViewer::InitializeCursorBoundary()
 	bound[4] = origin[2] + extent[4] * spacing[2];
 	bound[5] = origin[2] + extent[5] * spacing[2];
 
-	Cursor3D->SetTranslationMode(false);
 	Cursor3D->SetModelBounds(bound);
 	Cursor3D->Update();
 }

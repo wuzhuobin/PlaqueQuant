@@ -264,6 +264,13 @@ void InteractorStylePaintBrush::OnMouseMove()
 
 void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 {
+	{
+		for (int i = 0; i < 6; ++i) {
+			//cout << GetInput()->GetExtent()[i] << ' ';
+			cout << GetExtent()[i] << ' ';
+		}
+		cout << endl;
+	}
 	/// Delete stuff if the mode is disabled to save memory
 	if (m_borderWidget != NULL)
 	{
@@ -289,6 +296,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 
 	if (b)
 	{
+
+
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());

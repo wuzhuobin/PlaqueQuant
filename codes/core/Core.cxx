@@ -34,7 +34,7 @@ Core::Core(QObject* parent, QWidget* mainWindow)
 	// enable registration
 	m_ioManager->enableRegistration(true);
 
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_2DimageViewer[i] = vtkSmartPointer<MyImageViewer>::New();
 		m_interactor[i] = vtkSmartPointer<vtkRenderWindowInteractor>::New();
@@ -101,10 +101,10 @@ vtkLookupTable * Core::GetLookupTable()
 
 vtkRenderWindow * Core::GetRenderWindow(int num)
 {
-	if (num < 0 || num > VIEWER_NUM) {
+	if (num < 0 || num > NUMBER_OF_2DVIEWERS) {
 		return NULL;
 	}
-	else if (num == VIEWER_NUM) {
+	else if (num == NUMBER_OF_2DVIEWERS) {
 		return m_3DimageViewer;
 	}
 	else {
@@ -114,7 +114,7 @@ vtkRenderWindow * Core::GetRenderWindow(int num)
 
 void Core::RenderAllViewer()
 {
-	for (int i = 0; i < VIEWER_NUM; ++i) {
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		if(m_2DimageViewer[i]->GetInput() != NULL)
 			m_2DimageViewer[i]->Render();
 	}
@@ -155,7 +155,7 @@ void Core::slotAddOverlayToImageViewer() {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
 		return;
 	}
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		// The tableRange of LookupTable Change when the vtkImageViewer2::Render was call
 		// Very strange
@@ -173,7 +173,7 @@ void Core::slotVisualizeAll2DViewers()
 	slotValidatePatientInformation();
 	slotChangeView(MULTIPLANAR_VIEW);
 	if (m_firstInitialize) {
-		for (int i = 0; i < VIEWER_NUM; ++i) {
+		for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
 			m_interactor[i]->SetInteractorStyle(m_style[i]);
@@ -189,6 +189,12 @@ void Core::slotVisualizeAll2DViewers()
 		(extent[1] - extent[0]) / 2,
 		(extent[3] - extent[2]) / 2,
 		(extent[5] - extent[4]) / 2);
+
+	int extent1[6] = { 400,500,400,500,30,100 };
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
+		m_2DimageViewer[i]->SetImageVOI(extent1);
+		m_2DimageViewer[i]->SetOverlayVOI(extent1);
+	}
 
 	emit signalVisualizeAllViewers();
 }
@@ -207,7 +213,7 @@ void Core::slotChangeModality(QString modalityName, int viewerNum)
 
 	int index = this->m_imageManager->GetModalityIndex(modalityName);
 	if (m_viewMode == MULTIPLANAR_VIEW) {
-		for (int j = 0; j < VIEWER_NUM; ++j) {
+		for (int j = 0; j < NUMBER_OF_2DVIEWERS; ++j) {
 			m_2DimageViewer[j]->SetInputData(
 				this->m_imageManager->getListOfViewerInputImages()[index]);
 			m_2DimageViewer[j]->Render();
@@ -268,9 +274,9 @@ void Core::slotChangeView(int viewMode)
 	// SEGMENTATION_VIEW
 	if (viewMode) {
 		// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
-		for (int i1 = 0, i2 = 0; i2 < VIEWER_NUM; ++i2)
+		for (int i1 = 0, i2 = 0; i2 < NUMBER_OF_2DVIEWERS; ++i2)
 		{
-			for (; i1 < this->m_imageManager->getListOfViewerInputImages().size() && i2 < VIEWER_NUM;
+			for (; i1 < this->m_imageManager->getListOfViewerInputImages().size() && i2 < NUMBER_OF_2DVIEWERS;
 				++i1) {
 				// skip the NULL image
 				if (this->m_imageManager->getListOfViewerInputImages()[i1] != NULL) {
@@ -284,7 +290,7 @@ void Core::slotChangeView(int viewMode)
 					++i2;
 				}
 			}
-			if (i1 >= m_imageManager->getListOfVtkImages().size() && i2 < VIEWER_NUM ) {
+			if (i1 >= m_imageManager->getListOfVtkImages().size() && i2 < NUMBER_OF_2DVIEWERS ) {
 				this->m_2DimageViewer[i2]->GetRenderWindow()->GetInteractor()->Disable();
 				// disable view props
 				m_2DimageViewer[i2]->SetAllBlack(true);
@@ -296,7 +302,7 @@ void Core::slotChangeView(int viewMode)
 	}
 	// MULTIPLANAR_VIEW
 	else {
-		for (int i = 0; i < VIEWER_NUM; ++i) {
+		for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 			// Change input to same image, default 0
 			// SetupInteractor should be ahead of InitializeHeader
 			m_2DimageViewer[i]->SetInputData(
@@ -392,7 +398,7 @@ void Core::slotChangeView(int viewMode)
 
 void Core::slotNavigationMode()
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToNavigation();
 	}
@@ -401,7 +407,7 @@ void Core::slotNavigationMode()
 void Core::slotWindowLevelMode()
 {
 
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
@@ -410,7 +416,7 @@ void Core::slotWindowLevelMode()
 
 void Core::slotBrushMode()
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToPaintBrush();
 	}
@@ -420,7 +426,7 @@ void Core::slotBrushMode()
 
 void Core::slotSetBrushSize(int size)
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		if (m_style[i] != NULL) {
 			m_style[i]->GetPaintBrush()->SetBrushSize(size);
@@ -430,7 +436,7 @@ void Core::slotSetBrushSize(int size)
 
 void Core::slotSetBrushShape(int shape)
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		if (m_style[i] != NULL) {
 			m_style[i]->GetPaintBrush()->SetBrushShape(shape);
@@ -439,7 +445,7 @@ void Core::slotSetBrushShape(int shape)
 }
 
 void Core::slotSetImageLayerColor(int layer) {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		if (m_style[i] != NULL) {
 			m_style[i]->GetPaintBrush()->SetPaintBrushLabel(layer + 1);
@@ -450,7 +456,7 @@ void Core::slotSetImageLayerColor(int layer) {
 
 void Core::slotSetPaintBrushToEraser(bool flag)
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		if (m_style[i] != NULL) {
 
@@ -781,7 +787,7 @@ void Core::ModeChangeUpdate(INTERACTION_MODE index)
 
 void Core::slotContourMode()
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToPolygonDraw();
 	}
@@ -898,7 +904,7 @@ void Core::slotExtractLumenDilateLabel(vtkImageData* im)
 		cout << im->GetExtent()[i] << ' ' << vesselWallImage->GetExtent()[i];
 	}
 	cout << endl;
-	for (int i = 0; i < VIEWER_NUM; ++i) {
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		m_style[i]->GetSmartContour2()->SetLumenImage(im);
 		m_style[i]->GetSmartContour2()->SetVesselWallImage(vesselWallImage);
 	}
@@ -906,9 +912,9 @@ void Core::slotExtractLumenDilateLabel(vtkImageData* im)
 
 void Core::slotRulerMode()
 {
-	for (int i = 0; i < VIEWER_NUM; ++i) {
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		m_style[i]->SetInteractorStyleToRuler();
-		for (int j = 0; j < VIEWER_NUM; ++j) {
+		for (int j = 0; j < NUMBER_OF_2DVIEWERS; ++j) {
 			m_style[i]->GetRuler()->AddSynchronalRuler(m_style[j]->GetRuler());
 		}
 	}
@@ -918,7 +924,7 @@ void Core::slotRulerMode()
 
 void Core::slotEnableMaximumWallThickneesLabel(bool flag)
 {
-	for (int i = 0; i < VIEWER_NUM; ++i) {
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		m_style[i]->GetRuler()->EnableMaximumWallThickneesLabel(flag);
 	}
 }
@@ -950,7 +956,7 @@ void Core::slotROIMode()
 
 void Core::slotSmartContourMode()
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToSmartContour();
 	}
@@ -960,7 +966,7 @@ void Core::slotSmartContourMode()
 
 void Core::slotSmartContour2Mode()
 {
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToSmartContour2();
 	}
@@ -1008,7 +1014,7 @@ void Core::slotSelectROI()
 	slotChangeView(MULTIPLANAR_VIEW);
 	this->m_imageManager->getOverlay()->SetDisplayExtent(newExtent);
 
-	for (int i = 0; i < VIEWER_NUM; i++)
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		this->m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 		this->m_2DimageViewer[i]->GetInputLayer()->Modified();

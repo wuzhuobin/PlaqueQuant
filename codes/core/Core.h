@@ -65,7 +65,7 @@ public:
 	};
 
 	const static int DEFAULT_IMAGE = 0;
-	const static int VIEWER_NUM = 3;
+	const static int NUMBER_OF_2DVIEWERS = 3;
 
 	int* ConvertBoundsToExtent(double* bounds, bool clamping = true);
 	double* ConvertExtentToBounds(int* extent);
@@ -160,9 +160,9 @@ private:
 	void ModeChangeUpdate(INTERACTION_MODE);
 
 	// viewer
-	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];
-	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[VIEWER_NUM];
-	vtkSmartPointer<InteractorStyleSwitch> m_style[VIEWER_NUM];
+	vtkSmartPointer<MyImageViewer> m_2DimageViewer[NUMBER_OF_2DVIEWERS];
+	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[NUMBER_OF_2DVIEWERS];
+	vtkSmartPointer<InteractorStyleSwitch> m_style[NUMBER_OF_2DVIEWERS];
 	vtkRenderWindow*			m_3DimageViewer;
 	vtkRenderer*				m_3DDataRenderer;
 	vtkRenderer*				m_3DAnnotationRenderer;

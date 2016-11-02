@@ -1,12 +1,9 @@
 #ifndef __MYIMAGEVIEWER_H__
 #define __MYIMAGEVIEWER_H__
 
-#include <vtkObjectFactory.h>
 #include <vtkImageViewer2.h>
-#include <vtkDistanceWidget.h>
 #include <vtkTextActor.h>
 #include <vtkImageMapToWindowLevelColors.h>
-#include <vtkPlane.h>
 #include <vtkLogLookupTable.h>
 #include <vtkImageActor.h>
 #include <vtkCursor3D.h>
@@ -14,7 +11,7 @@
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include <vtkInteractorStyleImage.h>
+#include <vtkExtractVOI.h>
 
 #include <QObject>
 #include <QString>
@@ -22,6 +19,7 @@
 #include "Overlay.h"
 
 /**
+ * 
  * @class	MyImageViewer
  * @author	WUZHUOBIN
  * @version	
@@ -43,7 +41,11 @@ public:
 	virtual void GetFocalPointWithWorldCoordinate(double* coordinate);
 	virtual double* GetFocalPointWithWorldCoordinate();
 	virtual double* GetCursorBoundWithWorldCoordinate();
-
+	/**
+	 * return the all black flag
+	 * @return	true, if in all black
+	 *			false, if not
+	 */
 	virtual bool GetAllBlack();
 
 	// Description:
@@ -59,6 +61,14 @@ public:
 	// Set/Get Overlay
 	virtual void SetOverlay(Overlay* overlay);
 	virtual Overlay* GetOverlay();
+
+
+
+	virtual void SetImageVOI(int* extent);
+	virtual void ResetImageVOI();
+
+	virtual void SetOverlayVOI(int* extent);
+	virtual void ResetOverlayVOI();
 
 	// Description:
 	// return DefaultWindowLevel
@@ -159,43 +169,48 @@ signals:
 	void AllBlackAlready(bool flag);
 
 protected:
-	MyImageViewer(QObject* parent = NULL);
+	MyImageViewer(QObject* parent = nullptr);
 	~MyImageViewer();
 
 	// Text Method
 	virtual void ResizeHeaderAndOrientationText();
 	virtual void InitializeIntensityText(QString IntText);
 	virtual void InitializeOrientationText();
+	// Cursor method
+	virtual void InitializeCursorBoundary();
 
 	virtual void InstallPipeline();
 	virtual void UnInstallPipeline();
 	virtual void UpdateOrientation();
 
+	vtkExtractVOI* ImageExtractVOI;
+	vtkExtractVOI* OverlayExtractVOI;
+
+
 	//OrientationText
-	vtkTextActor*	OrientationTextActor[4] = { NULL };
+	vtkTextActor*	OrientationTextActor[4] = { nullptr };
 
 	//Header
-	vtkTextActor* HeaderActor = NULL;
+	vtkTextActor* HeaderActor = nullptr;
 
 	// IntensityText
-	vtkTextActor* IntTextActor = NULL;
+	vtkTextActor* IntTextActor = nullptr;
 
 	// Overlay
-	Overlay* SegmentationOverlay = NULL;
+	Overlay* SegmentationOverlay = nullptr;
+	vtkImageMapToWindowLevelColors* OverlayWindowLevel = nullptr;
+	vtkImageActor* OverlayActor = nullptr;
 
 	//Cursor
-	vtkCursor3D*		 Cursor3D = NULL;
-	vtkPolyDataMapper* CursorMapper = NULL;
-	vtkActor*			 CursorActor = NULL;
-	virtual void InitializeCursorBoundary();
+	vtkCursor3D*		 Cursor3D = nullptr;
+	vtkPolyDataMapper* CursorMapper = nullptr;
+	vtkActor*			 CursorActor = nullptr;
 
 	//Label and Annotation
-	vtkImageMapToWindowLevelColors* OverlayWindowLevel = NULL;
-	vtkImageActor* OverlayActor = NULL;
-	vtkRenderer* AnnotationRenderer = NULL;
+	vtkRenderer* AnnotationRenderer = nullptr;
 
 	// LookupTable for OverlayActor
-	vtkLookupTable* LookupTable = NULL;
+	vtkLookupTable* LookupTable = nullptr;
 
 
 	//Parameter
@@ -207,5 +222,9 @@ protected:
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.
 	void operator=(const MyImageViewer&);  // Not implemented.
+	/**
+	 * @deprecated
+	 */
+	//void SetInputConnection(vtkAlgorithmOutput* input);
 };
 #endif // !__MYIMAGEVIEWER_H__

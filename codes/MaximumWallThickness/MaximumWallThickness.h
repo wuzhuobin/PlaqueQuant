@@ -52,7 +52,7 @@ public:
 	std::vector<DistanceLoopPair>	GetDistanceLoopPairVect();
 
 	/* Two ways to specify the region of interest
-	1. Set image slice number, then default extent is extracted from SegmentationOverlay of mainwnd
+	1. Set image slice number, then default extent is extracted from Overlay of mainwnd
 	2. Directly set slice image
 	*/
 	void SetLumemIntensity(int i);
