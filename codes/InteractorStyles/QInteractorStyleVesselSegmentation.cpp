@@ -61,6 +61,16 @@ void QInteractorStyleVesselSegmentation::SetContourLabel(int label)
 	InteractorStyleVesselSegmentation::SetContourLabel(label + 1);
 }
 
+void QInteractorStyleVesselSegmentation::SetGenerateValue(int value)
+{
+	InteractorStyleVesselSegmentation::SetGenerateValue(value);
+}
+
+void QInteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
+{
+	InteractorStyleVesselSegmentation::GenerateLumenWallContourWidget();
+}
+
 QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiType, QWidget * parent)
 {
 	QNEW_UI();
@@ -78,6 +88,12 @@ QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiTyp
 		this, SLOT(EnableNoSegmentation(bool)));
 	connect(ui->labelComboBox, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(SetContourLabel(int)));
+	connect(ui->generatePushButton, SIGNAL(clicked()),
+		this, SLOT(GenerateLumenWallContourWidget()));
+	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
+		this, SLOT(SetGenerateValue(int)));
+	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)),
+		this, SLOT(GenerateLumenWallContourWidget()));
 }
 
 QInteractorStyleVesselSegmentation::~QInteractorStyleVesselSegmentation() 

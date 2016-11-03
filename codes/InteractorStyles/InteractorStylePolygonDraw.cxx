@@ -61,7 +61,7 @@ void InteractorStylePolygonDraw::OnMouseMove()
 {
 
 	if (m_polygonDrawEnabledFlag) {
-		SetPolygonModeEnabled(m_polygonDrawEnabledFlag);
+		NewContour();
 	}
 }
 
@@ -91,15 +91,16 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 		ClearAllConoturs();
 		m_currentContour = nullptr;
 	}
-	else if (m_currentContour == nullptr ||
-		m_currentContour->GetWidgetState() == vtkContourWidget::Manipulate) {
-		NewContour();
-	}
-	
 }
 
 void InteractorStylePolygonDraw::NewContour()
 {
+	// if user is manipulate a contour widget, the interactorstyle will not 
+	// generate new contour widget
+	if (m_currentContour != nullptr &&
+		m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
+		return;
+	}
 	// close loop the last contour
 	if (m_contours.size() != 0) {
 		m_contours.back()->CloseLoop();

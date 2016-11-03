@@ -150,7 +150,7 @@ MyWidgetManager* Core::GetMyWidgetManager()
 
 void Core::slotAddOverlayToImageViewer() {
 	int *extent1 = this->m_imageManager->getOverlay()->GetOutput()->GetExtent();
-	int *extent2 = this->m_imageManager->getListOfViewerInputImages()[0]->GetExtent();
+	int *extent2 = this->m_imageManager->getListOfVtkImages()[0]->GetExtent();
 	if (!std::equal(extent1, extent1 + 6, extent2)) {
 		this->DisplayErrorMessage("Selected segmentation has wrong spacing!");
 		return;
@@ -209,14 +209,14 @@ void Core::slotChangeModality(QString modalityName, int viewerNum)
 	if (m_viewMode == MULTIPLANAR_VIEW) {
 		for (int j = 0; j < NUMBER_OF_2DVIEWERS; ++j) {
 			m_2DimageViewer[j]->SetInputData(
-				this->m_imageManager->getListOfViewerInputImages()[index]);
+				this->m_imageManager->getListOfVtkImages()[index]);
 			m_2DimageViewer[j]->Render();
 			m_2DimageViewer[j]->InitializeHeader(m_imageManager->getModalityName(index));
 		}
 	}
 	else {
 		m_2DimageViewer[viewerNum]->SetInputData(
-			this->m_imageManager->getListOfViewerInputImages()[index]);
+			this->m_imageManager->getListOfVtkImages()[index]);
 		m_2DimageViewer[viewerNum]->Render();
 		m_2DimageViewer[viewerNum]->InitializeHeader(m_imageManager->getModalityName(index));
 	}
@@ -250,13 +250,13 @@ void Core::slotChangeView(int viewMode)
 		// i1 for looping all 5 vtkImage, while i2 for looping all 3 m_2DimageViewer
 		for (int i1 = 0, i2 = 0; i2 < NUMBER_OF_2DVIEWERS; ++i2)
 		{
-			for (; i1 < this->m_imageManager->getListOfViewerInputImages().size() && i2 < NUMBER_OF_2DVIEWERS;
+			for (; i1 < this->m_imageManager->getListOfVtkImages().size() && i2 < NUMBER_OF_2DVIEWERS;
 				++i1) {
 				// skip the NULL image
-				if (this->m_imageManager->getListOfViewerInputImages()[i1] != NULL) {
+				if (this->m_imageManager->getListOfVtkImages()[i1] != NULL) {
 					// SetupInteractor should be ahead of InitializeHeader
 					this->m_2DimageViewer[i2]->SetInputData(
-						this->m_imageManager->getListOfViewerInputImages()[i1]);
+						this->m_imageManager->getListOfVtkImages()[i1]);
 					this->m_2DimageViewer[i2]->SetSliceOrientation(MyImageViewer::SLICE_ORIENTATION_XY);
 					this->m_2DimageViewer[i2]->Render();
 					this->m_2DimageViewer[i2]->InitializeHeader(m_imageManager->getModalityName(i2));
@@ -280,7 +280,7 @@ void Core::slotChangeView(int viewMode)
 			// Change input to same image, default 0
 			// SetupInteractor should be ahead of InitializeHeader
 			m_2DimageViewer[i]->SetInputData(
-				this->m_imageManager->getListOfViewerInputImages()[DEFAULT_IMAGE]);
+				this->m_imageManager->getListOfVtkImages()[DEFAULT_IMAGE]);
 			m_2DimageViewer[i]->SetSliceOrientation(i);
 			m_2DimageViewer[i]->Render();
 			m_2DimageViewer[i]->InitializeHeader(m_imageManager->getModalityName(DEFAULT_IMAGE));
@@ -424,11 +424,11 @@ void Core::slotGenerateCenterlineBtn()
 	plane[0]->SetNormal(0, 0, -1);
 	plane[1]->SetNormal(0, 0, 1);
 	double zCoord1 = (this->m_imageManager->getOverlay()->GetDisplayExtent()[5] - 1) *
-		this->m_imageManager->getListOfViewerInputImages()[0]->GetSpacing()[2] +
-		this->m_imageManager->getListOfViewerInputImages()[0]->GetOrigin()[2];
+		this->m_imageManager->getListOfVtkImages()[0]->GetSpacing()[2] +
+		this->m_imageManager->getListOfVtkImages()[0]->GetOrigin()[2];
 	double zCoord2 = (this->m_imageManager->getOverlay()->GetDisplayExtent()[4] + 1) *
-		this->m_imageManager->getListOfViewerInputImages()[0]->GetSpacing()[2] +
-		this->m_imageManager->getListOfViewerInputImages()[0]->GetOrigin()[2];
+		this->m_imageManager->getListOfVtkImages()[0]->GetSpacing()[2] +
+		this->m_imageManager->getListOfVtkImages()[0]->GetOrigin()[2];
 	plane[0]->SetOrigin(0, 0, zCoord1);
 	plane[1]->SetOrigin(0, 0, zCoord2);
 	for (int i = 0; i < 2; i++)
@@ -629,8 +629,8 @@ void Core::slotValidatePatientInformation()
 	QString patientID = header->value("0010|0020");
 	//qDebug() << patientName;
 	//qDebug() << patientID;
-	for (int i = 1; i < m_imageManager->getListOfViewerInputImages().size(); ++i) {
-		if (m_imageManager->getListOfViewerInputImages()[i] == NULL) {
+	for (int i = 1; i < m_imageManager->getListOfVtkImages().size(); ++i) {
+		if (m_imageManager->getListOfVtkImages()[i] == NULL) {
 			continue;
 		}
 		QString _patientName = m_imageManager->getListOfDICOMHeader()[i]->
@@ -838,7 +838,7 @@ void Core::slotROIMode()
 	if (this->m_imageManager->getNumberOfImages() != 0 && !this->m_widgetManager->GetROIWidget()->GetEnabled())
 	{
 		double bounds[6];
-		this->m_imageManager->getListOfViewerInputImages().at(0)->GetBounds(bounds);
+		this->m_imageManager->getListOfVtkImages().at(0)->GetBounds(bounds);
 		this->m_widgetManager->EnableROIWidget(
 			this->m_2DimageViewer, 
 			this->m_3DimageViewer, 

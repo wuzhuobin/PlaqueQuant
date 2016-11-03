@@ -131,12 +131,12 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		connector->SetInput(_itkImage);
 		connector->Update();
 		_vtkImage = connector->GetOutput();
-		_vtkImageCopy = vtkSmartPointer<vtkImageData>::New();
-		_vtkImageCopy->DeepCopy(_vtkImage);
+		//_vtkImageCopy = vtkSmartPointer<vtkImageData>::New();
+		//_vtkImageCopy->DeepCopy(_vtkImage);
 	}
 
 	this->myImageManager->listOfItkImages.append( _itkImage);
-	this->myImageManager->listOfVtkViewerInputImages.append(_vtkImageCopy);
+	//this->myImageManager->listOfVtkViewerInputImages.append(_vtkImageCopy);
 	this->myImageManager->listOfVtkImages.append(_vtkImage);
 	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 
@@ -218,7 +218,7 @@ void IOManager::slotOpenMultiImages()
 		slotOpenOneImage(*cit);
 	}
 	this->myImageManager->overlay->Initialize(
-		this->myImageManager->listOfVtkViewerInputImages[0]);
+		this->myImageManager->listOfVtkImages[0]);
 
 	emit finishOpenMultiImages();
 }

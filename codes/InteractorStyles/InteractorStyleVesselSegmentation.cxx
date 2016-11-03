@@ -28,7 +28,8 @@ Copyright (C) 2016
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
 #include "InteractorStyleVesselSegmentation.h"
-#include "LumenSegmentation.h"
+#include "LumenSegmentationFilter.h"
+//#include "LumenSegmentation.h"
 
 using namespace std;
 vtkStandardNewMacro(InteractorStyleVesselSegmentation);
@@ -49,8 +50,9 @@ void InteractorStyleVesselSegmentation::OnLeftButtonUp()
 
 void InteractorStyleVesselSegmentation::OnMouseMove()
 {
-	WriteToPolydata();
 	InteractorStylePolygonDraw::OnMouseMove();
+	// save the polydata all the time
+	WriteToPolydata();
 }
 
 void InteractorStyleVesselSegmentation::OnKeyPress()
@@ -67,6 +69,7 @@ void InteractorStyleVesselSegmentation::OnKeyPress()
 void InteractorStyleVesselSegmentation::SetPolygonModeEnabled(bool b)
 {
 	InteractorStylePolygonDraw::SetPolygonModeEnabled(b);
+	ReadFromPolydata();
 }
 
 void InteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
@@ -77,6 +80,12 @@ void InteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(
 
 void InteractorStyleVesselSegmentation::NewContour()
 {
+	// if user is manipulate a contour widget, the interactorstyle will not 
+	// generate new contour widget
+	if (m_currentContour != nullptr &&
+		m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
+		return;
+	}
 	switch (m_contourType)
 	{
 	case CONTOUR:
@@ -119,7 +128,10 @@ void InteractorStyleVesselSegmentation::NewContour(int type, QList<vtkSmartPoint
 
 	for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit = list->cbegin();
 		cit != list->cend(); ++cit) {
-
+		// skip strange polydate
+		if ((*cit) != nullptr && (*cit)->GetNumberOfPoints() < 1) {
+			continue;
+		}
 		vtkSmartPointer<vtkOrientedGlyphContourRepresentation> _contourRep =
 			vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New();
 		_contourRep->SetLineInterpolator(m_interpolator);
@@ -189,10 +201,10 @@ void InteractorStyleVesselSegmentation::WriteToPolydata()
 	if (m_contourType == CONTOUR) {
 		return;
 	}
-	if (m_currentContour != nullptr &&
-		m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
-		return;
-	}
+	//if (m_currentContour != nullptr &&
+	//	m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
+	//	return;
+	//}
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY)
 		return;
 
@@ -233,6 +245,11 @@ void InteractorStyleVesselSegmentation::SetLumenWallLabel(int lumenWallLabel)
 	this->m_lumenWallLabel = lumenWallLabel;
 }
 
+void InteractorStyleVesselSegmentation::SetGenerateValue(int value)
+{
+	this->m_generateValue = value;
+}
+
 void InteractorStyleVesselSegmentation::SetSegmentationMode(int i)
 {
 	if (i < 0 || i > 2) {
@@ -265,6 +282,7 @@ void InteractorStyleVesselSegmentation::SetContourFilterGenerateValues(int gener
 
 void InteractorStyleVesselSegmentation::ClearAllConoturs()
 {
+	InteractorStylePolygonDraw::ClearAllConoturs();
 	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
 		= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
 		++cit) {
@@ -278,90 +296,46 @@ void InteractorStyleVesselSegmentation::ClearAllConoturs()
 	}
 	m_vesselWallContourWidgets.clear();
 	m_lumenWallContourWidgets.clear();
-	InteractorStylePolygonDraw::ClearAllConoturs();
 	m_imageViewer->Render();
 }
 
 void InteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 {
-	//if (m_vesselWallContourRepresentation == NULL || m_vesselWallContourWidget == NULL)
-	//	return;
+	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
+		return;
+	}
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* lumenMap = 
+		m_imageViewer->GetOverlay()->GetLumenPolyData();
+	if (lumenMap->contains(GetSlice())) {
+		delete  lumenMap->value(GetSlice());
+	}
+	(*lumenMap)[GetSlice()] = new QList<vtkSmartPointer<vtkPolyData>>;
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit =
+		m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend(); ++cit) {
+		if ((*cit)->GetContourRepresentation()->GetContourRepresentationAsPolyData()->GetNumberOfPoints() < 3) {
+			continue;
+		}
+		vtkSmartPointer<LumenSegmentationFilter> lsFilter =
+			vtkSmartPointer<LumenSegmentationFilter>::New();
+		lsFilter->SetInputData(m_imageViewer->GetInput());
+		lsFilter->SetGenerateValues(1,m_generateValue, m_generateValue);
+		lsFilter->SetVesselWallContourRepresentation(
+			vtkOrientedGlyphContourRepresentation::SafeDownCast((*cit)->GetContourRepresentation())
+		);
+		lsFilter->SetSlice(GetSlice());
+		lsFilter->Update();
+		(*(*lumenMap)[GetSlice()]) += lsFilter->GetOutput();
+	}
+	ReadFromPolydata();
 
-	//// if there are not points to close #Issue7
-	//if (this->m_vesselWallContourRepresentation->GetNumberOfNodes() < 1)
-	//	return;
-
-	//this->m_vesselWallContourWidget->CloseLoop();
-
-	//if (m_lumenWallContourWidget) {
-	//	m_lumenWallContourWidget->Off();
-	//	m_lumenWallContourWidget->SetRepresentation(NULL);
-	//	m_lumenWallContourWidget->EnabledOff();
-	//	m_lumenWallContourWidget->Delete();
-	//	m_lumenWallContourWidget = NULL;
-	//}
-
-
-	//if (m_lumenWallContourRepresentation) {
-	//	m_lumenWallContourRepresentation->Delete();
-	//	m_lumenWallContourRepresentation = NULL;
-	//}
-	//if (this->CONTOUR_IS_ON_FLAG) {
-	//	m_lumenWallContourRepresentation = vtkOrientedGlyphContourRepresentation::New();
-	//	MyImageViewer* viewer2 = dynamic_cast<MyImageViewer*>(m_imageViewer);
-	//	if (viewer2 != NULL) {
-	//		m_lumenWallContourRepresentation->SetRenderer(viewer2->GetAnnotationRenderer());
-	//	}
-	//	else {
-	//		m_lumenWallContourRepresentation->SetRenderer(m_imageViewer->GetRenderer());
-	//	}
-	//	m_lumenWallContourRepresentation->SetNeedToRender(true);
-	//	m_lumenWallContourRepresentation->GetLinesProperty()->SetColor(255, 0, 0);
-	//	m_lumenWallContourRepresentation->SetLineInterpolator(this->m_interpolator);
-	//	m_lumenWallContourRepresentation->AlwaysOnTopOn();
-	//	m_lumenWallContourRepresentation->BuildRepresentation();
-
-	//	m_lumenWallContourWidget = vtkContourWidget::New();
-	//	m_lumenWallContourWidget->SetInteractor(this->Interactor);
-	//	m_lumenWallContourWidget->SetRepresentation(m_lumenWallContourRepresentation);
-	//	if (viewer2 != NULL) {
-	//		m_lumenWallContourWidget->SetDefaultRenderer(viewer2->GetAnnotationRenderer());
-	//	}
-	//	else {
-	//		m_lumenWallContourWidget->SetDefaultRenderer(m_imageViewer->GetRenderer());
-	//	}
-	//	m_lumenWallContourWidget->FollowCursorOn();
-	//	m_lumenWallContourWidget->ContinuousDrawOn();
-	//	m_lumenWallContourWidget->On();
-	//	m_lumenWallContourWidget->EnabledOn();
-
-	//	vtkSmartPointer<LumenSegmentaiton> ls =
-	//		vtkSmartPointer<LumenSegmentaiton>::New();
-	//	ls->SetInputData(m_imageViewer->GetInput());
-	//	ls->SetSlice(GetSlice());
-	//	ls->SetGenerateValues(1, m_generateValue, m_generateValue);
-	//	ls->SetVesselWallContourRepresentation(this->m_vesselWallContourRepresentation);
-	//	ls->Update();
-
-	//	if (ls->GetOutput() == nullptr)
-	//		return;
-
-	//	// This prevent crash when a loop is not found #Issue7
-	//	if (ls->GetOutput()->GetNumberOfPoints() == 0)
-	//		return;
-
-	//	m_lumenWallContourWidget->Initialize(ls->GetOutput());
-	//	m_lumenWallContourWidget->CloseLoop();
-	//	m_imageViewer->Render();
-	//}
 }
 
 void InteractorStyleVesselSegmentation::FillPolygon()
 {
 	InteractorStylePolygonDraw::FillPolygon(
-		&m_lumenWallContourWidgets, m_lumenWallLabel);
-	InteractorStylePolygonDraw::FillPolygon(
 		&m_vesselWallContourWidgets, m_vesselWallLabel);
+	InteractorStylePolygonDraw::FillPolygon(
+		&m_lumenWallContourWidgets, m_lumenWallLabel);
 	InteractorStylePolygonDraw::FillPolygon();
 
 }

@@ -26,6 +26,8 @@ public slots:
 	virtual void EnableLumenSegmentation(bool flag);
 	virtual void EnableVesselWallSegmentation(bool flag);
 	virtual void SetContourLabel(int label);
+	virtual void SetGenerateValue(int value);
+	virtual void GenerateLumenWallContourWidget();
 
 protected:
 	QInteractorStyleVesselSegmentation(int uiType = UNIQUE_UI, QWidget * parent = Q_NULLPTR);

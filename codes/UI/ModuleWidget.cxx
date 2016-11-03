@@ -152,7 +152,7 @@ void ModuleWidget::UdateTargetImageComboBox()
 	this->ui->comboBoxTargeImage->clear();
 	for (int i = 0; i < imageManager->getListOfModalityNames().size();i++)
 	{
-		if (imageManager->getListOfViewerInputImages()[i] != NULL)
+		if (imageManager->getListOfVtkImages()[i] != NULL)
 		{
 			this->ui->comboBoxTargeImage->addItem(imageManager->getListOfModalityNames()[i]);
 		}
@@ -254,7 +254,7 @@ void ModuleWidget::slotUpdateROISpinBoxes(double* bounds)
 
 	double spacing[3];
 	double realSize[3];
-	this->m_mainWnd->GetCore()->GetMyImageManager()->getListOfViewerInputImages().at(0)->GetSpacing(spacing);
+	this->m_mainWnd->GetCore()->GetMyImageManager()->getListOfVtkImages().at(0)->GetSpacing(spacing);
 	for (int i = 0; i < 3;i++)
 	{
 		realSize[i] = spacing[i] * size[i];
@@ -331,7 +331,7 @@ void ModuleWidget::slotSetExtractLumenTargetImage(QString modName)
 		qDebug() << modName << " " << index;
 		return;
 	}
-	this->m_mainWnd->m_core->slotSetExtractLumenInputImage(imManager->getListOfViewerInputImages()[index]);
+	this->m_mainWnd->m_core->slotSetExtractLumenInputImage(imManager->getListOfVtkImages()[index]);
 }
 
 void ModuleWidget::slotGenerateContour()

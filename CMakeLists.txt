@@ -76,6 +76,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Managers
 	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/License
+	${PROJECT_BINARY_DIR}/codes/LumenSegmentationFilter
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
@@ -99,6 +100,8 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/MyImageReader
 	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/License
+	${PROJECT_SOURCE_DIR}/codes/LumenSegmentationFilter
+	
 	)
 
 SET(
@@ -131,6 +134,7 @@ set(
 	MyImageReader
 	Widget_License
 	LumenExtraction
+	LumenSegmentationFilter
 )
 
 include_directories(
@@ -150,6 +154,7 @@ add_subdirectory(codes/CenterlineBranching)
 add_subdirectory(codes/MyImageReader)
 add_subdirectory(codes/LumenExtraction)
 add_subdirectory(codes/License)
+add_subdirectory(codes/LumenSegmentationFilter)
 
 # Add_subdirectory(codes)
 

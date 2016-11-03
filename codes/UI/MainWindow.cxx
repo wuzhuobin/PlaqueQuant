@@ -257,9 +257,9 @@ bool MainWindow::slotVisualizeImage()
 	ChangeBaseImageULMenu.clear();
 	ChangeBaseImageURMenu.clear();
 	ChangeBaseImageLLMenu.clear();
-	for (int i = 0; i < this->imageManager->getListOfViewerInputImages().size(); i++)
+	for (int i = 0; i < this->imageManager->getListOfVtkImages().size(); i++)
 	{
-		if (this->imageManager->getListOfViewerInputImages()[i] != NULL) {
+		if (this->imageManager->getListOfVtkImages()[i] != NULL) {
 			ChangeBaseImageULMenu.addAction(
 				imageManager->getListOfModalityNames()[i])->setData(0);
 			ChangeBaseImageURMenu.addAction(

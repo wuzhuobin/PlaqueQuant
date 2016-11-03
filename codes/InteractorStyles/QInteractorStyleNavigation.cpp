@@ -9,7 +9,17 @@ void QInteractorStyleNavigation::Initialization()
 {
 	QAbstractNavigation::Initialization();
 	this->setEnabled(true);
-
+	if (numOfMyself == 1) {
+		connect(QAbstractNavigation->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(QAbstractNavigation->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(QAbstractNavigation->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+	}
 	// checking whether extent is equal to the old extent
 	// if different, update the maximum and minimum of the ui
 	const int* extent = GetExtent();

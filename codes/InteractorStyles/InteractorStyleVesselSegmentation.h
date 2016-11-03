@@ -48,6 +48,7 @@ public:
 
 	void SetVesselWallLabel(int vesselWallLabel);
 	void SetLumenWallLabel(int lumenWallLabel);
+	void SetGenerateValue(int value);
 
 	virtual void SetSegmentationMode(int i);
 	virtual void EnableNoSegmentation();
