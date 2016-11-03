@@ -305,7 +305,7 @@ void MyImageViewer::Render()
 void MyImageViewer::SetInputData(vtkImageData *in)
 {
 	ImageExtractVOI->SetInputData(in);
-	//ImageExtractVOI->SetVOI(in->GetExtent());
+	ImageExtractVOI->SetVOI(in->GetExtent());
 	ImageExtractVOI->Update();
 
 	Superclass::SetInputConnection(ImageExtractVOI->GetOutputPort());
@@ -327,7 +327,7 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 {
 	OverlayExtractVOI->SetInputData(in);
-	//OverlayExtractVOI->SetVOI(in->GetExtent());
+	OverlayExtractVOI->SetVOI(in->GetExtent());
 	OverlayExtractVOI->Update();
 
 	OverlayWindowLevel->SetInputConnection(OverlayExtractVOI->GetOutputPort());
@@ -361,12 +361,12 @@ void MyImageViewer::SetImageVOI(int * extent)
 {
 	const int* originalExtent = 
 		vtkImageData::SafeDownCast(ImageExtractVOI->GetInput())->GetExtent();
-	//extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
-	//extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
-	//extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
-	//extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
-	//extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
-	//extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
+	extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
+	extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
+	extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
+	extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
+	extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
+	extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
 	ImageExtractVOI->SetVOI(extent);
 	//InitializeCursorBoundary();
 	Render();
@@ -381,12 +381,12 @@ void MyImageViewer::SetOverlayVOI(int * extent)
 {
 	const int* originalExtent =
 		vtkImageData::SafeDownCast(OverlayExtractVOI->GetInput())->GetExtent();
-	//extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
-	//extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
-	//extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
-	//extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
-	//extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
-	//extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
+	extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
+	extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
+	extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
+	extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
+	extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
+	extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
 	OverlayExtractVOI->SetVOI(extent);
 	Render();
 }
