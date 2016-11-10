@@ -152,9 +152,6 @@ signals:
 	void signalVisualizeAllViewers();
 	void signalMultiPlanarView();
 	void signalSegmentationView();
-	//void signalChangeSliceX(int);
-	//void signalChangeSliceY(int);
-	//void signalChangeSliceZ(int);
 
 private:
 	void ModeChangeUpdate(INTERACTION_MODE);

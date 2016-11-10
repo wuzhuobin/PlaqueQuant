@@ -59,7 +59,7 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionBrush);
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
-	widgetGroup.addAction(ui->actionSmartContour);
+	widgetGroup.addAction(ui->actionSeedsPlacer);
 	widgetGroup.setExclusive(true);
 	connect(&widgetGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotChangeMode(QAction*)));
 	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
@@ -68,7 +68,7 @@ MainWindow::MainWindow()
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
-	connect(ui->actionSmartContour, SIGNAL(triggered()), this->m_core, SLOT(slotSmartContourMode()));
+	connect(ui->actionSeedsPlacer, SIGNAL(triggered()), this->m_core, SLOT(slotSmartContourMode()));
 
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
@@ -178,6 +178,7 @@ void MainWindow::setActionsEnable( bool b )
 	//switch after open the image
 	//ui->actionOpenImage->setEnabled(!b);
 	//ui->menuRecentImage->setEnabled(!b);
+	ui->sliceScrollArea->setEnabled(b);
 	ui->actionSave->setEnabled(b);
 	ui->actionNavigation->setEnabled(b);
 	ui->actionWindowLevel->setEnabled(b);
@@ -186,7 +187,7 @@ void MainWindow::setActionsEnable( bool b )
 	ui->actionRemoveContour->setEnabled(b);
 	ui->actionRuler->setEnabled(b);
 	ui->actionROI->setEnabled(b);
-	ui->actionSmartContour->setEnabled(b);
+	ui->actionSeedsPlacer->setEnabled(b);
 	ui->actionInformation->setEnabled(b);
 	ui->actionImage1->setEnabled(b);
 	ui->actionImage2->setEnabled(b);
@@ -293,6 +294,10 @@ void MainWindow::slotChangeMode(QAction* action)
 	if (action == ui->actionContour) {
 		ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
 			Core::DEFAULT_IMAGE)->GetPolygonDraw());
+	}
+	else if (action == ui->actionSeedsPlacer) {
+		ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetSeedsPlacer());
 	}
 	//else if (action == ui->actionBrush) {
 

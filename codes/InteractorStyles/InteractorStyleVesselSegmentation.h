@@ -44,6 +44,7 @@ public:
 	virtual void NewContour(int type, QList<vtkSmartPointer<vtkPolyData>>* list);
 	
 	virtual void ReadFromPolydata();
+	virtual void ReadFromPolydata(int type);
 	virtual void WriteToPolydata();
 
 	void SetVesselWallLabel(int vesselWallLabel);
@@ -59,7 +60,7 @@ public:
 
 
 	void SetContourFilterGenerateValues(int generateValues);
-	void GenerateLumenWallContourWidget();
+	void GenerateLumenPolydata();
 
 protected:
 	InteractorStyleVesselSegmentation();
@@ -70,7 +71,8 @@ protected:
 	virtual void OnKeyPress();
 
 
-	virtual void ClearAllConoturs();
+	virtual void CleanAllConoturs();
+	virtual void CleanConoturs(int type);
 
 	int m_generateValue = 60;
 

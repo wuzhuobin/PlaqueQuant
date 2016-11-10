@@ -1,17 +1,47 @@
-﻿#include "QInteractorStyleVesselSegmentation.hpp"
+﻿#include "QInteractorStyleVesselSegmentation.h"
 #include "ui_qinteractorstylevesselsegmentation.h"
+#include "ui_QAbstractNavigation.h"
 
 vtkStandardNewMacro(QInteractorStyleVesselSegmentation);
 QSETUP_UI_SRC(QInteractorStyleVesselSegmentation);
-void QInteractorStyleVesselSegmentation::Initialization()
+void QInteractorStyleVesselSegmentation::UniqueEnable(bool flag)
 {
-	QAbstractNavigation::Initialization();
-	this->setEnabled(true);
+	QAbstractNavigation::UniqueEnable(flag);
+	if (flag && flag != initializationFlag) {
+		// turn on codes
+
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+	}
+	// turn off
+	if (!flag && flag != initializationFlag) {
+		// turn off codes
+		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()));
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()));
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()));
+	}
+	if (flag != initializationFlag) {
+
+	}
+	initializationFlag = flag;
+
+
+
 }
 void QInteractorStyleVesselSegmentation::SetPolygonModeEnabled(bool flag)
 {
 	InteractorStyleVesselSegmentation::SetPolygonModeEnabled(flag);
-	Initialization();
+	UniqueEnable(flag);
 }
 void QInteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
@@ -64,11 +94,12 @@ void QInteractorStyleVesselSegmentation::SetContourLabel(int label)
 void QInteractorStyleVesselSegmentation::SetGenerateValue(int value)
 {
 	InteractorStyleVesselSegmentation::SetGenerateValue(value);
+	GenerateLumenWallContourWidget();
 }
 
 void QInteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 {
-	InteractorStyleVesselSegmentation::GenerateLumenWallContourWidget();
+	InteractorStyleVesselSegmentation::GenerateLumenPolydata();
 }
 
 QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiType, QWidget * parent)
@@ -92,8 +123,8 @@ QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiTyp
 		this, SLOT(GenerateLumenWallContourWidget()));
 	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
 		this, SLOT(SetGenerateValue(int)));
-	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)),
-		this, SLOT(GenerateLumenWallContourWidget()));
+	//connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)),
+	//	this, SLOT(GenerateLumenWallContourWidget()));
 }
 
 QInteractorStyleVesselSegmentation::~QInteractorStyleVesselSegmentation() 

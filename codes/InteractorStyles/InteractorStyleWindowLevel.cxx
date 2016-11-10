@@ -25,12 +25,6 @@ Copyright (C) 2016
 
 vtkStandardNewMacro(InteractorStyleWindowLevel);
 
-//void InteractorStyleWindowLevel::SetWindowLevelSpinBox(QDoubleSpinBox * w, QDoubleSpinBox * l)
-//{
-//	m_wlDoubleSpinBox[0] = w;
-//	m_wlDoubleSpinBox[1] = l;
-//}
-
 void InteractorStyleWindowLevel::SetWindowLevelModeEnabled(bool flag)
 {
 	// only using windowlevel to the lowest layer image
@@ -46,7 +40,7 @@ void InteractorStyleWindowLevel::SetWindow(double window)
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
-		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
+		if (m_imageViewer->GetOriginalInput() == (*it)->GetOriginalInput()) {
 			(*it)->GetImageActor()->GetProperty()->SetColorWindow(
 				m_window);
 			(*it)->GetImageActor()->GetProperty()->SetColorLevel(
@@ -63,7 +57,7 @@ void InteractorStyleWindowLevel::SetLevel(double level)
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
-		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
+		if (m_imageViewer->GetOriginalInput() == (*it)->GetOriginalInput()) {
 			(*it)->GetImageActor()->GetProperty()->SetColorWindow(
 				m_window);
 			(*it)->GetImageActor()->GetProperty()->SetColorLevel(
@@ -81,7 +75,7 @@ void InteractorStyleWindowLevel::SetWindowLevel(double window, double level)
 	for (std::list<MyImageViewer*>::iterator it = m_synchronalViewers.begin();
 		it != m_synchronalViewers.end(); ++it) {
 		// using the input address to figure out whether they are the same image
-		if (m_imageViewer->GetInput() == (*it)->GetInput()) {
+		if (m_imageViewer->GetOriginalInput() == (*it)->GetOriginalInput()) {
 			(*it)->GetImageActor()->GetProperty()->SetColorWindow(
 				m_window);
 			(*it)->GetImageActor()->GetProperty()->SetColorLevel(
@@ -214,7 +208,7 @@ void InteractorStyleWindowLevel::WindowLevel()
 	//int *size = this->GetCurrentRenderer()->GetSize();
 
 	//double window = 0.0, level = 0.0;
-	//if (m_imageViewer->GetInput() != NULL) {
+	//if (m_imageViewer->GetOriginalInput() != NULL) {
 	//	window = m_imageViewer->GetDefaultWindowLevel()[0];
 	//	level = m_imageViewer->GetDefaultWindowLevel()[1];
 	//	//window = m_window;

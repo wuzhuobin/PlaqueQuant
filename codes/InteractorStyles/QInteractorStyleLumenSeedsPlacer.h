@@ -1,0 +1,45 @@
+#ifndef __QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H_HH
+#define __QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H_HH
+
+#include "InteractorStyleSeedsPlacer.h"
+#include "QAbstractNavigation.h"
+
+namespace Ui { class QInteractorStyleLumenSeedsPlacer; }
+
+class QInteractorStyleLumenSeedsPlacer: public QAbstractNavigation, 
+	public InteractorStyleSeedsPlacer
+{
+	Q_OBJECT;
+	QSETUP_UI_HEAD(QInteractorStyleLumenSeedsPlacer);
+
+public:
+	vtkTypeMacro(QInteractorStyleLumenSeedsPlacer, InteractorStyleSeedsPlacer);
+	static QInteractorStyleLumenSeedsPlacer* New();
+	virtual void SetSeedsPlacerEnable(bool flag);
+	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+
+public slots:
+	virtual void SlotClearAllSeeds();
+	virtual void SetFocalSeed(int i);
+	virtual void DeleteFocalSeed();
+	virtual void SaveWidgetToSeeds();
+
+protected:
+	QInteractorStyleLumenSeedsPlacer(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
+	~QInteractorStyleLumenSeedsPlacer();
+
+	virtual void UniqueEnable(bool flag);
+	virtual void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
+
+	virtual void OnKeyPress();
+
+private:
+
+	Ui::QInteractorStyleLumenSeedsPlacer* ui = nullptr;
+
+};
+
+
+
+
+#endif // !__QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H_HH

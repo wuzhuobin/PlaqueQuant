@@ -126,7 +126,7 @@ ModuleWidget::ModuleWidget(QWidget *parent) :
 		this, SLOT(slotSetPage()));
 	connect(m_mainWnd->ui->actionROI, SIGNAL(triggered()),
 		this, SLOT(slotSetPage()));
-	connect(m_mainWnd->ui->actionSmartContour, SIGNAL(triggered()),
+	connect(m_mainWnd->ui->actionSeedsPlacer, SIGNAL(triggered()),
 		this, SLOT(slotSetPage()));
 
 	/// ROI
@@ -195,7 +195,7 @@ void ModuleWidget::slotSetPage()
 	else if (actionSender == m_mainWnd->ui->actionROI) {
 		ui->stackedWidget->setCurrentIndex(0);
 	}
-	else if (actionSender == m_mainWnd->ui->actionSmartContour) {
+	else if (actionSender == m_mainWnd->ui->actionSeedsPlacer) {
 		ui->stackedWidget->setCurrentIndex(1);
 
 	}

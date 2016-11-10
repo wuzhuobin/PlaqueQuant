@@ -16,12 +16,14 @@ void setUiType(int uiType);\
 int getUiType();\
 private:\
 int m_uiType = -1;\
-static int numOfMyself;
+static int numOfMyself;\
+static bool initializationFlag;
 #endif // !QSETUP_UI_HEAD(STYLE_NAME)
 
 #ifndef QSETUP_UI_SRC(STYLE_NAME)
 #define QSETUP_UI_SRC(STYLE_NAME) \
 int STYLE_NAME::numOfMyself = 0;\
+bool STYLE_NAME::initializationFlag = false;\
 QList<Ui::##STYLE_NAME*> STYLE_NAME::m_uis;\
 void STYLE_NAME::setupUi()\
 {\
@@ -61,7 +63,7 @@ Ui::##STYLE_NAME* STYLE_NAME::getUi(){\
 
 #ifndef QNEW_UI()
 #define QNEW_UI()\
-this->m_uiType = uiType;this->setupUi();this->setEnabled(false);
+this->m_uiType = uiType;this->setupUi();
 #endif // !QNEW_UI()
 
 #ifndef QDELETE_UI()
@@ -100,12 +102,6 @@ public:
 		UNIQUE_UI = 0X01,
 		MULTIPLE_UI = 0X02
 	};
-
-	/**
-	 * The Initialization method will run multiple times although there is only 
-	 * one UI, which should only run one time. It is still not robust enough
-	 */
-	virtual void Initialization() = 0;
 //protected:
 //	static QList<Ui::QAbstractInteractorStyle*> m_uis;
 //
@@ -137,7 +133,13 @@ protected:
 	QAbstractInteractorStyle(int uiType = NO_UI, QWidget * parent = Q_NULLPTR);
 	~QAbstractInteractorStyle();
 
-
+	/**
+	* The UniqueEnable method can provide a template which can turn on or turn off only once
+	* in all its instances
+	* so some connection or initialization for UNIQUE_UI which should only run once
+	* should place in it in case for multiple connections or initialization
+	*/
+	virtual void UniqueEnable(bool flag);
 
 
 

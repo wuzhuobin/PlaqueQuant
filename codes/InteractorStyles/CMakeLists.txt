@@ -49,9 +49,7 @@ file(
 	GLOB 
 	INTERACTORS_SRC  
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.c* 
-	${PROJECT_SOURCE_DIR}/LumenSegmentation.c*
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.c*
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.c*
 	${PROJECT_SOURCE_DIR}/MyBorderWidget.c*
 	PARENT_SCOPE
 	)
@@ -60,9 +58,7 @@ file(
 	INTERACTORS_INC  
 	${PROJECT_SOURCE_DIR}/InteractorStyle*.h*
 	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h*
-	${PROJECT_SOURCE_DIR}/LumenSegmentation.h*
 	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h*
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.h*
 	${PROJECT_SOURCE_DIR}/MyBorderWidget.h*
 	PARENT_SCOPE
 	)

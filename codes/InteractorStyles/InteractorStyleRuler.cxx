@@ -125,7 +125,7 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 
 	MaximumWallThickness* maximumWallThickness =
 		m_imageViewer->GetOverlay()->GetMeasurementFor2D(currentSlice).mwt;
-	if (m_imageViewer->GetOverlay()->Get2DMeasurementsStrings(currentSlice)[4] != "Normal") {
+	if ((m_imageViewer->GetOverlay()->Get2DMeasurementsStrings(currentSlice))[4] != "Normal") {
 		if (m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_lineActor)) {
 			m_imageViewer->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
 

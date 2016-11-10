@@ -23,9 +23,10 @@ Copyright (C) 2016
 
 #include <list>
 
-#include "QInteractorStyleNavigation.hpp"
-#include "QInteractorStyleWindowLevel.hpp"
-#include "QInteractorStyleVesselSegmentation.hpp"
+#include "QInteractorStyleNavigation.h"
+#include "QInteractorStyleWindowLevel.h"
+#include "QInteractorStyleVesselSegmentation.h"
+#include "QInteractorStyleLumenSeedsPlacer.h"
 #include "InteractorStylePaintBrush.h"
 #include "InteractorStyleROI.h"
 #include "InteractorStyleRuler.h"
@@ -43,6 +44,7 @@ public:
 	vtkGetMacro(WindowLevel, QInteractorStyleWindowLevel*);
 	vtkGetMacro(Navigation, QInteractorStyleNavigation*);
 	vtkGetMacro(PolygonDraw, QInteractorStyleVesselSegmentation*);
+	vtkGetMacro(SeedsPlacer, QInteractorStyleLumenSeedsPlacer*);
 	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
 	vtkGetMacro(ROI, InteractorStyleROI*);
 	vtkGetMacro(Ruler, InteractorStyleRuler*);
@@ -52,10 +54,11 @@ public:
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
 	SetInteractorStyleMacro(InteractorStyleTesting);
-	//SetInteractorStyleMacro(Navigation);
-	void SetInteractorStyleToNavigation();
+	SetInteractorStyleMacro(Navigation);
+	//void SetInteractorStyleToNavigation();
 	SetInteractorStyleMacro(WindowLevel);
 	SetInteractorStyleMacro(PolygonDraw);
+	SetInteractorStyleMacro(SeedsPlacer);
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
 	SetInteractorStyleMacro(Ruler);
@@ -66,6 +69,7 @@ public:
 	CurrentStyleMacro(Navigation);
 	CurrentStyleMacro(WindowLevel);
 	CurrentStyleMacro(PolygonDraw);
+	CurrentStyleMacro(SeedsPlacer);
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
 	CurrentStyleMacro(Ruler);
@@ -75,9 +79,6 @@ public:
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
-	//virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
-	//virtual void SetCurrentSlice(int slice);
-	//virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 	virtual void SetEnabled(int);
 	virtual void SetEnabledOn();
@@ -96,6 +97,7 @@ private:
 	QInteractorStyleNavigation*	Navigation;
 	QInteractorStyleWindowLevel* WindowLevel;
 	QInteractorStyleVesselSegmentation* PolygonDraw;
+	QInteractorStyleLumenSeedsPlacer* SeedsPlacer;
 	InteractorStylePaintBrush*	PaintBrush;
 	InteractorStyleROI* ROI;
 	InteractorStyleRuler* Ruler;

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "QAbstractNavigation.hpp"
+#include "QAbstractNavigation.h"
 #include "InteractorStyleVesselSegmentation.h"
 
 namespace Ui {class QInteractorStyleVesselSegmentation;}
@@ -14,7 +14,6 @@ public:
 	vtkTypeMacro(QInteractorStyleVesselSegmentation, InteractorStyleVesselSegmentation);
 	static QInteractorStyleVesselSegmentation* New();
 
-	virtual void Initialization();
 	virtual void SetPolygonModeEnabled(bool flag);
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
@@ -32,6 +31,8 @@ public slots:
 protected:
 	QInteractorStyleVesselSegmentation(int uiType = UNIQUE_UI, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleVesselSegmentation();
+	virtual void UniqueEnable(bool flag);
+
 
 private:
 	Ui::QInteractorStyleVesselSegmentation *ui = nullptr;

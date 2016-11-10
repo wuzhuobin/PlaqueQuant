@@ -55,6 +55,7 @@ public:
 	// Description:
 	// Set/Get the input image to the viewer.
 	virtual void SetInputData(vtkImageData * in);
+	virtual vtkImageData* GetOriginalInput();
 	// Set/Get Input Layer which is supposed to be the output of overlay
 	virtual void SetInputDataLayer(vtkImageData *in);
 	virtual vtkImageData *GetInputLayer();

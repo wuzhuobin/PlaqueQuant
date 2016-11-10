@@ -1,56 +1,75 @@
-﻿#include "QInteractorStyleNavigation.hpp"
+﻿#include "QInteractorStyleNavigation.h"
 #include "ui_qinteractorstylenavigation.h"
-
+#include "ui_QAbstractNavigation.h"
 
 vtkStandardNewMacro(QInteractorStyleNavigation);
 QSETUP_UI_SRC(QInteractorStyleNavigation);
 
-void QInteractorStyleNavigation::Initialization()
+void QInteractorStyleNavigation::UniqueEnable(bool flag)
 {
-	QAbstractNavigation::Initialization();
-	this->setEnabled(true);
-	if (numOfMyself == 1) {
-		connect(QAbstractNavigation->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-	}
-	// checking whether extent is equal to the old extent
-	// if different, update the maximum and minimum of the ui
-	const int* extent = GetExtent();
-	for (int i = 0; i < 6; ++i) {
-		if (extent[i] != m_oldExtent[i]) {
-			memcpy(m_oldExtent, extent, sizeof(m_oldExtent));
-			break;
-		}
-		else if (i == 5) {
-			return;
-		}
-	}
-	QAbstractNavigation::getUi()->sliceSpinBoxX->setMinimum(extent[0]);
-	QAbstractNavigation::getUi()->sliceSpinBoxY->setMinimum(extent[2]);
-	QAbstractNavigation::getUi()->sliceSpinBoxZ->setMinimum(extent[4]);
-	QAbstractNavigation::getUi()->sliceSpinBoxX->setMaximum(extent[1]);
-	QAbstractNavigation::getUi()->sliceSpinBoxY->setMaximum(extent[3]);
-	QAbstractNavigation::getUi()->sliceSpinBoxZ->setMaximum(extent[5]);
+	QAbstractNavigation::UniqueEnable(flag);
 
-	QAbstractNavigation::getUi()->sliceHorizontalSliderX->setMinimum(extent[0]);
-	QAbstractNavigation::getUi()->sliceHorizontalSliderY->setMinimum(extent[2]);
-	QAbstractNavigation::getUi()->sliceHorizontalSliderZ->setMinimum(extent[4]);
-	QAbstractNavigation::getUi()->sliceHorizontalSliderX->setMaximum(extent[1]);
-	QAbstractNavigation::getUi()->sliceHorizontalSliderY->setMaximum(extent[3]);
-	QAbstractNavigation::getUi()->sliceHorizontalSliderZ->setMaximum(extent[5]);
+	if (flag && flag != initializationFlag) {
+		// turn on codes
+ 
+
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()),
+			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+	}
+	// turn off
+	if (!flag && flag != initializationFlag) {
+		// turn off codes
+		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+		//	this, SLOT(slotChangeSlice()));
+		//connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+		//	this, SLOT(slotChangeSlice()));
+		//connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+		//	this, SLOT(slotChangeSlice()));
+	}
+	if (flag != initializationFlag) {
+		// checking whether extent is equal to the old extent
+		// if different, update the maximum and minimum of the ui
+		const int* extent = GetExtent();
+		for (int i = 0; i < 6; ++i) {
+			if (extent[i] != m_oldExtent[i]) {
+				memcpy(m_oldExtent, extent, sizeof(m_oldExtent));
+				break;
+			}
+			else if (i == 5) {
+				return;
+			}
+		}
+		QAbstractNavigation::getUi()->sliceSpinBoxX->setMinimum(extent[0]);
+		QAbstractNavigation::getUi()->sliceSpinBoxY->setMinimum(extent[2]);
+		QAbstractNavigation::getUi()->sliceSpinBoxZ->setMinimum(extent[4]);
+		QAbstractNavigation::getUi()->sliceSpinBoxX->setMaximum(extent[1]);
+		QAbstractNavigation::getUi()->sliceSpinBoxY->setMaximum(extent[3]);
+		QAbstractNavigation::getUi()->sliceSpinBoxZ->setMaximum(extent[5]);
+
+		QAbstractNavigation::getUi()->sliceHorizontalSliderX->setMinimum(extent[0]);
+		QAbstractNavigation::getUi()->sliceHorizontalSliderY->setMinimum(extent[2]);
+		QAbstractNavigation::getUi()->sliceHorizontalSliderZ->setMinimum(extent[4]);
+		QAbstractNavigation::getUi()->sliceHorizontalSliderX->setMaximum(extent[1]);
+		QAbstractNavigation::getUi()->sliceHorizontalSliderY->setMaximum(extent[3]);
+		QAbstractNavigation::getUi()->sliceHorizontalSliderZ->setMaximum(extent[5]);
+
+
+	}
+	initializationFlag = flag;
+
 }
 
 void QInteractorStyleNavigation::SetNavigationModeEnabled(bool flag)
 {
 	InteractorStyleNavigation::SetNavigationModeEnabled(flag);
-	Initialization();
+	UniqueEnable(flag);
 }
 
 void QInteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
@@ -62,6 +81,9 @@ void QInteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(int i, 
 QInteractorStyleNavigation::QInteractorStyleNavigation(int uiType, QWidget * parent)
 {
 	QNEW_UI();
+	if (numOfMyself == 1) {
+	}
+
 }
 
 QInteractorStyleNavigation::~QInteractorStyleNavigation() {

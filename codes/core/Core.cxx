@@ -75,8 +75,6 @@ void Core::Initialization()
 		this, SLOT(slotVisualizeAll2DViewers()));
 	connect(m_ioManager, SIGNAL(finishOpenSegmentation()),
 		this, SLOT(slotAddOverlayToImageViewer()));
-	connect(m_2DimageViewer[DEFAULT_IMAGE], SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)),
-		this, SLOT(slotChangeFocalPointWithImageCoordinate(int, int, int)));
 }
 
 vtkSmartPointer<vtkPolyData> Core::GetCenterlinePD()
@@ -854,7 +852,7 @@ void Core::slotSmartContourMode()
 {
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
-		m_style[i]->SetInteractorStyleToSmartContour();
+		m_style[i]->SetInteractorStyleToSeedsPlacer();
 	}
 	this->ModeChangeUpdate(SMARTCONTOUR_MODE);
 
@@ -894,19 +892,20 @@ void Core::slotSelectROI()
 		m_2DimageViewer[i]->SetOverlayVOI(newExtent);
 		m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 	}
-	m_style[DEFAULT_IMAGE]->GetNavigation()->Initialization();
-
+	// temporary method for reset the slice spin box
+	slotRulerMode();
+	slotNavigationMode();
 
 }
 void Core::slotResetROI()
 {
-
 	// Extract VOI of the vtkImage data
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		m_2DimageViewer[i]->ResetImageVOI();
 		m_2DimageViewer[i]->ResetOverlayVOI();
 		m_2DimageViewer[i]->GetRenderer()->ResetCamera();
 	}
-	m_style[DEFAULT_IMAGE]->GetNavigation()->Initialization();
-
+	// temporary method for reset the slice spin box
+	slotRulerMode();
+	slotNavigationMode();
 }

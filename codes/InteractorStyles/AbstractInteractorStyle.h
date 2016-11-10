@@ -30,7 +30,7 @@ Copyright (C) 2016
 for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
 	m_abstractInteractorStyles.cbegin(); cit != m_abstractInteractorStyles.cend(); ++cit){\
 	STYLE_NAME* _style = dynamic_cast<##STYLE_NAME*>(*cit); \
-	if (_style != nullptr && _style != this) { \
+	if (_style != nullptr) { \
 		_style->##METHOD; \
 	} \
 }

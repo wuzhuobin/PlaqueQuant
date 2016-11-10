@@ -804,7 +804,7 @@
     </property>
     <addaction name="actionOpenSegmentation"/>
     <addaction name="actionROI"/>
-    <addaction name="actionSmartContour"/>
+    <addaction name="actionSeedsPlacer"/>
     <addaction name="actionContour"/>
     <addaction name="actionRuler"/>
     <addaction name="actionCenterlineAlgorithm"/>
@@ -840,7 +840,7 @@
    <addaction name="actionRuler"/>
    <addaction name="separator"/>
    <addaction name="actionROI"/>
-   <addaction name="actionSmartContour"/>
+   <addaction name="actionSeedsPlacer"/>
    <addaction name="actionContour"/>
    <addaction name="actionBrush"/>
    <addaction name="separator"/>
@@ -1235,7 +1235,7 @@
     <string>Centerline Algorithm</string>
    </property>
   </action>
-  <action name="actionSmartContour">
+  <action name="actionSeedsPlacer">
    <property name="checkable">
     <bool>true</bool>
    </property>

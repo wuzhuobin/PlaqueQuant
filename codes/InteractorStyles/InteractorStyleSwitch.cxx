@@ -27,6 +27,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	Navigation = QInteractorStyleNavigation::New();
 	WindowLevel = QInteractorStyleWindowLevel::New();
 	PolygonDraw = QInteractorStyleVesselSegmentation::New();
+	SeedsPlacer = QInteractorStyleLumenSeedsPlacer::New();
 	PaintBrush = InteractorStylePaintBrush::New();
 	ROI = InteractorStyleROI::New();
 	Ruler = InteractorStyleRuler::New();
@@ -37,6 +38,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	allStyles.push_back(WindowLevel);
 	allStyles.push_back(Navigation);
 	allStyles.push_back(PolygonDraw);
+	allStyles.push_back(SeedsPlacer);
 	allStyles.push_back(PaintBrush);
 	allStyles.push_back(ROI);
 	allStyles.push_back(Ruler);
@@ -48,47 +50,6 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 
 InteractorStyleSwitch::~InteractorStyleSwitch()
 {
-	//if (InteractorStyleTesting != NULL) {
-	//	InteractorStyleTesting->Delete();
-	//	InteractorStyleTesting = 0;
-	//}
-
-	//if (WindowLevel != NULL) {
-	//	WindowLevel->Delete();
-	//	WindowLevel = NULL;
-	//}
-
-	//if (Navigation != NULL) {
-	//	Navigation->Delete();
-	//	Navigation = NULL;
-	//}
-
-	//if (PolygonDraw != NULL) {
-	//	PolygonDraw->Delete();
-	//	PolygonDraw = NULL;
-	//}
-
-	//if (PaintBrush != NULL) {
-	//	PaintBrush->Delete();
-	//	PaintBrush = NULL;
-	//}
-
-	//if (ROI != NULL) {
-	//	ROI->Delete();
-	//	ROI = NULL;
-	//}
-	//if (Ruler != NULL) {
-	//	Ruler->Delete();
-	//	Ruler = NULL;
-	//}
-	//if (SmartContour != NULL) {
-	//	SmartContour->Delete();
-	//	SmartContour = NULL;
-	//}
-	//if (SmartContour2 != NULL) {
-	//	SmartContour2->Delete();
-	//	SmartContour2 = NULL;
-	//}
 	/* Do not modifiy the lower code£¡ */
 	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 		it != allStyles.end(); ++it) {
@@ -110,6 +71,9 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->WindowLevel->SetWindowLevelModeEnabled(false);
 	if (this->CurrentStyle != this->PolygonDraw) 
 		this->PolygonDraw->SetPolygonModeEnabled(false);
+	if (this->CurrentStyle != this->SeedsPlacer)
+		this->SeedsPlacer->SetSeedsPlacerEnable(false);
+
 	if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
 	if (this->CurrentStyle != this->Ruler)
@@ -128,6 +92,9 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->WindowLevel->SetWindowLevelModeEnabled(true);
 	if (this->CurrentStyle == this->PolygonDraw)
 		this->PolygonDraw->SetPolygonModeEnabled(true);
+	if (this->CurrentStyle == this->SeedsPlacer)
+		this->SeedsPlacer->SetSeedsPlacerEnable(true);
+
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetPlaneWidgetEnabled(true);
 	if (this->CurrentStyle == this->Ruler)
@@ -190,42 +157,6 @@ void InteractorStyleSwitch::SetImageViewer(MyImageViewer* imageViewer)
 	}
 }
 
-//void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
-//{
-//	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-//		it != allStyles.end(); ++it) {
-//		AbstractNavigation* _style =
-//			AbstractNavigation::SafeDownCast(*it);
-//		if (_style != NULL) {
-//			_style->AddSynchronalViewer(imageViewer);
-//		}
-//	}
-//}
-
-//void InteractorStyleSwitch::SetCurrentSlice(int slice)
-//{
-//	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-//		it != allStyles.end(); ++it) {
-//		AbstractNavigation* _style =
-//			dynamic_cast<AbstractNavigation*>(*it);
-//		if (_style != NULL) {
-//			_style->SetCurrentSlice(slice);
-//		}
-//	}
-//}
-
-//void InteractorStyleSwitch::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
-//{
-//	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-//		it != allStyles.end(); ++it) {
-//		AbstractNavigation* _style =
-//			dynamic_cast<AbstractNavigation*>(*it);
-//		if (_style != NULL) {
-//			_style->SetCurrentFocalPointWithImageCoordinate(i, j, k);
-//		}
-//	}
-//}
-
 void InteractorStyleSwitch::SetEnabled(int i)
 {
 	Superclass::SetEnabled(i);
@@ -271,19 +202,19 @@ void InteractorStyleSwitch::SetInteractor(vtkRenderWindowInteractor *iren)
 	}
 }
 
-void InteractorStyleSwitch::SetInteractorStyleToNavigation()
-{
-
-	if (!this->CurrentStyleIsNavigation()) {
-		if (this->CurrentStyle) {
-			this->CurrentStyle->SetInteractor(0);
-		}
-		this->CurrentStyle = (vtkInteractorStyle*) this->Navigation;
-	}
-	if (this->CurrentStyle) {
-		this->CurrentStyle->SetInteractor(this->Interactor);
-		this->CurrentStyle->SetTDxStyle(this->TDxStyle);
-	}
-	this->InternalUpdate();
-}
+//void InteractorStyleSwitch::SetInteractorStyleToNavigation()
+//{
+//
+//	if (!this->CurrentStyleIsNavigation()) {
+//		if (this->CurrentStyle) {
+//			this->CurrentStyle->SetInteractor(0);
+//		}
+//		this->CurrentStyle = (vtkInteractorStyle*) this->Navigation;
+//	}
+//	if (this->CurrentStyle) {
+//		this->CurrentStyle->SetInteractor(this->Interactor);
+//		this->CurrentStyle->SetTDxStyle(this->TDxStyle);
+//	}
+//	this->InternalUpdate();
+//}
 

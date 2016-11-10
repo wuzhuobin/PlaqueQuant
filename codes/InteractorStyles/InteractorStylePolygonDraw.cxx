@@ -70,7 +70,7 @@ void InteractorStylePolygonDraw::OnKeyPress()
 	std::string key = this->Interactor->GetKeySym();
 	
 	if (key == "Escape") {
-		ClearAllConoturs();
+		CleanAllConoturs();
 	}
 	else if (key == "Return" ) {
 		this->FillPolygon();
@@ -88,7 +88,7 @@ void InteractorStylePolygonDraw::SetPolygonModeEnabled(bool b)
 {
 	m_polygonDrawEnabledFlag = b;
 	if (!m_polygonDrawEnabledFlag) {
-		ClearAllConoturs();
+		CleanAllConoturs();
 		m_currentContour = nullptr;
 	}
 }
@@ -146,7 +146,7 @@ void InteractorStylePolygonDraw::ClearCurrentContour()
 
 }
 
-void InteractorStylePolygonDraw::ClearAllConoturs()
+void InteractorStylePolygonDraw::CleanAllConoturs()
 {
 
 	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit

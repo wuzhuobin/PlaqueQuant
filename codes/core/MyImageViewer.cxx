@@ -324,6 +324,11 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 
 }
 
+vtkImageData* MyImageViewer::GetOriginalInput()
+{
+	return vtkImageData::SafeDownCast( ImageExtractVOI->GetInput());
+}
+
 void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 {
 	OverlayExtractVOI->SetInputData(in);
@@ -370,6 +375,13 @@ void MyImageViewer::SetImageVOI(int * extent)
 	ImageExtractVOI->SetVOI(extent);
 	//InitializeCursorBoundary();
 	Render();
+	cout << extent[0] << ' ';
+	cout << extent[1] << ' ';
+	cout << extent[2] << ' ';
+	cout << extent[3] << ' ';
+	cout << extent[4] << ' ';
+	cout << extent[5] << ' ';
+	cout << endl;
 }
 void MyImageViewer::ResetImageVOI()
 {

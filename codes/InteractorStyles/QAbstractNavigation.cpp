@@ -1,5 +1,6 @@
-﻿#include "QInteractorStyleNavigation.hpp"
-#include "QAbstractNavigation.hpp"
+﻿#include "QInteractorStyleNavigation.h"
+#include "QAbstractNavigation.h"
+#include "ui_QAbstractNavigation.h"
 
 QSETUP_UI_SRC(QAbstractNavigation);
 
@@ -8,15 +9,7 @@ QAbstractNavigation::QAbstractNavigation(int uiType, QWidget * parent)
 	// The first instance of QAbstractNavigation will have control of the UI widget
 	QNEW_UI();
 	if (numOfMyself == 1) {
-		connect(ui->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(ui->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(ui->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+
 	}
 }
 
@@ -42,10 +35,14 @@ void QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, 
 		ui->sliceSpinBoxZ->setValue(k);
 	}
 }
-
-void QAbstractNavigation::Initialization()
+void QAbstractNavigation::UniqueEnable(bool flag)
 {
-	this->setEnabled(true);
+	QAbstractInteractorStyle::UniqueEnable(flag);
+	// run any way for once
+	// I don't know why i need to do this
+	if (flag != initializationFlag) {
+
+	}
 }
 
 void QAbstractNavigation::slotChangeSlice()

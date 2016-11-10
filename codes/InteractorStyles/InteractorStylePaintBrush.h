@@ -99,11 +99,6 @@ private:
 	int m_brushShape = SQUARE;
 	bool m_eraserModeFlag = false;
 
-	////PaintBrush
-	//QComboBox*  m_drawBrushShapeComboBox;
-	//QSpinBox*	m_drawBrushSizeSpinBox;
-	//QCheckBox*	m_drawVolumetricCheckBox;
-	//QCheckBox*	m_drawIsotropicCheckBox;
 };
 
 

@@ -92,8 +92,8 @@ void Overlay::SetInputImageData(vtkImageData* imageData)
 		imageCast->Update();
 		m_vtkOverlay = imageCast->GetOutput();
 	}
-	Measure2D();
-	Measure3D();
+	//Measure2D();
+	//Measure3D();
 	emit signalOverlayUpdated();
 }
 
@@ -393,7 +393,7 @@ void Overlay::Measure2D(int slice)
 	//while (slice >= m_measurementFor2D.size()) {
 	//	m_measurementFor2D += new MeasurementFor2DIntegrated();
 	//}
-	m_2DMeasurements[slice] = _2DMeasurements;
+	m_2DMeasurements.insert(slice, _2DMeasurements);
 	m_measurementFor2D[slice] = new MeasurementFor2DIntegrated();
 	// Extract slice image
 	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
@@ -534,7 +534,7 @@ Overlay::MeasurementFor2DIntegrated Overlay::GetMeasurementFor2D(int slice)
 {
 	return *(m_measurementFor2D[slice]);
 }
-
+#include <qdebug.h>
 QStringList Overlay::Get2DMeasurementsStrings(int slice)
 {
 	const int* extent = m_vtkOverlay->GetExtent();
@@ -544,11 +544,11 @@ QStringList Overlay::Get2DMeasurementsStrings(int slice)
 	}
 	else if (slice > extent[5]) {
 		//Measure2D(extent[5]);
-		return m_2DMeasurements[slice];
+		return m_2DMeasurements[extent[5]];
 	}
 	else {
 		//Measure2D(slice);
-		return m_2DMeasurements[extent[5]];
+		return m_2DMeasurements[slice];
 	}
 }
 

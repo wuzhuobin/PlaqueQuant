@@ -176,6 +176,19 @@
        </layout>
       </item>
       <item>
+       <widget class="QRadioButton" name="noSegmentationRadioButton">
+        <property name="text">
+         <string>No Segmentation</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup_2</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="lumenSegmentationRadioButton">
         <property name="text">
          <string>Lumen Segmentation</string>
@@ -189,19 +202,6 @@
        <widget class="QRadioButton" name="vesselWallSegmentationRadioButton">
         <property name="text">
          <string>Vessel Wall Segmentation</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_2</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="noSegmentationRadioButton">
-        <property name="text">
-         <string>No Segmentation</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
         </property>
         <attribute name="buttonGroup">
          <string notr="true">buttonGroup_2</string>
@@ -587,10 +587,10 @@
      <zorder>groupBox</zorder>
      <zorder>lumenSegmentationRadioButton</zorder>
      <zorder>vesselWallSegmentationRadioButton</zorder>
-     <zorder>noSegmentationRadioButton</zorder>
      <zorder>vesselFrame</zorder>
      <zorder>groupBox_3</zorder>
      <zorder>frame_6</zorder>
+     <zorder>noSegmentationRadioButton</zorder>
     </widget>
    </item>
    <item>
@@ -758,7 +758,7 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

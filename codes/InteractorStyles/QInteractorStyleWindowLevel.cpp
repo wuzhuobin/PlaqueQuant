@@ -1,4 +1,4 @@
-﻿#include "QInteractorStyleWindowLevel.hpp"
+﻿#include "QInteractorStyleWindowLevel.h"
 #include "ui_qinteractorstylewindowlevel.h"
 
 
@@ -15,16 +15,10 @@ QInteractorStyleWindowLevel::~QInteractorStyleWindowLevel()
 	QDELETE_UI();
 }
 
-void QInteractorStyleWindowLevel::Initialization()
-{
-	QAbstractNavigation::Initialization();
-	this->setEnabled(true);
-}
-
 void QInteractorStyleWindowLevel::SetWindowLevelModeEnabled(bool flag)
 {
 	InteractorStyleWindowLevel::SetWindowLevelModeEnabled(flag);
-	Initialization();
+	UniqueEnable(flag);
 }
 
 void QInteractorStyleWindowLevel::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)

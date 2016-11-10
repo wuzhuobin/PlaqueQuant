@@ -114,9 +114,29 @@ void InteractorStyleVesselSegmentation::NewContour()
 		m_currentContourRep->AlwaysOnTopOn();
 		m_currentContour->EnabledOn();
 
-
 		break;
 	case LUMEN:
+		// close loop the last contour
+		if (m_lumenWallContourWidgets.size() != 0) {
+			m_lumenWallContourWidgets.back()->CloseLoop();
+		}
+		m_lumenWallContourWidgets.push_back(vtkSmartPointer<vtkContourWidget>::New());
+		m_currentContour = m_lumenWallContourWidgets.back();
+		m_currentContour->SetRepresentation(
+			vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New());
+
+		m_currentContourRep = vtkOrientedGlyphContourRepresentation::SafeDownCast(
+			m_currentContour->GetContourRepresentation());
+		m_currentContourRep->GetLinesProperty()->SetColor(255, 0, 0);
+
+		m_currentContour->SetInteractor(this->Interactor);
+		m_currentContour->SetCurrentRenderer(m_imageViewer->GetAnnotationRenderer());
+		m_currentContour->ContinuousDrawOn();
+		m_currentContour->FollowCursorOn();
+
+		m_currentContourRep->SetLineInterpolator(m_interpolator);
+		m_currentContourRep->AlwaysOnTopOn();
+		m_currentContour->EnabledOn();
 		break;
 	default:
 		break;
@@ -176,24 +196,30 @@ void InteractorStyleVesselSegmentation::NewContour(int type, QList<vtkSmartPoint
 
 void InteractorStyleVesselSegmentation::ReadFromPolydata()
 {
+	ReadFromPolydata(1);
+	ReadFromPolydata(2);
+	m_currentContour = nullptr;
+	m_imageViewer->Render();
+}
+
+void InteractorStyleVesselSegmentation::ReadFromPolydata(int type)
+{
 	if (m_contourType == CONTOUR) {
 		return;
 	}
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY)
 		return;
-	ClearAllConoturs();
+	CleanConoturs(type);
 	Overlay* overlay = m_imageViewer->GetOverlay();
 	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* maps[2] = {
 		overlay->GetVesselWallPolyData(),
 		overlay->GetLumenPolyData()
 	};
-	for (int i = 0; i < 2; ++i) {
-		if (maps[i]->contains(GetSlice())) {
-			QList<vtkSmartPointer<vtkPolyData>>* list = maps[i]->value(GetSlice());
-			NewContour(i + 1, list);
-		}
+
+	if (maps[type - 1]->contains(GetSlice())) {
+		QList<vtkSmartPointer<vtkPolyData>>* list = maps[type - 1]->value(GetSlice());
+		NewContour(type, list);
 	}
-	m_imageViewer->Render();
 }
 
 void InteractorStyleVesselSegmentation::WriteToPolydata()
@@ -280,26 +306,44 @@ void InteractorStyleVesselSegmentation::SetContourFilterGenerateValues(int gener
 	this->m_generateValue = generateValues;
 }
 
-void InteractorStyleVesselSegmentation::ClearAllConoturs()
+void InteractorStyleVesselSegmentation::CleanAllConoturs()
 {
-	InteractorStylePolygonDraw::ClearAllConoturs();
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
-		= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
-		++cit) {
-		(*cit)->EnabledOff();
-	}
-	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
-		= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
-		++cit) {
-		(*cit)->EnabledOff();
-
-	}
-	m_vesselWallContourWidgets.clear();
-	m_lumenWallContourWidgets.clear();
+	CleanConoturs(0);
+	CleanConoturs(1);
+	CleanConoturs(2);
 	m_imageViewer->Render();
+
 }
 
-void InteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
+void InteractorStyleVesselSegmentation::CleanConoturs(int type)
+{
+	switch (type)
+	{
+	case CONTOUR:
+		InteractorStylePolygonDraw::CleanAllConoturs();
+		break;
+	case VESSEL_WALL:
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+			= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
+			++cit) {
+			(*cit)->EnabledOff();
+		}
+		m_vesselWallContourWidgets.clear();
+		break;
+	case LUMEN:
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+			= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
+			++cit) {
+			(*cit)->EnabledOff();
+
+		}
+		m_lumenWallContourWidgets.clear();
+		break;
+	}
+
+}
+
+void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
 		return;
@@ -326,8 +370,10 @@ void InteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 		lsFilter->Update();
 		(*(*lumenMap)[GetSlice()]) += lsFilter->GetOutput();
 	}
-	ReadFromPolydata();
-
+	// Since the lumen polydata was wirten to the ovelay
+	// Reload the polydata from the overlay and genenrate new contour widgets
+	ReadFromPolydata(LUMEN);
+	m_imageViewer->Render();
 }
 
 void InteractorStyleVesselSegmentation::FillPolygon()
