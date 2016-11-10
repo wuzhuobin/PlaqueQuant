@@ -13,9 +13,7 @@ Copyright (C) 2016
 
 #include <vtkImageInterpolator.h>
 #include <vtkInteractorStyle.h>
-#include "MainWindow.h"
 #include "InteractorStyleSwitch.h"
-#include "ui_MainWindow.h"
 
 vtkStandardNewMacro(InteractorStyleSwitch);
 
@@ -64,7 +62,6 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 
 void InteractorStyleSwitch::InternalUpdate()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
 	if (this->CurrentStyle != this->Navigation)
 		this->Navigation->SetNavigationModeEnabled(false);
 	if (this->CurrentStyle != this->WindowLevel)
