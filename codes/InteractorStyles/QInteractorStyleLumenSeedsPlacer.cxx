@@ -1,7 +1,7 @@
 #include "QInteractorStyleLumenSeedsPlacer.h"
 
 #include <vtkRenderWindowInteractor.h>
-
+#include <itkImageToVTKImageFilter.h>
 
 #include "ui_QInteractorStyleLumenSeedsPlacer.h"
 #include "ui_QAbstractNavigation.h"
@@ -53,7 +53,6 @@ void QInteractorStyleLumenSeedsPlacer::SetFocalSeed(int i)
 {
 	if (i < 0)
 		return;
-	cout << "focal seed:" << i << endl;
 	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
 	int imageCoordinate[3];
 	double worldCoordinate[3];
@@ -114,15 +113,20 @@ void QInteractorStyleLumenSeedsPlacer::DropSeed()
 
 void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
 {
-	m_lumenExtraction->SetInputData(m_imageViewer->GetOriginalInput());
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
-	for (int i = 0; i < _seeds.size(); ++i) {
-		m_lumenExtraction->AddSeed(_seeds[i]);
-	}
-	m_lumenExtraction->Update();
-	vtkSmartPointer<vtkImageData> overlay = vtkSmartPointer<vtkImageData>::New();
-	m_lumenExtraction->GetLumenVtkImage(overlay);
-	m_imageViewer->GetOverlay()->ReplacePixels(overlay->GetExtent(), overlay);
+	//m_lumenExtraction->SetInputData(m_imageViewer->GetOriginalInput());
+	//QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	//for (int i = 0; i < _seeds.size(); ++i) {
+	//	m_lumenExtraction->AddSeed(_seeds[i]);
+	//}
+	//m_lumenExtraction->Update();
+	//vtkSmartPointer<vtkImageData> overlay = vtkSmartPointer<vtkImageData>::New();
+	//m_lumenExtraction->GetLumenVtkImage(overlay);
+	//m_imageViewer->GetOverlay()->ReplacePixels(overlay->GetExtent(), overlay);
+
+	typedef itk::ImageToVTKImageFilter<double> ToVTKImage;
+	ToVTKImage::
+	
+
 }
 
 void QInteractorStyleLumenSeedsPlacer::SetMultipier(double value)
@@ -167,6 +171,12 @@ QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, Q
 		m_lumenExtraction->SetMultiplier(2.3);
 		m_lumenExtraction->SetInitialNeighborhoodRadius(1);
 
+		
+		m_lumenExtractionFilter = LumenExtractionFilter::New();
+		m_lumenExtractionFilter->SetNumberOfIterations(30);
+		m_lumenExtractionFilter->SetDilationValue(4);
+		m_lumenExtractionFilter->SetMultiplier(2.3);
+		m_lumenExtractionFilter->SetInitialNeighborhoodRadius(1);
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
 		this, SLOT(SlotClearAllSeeds()));
@@ -219,8 +229,7 @@ void QInteractorStyleLumenSeedsPlacer::OnKeyPress()
 	string key = this->Interactor->GetKeySym();
 	cout << __func__ << ' ' << key << endl;
 	if (key == "D") {
-		cout << m_seeds.size() << endl;
-		cout << InteractorStyleSeedsPlacer::m_seeds.size() << endl;
+		InteractorStyleSeedsPlacer::OnKeyPress();
 	}
 	else {
 		InteractorStyleSeedsPlacer::OnKeyPress();

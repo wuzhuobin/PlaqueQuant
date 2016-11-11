@@ -6,33 +6,54 @@
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 
-#include <itkConfidenceConnectedImageFilter.h>
+#include <itkVotingBinaryIterativeHoleFillingImageFilter.h>
 
 
 namespace itk
 {
+	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::ClearSeeds()
+	{
+		m_confidenceConnectedFilter->ClearSeeds();
+	}
 
-	template< class TImage>
-	void LumenExtractionFilter< TImage>
+	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::SetInitialNeighborhoodRadius(unsigned int radius)
+	{
+		m_confidenceConnectedFilter->SetInitialNeighborhoodRadius(radius);
+	}
+	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::SetMultiplier(double multiplier)
+	{
+		m_confidenceConnectedFilter->SetMultiplier(multiplier);
+	}
+	/**
+	 * Constructor
+	 */
+	template<typename TImage>
+	inline LumenExtractionFilter<TImage>::LumenExtractionFilter()
+	{
+		m_confidenceConnectedFilter
+			= ConfidenceConnectedImageFilter::New();
+	}
+	template< typename TImage >
+	void LumenExtractionFilter< TImage >
 		::GenerateData()
 	{
-		typedef ConfidenceConnectedImageFilter< TImage, TImage > ConfidenceConnectedImageFilter;
+		typedef VotingBinaryIterativeHoleFillingImageFilter<TImage> FillHoleFilterType;
 
-		ConfidenceConnectedImageFilter::Pointer
-		
 
 		typename TImage::ConstPointer input = this->GetInput();
 		typename TImage::Pointer output = this->GetOutput();
+		m_confidenceConnectedFilter->SetInput(input);
+		m_confidenceConnectedFilter->Update();
 
-		itk::Index<2> cornerPixel = input->GetLargestPossibleRegion().GetIndex();
-		typename TImage::PixelType newValue = 3;
+		FillHoleFilterType::Pointer fillHoleFilter = FillHoleFilterType::New();
+		fillHoleFilter->SetInput(m_confidenceConnectedFilter->GetOutput());
+		fillHoleFilter->SetForegroundValue(1);
+		fillHoleFilter->Update();
 
-		this->AllocateOutputs();
-
-		ImageAlgorithm::Copy(input.GetPointer(), output.GetPointer(), output->GetRequestedRegion(),
-			output->GetRequestedRegion());
-
-		output->SetPixel(cornerPixel, newValue);
+		output->Graft(fillHoleFilter->GetOutput());
 	}
 
 }// end namespace
