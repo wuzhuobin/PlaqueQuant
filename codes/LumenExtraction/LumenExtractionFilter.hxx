@@ -6,6 +6,9 @@
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 
+#include <itkConfidenceConnectedImageFilter.h>
+
+
 namespace itk
 {
 
@@ -13,6 +16,11 @@ namespace itk
 	void LumenExtractionFilter< TImage>
 		::GenerateData()
 	{
+		typedef ConfidenceConnectedImageFilter< TImage, TImage > ConfidenceConnectedImageFilter;
+
+		ConfidenceConnectedImageFilter::Pointer
+		
+
 		typename TImage::ConstPointer input = this->GetInput();
 		typename TImage::Pointer output = this->GetOutput();
 

@@ -87,6 +87,7 @@ public:
 	virtual void ClearAllSeedWidget();
 	virtual void GenerateWidgetFromSeeds();
 	virtual void SaveWidgetToSeeds();
+	virtual void DropSeed();
 
 protected:
 	InteractorStyleSeedsPlacer();

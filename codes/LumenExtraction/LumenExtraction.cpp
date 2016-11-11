@@ -41,7 +41,7 @@ LumenExtraction::~LumenExtraction()
 	m_lumenSurface->Delete();
 	m_dilatedSurface->Delete();
 	m_dilatedVtkImage->Delete();
-	m_itkLumenImage->Delete();
+	//m_itkLumenImage->Delete();
 }
 
 void LumenExtraction::ClearAllSeeds()

@@ -1,11 +1,11 @@
-#ifndef __QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H_HH
-#define __QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H_HH
+#ifndef __QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H__
+#define __QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H__
 
 #include "InteractorStyleSeedsPlacer.h"
 #include "QAbstractNavigation.h"
 
 namespace Ui { class QInteractorStyleLumenSeedsPlacer; }
-
+class LumenExtraction;
 class QInteractorStyleLumenSeedsPlacer: public QAbstractNavigation, 
 	public InteractorStyleSeedsPlacer
 {
@@ -23,6 +23,11 @@ public slots:
 	virtual void SetFocalSeed(int i);
 	virtual void DeleteFocalSeed();
 	virtual void SaveWidgetToSeeds();
+	virtual void DropSeed();
+
+	virtual void ExtractLumen();
+	virtual void SetMultipier(double value);
+	virtual void SetInitialNeighborhoodRadius(int value);
 
 protected:
 	QInteractorStyleLumenSeedsPlacer(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
@@ -36,10 +41,10 @@ protected:
 private:
 
 	Ui::QInteractorStyleLumenSeedsPlacer* ui = nullptr;
-
+	LumenExtraction* m_lumenExtraction = nullptr;
 };
 
 
 
 
-#endif // !__QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H_HH
+#endif // !__QINTERACTOR_STYLE_LUMEN_SEEDS_PLACER_H__

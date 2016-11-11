@@ -167,6 +167,13 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="dropSeedPushButton">
+          <property name="text">
+           <string>Drop Seed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushBtnDeleteSeed">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -361,5 +368,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>sliderInitNeighborhoodRadius</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>spinBoxNeighborRadius</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>155</x>
+     <y>408</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBoxNeighborRadius</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderInitNeighborhoodRadius</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>244</x>
+     <y>412</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>107</x>
+     <y>410</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

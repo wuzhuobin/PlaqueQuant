@@ -28,9 +28,9 @@ void QInteractorStyleNavigation::UniqueEnable(bool flag)
 		// turn off codes
 		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
 		//	this, SLOT(slotChangeSlice()));
-		//connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
 		//	this, SLOT(slotChangeSlice()));
-		//connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
 		//	this, SLOT(slotChangeSlice()));
 	}
 	if (flag != initializationFlag) {

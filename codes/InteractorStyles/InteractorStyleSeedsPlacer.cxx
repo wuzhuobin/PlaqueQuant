@@ -58,7 +58,6 @@ void InteractorStyleSeedsPlacer::SetFocalSeed(int i)
 void InteractorStyleSeedsPlacer::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	AbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleSeedsPlacer, ClearAllSeedWidget());
 	STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleSeedsPlacer, GenerateWidgetFromSeeds());
 	MY_VIEWER_CONSTITERATOR(Render());
 }
@@ -241,6 +240,18 @@ void InteractorStyleSeedsPlacer::SaveWidgetToSeeds()
 	}
 
 	//MainWindow::GetMainWindow()->GetModuleWidget()->UpdateSeedListView();
+}
+
+void InteractorStyleSeedsPlacer::DropSeed()
+{
+	double* worldPos = m_imageViewer->GetFocalPointWithWorldCoordinate();
+	vtkHandleWidget* newSeed = m_seedWidget->CreateNewHandle();
+	newSeed->GetHandleRepresentation()->SetWorldPosition(worldPos);
+	newSeed->EnabledOn();
+	m_imageViewer->Render();
+
+	SaveWidgetToSeeds();
+	OnLeftButtonUp();
 }
 
 void InteractorStyleSeedsPlacer::ClearAllSeedWidget()

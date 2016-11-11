@@ -303,7 +303,7 @@ void MainWindow::slotChangeMode(QAction* action)
 
 	//}
 	else {
-		//ui->widgetDockWidget->setEnabled(false);
+		ui->widgetDockWidget->setEnabled(false);
 	}
 }
 

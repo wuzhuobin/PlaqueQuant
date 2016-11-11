@@ -5,6 +5,7 @@
 
 #include "ui_QInteractorStyleLumenSeedsPlacer.h"
 #include "ui_QAbstractNavigation.h"
+#include "lumenExtraction.h"
 
 
 vtkStandardNewMacro(QInteractorStyleLumenSeedsPlacer);
@@ -106,6 +107,38 @@ void QInteractorStyleLumenSeedsPlacer::SaveWidgetToSeeds()
 	}
 }
 
+void QInteractorStyleLumenSeedsPlacer::DropSeed()
+{
+	InteractorStyleSeedsPlacer::DropSeed();
+}
+
+void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
+{
+	m_lumenExtraction->SetInputData(m_imageViewer->GetOriginalInput());
+	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	for (int i = 0; i < _seeds.size(); ++i) {
+		m_lumenExtraction->AddSeed(_seeds[i]);
+	}
+	m_lumenExtraction->Update();
+	vtkSmartPointer<vtkImageData> overlay = vtkSmartPointer<vtkImageData>::New();
+	m_lumenExtraction->GetLumenVtkImage(overlay);
+	m_imageViewer->GetOverlay()->ReplacePixels(overlay->GetExtent(), overlay);
+}
+
+void QInteractorStyleLumenSeedsPlacer::SetMultipier(double value)
+{
+	if (m_lumenExtraction != nullptr) {
+		m_lumenExtraction->SetMultiplier(value);
+	}
+}
+
+void QInteractorStyleLumenSeedsPlacer::SetInitialNeighborhoodRadius(int value)
+{
+	if (m_lumenExtraction != nullptr) {
+		m_lumenExtraction->SetInitialNeighborhoodRadius(value);
+	}
+}
+
 QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, QWidget* parent)
 {
 	QNEW_UI();
@@ -115,6 +148,25 @@ QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, Q
 
 		connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
 			this, SLOT(SetFocalSeed(int)));
+		
+		connect(ui->dropSeedPushButton, SIGNAL(clicked()),
+			this, SLOT(DropSeed()));
+		// only create lumenExtraction and connect its parameter in the first 
+		// InteractorStyleLumenSeedsPalcer, others' are nullptr and won't be 
+		// connected
+		connect(ui->pushBtnExtractLumen, SIGNAL(clicked()),
+			this, SLOT(ExtractLumen()));
+		connect(ui->doubleSpinBoxMultiplier, SIGNAL(valueChanged(double)),
+			this, SLOT(SetMultipier(double)));
+		connect(ui->spinBoxNeighborRadius, SIGNAL(valueChanged(int)),
+			this, SLOT(SetInitialNeighborhoodRadius(int)));
+
+		m_lumenExtraction = new LumenExtraction;
+		m_lumenExtraction->SetNumberOfIterations(30);
+		m_lumenExtraction->SetDilationValue(4);
+		m_lumenExtraction->SetMultiplier(2.3);
+		m_lumenExtraction->SetInitialNeighborhoodRadius(1);
+
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
 		this, SLOT(SlotClearAllSeeds()));
@@ -123,6 +175,10 @@ QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, Q
 QInteractorStyleLumenSeedsPlacer::~QInteractorStyleLumenSeedsPlacer()
 {
 	QDELETE_UI();
+
+	if (m_lumenExtraction != nullptr) {
+		delete m_lumenExtraction;
+	}
 }
 
 void QInteractorStyleLumenSeedsPlacer::UniqueEnable(bool flag)
@@ -147,9 +203,9 @@ void QInteractorStyleLumenSeedsPlacer::UniqueEnable(bool flag)
 		// turn off codes
 		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
 			this, SLOT(slotChangeSlice()));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
 			this, SLOT(slotChangeSlice()));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
 			this, SLOT(slotChangeSlice()));
 	}
 	if (flag != initializationFlag) {
