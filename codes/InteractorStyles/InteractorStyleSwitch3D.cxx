@@ -17,7 +17,6 @@ Copyright (C) 2016
 #include <vtkCallbackCommand.h>
 #include "InteractorStyleSwitch3D.h"
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
 
 class MyViewer;
 

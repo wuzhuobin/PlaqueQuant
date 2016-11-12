@@ -15,7 +15,7 @@
 #include <itkImageFileWriter.h>
 #include <itkIndex.h>
 #include <itkLabelMapToBinaryImageFilter.h>
-#include <itkVTKImageToImageFilter.h>		
+#include "itkBinaryDilateImageFilter.h"
 #include <itkVotingBinaryIterativeHoleFillingImageFilter.h>
 #include <vtkImageCast.h>
 

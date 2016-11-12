@@ -39,6 +39,8 @@ void VesselSegmentation::SetInputSegmentationImage(FloatImageType::Pointer input
 	
 	m_hasInputSegmentation = 1;
 }
+#include <itkMergeLabelMapFilter.h>
+#include <itkCastImageFilter.h>
 
 void VesselSegmentation::Update()
 {

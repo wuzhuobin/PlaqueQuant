@@ -8,7 +8,7 @@
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
 #include "InteractorStyleSwitch3D.h"
-#include "LumenExtraction.h"
+//#include "LumenExtraction.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
 #include "MyWidgetManager.h"
@@ -175,8 +175,8 @@ private:
 	vtkSmartPointer<vtkPolyData> m_centerlinePD;
 
 
-	// Filter
-	LumenExtraction* m_lumenExtractionFilter;
+	//// Filter
+	//LumenExtraction* m_lumenExtractionFilter;
 
 
 	bool m_firstInitialize = true;

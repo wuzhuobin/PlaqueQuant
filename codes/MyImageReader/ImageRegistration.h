@@ -6,7 +6,6 @@
 #include <itkImage.h>
 #include <itkVersorRigid3DTransform.h>
 
-//#include "Define.h"
 //Registration
 typedef itk::Image< float, 3 >		ImageType;
 typedef itk::VersorRigid3DTransform <double>									TransformType;		//TransformType

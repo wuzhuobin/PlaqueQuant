@@ -2,11 +2,16 @@
 #define MYTHREAD_H
 
 #include <QThread>
-#include "Define.h"
+#include "itkImage.h"
+
 class MyThread : public QThread
 {
     Q_OBJECT
 public:
+	typedef float										PixelType;
+	const static unsigned int							ImageDimension = 3;
+	typedef itk::Image< PixelType, ImageDimension >		ImageType;
+
     explicit MyThread(QObject *parent = 0);
     void run();
 	void forceStop();

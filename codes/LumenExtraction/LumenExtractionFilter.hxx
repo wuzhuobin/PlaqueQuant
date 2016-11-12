@@ -12,6 +12,11 @@
 namespace itk
 {
 	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::AddSeed(const typename TImage::IndexType & seed)
+	{
+		m_confidenceConnectedFilter->AddSeed(seed);
+	}
+	template<typename TImage>
 	inline void LumenExtractionFilter<TImage>::ClearSeeds()
 	{
 		m_confidenceConnectedFilter->ClearSeeds();
@@ -26,6 +31,16 @@ namespace itk
 	inline void LumenExtractionFilter<TImage>::SetMultiplier(double multiplier)
 	{
 		m_confidenceConnectedFilter->SetMultiplier(multiplier);
+	}
+	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::SetNumberOfIterations(unsigned int num)
+	{
+		m_confidenceConnectedFilter->SetNumberOfIterations(num);
+	}
+	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::SetDilationValue(int dilationVal)
+	{
+		m_confidenceConnectedFilter->SetDilationValue(dilationVal);
 	}
 	/**
 	 * Constructor

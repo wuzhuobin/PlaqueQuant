@@ -20,14 +20,15 @@ namespace itk
 		typedef SmartPointer< const Self >        ConstPointer;
 		typedef ConfidenceConnectedImageFilter< TImage, TImage > ConfidenceConnectedImageFilter;
 
-
 		/** Method for creation through the object factory. */
 		itkNewMacro(Self);
 
 		/** Run-time type information (and related methods). */
 		itkTypeMacro(LumenExtractionFilter, ImageToImageFilter);
+		typedef typename TImage::IndexType IndexType;
 
-		void AddSeed(const typename TImage::IndexType& seed);
+
+		void AddSeed(const typename IndexType& seed);
 		void ClearSeeds();
 
 		void SetInitialNeighborhoodRadius(unsigned int radius);

@@ -23,7 +23,15 @@
 #include <QFileInfo>
 #include <QRadioButton>
 #include <QGroupBox>
-#include "Define.h"
+
+#include "itkGDCMSeriesFileNames.h"
+#include "itkImageSeriesReader.h"
+#include "itkGDCMImageIO.h"
+
+typedef itk::Image< float, 3 >		ImageType;
+typedef itk::GDCMSeriesFileNames					NamesGeneratorType;
+typedef itk::ImageSeriesReader< ImageType >			ReaderType;
+typedef itk::GDCMImageIO							ImageIOType;
 
 
 RegistrationWizard::RegistrationWizard(QString dir, QWidget *parent) : QWizard(parent)
