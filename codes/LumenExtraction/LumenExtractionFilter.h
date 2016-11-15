@@ -58,5 +58,47 @@ namespace itk
 #include "LumenExtractionFilter.hxx"
 #endif
 
+#include <vtkImageAlgorithm.h>
+#include <itkImageToVTKImageFilter.h>
+#include <itkVTKImageToImageFilter.h>
+
+class LumenExtractionFilter: public vtkImageAlgorithm
+{
+public:
+	typedef itk::Image<float, 3> ImageType;
+	typedef itk::ImageToVTKImageFilter<ImageType> ImageToVtkImageFilter;
+	typedef itk::VTKImageToImageFilter<ImageType> VTKImageToImageFilter;
+	typedef itk::LumenExtractionFilter<ImageType> LEFilter;
+	LEFilter::Pointer CoreFilter = nullptr;
+
+
+	static LumenExtractionFilter* New();
+	vtkTypeMacro(LumenExtractionFilter, vtkImageAlgorithm);
+	void PrintSelf(ostream& os, vtkIndent indent);
+
+protected:
+
+	virtual int RequestUpdateExtent(vtkInformation* request,
+		vtkInformationVector** inputVector,
+		vtkInformationVector* outputVector);
+	virtual int RequestInformation(vtkInformation*,
+		vtkInformationVector**,
+		vtkInformationVector*);
+	virtual int RequestData(vtkInformation* request,
+		vtkInformationVector** inputVector,
+		vtkInformationVector* outputVector);
+
+
+private:
+	LumenExtractionFilter();
+	~LumenExtractionFilter();
+
+
+};
+
+
+
+
+
 
 #endif // !__LUMEN_EXTRACTION_FILTER_H__

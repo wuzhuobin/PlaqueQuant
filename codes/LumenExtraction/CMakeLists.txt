@@ -29,6 +29,7 @@ include_directories(
 set(
     LUMENEXTRATION_SRC
 	${PROJECT_SOURCE_DIR}/LumenExtraction.cpp
+	${PROJECT_SOURCE_DIR}/LumenExtractionFilter.cpp
 	
 )
 

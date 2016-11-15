@@ -321,37 +321,12 @@ void Overlay::ReplacePixels(int* extent, vtkImageData* image)
 
 					if (image->GetScalarType() == VTK_FLOAT)
 					{
-						double val = image->GetScalarComponentAsDouble(pos[0], pos[1], pos[2], 0);
+						double val = image->GetScalarComponentAsFloat(pos[0], pos[1], pos[2], 0);
 						SetPixel(pos, val);
-					}
-					else {
-						unsigned char* val = static_cast<unsigned char*>(image->GetScalarPointer(pos));
-						if (val == nullptr)
-							continue;
-
-
-						if (std::max_element(val, val + scalerLength) > 0) {
-							for (int i = 0; i < m_lookupTable->GetNumberOfColors(); ++i) {
-								double rgba[4];
-								uchar rgbaUCHAR[4];
-								m_lookupTable->GetIndexedColor(i, rgba);
-								m_lookupTable->GetColorAsUnsignedChars(rgba, rgbaUCHAR); // convert double to uchar
-
-								if (val[0] == rgbaUCHAR[0] && val[1] == rgbaUCHAR[1] &&
-									val[2] == rgbaUCHAR[2]) {
-									pixelval = i;
-									break;
-								}
-
-							}
-
-						}
-						SetPixel(pos, pixelval);
 					}
 				}
 			}
 		}
-			break;
 	}
 	m_vtkOverlay->Modified();
 	emit signalOverlayUpdated();

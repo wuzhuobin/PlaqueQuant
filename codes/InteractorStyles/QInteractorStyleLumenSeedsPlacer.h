@@ -7,14 +7,12 @@
 #include "LumenExtractionFilter.h"
 
 namespace Ui { class QInteractorStyleLumenSeedsPlacer; }
-//class LumenExtraction;
 class QInteractorStyleLumenSeedsPlacer: public QAbstractNavigation, 
 	public InteractorStyleSeedsPlacer
 {
 	Q_OBJECT;
 	QSETUP_UI_HEAD(QInteractorStyleLumenSeedsPlacer);
-	typedef itk::Image<double, 3> ImageType;
-	typedef itk::LumenExtractionFilter<ImageType> LumenExtractionFilter;
+
 public:
 	vtkTypeMacro(QInteractorStyleLumenSeedsPlacer, InteractorStyleSeedsPlacer);
 	static QInteractorStyleLumenSeedsPlacer* New();
@@ -44,8 +42,8 @@ protected:
 private:
 
 	Ui::QInteractorStyleLumenSeedsPlacer* ui = nullptr;
-	//LumenExtraction* m_lumenExtraction = nullptr;
-	itk::LumenExtractionFilter<ImageType>::Pointer m_lumenExtractionFilter = nullptr;
+	vtkSmartPointer<LumenExtractionFilter> m_lumenExtractionFilter = nullptr;
+
 };
 
 

@@ -40,7 +40,7 @@ namespace itk
 	template<typename TImage>
 	inline void LumenExtractionFilter<TImage>::SetDilationValue(int dilationVal)
 	{
-		m_confidenceConnectedFilter->SetDilationValue(dilationVal);
+		//m_confidenceConnectedFilter->SetDilationValue(dilationVal);
 	}
 	/**
 	 * Constructor
