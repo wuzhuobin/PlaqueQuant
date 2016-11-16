@@ -12,6 +12,11 @@ SET(
   "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
   )
 
+# set(
+#     CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
+#     ON
+# )
+
 #ITK
 find_package(ITK REQUIRED)
 if (NOT ITK_FOUND)
@@ -71,6 +76,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/Managers
 	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/License
+	${PROJECT_BINARY_DIR}/codes/EncryptionAuthentication
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
@@ -94,14 +100,17 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/MyImageReader
 	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/License
+	${PROJECT_SOURCE_DIR}/codes/EncryptionAuthentication
+	
 	)
 
-SET(
-	LIBRARY_OUTPUT_PATH
+set(
+	CMAKE_LIBRARY_OUTPUT_DIRECTORY
 	${CMAKE_SOURCE_DIR}/lib
 )
-SET(
-	EXECUTABLE_OUTPUT_PATH 
+
+set(
+	CMAKE_RUNTIME_OUTPUT_DIRECTORY
 	${CMAKE_SOURCE_DIR}/bin
 )
 
@@ -126,6 +135,7 @@ set(
 	MyImageReader
 	Widget_License
 	LumenExtraction
+	EncryptionAuthentication
 )
 
 include_directories(
@@ -146,6 +156,7 @@ add_subdirectory(codes/MyImageReader)
 add_subdirectory(codes/LumenExtraction)
 add_subdirectory(codes/License)
 add_subdirectory(codes/Testing)
+add_subdirectory(codes/EncryptionAuthentication)
 
 # Add_subdirectory(codes)
 
