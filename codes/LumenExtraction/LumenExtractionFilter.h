@@ -81,9 +81,9 @@ protected:
 	virtual int RequestUpdateExtent(vtkInformation* request,
 		vtkInformationVector** inputVector,
 		vtkInformationVector* outputVector);
-	virtual int RequestInformation(vtkInformation*,
-		vtkInformationVector**,
-		vtkInformationVector*);
+	virtual int RequestInformation(vtkInformation* request,
+		vtkInformationVector** inputVector,
+		vtkInformationVector* outputVector);
 	virtual int RequestData(vtkInformation* request,
 		vtkInformationVector** inputVector,
 		vtkInformationVector* outputVector);

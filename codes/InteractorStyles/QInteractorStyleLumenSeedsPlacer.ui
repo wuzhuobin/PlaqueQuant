@@ -233,7 +233,7 @@
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Multipier</string>
+           <string>Multiplier</string>
           </property>
          </widget>
         </item>
@@ -264,14 +264,17 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="minimum">
+           <double>1.700000000000000</double>
+          </property>
           <property name="maximum">
-           <double>10.000000000000000</double>
+           <double>2.100000000000000</double>
           </property>
           <property name="singleStep">
-           <double>0.100000000000000</double>
+           <double>0.050000000000000</double>
           </property>
           <property name="value">
-           <double>2.300000000000000</double>
+           <double>1.950000000000000</double>
           </property>
          </widget>
         </item>
@@ -280,25 +283,25 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Initial Neighborhood Radius</string>
+         <string>Number Of Iterations</string>
         </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_14">
         <item>
-         <widget class="QSlider" name="sliderInitNeighborhoodRadius">
+         <widget class="QSlider" name="numberOfIterationsSliderInit">
           <property name="minimum">
-           <number>1</number>
+           <number>3</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>15</number>
           </property>
           <property name="value">
-           <number>1</number>
+           <number>6</number>
           </property>
           <property name="sliderPosition">
-           <number>1</number>
+           <number>6</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -306,7 +309,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBoxNeighborRadius">
+         <widget class="QSpinBox" name="numberOfIterationsSpinBox">
           <property name="minimumSize">
            <size>
             <width>50</width>
@@ -320,10 +323,13 @@
            </size>
           </property>
           <property name="minimum">
-           <number>1</number>
+           <number>3</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>15</number>
+          </property>
+          <property name="value">
+           <number>6</number>
           </property>
          </widget>
         </item>
@@ -370,9 +376,9 @@
  <resources/>
  <connections>
   <connection>
-   <sender>sliderInitNeighborhoodRadius</sender>
+   <sender>numberOfIterationsSliderInit</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>spinBoxNeighborRadius</receiver>
+   <receiver>numberOfIterationsSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -386,9 +392,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBoxNeighborRadius</sender>
+   <sender>numberOfIterationsSpinBox</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>sliderInitNeighborhoodRadius</receiver>
+   <receiver>numberOfIterationsSliderInit</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">

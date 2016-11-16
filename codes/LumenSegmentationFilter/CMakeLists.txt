@@ -1,9 +1,5 @@
 
 project(LumenSegmentationFilter)
-SET(
-  CMAKE_PREFIX_PATH
-  "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
-  )
 
 #VTK
 find_package(VTK REQUIRED)
@@ -26,6 +22,7 @@ set(
 
 add_library(
 	LumenSegmentationFilter 
+	SHARED
 	${LUMEN_SEGMENTATION_FILTER_SRC}
 	${LUMEN_SEGMENTATION_FILTER_INC}
 	)
@@ -35,6 +32,14 @@ target_link_libraries(
 	LumenSegmentationFilter
 	${VTK_LIBRARIES}
 	)
+set_target_properties(
+    LumenSegmentationFilter
+    PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS 
+    true
+    # RUNTIME_OUTPUT_DIRECTORY
+	# ${CMAKE_SOURCE_DIR}/bin
+)
 #Grouping in MSVC
 SOURCE_GROUP(
 	"Header Files" 

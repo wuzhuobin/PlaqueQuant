@@ -133,10 +133,10 @@ void QInteractorStyleLumenSeedsPlacer::SetMultipier(double value)
 	}
 }
 
-void QInteractorStyleLumenSeedsPlacer::SetInitialNeighborhoodRadius(int value)
+void QInteractorStyleLumenSeedsPlacer::SetNumberOfIteractions(int value)
 {
 	if (m_lumenExtractionFilter != nullptr) {
-		m_lumenExtractionFilter->CoreFilter->SetInitialNeighborhoodRadius(value);
+		m_lumenExtractionFilter->CoreFilter->SetNumberOfIterations(value);
 	}
 }
 
@@ -159,12 +159,12 @@ QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, Q
 			this, SLOT(ExtractLumen()));
 		connect(ui->doubleSpinBoxMultiplier, SIGNAL(valueChanged(double)),
 			this, SLOT(SetMultipier(double)));
-		connect(ui->spinBoxNeighborRadius, SIGNAL(valueChanged(int)),
-			this, SLOT(SetInitialNeighborhoodRadius(int)));
+		connect(ui->numberOfIterationsSpinBox, SIGNAL(valueChanged(int)),
+			this, SLOT(SetNumberOfIteractions(int)));
 
 		m_lumenExtractionFilter = vtkSmartPointer<LumenExtractionFilter>::New();
-		m_lumenExtractionFilter->CoreFilter->SetNumberOfIterations(30);
-		m_lumenExtractionFilter->CoreFilter->SetMultiplier(2.3);
+		m_lumenExtractionFilter->CoreFilter->SetNumberOfIterations(6);
+		m_lumenExtractionFilter->CoreFilter->SetMultiplier(1.95);
 		m_lumenExtractionFilter->CoreFilter->SetInitialNeighborhoodRadius(1);
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),

@@ -28,7 +28,7 @@ public slots:
 
 	virtual void ExtractLumen();
 	virtual void SetMultipier(double value);
-	virtual void SetInitialNeighborhoodRadius(int value);
+	virtual void SetNumberOfIteractions(int value);
 
 protected:
 	QInteractorStyleLumenSeedsPlacer(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);

@@ -61,6 +61,8 @@ namespace itk
 		typename TImage::ConstPointer input = this->GetInput();
 		typename TImage::Pointer output = this->GetOutput();
 		m_confidenceConnectedFilter->SetInput(input);
+		std::cout << m_confidenceConnectedFilter->GetNumberOfIterations() << std::endl;
+		std::cout << m_confidenceConnectedFilter->GetMultiplier() << std::endl;
 		m_confidenceConnectedFilter->Update();
 
 		FillHoleFilterType::Pointer fillHoleFilter = FillHoleFilterType::New();
