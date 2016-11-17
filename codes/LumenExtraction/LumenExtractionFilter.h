@@ -34,6 +34,7 @@ namespace itk
 		void SetInitialNeighborhoodRadius(unsigned int radius);
 		void SetMultiplier(double multiplier);
 		void SetNumberOfIterations(unsigned int num);
+		void SetMaximumNumberOfIterations(unsigned int value);
 
 		void SetDilationValue(int dilationVal);
 	protected:
@@ -48,6 +49,7 @@ namespace itk
 		void operator=(const Self &);  //purposely not implemented
 
 		typename ConfidenceConnectedImageFilter::Pointer m_confidenceConnectedFilter;
+		unsigned int MaximumNumberOfIterationsOfHoleFilling = 2;
 		
 
 	};

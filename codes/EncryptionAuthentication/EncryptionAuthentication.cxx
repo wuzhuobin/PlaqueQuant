@@ -54,54 +54,57 @@ int EncryptionAuthentication::authenticationExec(int errorCode)
 {
 
 	bool loopFlag = true;
-	int authenticationPass = SUCCESSFUL;
+	int authenticationPass = NORMAL;
 	int status;
 	if (errorCode == NORMAL) {
-		return SUCCESSFUL;
+		return authenticationPass;
 	}
 	while (loopFlag) {
 		QString message;
-		authenticationPass = SUCCESSFUL;
+		authenticationPass = NORMAL;
 		reloadViKey();
 
 		if (errorCode & HAVING_KEY) {
 			if (!authenticationByHavingKey()) {
 				message += '\n';
 				message += m_messages[HAVING_KEY];
-				authenticationPass = FAIL;
+				authenticationPass |=  HAVING_KEY;
 			}
 		}
 		if (errorCode & SOFT_ID) {
 			if (!authenticationBySoftID()) {
 				message += '\n';
 				message += m_messages[SOFT_ID];
-				authenticationPass = FAIL;
+				authenticationPass |= SOFT_ID;
 			}
 		}
 		if (errorCode & HARD_ID) {
 			if (!authenticationByHardID()) {
 				message += '\n';
 				message += m_messages[HARD_ID];
-				authenticationPass = FAIL;
+				authenticationPass |= HARD_ID;
 			}
 		}
 		if (errorCode & PRODUCT_NAME) {
 			if (!authenticationByProductName()) {
 				message += '\n';
 				message += m_messages[PRODUCT_NAME];
-				authenticationPass = FAIL;
+				authenticationPass |= PRODUCT_NAME;
 			}
 		}
+		// The only different between authenticationExecAndKeyType and authenticationExec
+		// @see #authenticationByExpiredDateTimeAndKeytype
+		// @see #authenticationByExpiredDateTime
 		if (errorCode & EXPIRED_DATE_TIME) {
 			if (!authenticationByExpiredDateTime()) {
 				message += '\n';
 				message += m_messages[EXPIRED_DATE_TIME];
-				authenticationPass = FAIL;
+				authenticationPass |= EXPIRED_DATE_TIME;
 			}
 		}
-		if (authenticationPass == SUCCESSFUL) {
+		if (authenticationPass == NORMAL ) {
 			loopFlag = false;
-			if (m_expiredDateTime != QDateTime()) {
+			if (m_expiredDateTime != QDateTime() && m_expiredDateTimeHintFlag) {
 				m_messageBox.setIcon(QMessageBox::Information);
 				m_messageBox.setStandardButtons(QMessageBox::Ok);
 				m_messageBox.setText(m_messages[NORMAL]);
@@ -122,6 +125,79 @@ int EncryptionAuthentication::authenticationExec(int errorCode)
 
 }
 
+int EncryptionAuthentication::authenticationExecAndKeyType(int errorCode)
+{
+	bool loopFlag = true;
+	int authenticationPass = NORMAL;
+	int status;
+	if (errorCode == NORMAL) {
+		return authenticationPass;
+	}
+	while (loopFlag) {
+		QString message;
+		authenticationPass = NORMAL;
+		reloadViKey();
+
+		if (errorCode & HAVING_KEY) {
+			if (!authenticationByHavingKey()) {
+				message += '\n';
+				message += m_messages[HAVING_KEY];
+				authenticationPass |= HAVING_KEY;
+			}
+		}
+		if (errorCode & SOFT_ID) {
+			if (!authenticationBySoftID()) {
+				message += '\n';
+				message += m_messages[SOFT_ID];
+				authenticationPass |= SOFT_ID;
+			}
+		}
+		if (errorCode & HARD_ID) {
+			if (!authenticationByHardID()) {
+				message += '\n';
+				message += m_messages[HARD_ID];
+				authenticationPass |= HARD_ID;
+			}
+		}
+		if (errorCode & PRODUCT_NAME) {
+			if (!authenticationByProductNameAndKeyType()) {
+				message += '\n';
+				message += m_messages[PRODUCT_NAME];
+				authenticationPass |= PRODUCT_NAME;
+			}
+		}
+		// The only different between authenticationExecAndKeyType and authenticationExec
+		// @see #authenticationByExpiredDateTimeAndKeytype
+		// @see #authenticationByExpiredDateTime
+		if (errorCode & EXPIRED_DATE_TIME) {
+			if (!authenticationByExpiredDateTimeAndKeytype()) {
+				message += '\n';
+				message += m_messages[EXPIRED_DATE_TIME];
+				authenticationPass |= EXPIRED_DATE_TIME;
+			}
+		}
+		if (authenticationPass == NORMAL) {
+			loopFlag = false;
+			if (m_expiredDateTime != QDateTime() && m_expiredDateTimeHintFlag) {
+				m_messageBox.setIcon(QMessageBox::Information);
+				m_messageBox.setStandardButtons(QMessageBox::Ok);
+				m_messageBox.setText(m_messages[NORMAL]);
+				m_messageBox.exec();
+			}
+
+		}
+		else {
+			m_messageBox.setText(message);
+			status = m_messageBox.exec();
+			if (status == QMessageBox::Cancel) {
+				loopFlag = false;
+			}
+		}
+
+	}
+	return authenticationPass;
+}
+
 void EncryptionAuthentication::setUserPassword(QString userPassword)
 {
 	m_userPassWord = userPassword;
@@ -130,6 +206,11 @@ void EncryptionAuthentication::setUserPassword(QString userPassword)
 void EncryptionAuthentication::setAdminPassword(QString adminPassword)
 {
 	m_adminPassWord = adminPassword;
+}
+
+void EncryptionAuthentication::enableExpiredDateTimeHint(bool flag)
+{
+	m_expiredDateTimeHintFlag = flag;
 }
 
 int EncryptionAuthentication::authenticationBySoftID()
@@ -255,4 +336,72 @@ int EncryptionAuthentication::authenticationByExpiredDateTime()
 
 
 
+}
+
+int EncryptionAuthentication::authenticationByExpiredDateTimeAndKeytype()
+{
+	// if m_expiredDateTime is not specified, it is the OS's dateTime
+	// it will return successfule directly
+	if (m_expiredDateTime == QDateTime()) {
+		return SUCCESSFUL;
+	}
+	WORD Index = 0;
+	//获取时钟型加密狗中的内部时间
+	SVikeyTime pTime;
+	if (!VikeyGetTime(Index, &pTime)) {
+		char* time = reinterpret_cast<char*>(&pTime);
+		QString year = QString::number(time[0]);
+		QString month = QString::number(time[1]);
+		QString day = QString::number(time[2]);
+		QString hour = QString::number(time[3]);
+		QString minute = QString::number(time[4]);
+		QString second = QString::number(time[5]);
+
+		QDateTime dateTimeOfKey(QDate(time[0] + 2000, time[1], time[2]),
+			QTime(time[3], time[4], time[5]));
+
+		if (dateTimeOfKey > m_expiredDateTime) {
+			return FAIL;
+		}
+		else {
+			return SUCCESSFUL;
+		}
+	}
+	else {
+		if (QDateTime() > m_expiredDateTime) {
+			return FAIL;
+		}
+		else{
+			return SUCCESSFUL;
+		}
+	}
+}
+
+int EncryptionAuthentication::authenticationByProductNameAndKeyType()
+{
+	if (m_productName.isEmpty()) {
+		return SUCCESSFUL;
+	}
+	WORD index = 0;
+	WCHAR szName[16];
+	if (VikeyUserLogin(index, const_cast<char*>(m_userPassWord.toStdString().c_str())))
+	{
+		return FAIL;
+	}
+
+	if (!VikeyGetPtroductName(index, szName)) {
+		VikeyLogoff(index);
+		QString _productName = QString::fromWCharArray(szName);
+		_productName.truncate(m_productName.size());
+		if (_productName == m_productName) {
+			return SUCCESSFUL;
+		}
+		else {
+			return FAIL;
+		}
+	}
+	else {
+		VikeyLogoff(index);
+		return SUCCESSFUL;
+	}
 }

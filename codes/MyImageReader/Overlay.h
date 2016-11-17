@@ -105,6 +105,7 @@ public:
 	void SetPixels(vtkPoints* points, int label);
 	void ReplacePixels(int* extent, vtkImageData* image);
 
+	void vtkShallowCopyImage(vtkImageData* image);
 
 
 	vtkImageData* GetOutput();

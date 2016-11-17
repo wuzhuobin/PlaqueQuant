@@ -6,11 +6,6 @@ IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-
-SET(
-  CMAKE_PREFIX_PATH
-  "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
-  )
 # multi-processor build
 set(
 	CMAKE_CXX_FLAGS 
@@ -63,7 +58,6 @@ SET(
 	# AbstractInteractorStyles
 	${PROJECT_BINARY_DIR}/codes/InteractorStyles
 	# Abstract Data structure
-	# ${PROJECT_BINARY_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_BINARY_DIR}/codes/Widgets
 	# Source for GPURender
@@ -88,7 +82,6 @@ SET(
 	# AbstractInteractorStyles
 	${PROJECT_SOURCE_DIR}/codes/InteractorStyles
 	# Abstract Data structure
-	# ${PROJECT_SOURCE_DIR}/codes/AbstractData
 	# Source for Widgets
 	${PROJECT_SOURCE_DIR}/codes/Widgets
 	# Source for GPURender
@@ -105,11 +98,11 @@ SET(
 	)
 
 SET(
-	LIBRARY_OUTPUT_PATH
+	CMAKE_LIBRARY_OUTPUT_DIRECTORY
 	${CMAKE_SOURCE_DIR}/lib
 )
 SET(
-	EXECUTABLE_OUTPUT_PATH 
+	CMAKE_RUNTIME_OUTPUT_DIRECTORY 
 	${CMAKE_SOURCE_DIR}/bin
 )
 
@@ -122,10 +115,8 @@ set(
 	Qt5::PrintSupport
 	UI
 	Core
-	# Managers
 	Widgets
 	InteractorStyles
-	# AbstractData
 	Widgets 
 	GPURenderWithLUT
 	Measurements
@@ -135,6 +126,7 @@ set(
 	Widget_License
 	LumenExtraction
 	LumenSegmentationFilter
+	EncryptionAuthentication
 )
 
 include_directories(
@@ -144,19 +136,16 @@ add_subdirectory(codes/UI)
 add_subdirectory(codes/Widgets)
 add_subdirectory(codes/Main)
 add_subdirectory(codes/InteractorStyles)
-# add_subdirectory(codes/AbstractData)
 add_subdirectory(codes/GPURenderWithLUT)
 add_subdirectory(codes/Core)
 add_subdirectory(codes/Measurements)
 add_subdirectory(codes/MaximumWallThickness)
-# add_subdirectory(codes/Managers)
 add_subdirectory(codes/CenterlineBranching)
 add_subdirectory(codes/MyImageReader)
 add_subdirectory(codes/LumenExtraction)
 add_subdirectory(codes/License)
 add_subdirectory(codes/LumenSegmentationFilter)
-
-# Add_subdirectory(codes)
+add_subdirectory(codes/EncryptionAuthentication)
 
 
 

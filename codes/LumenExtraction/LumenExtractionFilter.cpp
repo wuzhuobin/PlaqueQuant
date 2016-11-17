@@ -4,6 +4,7 @@
 #include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkImageCast.h>
 
 vtkStandardNewMacro(LumenExtractionFilter);
 
@@ -49,9 +50,10 @@ int LumenExtractionFilter::RequestInformation(vtkInformation * request, vtkInfor
 	outInfo->Set(vtkDataObject::SPACING(), out_spacing, 3);
 	outInfo->Set(vtkDataObject::ORIGIN(), out_origin, 3);
 
-	return 1;
+	return vtkImageAlgorithm::RequestInformation(request, inputVector, outputVector);
 }
 
+//#include <qlist.h>
 int LumenExtractionFilter::RequestData(vtkInformation* request,
 	vtkInformationVector** inputVector,
 	vtkInformationVector* outputVector) {
@@ -79,6 +81,40 @@ int LumenExtractionFilter::RequestData(vtkInformation* request,
 	itkToVtk->SetInput(CoreFilter->GetOutput());
 	itkToVtk->Update();
 
-	output->ShallowCopy(itkToVtk->GetOutput());
+	vtkSmartPointer<vtkImageCast> cast =
+		vtkSmartPointer<vtkImageCast>::New();
+	cast->SetInputData(itkToVtk->GetOutput());
+	cast->SetOutputScalarTypeToDouble();
+	cast->Update();
+
+	output->ShallowCopy(cast->GetOutput());
+	//QList<int> l = { 1, 2, 3 };
+	//for (int i = 0; i < 3; ++i) {
+	//	// get the info objects
+	//	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	//	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	//	// get the input and output
+	//	vtkImageData *input = vtkImageData::SafeDownCast(
+	//		inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	//	vtkImageData *output = vtkImageData::SafeDownCast(
+	//		outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+	//	VTKImageToImageFilter::Pointer vtkToItk =
+	//		VTKImageToImageFilter::New();
+	//	vtkToItk->SetInput(input);
+	//	vtkToItk->Update();
+
+	//	CoreFilter->SetInput(vtkToItk->GetOutput());
+	//	CoreFilter->SetNumberOfIterations(l[i]);
+	//	CoreFilter->Update();
+
+	//	ImageToVtkImageFilter::Pointer itkToVtk =
+	//		ImageToVtkImageFilter::New();
+	//	itkToVtk->SetInput(CoreFilter->GetOutput());
+	//	itkToVtk->Update();
+
+	//	output->ShallowCopy(itkToVtk->GetOutput());
+	//}
 	return 1;
 }

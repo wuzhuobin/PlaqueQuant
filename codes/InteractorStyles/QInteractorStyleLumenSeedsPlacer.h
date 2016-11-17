@@ -29,6 +29,7 @@ public slots:
 	virtual void ExtractLumen();
 	virtual void SetMultipier(double value);
 	virtual void SetNumberOfIteractions(int value);
+	virtual void SetInitialNeighborhoodRadius(int value);
 
 protected:
 	QInteractorStyleLumenSeedsPlacer(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
@@ -42,7 +43,10 @@ protected:
 private:
 
 	Ui::QInteractorStyleLumenSeedsPlacer* ui = nullptr;
-	vtkSmartPointer<LumenExtractionFilter> m_lumenExtractionFilter = nullptr;
+
+	int m_numberOfIteractions = 9;
+	double m_multiplier = 2.1;
+	int m_initialNeighborhoodRadius = 1;
 
 };
 

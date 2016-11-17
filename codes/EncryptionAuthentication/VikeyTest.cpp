@@ -7,16 +7,14 @@
 
 void main(int argc, char** argv) {
 	QApplication app(argc, argv);
-	EncryptionAuthentication ea(300033583, "PQ543288", "PlaqueQuant",
+	EncryptionAuthentication ea(0, QString(), QString(),
 		QDateTime(QDate(2016, 12, 12),
 			QTime(24, 0, 0)));
 
-
-	qDebug() << ea.authenticationExec(
+	ea.enableExpiredDateTimeHint(true);
+	qDebug() << ea.authenticationExecAndKeyType(
 		EncryptionAuthentication::HAVING_KEY|
-		EncryptionAuthentication::EXPIRED_DATE_TIME|
-		EncryptionAuthentication::PRODUCT_NAME |
-		EncryptionAuthentication::NORMAL
+		EncryptionAuthentication::EXPIRED_DATE_TIME
 	);
 
 	app.exec();

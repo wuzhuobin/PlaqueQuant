@@ -332,6 +332,15 @@ void Overlay::ReplacePixels(int* extent, vtkImageData* image)
 	emit signalOverlayUpdated();
 }
 
+void Overlay::vtkShallowCopyImage(vtkImageData * image)
+{
+	image->Print(cout);
+	cout << endl;
+	m_vtkOverlay->Print(cout);
+	m_vtkOverlay->ShallowCopy(image);
+	emit signalOverlayUpdated();
+}
+
 void Overlay::Measure3D()
 {
 	m_measurementFor3D.SetInputData(m_vtkOverlay);

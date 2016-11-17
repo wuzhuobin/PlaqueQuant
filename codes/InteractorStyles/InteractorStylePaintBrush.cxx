@@ -136,18 +136,13 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 	//	return;
 
 	// Project picked world point to plane and obtain ijk index
-	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
 		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] + GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
+			draw_index_old[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i] + 0.5;
 		}
 	}
-	draw_index_old[0] = (int)(index[0] + 0.5);
-	draw_index_old[1] = (int)(index[1] + 0.5);
-	draw_index_old[2] = (int)(index[2] + 0.5);
-	// 
 	if (m_rightFunctioning == true)
 	{
 		m_rightFunctioning = false;

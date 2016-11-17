@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>SeedsPlacer</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QLabel" name="label_39">
      <property name="font">
@@ -87,7 +87,7 @@
       <item>
        <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>Selects the region of interest (ROI) for segmentation</string>
+         <string>To be continued</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -102,7 +102,7 @@
      <property name="title">
       <string>Lumen Extraction</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLabel" name="label_60">
         <property name="text">
@@ -268,40 +268,156 @@
            <double>1.700000000000000</double>
           </property>
           <property name="maximum">
-           <double>2.100000000000000</double>
+           <double>2.500000000000000</double>
           </property>
           <property name="singleStep">
            <double>0.050000000000000</double>
           </property>
           <property name="value">
-           <double>1.950000000000000</double>
+           <double>2.100000000000000</double>
           </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Number Of Iterations</string>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="pushBtnExtractLumen">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Extract Lumen</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Advance</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+     <zorder>pushBtnExtractLumen</zorder>
+     <zorder>line</zorder>
+     <zorder>listWidgetSeedList</zorder>
+     <zorder>label_60</zorder>
+     <zorder>checkBox</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="initialNeighbodhoodSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="displayIntegerBase">
+         <number>10</number>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Initial neighborhood radius:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+      </item>
+      <item row="0" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Number Of Iterations</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QSlider" name="numberOfIterationsSliderInit">
           <property name="minimum">
            <number>3</number>
           </property>
           <property name="maximum">
-           <number>15</number>
+           <number>20</number>
           </property>
           <property name="value">
-           <number>6</number>
+           <number>9</number>
           </property>
           <property name="sliderPosition">
-           <number>6</number>
+           <number>9</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -326,36 +442,30 @@
            <number>3</number>
           </property>
           <property name="maximum">
-           <number>15</number>
+           <number>20</number>
           </property>
           <property name="value">
-           <number>6</number>
+           <number>9</number>
           </property>
          </widget>
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QPushButton" name="pushBtnExtractLumen">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Extract Lumen</string>
+         <string>Holes filling iterations: </string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="Line" name="line_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="spinBox">
+        <property name="value">
+         <number>2</number>
         </property>
        </widget>
       </item>
      </layout>
-     <zorder>pushBtnExtractLumen</zorder>
-     <zorder>line</zorder>
-     <zorder>listWidgetSeedList</zorder>
-     <zorder>label_60</zorder>
-     <zorder>label_3</zorder>
-     <zorder>line_3</zorder>
     </widget>
    </item>
    <item>
@@ -382,12 +492,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>155</x>
-     <y>408</y>
+     <x>218</x>
+     <y>373</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>406</y>
+     <x>274</x>
+     <y>372</y>
     </hint>
    </hints>
   </connection>
@@ -398,12 +508,28 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>244</x>
-     <y>412</y>
+     <x>274</x>
+     <y>372</y>
     </hint>
     <hint type="destinationlabel">
-     <x>107</x>
-     <y>410</y>
+     <x>218</x>
+     <y>373</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>frame</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>219</x>
+     <y>392</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>237</x>
+     <y>426</y>
     </hint>
    </hints>
   </connection>

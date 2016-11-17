@@ -5,6 +5,10 @@ project(EncryptionAuthentication)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 
+include_directories(
+    ${PROJECT_SOURCE_DIR}
+)
+
 file(
     GLOB
     VIKEY_H

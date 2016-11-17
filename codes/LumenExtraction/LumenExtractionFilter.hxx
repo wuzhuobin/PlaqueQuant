@@ -38,6 +38,11 @@ namespace itk
 		m_confidenceConnectedFilter->SetNumberOfIterations(num);
 	}
 	template<typename TImage>
+	inline void LumenExtractionFilter<TImage>::SetMaximumNumberOfIterations(unsigned int value)
+	{
+		MaximumNumberOfIterationsOfHoleFilling = value;
+	}
+	template<typename TImage>
 	inline void LumenExtractionFilter<TImage>::SetDilationValue(int dilationVal)
 	{
 		//m_confidenceConnectedFilter->SetDilationValue(dilationVal);
@@ -57,17 +62,17 @@ namespace itk
 	{
 		typedef VotingBinaryIterativeHoleFillingImageFilter<TImage> FillHoleFilterType;
 
-
 		typename TImage::ConstPointer input = this->GetInput();
 		typename TImage::Pointer output = this->GetOutput();
 		m_confidenceConnectedFilter->SetInput(input);
-		std::cout << m_confidenceConnectedFilter->GetNumberOfIterations() << std::endl;
-		std::cout << m_confidenceConnectedFilter->GetMultiplier() << std::endl;
+		m_confidenceConnectedFilter->SetNumberOfThreads(4);
 		m_confidenceConnectedFilter->Update();
 
 		FillHoleFilterType::Pointer fillHoleFilter = FillHoleFilterType::New();
 		fillHoleFilter->SetInput(m_confidenceConnectedFilter->GetOutput());
 		fillHoleFilter->SetForegroundValue(1);
+		fillHoleFilter->SetMaximumNumberOfIterations(MaximumNumberOfIterationsOfHoleFilling);
+		fillHoleFilter->SetNumberOfThreads(4);
 		fillHoleFilter->Update();
 
 		output->Graft(fillHoleFilter->GetOutput());
