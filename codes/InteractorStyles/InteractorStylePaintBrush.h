@@ -42,15 +42,15 @@ public:
 	};
 	vtkTypeMacro(InteractorStylePaintBrush, AbstractNavigation);
 	static InteractorStylePaintBrush* New();
-	void SetPaintBrushModeEnabled(bool b);
-	void SetPaintBrushLabel(int paintBrushLabel);
-	void SetDrawColor(int r, int g, int b);
-	void SetDrawColor(const int* rgb);
-	void SetDrawOpacity(int opacity);
+	virtual void SetPaintBrushModeEnabled(bool b);
+	virtual void SetPaintBrushLabel(int paintBrushLabel);
+	virtual void SetDrawColor(int r, int g, int b);
+	virtual void SetDrawColor(const int* rgb);
+	virtual void SetDrawOpacity(int opacity);
 
-	void SetBrushShape(int brushShape);
-	void SetBrushSize(int size);
-	void EnableEraserMode(bool flag);
+	virtual void SetBrushShape(int brushShape);
+	virtual void SetBrushSize(int size);
+	virtual void EnableEraserMode(bool flag);
 
 
 protected:

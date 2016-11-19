@@ -28,7 +28,6 @@ MainWindow::MainWindow()
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
 	m_measurementWidget = new MeasurementWidget(this);
-	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	ui->measurementDockWidget->setWidget(m_measurementWidget);
 	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	this->tabifyDockWidget(ui->widgetDockWidget, ui->measurementDockWidget);
@@ -68,7 +67,7 @@ MainWindow::MainWindow()
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
-	connect(ui->actionSeedsPlacer, SIGNAL(triggered()), this->m_core, SLOT(slotSmartContourMode()));
+	connect(ui->actionSeedsPlacer, SIGNAL(triggered()), this->m_core, SLOT(slotSeedsPlacerMode()));
 
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
@@ -249,6 +248,11 @@ bool MainWindow::slotVisualizeImage()
 	//Enable Actions 
 	setActionsEnable(true);
 
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPaintBrush());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetRuler());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetSeedsPlacer());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPolygonDraw());
+
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
 	// update DICOM header imformation
@@ -284,7 +288,7 @@ bool MainWindow::slotVisualizeImage()
 
 
 	/// Initialize Module widget ui
-	this->m_moduleWidget->UdateTargetImageComboBox();
+	//this->m_moduleWidget->UdateTargetImageComboBox();
 	return 0;
 }
 
@@ -292,18 +296,27 @@ void MainWindow::slotChangeMode(QAction* action)
 {
 	ui->widgetDockWidget->setEnabled(true);
 	if (action == ui->actionContour) {
-		ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
 			Core::DEFAULT_IMAGE)->GetPolygonDraw());
 	}
 	else if (action == ui->actionSeedsPlacer) {
-		ui->widgetDockWidget->setWidget(m_core->Get2DInteractorStyle(
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
 			Core::DEFAULT_IMAGE)->GetSeedsPlacer());
 	}
+	else if (action == ui->actionRuler) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetRuler());
+	}
+	else if (action == ui->actionBrush) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetPaintBrush());
+	}
 	//else if (action == ui->actionBrush) {
-
+	//	m_moduleWidget->SetStyleWidget(m_core->Get2DInteractorStyle(
+	//	Core::DEFAULT_IMAGE)->Get);
 	//}
 	else {
-		ui->widgetDockWidget->setEnabled(false);
+		m_moduleWidget->setWidget(nullptr);
 	}
 }
 

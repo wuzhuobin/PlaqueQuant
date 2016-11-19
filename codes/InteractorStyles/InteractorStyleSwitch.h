@@ -27,11 +27,11 @@ Copyright (C) 2016
 #include "QInteractorStyleWindowLevel.h"
 #include "QInteractorStyleVesselSegmentation.h"
 #include "QInteractorStyleLumenSeedsPlacer.h"
-#include "InteractorStylePaintBrush.h"
+#include "QInteractorStylePaintBrush.h"
 #include "InteractorStyleROI.h"
-#include "InteractorStyleRuler.h"
-#include "InteractorStyleSmartContour.h"
-#include "InteractorStyleSmartContour2.h"
+#include "QInteractorStyleRuler.h"
+//#include "InteractorStyleSmartContour.h"
+//#include "InteractorStyleSmartContour2.h"
 #include "StyleSwitchMacro.h"
 
 class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
@@ -45,11 +45,11 @@ public:
 	vtkGetMacro(Navigation, QInteractorStyleNavigation*);
 	vtkGetMacro(PolygonDraw, QInteractorStyleVesselSegmentation*);
 	vtkGetMacro(SeedsPlacer, QInteractorStyleLumenSeedsPlacer*);
-	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
+	vtkGetMacro(PaintBrush, QInteractorStylePaintBrush*);
 	vtkGetMacro(ROI, InteractorStyleROI*);
-	vtkGetMacro(Ruler, InteractorStyleRuler*);
-	vtkGetMacro(SmartContour, InteractorStyleSmartContour*);
-	vtkGetMacro(SmartContour2, InteractorStyleSmartContour2*);
+	vtkGetMacro(Ruler, QInteractorStyleRuler*);
+	//vtkGetMacro(SmartContour, InteractorStyleSmartContour*);
+	//vtkGetMacro(SmartContour2, InteractorStyleSmartContour2*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
@@ -62,8 +62,8 @@ public:
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
 	SetInteractorStyleMacro(Ruler);
-	SetInteractorStyleMacro(SmartContour);
-	SetInteractorStyleMacro(SmartContour2);
+	//SetInteractorStyleMacro(SmartContour);
+	//SetInteractorStyleMacro(SmartContour2);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
@@ -73,8 +73,8 @@ public:
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
 	CurrentStyleMacro(Ruler);
-	CurrentStyleMacro(SmartContour);
-	CurrentStyleMacro(SmartContour2);
+	//CurrentStyleMacro(SmartContour);
+	//CurrentStyleMacro(SmartContour2);
 
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
@@ -98,11 +98,11 @@ private:
 	QInteractorStyleWindowLevel* WindowLevel;
 	QInteractorStyleVesselSegmentation* PolygonDraw;
 	QInteractorStyleLumenSeedsPlacer* SeedsPlacer;
-	InteractorStylePaintBrush*	PaintBrush;
+	QInteractorStylePaintBrush*	PaintBrush;
 	InteractorStyleROI* ROI;
-	InteractorStyleRuler* Ruler;
-	InteractorStyleSmartContour* SmartContour;
-	InteractorStyleSmartContour2* SmartContour2;
+	QInteractorStyleRuler* Ruler;
+	//InteractorStyleSmartContour* SmartContour;
+	//InteractorStyleSmartContour2* SmartContour2;
 	vtkInteractorStyle*	CurrentStyle;
 	std::list<vtkInteractorStyle*> allStyles;
 };

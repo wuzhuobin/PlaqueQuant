@@ -46,12 +46,6 @@ MeasurementWidget::~MeasurementWidget() {
 	
 }
 
-void MeasurementWidget::setMainWindow(MainWindow * mainWnd)
-{
-	m_mainWnd = mainWnd;
-
-}
-
 void MeasurementWidget::slotUpdate3DMeasurements()
 {
 	m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();

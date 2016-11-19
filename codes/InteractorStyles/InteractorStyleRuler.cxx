@@ -106,6 +106,7 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 		return;
 	}
 	int currentSlice = GetSlice();
+	m_imageViewer->GetOverlay()->Measure2D(currentSlice);
 
 	MaximumWallThickness* maximumWallThickness =
 		m_imageViewer->GetOverlay()->GetMeasurementFor2D(currentSlice).mwt;

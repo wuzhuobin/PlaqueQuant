@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>296</width>
-    <height>383</height>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>PaintBrush</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QLabel" name="label_25">
      <property name="font">
@@ -102,7 +102,7 @@
      <property name="title">
       <string>Segmentation of Plaque</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLabel" name="label_16">
         <property name="text">
@@ -177,6 +177,156 @@
        </widget>
       </item>
       <item>
+       <widget class="QFrame" name="frame_4">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(226, 226, 226)</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <item>
+          <widget class="QLabel" name="activeLabelLabel">
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Brush Label:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="labelComboBox">
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>13</width>
+             <height>13</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>Lumen</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources/Project.qrc">
+              <normaloff>:/icons/redbox.png</normaloff>:/icons/redbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Vessel Wall</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources/Project.qrc">
+              <normaloff>:/icons/bluebox.png</normaloff>:/icons/bluebox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Calcification</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources/Project.qrc">
+              <normaloff>:/icons/greenbox.png</normaloff>:/icons/greenbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Hemorrhage</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources/Project.qrc">
+              <normaloff>:/icons/yellowbox.png</normaloff>:/icons/yellowbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LRNC</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources/Project.qrc">
+              <normaloff>:/icons/lightbluebox.png</normaloff>:/icons/lightbluebox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LM</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources/Project.qrc">
+              <normaloff>:/icons/purplebox.png</normaloff>:/icons/purplebox.png</iconset>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Brush Opacity:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QSpinBox" name="opacitySpinBox">
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>100</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="opacitySlider">
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>100</number>
+             </property>
+             <property name="sliderPosition">
+              <number>100</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -194,6 +344,89 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources>
+  <include location="../../resources/Project.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>BrushSizeSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>BrushSizeSpinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>187</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BrushSizeSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>BrushSizeSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>254</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>147</x>
+     <y>163</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>eraserCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_4</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>50</x>
+     <y>256</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>207</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>opacitySpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>opacitySlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>353</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>120</x>
+     <y>354</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>opacitySlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>opacitySpinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>358</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>57</x>
+     <y>362</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

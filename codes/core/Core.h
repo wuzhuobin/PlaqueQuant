@@ -85,39 +85,16 @@ public:
 	virtual void slotMultiPlanarView();
 	virtual void slotChangeView(int viewMode);
 
-	// Viewers's slice position
-	//virtual void slotChangeSlice(int slice);
-	//virtual void slotChangeSlices(int* ijk);
-	//virtual void slotChangeSlices(int, int, int);
-	//virtual void slotChangeSliceX(int x);
-	//virtual void slotChangeSliceY(int y);
-	//virtual void slotChangeSliceZ(int z);
-	//virtual void slotChangeFocalPointWithImageCoordinate(int i, int j, int k);
-
 	// mode stuff
 	virtual void slotNavigationMode();
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
 	virtual void slotContourMode();
 	virtual void slotROIMode();
-	virtual void slotSmartContourMode();
+	virtual void slotSeedsPlacerMode();
 	virtual void slotSmartContour2Mode();
 	virtual void slotRulerMode();
 
-	// Paint Brush 
-	virtual void slotSetBrushSize(int size);
-	virtual void slotSetBrushShape(int shape);
-	virtual void slotSetPaintBrushToEraser(bool flag);
-	// set layer color actually both Contour and paintBrush depend on it
-	virtual void slotSetImageLayerColor(int layer);
-
-	// Semi-Auto Lumen Segmenation 
-	virtual void slotFillContour();
-	virtual void slotClearContour();
-	virtual void slotEnableAutoLumenSegmentation(bool flag);
-	virtual void slotSetContourFilterGenerateValues(int generateValues);
-	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
-	virtual void slotSetLineInterpolatorToPolygon(bool flag);
 
 	// Lumen Extraction
 	virtual void slotExtractLumen();
@@ -134,11 +111,6 @@ public:
 	virtual void slotSelectROI();
 	virtual void slotResetROI();
 	
-	// Ruler
-	virtual void slotEnableMaximumWallThickneesLabel(bool flag);
-
-
-
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();
 	virtual void slotUpdate3DLabelBtn();

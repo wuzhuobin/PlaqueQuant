@@ -323,46 +323,6 @@ void Core::slotBrushMode()
 	this->ModeChangeUpdate(BRUSH_MODE);
 }
 
-void Core::slotSetBrushSize(int size)
-{
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
-	{
-		if (m_style[i] != NULL) {
-			m_style[i]->GetPaintBrush()->SetBrushSize(size);
-		}
-	}
-}
-
-void Core::slotSetBrushShape(int shape)
-{
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
-	{
-		if (m_style[i] != NULL) {
-			m_style[i]->GetPaintBrush()->SetBrushShape(shape);
-		}
-	}
-}
-
-void Core::slotSetImageLayerColor(int layer) {
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
-	{
-		if (m_style[i] != NULL) {
-			m_style[i]->GetPaintBrush()->SetPaintBrushLabel(layer + 1);
-			//m_style[i]->GetPolygonDraw()->SetVesselWallLabel(layer + 1);
-		}
-	}
-}
-
-void Core::slotSetPaintBrushToEraser(bool flag)
-{
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
-	{
-		if (m_style[i] != NULL) {
-
-			m_style[i]->GetPaintBrush()->EnableEraserMode(flag);
-		}
-	}
-}
 #include <itkVTKImageToImageFilter.h>
 #include <itkImageToVTKImageFilter.h>
 void Core::slotGenerateCenterlineBtn()
@@ -694,63 +654,6 @@ void Core::slotContourMode()
 	this->ModeChangeUpdate(POLYGON_CONTOUR_MODE);
 }
 
-void Core::slotFillContour()
-{
-	for (int i = 0; i < 3; i++)
-	{
-		m_style[i]->GetPolygonDraw()->FillPolygon();
-	}
-}
-
-void Core::slotClearContour()
-{
-	for (int i = 0; i < 3; i++)
-	{
-		m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(false);
-		m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(true);
-
-	}
-}
-
-void Core::slotEnableAutoLumenSegmentation(bool flag)
-{
-	for (int i = 0; i < 3; i++)
-	{
-		//m_style[i]->GetPolygonDraw()->EnableAutoLumenSegmentation(flag);
-	}
-}
-
-void Core::slotSetContourFilterGenerateValues(int generateValues)
-{
-	for (int i = 0; i < 3; ++i) {
-		//m_style[i]->GetPolygonDraw()->
-		//	SetContourFilterGenerateValues(generateValues);
-		//m_style[i]->GetPolygonDraw()->
-		//	GenerateLumenWallContourWidget();
-
-	}
-}
-
-void Core::slotSetLineInterpolatorToSmoothCurve(bool flag)
-{
-	if (flag) {
-		for (int i = 0; i < 3; i++)
-		{
-			m_style[i]->GetPolygonDraw()->SetLineInterpolator(0);
-		}
-	}
-}
-
-void Core::slotSetLineInterpolatorToPolygon(bool flag)
-{
-	if (flag) {
-		for (int i = 0; i < 3; i++)
-		{
-			m_style[i]->GetPolygonDraw()->SetLineInterpolator(1);
-		}
-	}
-}
-
 void Core::slotExtractLumen()
 {
 	//try
@@ -789,7 +692,7 @@ void Core::slotSetExtractLumenMultiplier(double val)
 
 void Core::slotDrawSegmentation()
 {
-	this->m_style[2]->GetSmartContour2()->FillAllPolygons();
+	//this->m_style[2]->GetSmartContour2()->FillAllPolygons();
 }
 
 void Core::slotExtractLumenDilateLabel(vtkImageData* im)
@@ -814,19 +717,9 @@ void Core::slotRulerMode()
 {
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		m_style[i]->SetInteractorStyleToRuler();
-		for (int j = 0; j < NUMBER_OF_2DVIEWERS; ++j) {
-			m_style[i]->GetRuler()->AddSynchronalRuler(m_style[j]->GetRuler());
-		}
 	}
 
 	this->ModeChangeUpdate(RULER_MODE);
-}
-
-void Core::slotEnableMaximumWallThickneesLabel(bool flag)
-{
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
-		m_style[i]->GetRuler()->EnableMaximumWallThickneesLabel(flag);
-	}
 }
 
 void Core::slotROIMode()
@@ -849,7 +742,7 @@ void Core::slotROIMode()
 	this->ModeChangeUpdate(ROI_MODE);
 }
 
-void Core::slotSmartContourMode()
+void Core::slotSeedsPlacerMode()
 {
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
@@ -863,7 +756,7 @@ void Core::slotSmartContour2Mode()
 {
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
-		m_style[i]->SetInteractorStyleToSmartContour2();
+		//m_style[i]->SetInteractorStyleToSmartContour2();
 	}
 	this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
 

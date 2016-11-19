@@ -15,8 +15,6 @@ public:
 	MeasurementWidget(QWidget * parent = Q_NULLPTR);
 	~MeasurementWidget();
 
-	void setMainWindow(MainWindow* mainWnd);
-
 public slots:
 	void slotUpdate3DMeasurements();
 	void slotUpdate2DMeasurements();

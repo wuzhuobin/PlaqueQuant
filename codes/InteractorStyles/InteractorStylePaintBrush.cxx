@@ -80,6 +80,7 @@ void InteractorStylePaintBrush::SetDrawColor(const int* rgb)
 {
 	SetDrawColor(rgb[0], rgb[1], rgb[2]);
 }
+
 void InteractorStylePaintBrush::SetDrawOpacity(int opacity)
 {
 	this->m_opacity = opacity;

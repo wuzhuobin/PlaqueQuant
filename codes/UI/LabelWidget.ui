@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QInteractorStyleSegmentationLabels</class>
- <widget class="QWidget" name="QInteractorStyleSegmentationLabels">
+ <class>LabelWidget</class>
+ <widget class="QWidget" name="LabelWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>204</width>
-    <height>300</height>
+    <height>161</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>SegmentationLabels</string>
+   <string>LabelWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,6 +23,12 @@
    </item>
    <item>
     <widget class="QLabel" name="label_14">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="font">
       <font>
        <pointsize>11</pointsize>
@@ -136,49 +142,6 @@
          </property>
         </item>
        </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lumenLabel">
-        <property name="font">
-         <font>
-          <family>Arial</family>
-         </font>
-        </property>
-        <property name="text">
-         <string>Lumen Label:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="lumenComboBox">
-        <property name="font">
-         <font>
-          <family>Arial</family>
-         </font>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>13</width>
-          <height>13</height>
-         </size>
-        </property>
-        <item>
-         <property name="text">
-          <string>Lumen</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../resources/Project.qrc">
-           <normaloff>:/icons/redbox.png</normaloff>:/icons/redbox.png</iconset>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-       </layout>
       </item>
       <item>
        <widget class="QLabel" name="label_13">
