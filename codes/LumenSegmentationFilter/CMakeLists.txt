@@ -11,11 +11,13 @@ include(${VTK_USE_FILE})
 set(
     LUMEN_SEGMENTATION_FILTER_SRC
 	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter.cxx
+	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter2.cxx
 )
 
 set(
 	LUMEN_SEGMENTATION_FILTER_INC
 	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter.h
+	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter2.h
 )
 
 

@@ -28,7 +28,7 @@ Copyright (C) 2016
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
 #include "InteractorStyleVesselSegmentation.h"
-#include "LumenSegmentationFilter.h"
+#include "LumenSegmentationFilter2.h"
 //#include "LumenSegmentation.h"
 
 using namespace std;
@@ -359,8 +359,8 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 		if ((*cit)->GetContourRepresentation()->GetContourRepresentationAsPolyData()->GetNumberOfPoints() < 3) {
 			continue;
 		}
-		vtkSmartPointer<LumenSegmentationFilter> lsFilter =
-			vtkSmartPointer<LumenSegmentationFilter>::New();
+		vtkSmartPointer<LumenSegmentationFilter2> lsFilter =
+			vtkSmartPointer<LumenSegmentationFilter2>::New();
 		lsFilter->SetInputData(m_imageViewer->GetInput());
 		lsFilter->SetGenerateValues(1,m_generateValue, m_generateValue);
 		lsFilter->SetVesselWallContourRepresentation(
