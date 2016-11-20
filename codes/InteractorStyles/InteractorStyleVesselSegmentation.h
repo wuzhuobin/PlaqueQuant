@@ -61,6 +61,7 @@ public:
 
 	void SetContourFilterGenerateValues(int generateValues);
 	void GenerateLumenPolydata();
+	void GenerateVesselWallPolyData();
 
 protected:
 	InteractorStyleVesselSegmentation();

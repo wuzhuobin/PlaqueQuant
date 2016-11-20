@@ -1,7 +1,11 @@
 #include "QInteractorStyleLumenSeedsPlacer.h"
 
 #include <vtkRenderWindowInteractor.h>
+#include <vtkMarchingSquares.h>
+#include <vtkPolyDataConnectivityFilter.h>
+#include <vtkCleanPolyData.h>
 
+#include "LumenSegmentationFilter2.h"
 #include "ui_QInteractorStyleLumenSeedsPlacer.h"
 #include "ui_QAbstractNavigation.h"
 
@@ -131,6 +135,75 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
 	m_imageViewer->GetOverlay()->vtkShallowCopyImage(
 		lumenExtractionFilter->GetOutput());
 	MY_VIEWER_CONSTITERATOR(Render());
+
+	ExtractLumenPolyData();
+}
+
+void QInteractorStyleLumenSeedsPlacer::ExtractLumenPolyData()
+{
+
+	const int* extent = m_imageViewer->GetOverlay()->GetOutput()->GetExtent(); 
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* lumenMap =
+		m_imageViewer->GetOverlay()->GetLumenPolyData();
+
+
+	for (int i = extent[4]; i <= extent[5]; ++i) {
+
+		if (lumenMap->contains(i)) {
+			delete  lumenMap->value(i);
+		}
+		(*lumenMap)[i] = new QList<vtkSmartPointer<vtkPolyData>>;
+
+		vtkSmartPointer<vtkMarchingSquares> marchingSquares =
+			vtkSmartPointer<vtkMarchingSquares>::New();
+		marchingSquares->SetInputData(m_imageViewer->GetOverlay()->GetOutput());
+		marchingSquares->CreateDefaultLocator();
+		marchingSquares->SetImageRange(extent[0], extent[1], extent[2], extent[3], i, i);
+		marchingSquares->GenerateValues(1, 1, 1);
+		marchingSquares->Update();
+
+		vtkSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter =
+			vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+		connectivityFilter->SetInputConnection(marchingSquares->GetOutputPort());
+		connectivityFilter->SetExtractionModeToAllRegions();
+		connectivityFilter->Update();
+		
+		for (int j = 0; j < connectivityFilter->GetNumberOfExtractedRegions(); ++j) {
+			vtkSmartPointer<vtkPolyDataConnectivityFilter> _connectivityFilter =
+				vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+			_connectivityFilter->SetInputConnection(marchingSquares->GetOutputPort());
+			_connectivityFilter->AddSpecifiedRegion(j);
+			_connectivityFilter->SetExtractionModeToSpecifiedRegions();
+			_connectivityFilter->Update();
+
+			LumenSegmentationFilter2::ReorderPolyData(_connectivityFilter->GetOutput());
+
+			double toleranceInitial = 1;
+			int loopBreaker = 0;
+
+			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
+				vtkSmartPointer<vtkCleanPolyData>::New();
+			clearPolyData->SetInputConnection(_connectivityFilter->GetOutputPort());
+			clearPolyData->ToleranceIsAbsoluteOn();
+			clearPolyData->SetAbsoluteTolerance(toleranceInitial);
+			clearPolyData->PointMergingOn();
+			clearPolyData->Update();
+			while (clearPolyData->GetOutput()->GetNumberOfPoints() < 3 && loopBreaker < 10) {
+				toleranceInitial *= 0.75;
+				clearPolyData->SetAbsoluteTolerance(toleranceInitial);
+				clearPolyData->Update();
+				loopBreaker += 1;
+			}
+
+			vtkSmartPointer<vtkPolyData> _lumenPolyData =
+				vtkSmartPointer<vtkPolyData>::New();
+			_lumenPolyData->ShallowCopy(clearPolyData->GetOutput());
+			(*(*lumenMap)[i]) += _lumenPolyData;
+
+		}
+		
+
+	}
 }
 
 void QInteractorStyleLumenSeedsPlacer::SetMultipier(double value)

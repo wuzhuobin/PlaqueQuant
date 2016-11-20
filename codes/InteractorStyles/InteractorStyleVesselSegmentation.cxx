@@ -368,12 +368,26 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 		);
 		lsFilter->SetSlice(GetSlice());
 		lsFilter->Update();
-		(*(*lumenMap)[GetSlice()]) += lsFilter->GetOutput();
+
+		vtkSmartPointer<vtkPolyData> _lumenPolyData =
+			vtkSmartPointer<vtkPolyData>::New();
+		_lumenPolyData->ShallowCopy(lsFilter->GetOutput());
+
+		(*(*lumenMap)[GetSlice()]) += _lumenPolyData;
 	}
 	// Since the lumen polydata was wirten to the ovelay
 	// Reload the polydata from the overlay and genenrate new contour widgets
 	ReadFromPolydata(LUMEN);
 	m_imageViewer->Render();
+}
+
+void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
+{
+	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
+		return;
+	}
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* vesselWallMap =
+		m_imageViewer->GetOverlay()->GetVesselWallPolyData();
 }
 
 void InteractorStyleVesselSegmentation::FillPolygon()

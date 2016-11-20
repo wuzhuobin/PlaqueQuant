@@ -27,6 +27,7 @@ public slots:
 	virtual void DropSeed();
 
 	virtual void ExtractLumen();
+	virtual void ExtractLumenPolyData();
 	virtual void SetMultipier(double value);
 	virtual void SetNumberOfIteractions(int value);
 	virtual void SetInitialNeighborhoodRadius(int value);

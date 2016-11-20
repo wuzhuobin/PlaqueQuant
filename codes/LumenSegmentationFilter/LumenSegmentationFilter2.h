@@ -18,10 +18,6 @@ public:
 
 	static LumenSegmentationFilter2 *New();
 
-	//void SetInputData(vtkImageData* input);
-
-	//vtkPolyData* GetOutput();
-
 	void SetSlice(int slice);
 	/**
 	 * Set GenerateValuse of the vtkPolyDataContourFilter
@@ -48,11 +44,6 @@ protected:
 	virtual int FillInputPortInformation(int port, vtkInformation *info);
 
 	vtkContourRepresentation* vesselWallContourRepresentation = nullptr;
-
-
-	//vtkSmartPointer<vtkPolyData> m_contour = NULL;
-	//vtkSmartPointer<vtkImageData> input = NULL;
-	//vtkSmartPointer<vtkImageData> extract = NULL;
 
 	double generateValues[3] = { 0 };
 	int VOI[6] = { 0 };

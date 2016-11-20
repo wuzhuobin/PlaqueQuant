@@ -71,6 +71,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/License
 	${PROJECT_BINARY_DIR}/codes/LumenSegmentationFilter
+	${PROJECT_BINARY_DIR}/codes/vtkImageToContourPolyData
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
@@ -94,6 +95,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/License
 	${PROJECT_SOURCE_DIR}/codes/LumenSegmentationFilter
+	${PEOJECT_SOURCE_DIR}/codes/vtkImageToContourPolyData
 	
 	)
 
@@ -127,6 +129,7 @@ set(
 	LumenExtraction
 	LumenSegmentationFilter
 	EncryptionAuthentication
+	vtkImageToContourPolyData
 )
 
 include_directories(
@@ -146,6 +149,7 @@ add_subdirectory(codes/LumenExtraction)
 add_subdirectory(codes/License)
 add_subdirectory(codes/LumenSegmentationFilter)
 add_subdirectory(codes/EncryptionAuthentication)
+add_subdirectory(codes/vtkImageToContourPolyData)
 
 
 

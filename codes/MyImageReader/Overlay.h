@@ -22,6 +22,7 @@ typedef itk::Image<float, 3> ImageType;
  * @version
  * @since
  * A very important part of element for using other InteractorStyle
+ * the vtkImageData scalar type now is set to float
  */
 class Overlay : public QObject
 {
