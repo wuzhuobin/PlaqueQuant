@@ -94,6 +94,10 @@ void LumenSegmentationFilter::ReorderPolyData(vtkPolyData * lumenWallPolyData)
 	int l_prevID = -1;
 	// Start from a point that has cell
 	vtkIdList* startPointFinder = vtkIdList::New();
+	// if the lumenWallPolyData has no cells
+	if (lumenWallPolyData->GetNumberOfCells() < 1) {
+		return;
+	}
 	lumenWallPolyData->GetCellPoints(0, startPointFinder);
 	l_looper = startPointFinder->GetId(1);
 	startID = l_looper;

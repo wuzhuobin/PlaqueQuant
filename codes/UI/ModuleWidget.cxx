@@ -96,6 +96,7 @@ void ModuleWidget::setWidget(QWidget * style)
 		ui->styleStackedWidget->setDisabled(true);
 	}
 	else {
+		ui->styleStackedWidget->setEnabled(true);
 		ui->styleStackedWidget->setCurrentIndex(index);
 	}
 }

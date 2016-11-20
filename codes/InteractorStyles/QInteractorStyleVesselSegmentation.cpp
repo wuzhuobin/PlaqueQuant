@@ -95,12 +95,14 @@ void QInteractorStyleVesselSegmentation::SetContourLabel(int label)
 void QInteractorStyleVesselSegmentation::SetGenerateValue(int value)
 {
 	InteractorStyleVesselSegmentation::SetGenerateValue(value);
-	GenerateLumenWallContourWidget();
+	InteractorStyleVesselSegmentation::GenerateLumenPolydata();
+
 }
 
 void QInteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 {
-	InteractorStyleVesselSegmentation::GenerateLumenPolydata();
+	//InteractorStyleVesselSegmentation::SetGenerateValue(ui->autoLumenSegmentationSpinBox->value());
+	//InteractorStyleVesselSegmentation::GenerateLumenPolydata();
 }
 
 QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiType, QWidget * parent)
@@ -123,9 +125,9 @@ QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiTyp
 	connect(ui->generatePushButton, SIGNAL(clicked()),
 		this, SLOT(GenerateLumenWallContourWidget()));
 	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
-		this, SLOT(SetGenerateValue(int)));
-	//connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)),
-	//	this, SLOT(GenerateLumenWallContourWidget()));
+		this, SLOT(SetGenerateValue(int)), Qt::QueuedConnection);
+	//connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),
+	//	this, SLOT(GenerateLumenWallContourWidget()), Qt::QueuedConnection);
 }
 
 QInteractorStyleVesselSegmentation::~QInteractorStyleVesselSegmentation() 
