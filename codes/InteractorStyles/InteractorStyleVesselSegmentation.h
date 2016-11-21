@@ -47,9 +47,9 @@ public:
 	virtual void ReadFromPolydata(int type);
 	virtual void WriteToPolydata();
 
-	void SetVesselWallLabel(int vesselWallLabel);
-	void SetLumenWallLabel(int lumenWallLabel);
-	void SetGenerateValue(int value);
+	virtual void SetVesselWallLabel(int vesselWallLabel);
+	virtual void SetLumenWallLabel(int lumenWallLabel);
+	virtual void SetGenerateValue(int value);
 
 	virtual void SetSegmentationMode(int i);
 	virtual void EnableNoSegmentation();
@@ -59,9 +59,10 @@ public:
 	virtual void FillPolygon();
 
 
-	void SetContourFilterGenerateValues(int generateValues);
-	void GenerateLumenPolydata();
-	void GenerateVesselWallPolyData();
+	virtual void SetContourFilterGenerateValues(int generateValues);
+	virtual void SetDilateValue(double value);
+	virtual void GenerateLumenPolydata();
+	virtual void GenerateVesselWallPolyData();
 
 protected:
 	InteractorStyleVesselSegmentation();
@@ -76,6 +77,7 @@ protected:
 	virtual void CleanConoturs(int type);
 
 	int m_generateValue = 60;
+	double m_dilateValue = 0.5;
 
 	// contour initial type
 	int m_contourType = CONTOUR;

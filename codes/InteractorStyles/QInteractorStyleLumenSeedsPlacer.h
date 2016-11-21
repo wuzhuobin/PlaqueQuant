@@ -45,7 +45,7 @@ private:
 
 	Ui::QInteractorStyleLumenSeedsPlacer* ui = nullptr;
 
-	int m_numberOfIteractions = 9;
+	int m_numberOfIteractions = 3;
 	double m_multiplier = 2.1;
 	int m_initialNeighborhoodRadius = 1;
 

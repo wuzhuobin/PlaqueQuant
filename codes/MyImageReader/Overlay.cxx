@@ -334,9 +334,6 @@ void Overlay::ReplacePixels(int* extent, vtkImageData* image)
 
 void Overlay::vtkShallowCopyImage(vtkImageData * image)
 {
-	image->Print(cout);
-	cout << endl;
-	m_vtkOverlay->Print(cout);
 	m_vtkOverlay->ShallowCopy(image);
 	emit signalOverlayUpdated();
 }

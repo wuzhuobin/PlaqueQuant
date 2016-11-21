@@ -26,6 +26,7 @@ public slots:
 	virtual void EnableVesselWallSegmentation(bool flag);
 	virtual void SetContourLabel(int label);
 	virtual void SetGenerateValue(int value);
+	virtual void SetDilateValue(double value);
 	virtual void GenerateLumenWallContourWidget();
 
 protected:

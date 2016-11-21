@@ -69,11 +69,20 @@ void InteractorStyleVesselSegmentation::OnKeyPress()
 void InteractorStyleVesselSegmentation::SetPolygonModeEnabled(bool b)
 {
 	InteractorStylePolygonDraw::SetPolygonModeEnabled(b);
-	ReadFromPolydata();
+	if (b) {
+		ReadFromPolydata();
+	}
 }
 
 void InteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
+	// in case for double re-reading (generate the same contour twice)
+	// which made the contour blink and performance down
+	int ijk[3];
+	m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
+	if (i == ijk[0] && j == ijk[1] && k == ijk[2]) {
+		return;
+	}
 	AbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 	ReadFromPolydata();
 }
@@ -282,8 +291,7 @@ void InteractorStyleVesselSegmentation::SetSegmentationMode(int i)
 		return;
 	}
 	m_contourType = i;
-	SetPolygonModeEnabled(false);
-	SetPolygonModeEnabled(true);
+	ReadFromPolydata();
 }
 
 void InteractorStyleVesselSegmentation::EnableNoSegmentation()
@@ -304,6 +312,11 @@ void InteractorStyleVesselSegmentation::EnableVesselWallSegmentation()
 void InteractorStyleVesselSegmentation::SetContourFilterGenerateValues(int generateValues)
 {
 	this->m_generateValue = generateValues;
+}
+
+void InteractorStyleVesselSegmentation::SetDilateValue(double value)
+{
+	m_dilateValue = value;
 }
 
 void InteractorStyleVesselSegmentation::CleanAllConoturs()
@@ -380,14 +393,75 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 	ReadFromPolydata(LUMEN);
 	m_imageViewer->Render();
 }
-
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkCenterOfMass.h>
+//#include <vtkXMLPolyDataWriter.h>
+//#include <vtkAppendPolyData.h>
 void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
 		return;
 	}
+	const int* extent = m_imageViewer->GetOverlay()->GetOutput()->GetExtent();
 	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* vesselWallMap =
 		m_imageViewer->GetOverlay()->GetVesselWallPolyData();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* lumenMap =
+		m_imageViewer->GetOverlay()->GetLumenPolyData();
+
+
+	//vtkSmartPointer<vtkXMLPolyDataWriter> w =
+	//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	//w->SetFileName("C:\\Users\\jieji\\Desktop\\reorder\\test2.vtp");
+	//vtkSmartPointer<vtkAppendPolyData> a =
+	//	vtkSmartPointer<vtkAppendPolyData>::New();
+
+	for (int i = extent[4]; i <= extent[5]; ++i) {
+		if (!lumenMap->contains(i)) {
+			continue;
+		}
+		if (vesselWallMap->contains(i)) {
+			delete  vesselWallMap->value(i);
+		}
+		(*vesselWallMap)[i] = new QList<vtkSmartPointer<vtkPolyData>>;
+		QList<vtkSmartPointer<vtkPolyData>> _list = *(*lumenMap)[i];
+		for (int j = 0; j < _list.size(); ++j) {
+			double center[3];
+			vtkSmartPointer<vtkCenterOfMass> centerOfMassFilter =
+				vtkSmartPointer<vtkCenterOfMass>::New();
+			centerOfMassFilter->SetInputData(_list[j]);
+			centerOfMassFilter->SetUseScalarsAsWeights(false);
+			centerOfMassFilter->Update();
+			centerOfMassFilter->GetCenter(center);
+
+			vtkSmartPointer<vtkTransform> trans1 =
+				vtkSmartPointer<vtkTransform>::New();
+			trans1->Translate(-center[0], -center[1], -center[2]);
+			vtkSmartPointer<vtkTransform> trans2 =
+				vtkSmartPointer<vtkTransform>::New();
+			trans2->Scale(1 + m_dilateValue, 1 + m_dilateValue ,1);
+			trans2->Concatenate(trans1);
+			vtkSmartPointer<vtkTransform> trans3 =
+				vtkSmartPointer<vtkTransform>::New();
+			trans3->Translate(center);
+			trans3->Concatenate(trans2);
+			trans3->Update();
+
+			vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyDataFilter =
+				vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+			transformPolyDataFilter->SetTransform(trans3);
+			transformPolyDataFilter->SetInputData(_list[j]);
+			transformPolyDataFilter->Update();
+			*(*vesselWallMap)[i] += transformPolyDataFilter->GetOutput();
+			//a->AddInputData(transformPolyDataFilter->GetOutput());
+		}
+
+	}
+	ReadFromPolydata(VESSEL_WALL);
+	m_imageViewer->Render();
+	//a->Update();
+	//w->SetInputConnection(a->GetOutputPort());
+	//w->Write();
 }
 
 void InteractorStyleVesselSegmentation::FillPolygon()

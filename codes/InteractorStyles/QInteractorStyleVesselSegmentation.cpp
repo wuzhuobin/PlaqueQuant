@@ -99,10 +99,26 @@ void QInteractorStyleVesselSegmentation::SetGenerateValue(int value)
 
 }
 
+void QInteractorStyleVesselSegmentation::SetDilateValue(double value)
+{
+	InteractorStyleVesselSegmentation::SetDilateValue(value);
+}
+
 void QInteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 {
 	//InteractorStyleVesselSegmentation::SetGenerateValue(ui->autoLumenSegmentationSpinBox->value());
-	//InteractorStyleVesselSegmentation::GenerateLumenPolydata();
+	switch (m_contourType)
+	{
+	case VESSEL_WALL:
+		GenerateLumenPolydata();
+		break;
+	case LUMEN:
+		GenerateVesselWallPolyData();
+		break;
+	default:
+		break;
+	}
+	
 }
 
 QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiType, QWidget * parent)
@@ -126,6 +142,8 @@ QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiTyp
 		this, SLOT(GenerateLumenWallContourWidget()));
 	connect(ui->autoLumenSegmentationSpinBox, SIGNAL(valueChanged(int)), 
 		this, SLOT(SetGenerateValue(int)), Qt::QueuedConnection);
+	connect(ui->doubleSpinBoxVesselWallThickness, SIGNAL(valueChanged(double)),
+		this, SLOT(SetDilateValue(double)));
 	//connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),
 	//	this, SLOT(GenerateLumenWallContourWidget()), Qt::QueuedConnection);
 }
