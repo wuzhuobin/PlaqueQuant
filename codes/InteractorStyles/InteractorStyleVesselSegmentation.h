@@ -42,8 +42,18 @@ public:
 
 	virtual void NewContour();
 	virtual void NewContour(int type, QList<vtkSmartPointer<vtkPolyData>>* list);
-	
+
+
+	/**
+	 * generate all contourWidget, it will automatically delete all 
+	 * contourWidgets beforhand
+	 */
 	virtual void ReadFromPolydata();
+	/**
+	* for better performance please manually clear corresponding contourWidget
+	* manually, otherwise it will generate 2 times!
+	* @param	type, the pre-setting contourWidget type
+	*/
 	virtual void ReadFromPolydata(int type);
 	virtual void WriteToPolydata();
 
@@ -73,8 +83,8 @@ protected:
 	virtual void OnKeyPress();
 
 
-	virtual void CleanAllConoturs();
-	virtual void CleanConoturs(int type);
+	virtual void CleanAllContours();
+	virtual void CleanContours(int type);
 
 	int m_generateValue = 60;
 	double m_dilateValue = 0.5;

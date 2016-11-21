@@ -279,28 +279,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="sliderVesselWallThickness">
-             <property name="minimum">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <number>3</number>
-             </property>
-             <property name="singleStep">
-              <number>0</number>
-             </property>
-             <property name="value">
-              <number>3</number>
-             </property>
-             <property name="sliderPosition">
-              <number>3</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QDoubleSpinBox" name="doubleSpinBoxVesselWallThickness">
              <property name="minimumSize">
               <size>

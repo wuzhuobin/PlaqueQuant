@@ -24,6 +24,12 @@ Copyright (C) 2016
 #include <vtkLinearContourLineInterpolator.h>
 #include <vtkBezierContourLineInterpolator.h>
 #include <vtkProperty.h>
+#include <vtkMarchingSquares.h>
+#include <vtkPolyDataConnectivityFilter.h>
+#include <vtkCleanPolyData.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkCenterOfMass.h>
 
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
@@ -205,6 +211,8 @@ void InteractorStyleVesselSegmentation::NewContour(int type, QList<vtkSmartPoint
 
 void InteractorStyleVesselSegmentation::ReadFromPolydata()
 {
+	CleanContours(1);
+	CleanContours(2);
 	ReadFromPolydata(1);
 	ReadFromPolydata(2);
 	m_currentContour = nullptr;
@@ -218,7 +226,6 @@ void InteractorStyleVesselSegmentation::ReadFromPolydata(int type)
 	}
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY)
 		return;
-	CleanConoturs(type);
 	Overlay* overlay = m_imageViewer->GetOverlay();
 	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* maps[2] = {
 		overlay->GetVesselWallPolyData(),
@@ -291,6 +298,7 @@ void InteractorStyleVesselSegmentation::SetSegmentationMode(int i)
 		return;
 	}
 	m_contourType = i;
+	m_currentContour = nullptr;
 	ReadFromPolydata();
 }
 
@@ -319,21 +327,21 @@ void InteractorStyleVesselSegmentation::SetDilateValue(double value)
 	m_dilateValue = value;
 }
 
-void InteractorStyleVesselSegmentation::CleanAllConoturs()
+void InteractorStyleVesselSegmentation::CleanAllContours()
 {
-	CleanConoturs(0);
-	CleanConoturs(1);
-	CleanConoturs(2);
+	CleanContours(0);
+	CleanContours(1);
+	CleanContours(2);
 	m_imageViewer->Render();
 
 }
 
-void InteractorStyleVesselSegmentation::CleanConoturs(int type)
+void InteractorStyleVesselSegmentation::CleanContours(int type)
 {
 	switch (type)
 	{
 	case CONTOUR:
-		InteractorStylePolygonDraw::CleanAllConoturs();
+		InteractorStylePolygonDraw::CleanAllContours();
 		break;
 	case VESSEL_WALL:
 		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
@@ -390,14 +398,11 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 	}
 	// Since the lumen polydata was wirten to the ovelay
 	// Reload the polydata from the overlay and genenrate new contour widgets
+	CleanContours(LUMEN);
 	ReadFromPolydata(LUMEN);
 	m_imageViewer->Render();
 }
-#include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkCenterOfMass.h>
-//#include <vtkXMLPolyDataWriter.h>
-//#include <vtkAppendPolyData.h>
+
 void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
@@ -409,27 +414,71 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* lumenMap =
 		m_imageViewer->GetOverlay()->GetLumenPolyData();
 
-
-	//vtkSmartPointer<vtkXMLPolyDataWriter> w =
-	//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	//w->SetFileName("C:\\Users\\jieji\\Desktop\\reorder\\test2.vtp");
-	//vtkSmartPointer<vtkAppendPolyData> a =
-	//	vtkSmartPointer<vtkAppendPolyData>::New();
-
 	for (int i = extent[4]; i <= extent[5]; ++i) {
-		if (!lumenMap->contains(i)) {
-			continue;
+
+		if (lumenMap->contains(i)) {
+			delete  lumenMap->value(i);
 		}
 		if (vesselWallMap->contains(i)) {
 			delete  vesselWallMap->value(i);
 		}
+		(*lumenMap)[i] = new QList<vtkSmartPointer<vtkPolyData>>;
 		(*vesselWallMap)[i] = new QList<vtkSmartPointer<vtkPolyData>>;
-		QList<vtkSmartPointer<vtkPolyData>> _list = *(*lumenMap)[i];
-		for (int j = 0; j < _list.size(); ++j) {
+
+		vtkSmartPointer<vtkMarchingSquares> marchingSquares =
+			vtkSmartPointer<vtkMarchingSquares>::New();
+		marchingSquares->SetInputData(m_imageViewer->GetOverlay()->GetOutput());
+		marchingSquares->CreateDefaultLocator();
+		marchingSquares->SetImageRange(extent[0], extent[1], extent[2], extent[3], i, i);
+		marchingSquares->GenerateValues(1, 1, 1);
+		marchingSquares->Update();
+
+		vtkSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter =
+			vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+		connectivityFilter->SetInputConnection(marchingSquares->GetOutputPort());
+		connectivityFilter->SetExtractionModeToAllRegions();
+		connectivityFilter->Update();
+
+		for (int j = 0; j < connectivityFilter->GetNumberOfExtractedRegions(); ++j) {
+			// extract lumen contour polydata
+			vtkSmartPointer<vtkPolyDataConnectivityFilter> _connectivityFilter =
+				vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+			_connectivityFilter->SetInputConnection(marchingSquares->GetOutputPort());
+			_connectivityFilter->AddSpecifiedRegion(j);
+			_connectivityFilter->SetExtractionModeToSpecifiedRegions();
+			_connectivityFilter->Update();
+
+			LumenSegmentationFilter2::ReorderPolyData(_connectivityFilter->GetOutput());
+
+			double toleranceInitial = 1;
+			int loopBreaker = 0;
+
+			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
+				vtkSmartPointer<vtkCleanPolyData>::New();
+			clearPolyData->SetInputConnection(_connectivityFilter->GetOutputPort());
+			clearPolyData->ToleranceIsAbsoluteOn();
+			clearPolyData->SetAbsoluteTolerance(toleranceInitial);
+			clearPolyData->PointMergingOn();
+			clearPolyData->Update();
+			while (clearPolyData->GetOutput()->GetNumberOfPoints() < 3 && loopBreaker < 10) {
+				toleranceInitial *= 0.75;
+				clearPolyData->SetAbsoluteTolerance(toleranceInitial);
+				clearPolyData->Update();
+				loopBreaker += 1;
+			}
+
+			vtkSmartPointer<vtkPolyData> _lumenPolyData =
+				vtkSmartPointer<vtkPolyData>::New();
+			_lumenPolyData->ShallowCopy(clearPolyData->GetOutput());
+			(*(*lumenMap)[i]) += _lumenPolyData;
+
+
+			// Dilate part
+			// generate polydata 
 			double center[3];
 			vtkSmartPointer<vtkCenterOfMass> centerOfMassFilter =
 				vtkSmartPointer<vtkCenterOfMass>::New();
-			centerOfMassFilter->SetInputData(_list[j]);
+			centerOfMassFilter->SetInputData(_lumenPolyData);
 			centerOfMassFilter->SetUseScalarsAsWeights(false);
 			centerOfMassFilter->Update();
 			centerOfMassFilter->GetCenter(center);
@@ -439,7 +488,7 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			trans1->Translate(-center[0], -center[1], -center[2]);
 			vtkSmartPointer<vtkTransform> trans2 =
 				vtkSmartPointer<vtkTransform>::New();
-			trans2->Scale(1 + m_dilateValue, 1 + m_dilateValue ,1);
+			trans2->Scale(1 + m_dilateValue, 1 + m_dilateValue, 1);
 			trans2->Concatenate(trans1);
 			vtkSmartPointer<vtkTransform> trans3 =
 				vtkSmartPointer<vtkTransform>::New();
@@ -450,18 +499,22 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyDataFilter =
 				vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 			transformPolyDataFilter->SetTransform(trans3);
-			transformPolyDataFilter->SetInputData(_list[j]);
+			transformPolyDataFilter->SetInputData(_lumenPolyData);
 			transformPolyDataFilter->Update();
-			*(*vesselWallMap)[i] += transformPolyDataFilter->GetOutput();
-			//a->AddInputData(transformPolyDataFilter->GetOutput());
+
+			vtkSmartPointer<vtkPolyData> _vesselWalll =
+				vtkSmartPointer<vtkPolyData>::New();
+			_vesselWalll->ShallowCopy(transformPolyDataFilter->GetOutput());
+			*(*vesselWallMap)[i] += _vesselWalll;
 		}
 
 	}
+	CleanContours(LUMEN);
+	CleanContours(VESSEL_WALL);
+
+	ReadFromPolydata(LUMEN);
 	ReadFromPolydata(VESSEL_WALL);
 	m_imageViewer->Render();
-	//a->Update();
-	//w->SetInputConnection(a->GetOutputPort());
-	//w->Write();
 }
 
 void InteractorStyleVesselSegmentation::FillPolygon()

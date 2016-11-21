@@ -136,20 +136,11 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
 		lumenExtractionFilter->GetOutput());
 	MY_VIEWER_CONSTITERATOR(Render());
 
-	ExtractLumenPolyData();
+	//ExtractLumenPolyData();
 }
-
-//#include <vtkXMLPolyDataWriter.h>
-//#include <vtkAppendPolyData.h>
 
 void QInteractorStyleLumenSeedsPlacer::ExtractLumenPolyData()
 {
-	//vtkSmartPointer<vtkXMLPolyDataWriter> w =
-	//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	//w->SetFileName("C:\\Users\\jieji\\Desktop\\reorder\\test.vtp");
-	//vtkSmartPointer<vtkAppendPolyData> a =
-	//	vtkSmartPointer<vtkAppendPolyData>::New();
-
 
 
 	const int* extent = m_imageViewer->GetOverlay()->GetOutput()->GetExtent(); 
@@ -209,14 +200,10 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumenPolyData()
 				vtkSmartPointer<vtkPolyData>::New();
 			_lumenPolyData->ShallowCopy(clearPolyData->GetOutput());
 			(*(*lumenMap)[i]) += _lumenPolyData;
-			//a->AddInputData(_lumenPolyData);
 		}
 		
 
 	}
-	//a->Update();
-	//w->SetInputConnection(a->GetOutputPort());
-	//w->Write();
 }
 
 void QInteractorStyleLumenSeedsPlacer::SetMultipier(double value)

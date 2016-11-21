@@ -54,7 +54,7 @@ protected:
 
 
 	virtual void ClearCurrentContour();
-	virtual void CleanAllConoturs();
+	virtual void CleanAllContours();
 
 	bool m_polygonDrawEnabledFlag = false;
 

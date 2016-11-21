@@ -27,6 +27,9 @@ public slots:
 	virtual void DropSeed();
 
 	virtual void ExtractLumen();
+	/**
+	 * @deprecated
+	 */
 	virtual void ExtractLumenPolyData();
 	virtual void SetMultipier(double value);
 	virtual void SetNumberOfIteractions(int value);
