@@ -62,6 +62,7 @@ void InteractorStylePolygonDraw::OnMouseMove()
 
 	if (m_polygonDrawEnabledFlag) {
 		NewContour();
+		m_currentContour->EnabledOn();
 	}
 }
 
@@ -76,7 +77,7 @@ void InteractorStylePolygonDraw::OnKeyPress()
 		this->FillPolygon();
 	}
 	else if (key == "G") {
-		ClearCurrentContour();
+		CleanCurrentContour();
 	}
 	else {
 		AbstractNavigation::OnKeyPress();
@@ -121,7 +122,6 @@ void InteractorStylePolygonDraw::NewContour()
 
 	m_currentContourRep->SetLineInterpolator(m_interpolator);
 	m_currentContourRep->AlwaysOnTopOn();
-	m_currentContour->EnabledOn();
 }
 
 
@@ -130,7 +130,7 @@ void InteractorStylePolygonDraw::SetContourLabel(int noSegLabel)
 	this->m_contourLabel = noSegLabel;
 }
 
-void InteractorStylePolygonDraw::ClearCurrentContour()
+void InteractorStylePolygonDraw::CleanCurrentContour()
 {
 	if (m_contours.size() > 0) {
 		m_contours.back()->EnabledOff();
@@ -161,6 +161,15 @@ void InteractorStylePolygonDraw::CleanAllContours()
 	m_imageViewer->Render();
 }
 
+void InteractorStylePolygonDraw::SetAllContoursEnabled(int flag)
+{
+	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+		= m_contours.cbegin(); cit != m_contours.cend();
+		++cit) {
+		(*cit)->SetEnabled(flag);
+	}
+}
+
 void InteractorStylePolygonDraw::SetSmoothCurveEnable()
 {
 	SetLineInterpolator(0);
@@ -184,7 +193,7 @@ void InteractorStylePolygonDraw::SetLineInterpolator(int i)
 	}
 	if (m_currentContour != nullptr &&
 		m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
-		ClearCurrentContour();
+		CleanCurrentContour();
 	}
 }
 

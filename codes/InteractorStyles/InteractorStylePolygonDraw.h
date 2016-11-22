@@ -33,6 +33,10 @@ public:
 	static InteractorStylePolygonDraw* New();
 
 	virtual void SetPolygonModeEnabled(bool b);
+	/**
+	 * For better performance, NewContour() will not invoke EnabledOn()
+	 * it need to be enable manually
+	 */
 	virtual void NewContour();
 
 	virtual void SetContourLabel(int contourLabel);
@@ -53,8 +57,9 @@ protected:
 	virtual void OnKeyPress();
 
 
-	virtual void ClearCurrentContour();
+	virtual void CleanCurrentContour();
 	virtual void CleanAllContours();
+	virtual void SetAllContoursEnabled(int flag);
 
 	bool m_polygonDrawEnabledFlag = false;
 

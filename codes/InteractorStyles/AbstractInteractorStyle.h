@@ -47,7 +47,7 @@ public:
 
 protected:
 	AbstractInteractorStyle();
-	~AbstractInteractorStyle();
+	virtual ~AbstractInteractorStyle();
 
 	virtual void OnLeftButtonDown();
 	virtual void OnRightButtonDown();

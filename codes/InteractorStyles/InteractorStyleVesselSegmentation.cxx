@@ -30,6 +30,7 @@ Copyright (C) 2016
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkCenterOfMass.h>
+#include <vtkImageThreshold.h>
 
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
@@ -84,13 +85,14 @@ void InteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(
 {
 	// in case for double re-reading (generate the same contour twice)
 	// which made the contour blink and performance down
-	int ijk[3];
-	m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
-	if (i == ijk[0] && j == ijk[1] && k == ijk[2]) {
-		return;
-	}
+	//int ijk[3];
+	//m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
+	//if (i == ijk[0] && j == ijk[1] && k == ijk[2]) {
+	//	return;
+	//}
 	AbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	ReadFromPolydata();
+	STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleVesselSegmentation, ReadFromPolydata());
+	//ReadFromPolydata();
 }
 
 void InteractorStyleVesselSegmentation::NewContour()
@@ -127,7 +129,6 @@ void InteractorStyleVesselSegmentation::NewContour()
 
 		m_currentContourRep->SetLineInterpolator(m_interpolator);
 		m_currentContourRep->AlwaysOnTopOn();
-		m_currentContour->EnabledOn();
 
 		break;
 	case LUMEN:
@@ -151,7 +152,6 @@ void InteractorStyleVesselSegmentation::NewContour()
 
 		m_currentContourRep->SetLineInterpolator(m_interpolator);
 		m_currentContourRep->AlwaysOnTopOn();
-		m_currentContour->EnabledOn();
 		break;
 	default:
 		break;
@@ -215,6 +215,7 @@ void InteractorStyleVesselSegmentation::ReadFromPolydata()
 	CleanContours(2);
 	ReadFromPolydata(1);
 	ReadFromPolydata(2);
+	SetAllContoursEnabled(true);
 	m_currentContour = nullptr;
 	m_imageViewer->Render();
 }
@@ -298,6 +299,10 @@ void InteractorStyleVesselSegmentation::SetSegmentationMode(int i)
 		return;
 	}
 	m_contourType = i;
+	if (m_currentContour != nullptr &&
+		m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
+		CleanCurrentContour();
+	}
 	m_currentContour = nullptr;
 	ReadFromPolydata();
 }
@@ -325,6 +330,29 @@ void InteractorStyleVesselSegmentation::SetContourFilterGenerateValues(int gener
 void InteractorStyleVesselSegmentation::SetDilateValue(double value)
 {
 	m_dilateValue = value;
+}
+
+void InteractorStyleVesselSegmentation::CleanCurrentContour()
+{
+
+	list<vtkSmartPointer<vtkContourWidget>>* _contourss[] =
+		{&m_contours, &m_vesselWallContourWidgets, &m_lumenWallContourWidgets};
+	int i = 0;
+	for (; i < 3; ++i) {
+		if (_contourss[i]->size() > 0 &&
+			_contourss[i]->back() == m_currentContour) {
+			_contourss[i]->back()->EnabledOff();
+			_contourss[i]->pop_back();
+			break;
+		}
+	}
+	if (_contourss[i]->size() == 0) {
+		m_currentContour = nullptr;
+	}
+	else {
+		m_currentContour = _contourss[i]->back();
+	}
+	m_imageViewer->Render();
 }
 
 void InteractorStyleVesselSegmentation::CleanAllContours()
@@ -362,6 +390,37 @@ void InteractorStyleVesselSegmentation::CleanContours(int type)
 		break;
 	}
 
+}
+
+void InteractorStyleVesselSegmentation::SetAllContoursEnabled(int flag)
+{
+	SetAllContoursEnabled(CONTOUR, flag);
+	SetAllContoursEnabled(VESSEL_WALL, flag);
+	SetAllContoursEnabled(LUMEN, flag);
+}
+
+void InteractorStyleVesselSegmentation::SetAllContoursEnabled(int type, int flag)
+{
+	switch (type)
+	{
+	case CONTOUR:
+		InteractorStylePolygonDraw::SetAllContoursEnabled(flag);
+		break;
+	case VESSEL_WALL:
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+			= m_vesselWallContourWidgets.cbegin(); cit != m_vesselWallContourWidgets.cend();
+			++cit) {
+			(*cit)->SetEnabled(flag);
+		}
+		break;
+	case LUMEN:
+		for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit
+			= m_lumenWallContourWidgets.cbegin(); cit != m_lumenWallContourWidgets.cend();
+			++cit) {
+			(*cit)->SetEnabled(flag);
+		}
+		break;
+	}
 }
 
 void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
@@ -403,6 +462,8 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 	m_imageViewer->Render();
 }
 
+#include <vtkNIFTIImageWriter.h>
+
 void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
@@ -413,6 +474,23 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 		m_imageViewer->GetOverlay()->GetVesselWallPolyData();
 	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* lumenMap =
 		m_imageViewer->GetOverlay()->GetLumenPolyData();
+
+	// since the upper range of the vtkMarchingSquare don't work at all
+	// here it do manually thresholding for remove 
+	vtkSmartPointer<vtkImageThreshold> imageThreshold =
+		vtkSmartPointer<vtkImageThreshold>::New();
+	//imageThreshold->ThresholdBetween(0.9, 1.1);
+	imageThreshold->ThresholdByLower(1);
+	imageThreshold->SetInputData(m_imageViewer->GetOverlay()->GetOutput());
+	imageThreshold->ReplaceOutOn();
+	imageThreshold->SetOutValue(0);
+	imageThreshold->Update();
+
+	vtkSmartPointer<vtkNIFTIImageWriter> w =
+		vtkSmartPointer<vtkNIFTIImageWriter>::New();
+	w->SetInputConnection(imageThreshold->GetOutputPort());
+	w->SetFileName("C:\\Users\\user\\Desktop\\h\\test.nii");
+	w->Write();
 
 	for (int i = extent[4]; i <= extent[5]; ++i) {
 
@@ -425,12 +503,14 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 		(*lumenMap)[i] = new QList<vtkSmartPointer<vtkPolyData>>;
 		(*vesselWallMap)[i] = new QList<vtkSmartPointer<vtkPolyData>>;
 
+
 		vtkSmartPointer<vtkMarchingSquares> marchingSquares =
 			vtkSmartPointer<vtkMarchingSquares>::New();
-		marchingSquares->SetInputData(m_imageViewer->GetOverlay()->GetOutput());
+		marchingSquares->SetInputConnection(imageThreshold->GetOutputPort());
+		//marchingSquares->SetInputData(m_imageViewer->GetOverlay()->GetOutput());
 		marchingSquares->CreateDefaultLocator();
 		marchingSquares->SetImageRange(extent[0], extent[1], extent[2], extent[3], i, i);
-		marchingSquares->GenerateValues(1, 1, 1);
+		marchingSquares->SetValue(1, 1.00);
 		marchingSquares->Update();
 
 		vtkSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter =

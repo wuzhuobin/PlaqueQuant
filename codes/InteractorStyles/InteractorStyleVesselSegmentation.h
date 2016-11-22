@@ -39,8 +39,21 @@ public:
 	virtual void SetPolygonModeEnabled(bool b);
 
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-
+	/**
+	 * @override
+	 * For better performance, NewContour() will not invoke EnabledOn()
+	 * it need to be enable manually
+	 */
 	virtual void NewContour();
+	/**
+	 * @override
+ 	 * For better performance, NewContour() will not invoke EnabledOn()
+	 * it need to be enable manually
+	 * @param	type, it specifies the type of the contourWidget, CONTOUR_TYPE
+	 * @param	list, it will generate multiple contourWidgets, the number of 
+	 *			contourWidgets equals the size of list
+ 	 * 
+	 */
 	virtual void NewContour(int type, QList<vtkSmartPointer<vtkPolyData>>* list);
 
 
@@ -82,9 +95,12 @@ protected:
 	virtual void OnMouseMove();
 	virtual void OnKeyPress();
 
-
+	virtual void CleanCurrentContour();
 	virtual void CleanAllContours();
 	virtual void CleanContours(int type);
+	virtual void SetAllContoursEnabled(int flag);
+	virtual void SetAllContoursEnabled(int type, int flag);
+
 
 	int m_generateValue = 60;
 	double m_dilateValue = 0.5;
