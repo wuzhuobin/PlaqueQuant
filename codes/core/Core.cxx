@@ -2,6 +2,10 @@
 
 #include "SurfaceCreator.h"
 #include "Centerline.h"
+
+#include <vtkRenderWindow.h>
+#include <vtkProperty.h>
+
 #include <GPUVolumeRenderingFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
@@ -23,13 +27,6 @@ Core::Core(QObject* parent, QWidget* mainWindow)
 	m_imageManager = new  MyImageManager(this);
 	m_ioManager = new IOManager(mainWindow);
 	m_widgetManager = new MyWidgetManager(this);
-	//m_lumenExtractionFilter = new LumenExtraction();
-
-	//// default parameters for lumen extractions
-	//this->m_lumenExtractionFilter->SetNumberOfIterations(30);
-	//this->m_lumenExtractionFilter->SetDilationValue(4);
-	//this->m_lumenExtractionFilter->SetMultiplier(2.3);
-	//this->m_lumenExtractionFilter->SetInitialNeighborhoodRadius(1);
 
 	// enable registration
 	m_ioManager->enableRegistration(true);
@@ -310,7 +307,7 @@ void Core::slotWindowLevelMode()
 	{
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
-	this->ModeChangeUpdate(WINDOW_LEVEL_MODE);
+// this->ModeChangeUpdate(WINDOW_LEVEL_MODE);
 }
 
 void Core::slotBrushMode()
@@ -320,7 +317,7 @@ void Core::slotBrushMode()
 		m_style[i]->SetInteractorStyleToPaintBrush();
 	}
 	
-	this->ModeChangeUpdate(BRUSH_MODE);
+// this->ModeChangeUpdate(BRUSH_MODE);
 }
 
 #include <itkVTKImageToImageFilter.h>
@@ -564,15 +561,6 @@ double* Core::ConvertExtentToBounds(int* extent)
 	return bounds;
 }
 
-void Core::slotSetExtractLumenSeedList(std::vector<int *> seedList)
-{
-	//this->m_lumenExtractionFilter->ClearAllSeeds();
-	//for each (int* seedIndex in seedList)
-	//{
-	//	this->m_lumenExtractionFilter->AddSeed(seedIndex);
-	//}
-}
-
 void Core::slotValidatePatientInformation()
 {
 	if (m_imageManager->getNumberOfImages() == 1) {
@@ -651,66 +639,7 @@ void Core::slotContourMode()
 	{
 		m_style[i]->SetInteractorStyleToPolygonDraw();
 	}
-	this->ModeChangeUpdate(POLYGON_CONTOUR_MODE);
-}
-
-void Core::slotExtractLumen()
-{
-	//try
-	//{
-	//	this->m_lumenExtractionFilter->Update();
-	//	vtkSmartPointer<vtkImageData> lumenImage =
-	//		vtkSmartPointer<vtkImageData>::New();
-	//	this->m_lumenExtractionFilter->GetLumenVtkImage(lumenImage);
-	//	this->m_imageManager->getOverlay()->ReplacePixels(lumenImage->GetExtent(), lumenImage);
-	//	this->RenderAllViewer();
-	//}
-	//catch (...) {
-	//	this->DisplayErrorMessage("Unknown Error!");
-	//}
-}
-
-void Core::slotSetExtractLumenInputImage(vtkImageData* im)
-{
-	//this->m_lumenExtractionFilter->SetInputData(im);
-}
-
-void Core::slotSetExtractLumenDilationValue(int val)
-{
-	//this->m_lumenExtractionFilter->SetDilationValue(val);
-}
-
-void Core::slotSetExtractLumenInitialNeighborhoodRadius(int val)
-{
-	//this->m_lumenExtractionFilter->SetInitialNeighborhoodRadius(val);
-}
-
-void Core::slotSetExtractLumenMultiplier(double val)
-{
-	//this->m_lumenExtractionFilter->SetMultiplier(val);
-}
-
-void Core::slotDrawSegmentation()
-{
-	//this->m_style[2]->GetSmartContour2()->FillAllPolygons();
-}
-
-void Core::slotExtractLumenDilateLabel(vtkImageData* im)
-{
-	//this->m_lumenExtractionFilter->LabelDilation(im);
-	//vtkSmartPointer<vtkImageData> vesselWallImage =
-	//	vtkSmartPointer<vtkImageData>::New();
-
-	//this->m_lumenExtractionFilter->GetDilatedVtkImage(vesselWallImage);
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	cout << im->GetExtent()[i] << ' ' << vesselWallImage->GetExtent()[i];
-	//}
-	//cout << endl;
-	//for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
-	//	m_style[i]->GetSmartContour2()->SetLumenImage(im);
-	//	m_style[i]->GetSmartContour2()->SetVesselWallImage(vesselWallImage);
-	//}
+// this->ModeChangeUpdate(POLYGON_CONTOUR_MODE);
 }
 
 void Core::slotRulerMode()
@@ -719,7 +648,7 @@ void Core::slotRulerMode()
 		m_style[i]->SetInteractorStyleToRuler();
 	}
 
-	this->ModeChangeUpdate(RULER_MODE);
+// this->ModeChangeUpdate(RULER_MODE);
 }
 
 void Core::slotROIMode()
@@ -739,7 +668,7 @@ void Core::slotROIMode()
 		this->m_widgetManager->GetROIWidget()->GetRepresentation()->VisibilityOff();
 	}
 
-	this->ModeChangeUpdate(ROI_MODE);
+// this->ModeChangeUpdate(ROI_MODE);
 }
 
 void Core::slotSeedsPlacerMode()
@@ -748,7 +677,7 @@ void Core::slotSeedsPlacerMode()
 	{
 		m_style[i]->SetInteractorStyleToSeedsPlacer();
 	}
-	this->ModeChangeUpdate(SMARTCONTOUR_MODE);
+// this->ModeChangeUpdate(SMARTCONTOUR_MODE);
 
 }
 
@@ -758,7 +687,7 @@ void Core::slotSmartContour2Mode()
 	{
 		//m_style[i]->SetInteractorStyleToSmartContour2();
 	}
-	this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
+// this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
 
 }
 

@@ -27,7 +27,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PolygonDraw = QInteractorStyleVesselSegmentation::New();
 	SeedsPlacer = QInteractorStyleLumenSeedsPlacer::New();
 	PaintBrush = QInteractorStylePaintBrush::New();
-	ROI = InteractorStyleROI::New();
+	ROI = QInteractorStyleROI::New();
 	Ruler = QInteractorStyleRuler::New();
 	//SmartContour = InteractorStyleSmartContour::New();
 	//SmartContour2 = InteractorStyleSmartContour2::New();
@@ -76,7 +76,7 @@ void InteractorStyleSwitch::InternalUpdate()
 	if (this->CurrentStyle != this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(false);
 	if (this->CurrentStyle != this->ROI)
-		this->ROI->SetPlaneWidgetEnabled(false);
+		this->ROI->SetROIWidgetEnabled(false);
 	//if (this->CurrentStyle != this->SmartContour)
 	//	this->SmartContour->SetSmartContourEnable(false);
 	//if (this->CurrentStyle != this->SmartContour2)
@@ -93,7 +93,7 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->SeedsPlacer->SetSeedsPlacerEnable(true);
 
 	if (this->CurrentStyle == this->ROI)
-		this->ROI->SetPlaneWidgetEnabled(true);
+		this->ROI->SetROIWidgetEnabled(true);
 	if (this->CurrentStyle == this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(true);
 	if (this->CurrentStyle == this->Ruler)

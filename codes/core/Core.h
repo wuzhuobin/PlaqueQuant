@@ -97,14 +97,14 @@ public:
 
 
 	// Lumen Extraction
-	virtual void slotExtractLumen();
-	virtual void slotExtractLumenDilateLabel(vtkImageData*);
-	virtual void slotSetExtractLumenSeedList(std::vector<int *>);
-	virtual void slotSetExtractLumenInputImage(vtkImageData*);
-	virtual void slotSetExtractLumenDilationValue(int val);
-	virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
-	virtual void slotSetExtractLumenMultiplier(double);
-	virtual void slotDrawSegmentation();
+	//virtual void slotExtractLumen();
+	//virtual void slotExtractLumenDilateLabel(vtkImageData*);
+	//virtual void slotSetExtractLumenSeedList(std::vector<int *>);
+	//virtual void slotSetExtractLumenInputImage(vtkImageData*);
+	//virtual void slotSetExtractLumenDilationValue(int val);
+	//virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
+	//virtual void slotSetExtractLumenMultiplier(double);
+	//virtual void slotDrawSegmentation();
 
 	// ROI 
 	virtual void slotChangeROI();
@@ -146,9 +146,6 @@ private:
 	IOManager*		m_ioManager;
 	vtkSmartPointer<vtkPolyData> m_centerlinePD;
 
-
-	//// Filter
-	//LumenExtraction* m_lumenExtractionFilter;
 
 
 	bool m_firstInitialize = true;

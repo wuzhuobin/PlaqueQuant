@@ -2,6 +2,7 @@
 #include <vtkDistanceRepresentation3D.h>
 #include <vtkAbstractPicker.h>
 #include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
 
 #include "Distance3DWidget.h"
 #include "MainWindow.h"

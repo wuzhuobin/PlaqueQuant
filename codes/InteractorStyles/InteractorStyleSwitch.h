@@ -28,7 +28,7 @@ Copyright (C) 2016
 #include "QInteractorStyleVesselSegmentation.h"
 #include "QInteractorStyleLumenSeedsPlacer.h"
 #include "QInteractorStylePaintBrush.h"
-#include "InteractorStyleROI.h"
+#include "QInteractorStyleROI.h"
 #include "QInteractorStyleRuler.h"
 //#include "InteractorStyleSmartContour.h"
 //#include "InteractorStyleSmartContour2.h"
@@ -46,7 +46,7 @@ public:
 	vtkGetMacro(PolygonDraw, QInteractorStyleVesselSegmentation*);
 	vtkGetMacro(SeedsPlacer, QInteractorStyleLumenSeedsPlacer*);
 	vtkGetMacro(PaintBrush, QInteractorStylePaintBrush*);
-	vtkGetMacro(ROI, InteractorStyleROI*);
+	vtkGetMacro(ROI, QInteractorStyleROI*);
 	vtkGetMacro(Ruler, QInteractorStyleRuler*);
 	//vtkGetMacro(SmartContour, InteractorStyleSmartContour*);
 	//vtkGetMacro(SmartContour2, InteractorStyleSmartContour2*);
@@ -99,7 +99,7 @@ private:
 	QInteractorStyleVesselSegmentation* PolygonDraw;
 	QInteractorStyleLumenSeedsPlacer* SeedsPlacer;
 	QInteractorStylePaintBrush*	PaintBrush;
-	InteractorStyleROI* ROI;
+	QInteractorStyleROI* ROI;
 	QInteractorStyleRuler* Ruler;
 	//InteractorStyleSmartContour* SmartContour;
 	//InteractorStyleSmartContour2* SmartContour2;

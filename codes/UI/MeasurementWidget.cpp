@@ -4,6 +4,7 @@
 #include <QFileInfo>
 
 #include <vtkWindowToImageFilter.h>
+#include <vtkRenderWindow.h>
 #include <vtkImageResize.h>
 #include <vtkPNGWriter.h>
 
@@ -175,6 +176,7 @@ void MeasurementWidget::GenerateReport()
 	writer->Update();
 	writer->Write();
 	//3d
+
 	windowToImageFilter->SetInput(m_mainWnd->GetRenderWindow(4));
 	writer->SetFileName(_3dResult.toStdString().c_str());
 	writer->Update();

@@ -14,6 +14,10 @@ Copyright (C) 2016
 #include <vtkSphereSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkRenderWindow.h>
+#include <vtkProperty.h>
+//#include <vtkRenderWindowInteractor.h>
+//#include <vtkRenderer.h>
 
 #include <vtkPointData.h>
 #include <vtkKdTree.h>
