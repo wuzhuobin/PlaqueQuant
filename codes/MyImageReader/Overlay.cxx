@@ -515,7 +515,7 @@ Overlay::MeasurementFor2DIntegrated Overlay::GetMeasurementFor2D(int slice)
 {
 	return *(m_measurementFor2D[slice]);
 }
-#include <qdebug.h>
+
 QStringList Overlay::Get2DMeasurementsStrings(int slice)
 {
 	const int* extent = m_vtkOverlay->GetExtent();

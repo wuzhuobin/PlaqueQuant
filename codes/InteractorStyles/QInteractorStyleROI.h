@@ -16,13 +16,11 @@ public:
 	vtkTypeMacro(QInteractorStyleROI, InteractorStyleNavigation);
 	static QInteractorStyleROI* New();
 	virtual void SetROIWidgetEnabled(bool flag);
-	//void OnMouseMove();
-	//void OnLeftButtonDown();
-	//void OnLeftButtonUp();
-	//void SelectROI(int* newExtent);
-	//void UpdateAllWidget();
-	//void UpdateAllWidget(double* bound);
 
+public slots:
+	virtual void slotUpdateROISpinBoxes(double* values);
+	virtual void ExtractVOI();
+	virtual void ResetVOI();
 
 protected:
 	QInteractorStyleROI(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);

@@ -41,7 +41,7 @@ public:
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 	/**
 	 * @override
-	 * For better performance, NewContour() will not invoke EnabledOn()
+	 * For better performance, NewContour() will not invoke EnabledOn() 
 	 * it need to be enable manually
 	 */
 	virtual void NewContour();
@@ -81,7 +81,6 @@ public:
 
 	virtual void FillPolygon();
 
-
 	virtual void SetContourFilterGenerateValues(int generateValues);
 	virtual void SetDilateValue(double value);
 	virtual void GenerateLumenPolydata();
@@ -110,7 +109,6 @@ protected:
 	// defaule label
 	int m_vesselWallLabel = 2;
 	int m_lumenWallLabel = 1;
-
 
 	/**
 	* When refering to using index to represnet the image

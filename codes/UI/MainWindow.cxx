@@ -252,6 +252,7 @@ bool MainWindow::slotVisualizeImage()
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetRuler());
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetSeedsPlacer());
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPolygonDraw());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetROI());
 
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
@@ -311,10 +312,10 @@ void MainWindow::slotChangeMode(QAction* action)
 		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
 			Core::DEFAULT_IMAGE)->GetPaintBrush());
 	}
-	//else if (action == ui->actionBrush) {
-	//	m_moduleWidget->SetStyleWidget(m_core->Get2DInteractorStyle(
-	//	Core::DEFAULT_IMAGE)->Get);
-	//}
+	else if (action == ui->actionROI) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+		Core::DEFAULT_IMAGE)->GetROI());
+	}
 	else {
 		m_moduleWidget->setWidget(nullptr);
 	}

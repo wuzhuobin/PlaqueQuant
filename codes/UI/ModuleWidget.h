@@ -21,32 +21,11 @@ public:
 	void ClearWidget();
 	void addWidget(QWidget* style);
 	void setWidget(QWidget* style);
-	//void UdateTargetImageComboBox();
-	//void UpdateSeedListView();
-
-	//static std::vector<int*>		SeedIJKList;
-	//static std::vector<double*>		SeedCoordinatesList;
 
 public slots:
 	void slotChangeOpacity(int opactiy);
 	void slotUpdateOpacity();
-	void slotChangeROI(int* bound);
-	//void slotSetPage();
-	void slotUpdateROISpinBoxes(double* bounds);
 
-	//// UI Linking
-	//virtual void slotChangeSliderNeighborhoodRadius();
-	//virtual void slotChangeSpinBoxNeighborhoodRadius();
-	//virtual void slotChangeSliderVesselWallThickness();
-	//virtual void slotChangeSpinBoxVesselWallThickness();
-	//
-	//// Seeds Operations
-	//virtual void slotUpdateCoordinateLabel();
-	////virtual void slotUpdateSeedListView();
-	//virtual void slotDeleteCurrentSeed();
-	//virtual void slotSetExtractLumenTargetImage(QString);
-	//virtual void slotGenerateContour();
-	//virtual void slotSnapToSeed(int rowIndex);
 
 
 protected:

@@ -26,7 +26,6 @@ Core::Core(QObject* parent, QWidget* mainWindow)
 {
 	m_imageManager = new  MyImageManager(this);
 	m_ioManager = new IOManager(mainWindow);
-	m_widgetManager = new MyWidgetManager(this);
 
 	// enable registration
 	m_ioManager->enableRegistration(true);
@@ -58,13 +57,6 @@ void Core::Initialization()
 	this->m_3DDataRenderer->SetBackground(0.3, 0.3, 0.3);
 	this->m_3DimageViewer->AddRenderer(this->m_3DDataRenderer);
 	this->m_3Dinteractor->Initialize();
-
-	vtkROIWidget* roi = this->m_widgetManager->GetROIWidget();
-	for (int i = 0; i < 3;i++)
-	{
-		roi->SetBorderWidgetsInteractor(i, this->m_2DimageViewer[i]->GetRenderWindow()->GetInteractor());
-	}
-	roi->SetInteractor(this->m_3Dinteractor);
 
 	m_ioManager->setMyImageManager(m_imageManager);
 
@@ -138,10 +130,7 @@ MyImageManager * Core::GetMyImageManager()
 	return m_imageManager;
 }
 
-MyWidgetManager* Core::GetMyWidgetManager()
-{
-	return this->m_widgetManager;
-}
+
 
 void Core::slotAddOverlayToImageViewer() {
 	int *extent1 = this->m_imageManager->getOverlay()->GetOutput()->GetExtent();
@@ -307,7 +296,6 @@ void Core::slotWindowLevelMode()
 	{
 		m_style[i]->SetInteractorStyleToWindowLevel();
 	}
-// this->ModeChangeUpdate(WINDOW_LEVEL_MODE);
 }
 
 void Core::slotBrushMode()
@@ -317,7 +305,6 @@ void Core::slotBrushMode()
 		m_style[i]->SetInteractorStyleToPaintBrush();
 	}
 	
-// this->ModeChangeUpdate(BRUSH_MODE);
 }
 
 #include <itkVTKImageToImageFilter.h>
@@ -510,57 +497,6 @@ void Core::slotUpdate3DLabelBtn()
 	interacotr->Start();*/
 }
 
-int* Core::ConvertBoundsToExtent(double* bounds, bool clampping)
-{
-	// Error check
-	if (this->m_imageManager->getNumberOfImages() == 0)
-		return nullptr;
-
-	int imExtent[6];
-	double spacing[3], origin[3];
-	this->m_imageManager->getListOfVtkImages().at(0)->GetSpacing(spacing);
-	this->m_imageManager->getListOfVtkImages().at(0)->GetOrigin(origin);
-	this->m_imageManager->getListOfVtkImages().at(0)->GetExtent(imExtent);
-
-	int* extent = (int*)malloc(sizeof(int) * 6);
-	extent[0] = ceil((bounds[0] - origin[0]) / spacing[0]);
-	extent[1] = floor((bounds[1] - origin[0]) / spacing[0]);
-	extent[2] = ceil((bounds[2] - origin[1]) / spacing[1]);
-	extent[3] = floor((bounds[3] - origin[1]) / spacing[1]);
-	extent[4] = ceil((bounds[4] - origin[2]) / spacing[2]);
-	extent[5] = floor((bounds[5] - origin[2]) / spacing[2]);
-
-	if (clampping)
-		for (int i = 0; i < 3;i++)
-		{
-			extent[2*i] = { extent[2*i] < imExtent[2*i] ? imExtent[2*i] : extent[2*i] };
-			extent[2*i+1] = { extent[2*i+1] > imExtent[2*i+1] ? imExtent[2*i+1] : extent[2*i+1] };
-		}
-
-	return extent;
-}
-
-double* Core::ConvertExtentToBounds(int* extent)
-{
-	// Error check
-	if (this->m_imageManager->getNumberOfImages() == 0)
-		return nullptr;
-
-	double spacing[3], origin[3];
-	this->m_imageManager->getListOfVtkImages().at(0)->GetSpacing(spacing);
-	this->m_imageManager->getListOfVtkImages().at(0)->GetOrigin(origin);
-
-	double* bounds = (double*)malloc(sizeof(double) * 6);
-	bounds[0] = extent[0] * spacing[0] + origin[0];
-	bounds[1] = extent[1] * spacing[0] + origin[0];
-	bounds[2] = extent[2] * spacing[1] + origin[1];
-	bounds[3] = extent[3] * spacing[1] + origin[1];
-	bounds[4] = extent[4] * spacing[2] + origin[2];
-	bounds[5] = extent[5] * spacing[2] + origin[2];
-
-	return bounds;
-}
-
 void Core::slotValidatePatientInformation()
 {
 	if (m_imageManager->getNumberOfImages() == 1) {
@@ -604,42 +540,12 @@ void Core::slotChangeOpacity(int layer, int opacity)
 	RenderAllViewer();
 }
 
-void Core::ModeChangeUpdate(INTERACTION_MODE index)
-{
-	if (index != ROI_MODE)
-	{
-		// turn off ROI widget
-		this->m_widgetManager->DisableROIWidget();
-	}
-
-	if (index != RULER_MODE)
-	{
-		// turn off Ruler widget
-		for (int i = 0; i < 3;i++)
-		{
-			this->m_style[i]->GetRuler()->SetDistanceWidgetEnabled(false);
-		}
-	}
-
-	if (index != POLYGON_CONTOUR_MODE)
-	{
-		// turn off contour widget
-		for (int i = 0; i < 3;i++)
-		{
-			this->m_style[i]->GetPolygonDraw()->SetPolygonModeEnabled(false);
-		}
-	}
-
-	this->RenderAllViewer();
-}
-
 void Core::slotContourMode()
 {
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
 		m_style[i]->SetInteractorStyleToPolygonDraw();
 	}
-// this->ModeChangeUpdate(POLYGON_CONTOUR_MODE);
 }
 
 void Core::slotRulerMode()
@@ -647,28 +553,14 @@ void Core::slotRulerMode()
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 		m_style[i]->SetInteractorStyleToRuler();
 	}
-
-// this->ModeChangeUpdate(RULER_MODE);
 }
 
 void Core::slotROIMode()
 {
 	// force user into ROI mode
-	this->slotNavigationMode();
-
-	if (this->m_imageManager->getNumberOfImages() != 0 && !this->m_widgetManager->GetROIWidget()->GetEnabled())
-	{
-		double bounds[6];
-		this->m_imageManager->getListOfVtkImages().at(0)->GetBounds(bounds);
-		this->m_widgetManager->EnableROIWidget(
-			this->m_2DimageViewer, 
-			this->m_3DimageViewer, 
-			bounds, 
-			this->m_2DimageViewer[0]->GetFocalPointWithWorldCoordinate());
-		this->m_widgetManager->GetROIWidget()->GetRepresentation()->VisibilityOff();
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
+		m_style[i]->SetInteractorStyleToROI();
 	}
-
-// this->ModeChangeUpdate(ROI_MODE);
 }
 
 void Core::slotSeedsPlacerMode()
@@ -677,58 +569,4 @@ void Core::slotSeedsPlacerMode()
 	{
 		m_style[i]->SetInteractorStyleToSeedsPlacer();
 	}
-// this->ModeChangeUpdate(SMARTCONTOUR_MODE);
-
-}
-
-void Core::slotSmartContour2Mode()
-{
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
-	{
-		//m_style[i]->SetInteractorStyleToSmartContour2();
-	}
-// this->ModeChangeUpdate(SMARTCONTOUR2_MODE);
-
-}
-
-void Core::slotChangeROI()
-{
-	/// Depicted
-
-
-}
-
-void Core::slotSelectROI()
-{
-
-	int newExtent[6];
-	double newBounds[6];
-	double* bounds = this->m_widgetManager->GetROIWidget()->GetRepresentation()->GetBounds();
-	memcpy(newExtent, this->ConvertBoundsToExtent(bounds), sizeof(int) * 6);
-
-	// Convert clamped value back to bounds for ROI widget
-	memcpy(newBounds, this->ConvertExtentToBounds(newExtent), sizeof(double) * 6);
-	this->m_widgetManager->GetROIWidget()->GetRepresentation()->PlaceWidget(newBounds);
-
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
-		m_2DimageViewer[i]->SetImageVOI(newExtent);
-		m_2DimageViewer[i]->SetOverlayVOI(newExtent);
-		m_2DimageViewer[i]->GetRenderer()->ResetCamera();
-	}
-	// temporary method for reset the slice spin box
-	slotRulerMode();
-	slotNavigationMode();
-
-}
-void Core::slotResetROI()
-{
-	// Extract VOI of the vtkImage data
-	for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
-		m_2DimageViewer[i]->ResetImageVOI();
-		m_2DimageViewer[i]->ResetOverlayVOI();
-		m_2DimageViewer[i]->GetRenderer()->ResetCamera();
-	}
-	// temporary method for reset the slice spin box
-	slotRulerMode();
-	slotNavigationMode();
 }

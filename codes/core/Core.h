@@ -8,10 +8,8 @@
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
 #include "InteractorStyleSwitch3D.h"
-//#include "LumenExtraction.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
-#include "MyWidgetManager.h"
 
 
 class Core:public QObject
@@ -31,7 +29,6 @@ public:
 	vtkRenderWindow*	GetRenderWindow(int num);
 	IOManager*			GetIOManager();
 	MyImageManager*		GetMyImageManager();
-	MyWidgetManager*	GetMyWidgetManager();
 
 	void RenderAllViewer();
 	void DisplayErrorMessage(std::string str);
@@ -92,25 +89,8 @@ public:
 	virtual void slotContourMode();
 	virtual void slotROIMode();
 	virtual void slotSeedsPlacerMode();
-	virtual void slotSmartContour2Mode();
 	virtual void slotRulerMode();
 
-
-	// Lumen Extraction
-	//virtual void slotExtractLumen();
-	//virtual void slotExtractLumenDilateLabel(vtkImageData*);
-	//virtual void slotSetExtractLumenSeedList(std::vector<int *>);
-	//virtual void slotSetExtractLumenInputImage(vtkImageData*);
-	//virtual void slotSetExtractLumenDilationValue(int val);
-	//virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
-	//virtual void slotSetExtractLumenMultiplier(double);
-	//virtual void slotDrawSegmentation();
-
-	// ROI 
-	virtual void slotChangeROI();
-	virtual void slotSelectROI();
-	virtual void slotResetROI();
-	
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();
 	virtual void slotUpdate3DLabelBtn();
@@ -126,8 +106,6 @@ signals:
 	void signalSegmentationView();
 
 private:
-	void ModeChangeUpdate(INTERACTION_MODE);
-
 	// viewer
 	vtkSmartPointer<MyImageViewer> m_2DimageViewer[NUMBER_OF_2DVIEWERS];
 	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[NUMBER_OF_2DVIEWERS];
@@ -137,9 +115,6 @@ private:
 	vtkRenderer*				m_3DAnnotationRenderer;
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	InteractorStyleSwitch3D*	m_style3D;
-
-	// widget
-	MyWidgetManager* m_widgetManager = NULL;
 
 	// Data
 	MyImageManager* m_imageManager;
