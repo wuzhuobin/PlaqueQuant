@@ -14,11 +14,12 @@ public:
 	static QInteractorStyleWindowLevel* New();
 	virtual void SetWindowLevelModeEnabled(bool flag);
 
+
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 protected:
 	QInteractorStyleWindowLevel(int uiType = NO_UI, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleWindowLevel();
-
+	virtual void UniqueEnable(bool flag);
 
 private:
 	Ui::QInteractorStyleWindowLevel *ui = nullptr;

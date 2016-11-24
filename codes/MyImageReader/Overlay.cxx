@@ -1,24 +1,20 @@
 #include "Overlay.h"
 
-#include <itkVTKImageToImageFilter.h>
-#include <itkCastImageFilter.h>
-#include <itkOrientImageFilter.h>
-#include <itkImageToVTKImageFilter.h>
+
 #include <itkImageSeriesReader.h>
 #include <itkImageDuplicator.h>
+#include <itkImageToVTKImageFilter.h>
 
 #include <vtkImageMagnitude.h>
 #include <vtkImageCast.h>
 #include <vtkSimpleImageToImageFilter.h>
 #include <vtkExtractVOI.h>
 #include <vtkDoubleArray.h>
+#include <vtkImageIterator.h>
 
-
-
-typedef itk::OrientImageFilter<ImageType, ImageType> OrienterType;
-typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
-typedef itk::ImageSeriesReader< ImageType >			ReaderType;
-typedef itk::ImageDuplicator<ImageType>				DuplicatorType;
+typedef itk::ImageSeriesReader< Overlay::OverlayImageType >			ReaderType;
+typedef itk::ImageDuplicator<Overlay::OverlayImageType>				DuplicatorType;
+typedef itk::ImageToVTKImageFilter<Overlay::OverlayImageType>		ConnectorType;
 
 
 Overlay::Overlay(QObject* parent) : QObject(parent)
@@ -37,7 +33,7 @@ Overlay::Overlay(QObject* parent) : QObject(parent)
 
 	m_lookupTable = vtkSmartPointer<vtkLookupTable>::New();
 	m_lookupTable->SetNumberOfTableValues(7);
-	m_lookupTable->SetTableRange(0.0, 6);
+	m_lookupTable->SetTableRange(0.0, 6.0);
 	for (int i = 0; i < 7; ++i) {
 		double rgba[4];
 		for (int j = 0; j < 4; ++j) {
@@ -63,8 +59,35 @@ Overlay::~Overlay()
 	}
 }
 
-void Overlay::SetInputImageData(ImageType::Pointer imageData)
+void Overlay::SetDisplayExtent(int *extent)
 {
+	memcpy(this->DisplayExtent, extent, sizeof(int) * 6);
+}
+
+int * Overlay::GetDisplayExtent()
+{
+	return this->DisplayExtent;
+}
+
+void Overlay::GetDisplayExtent(int *extent)
+{
+	memcpy(extent, this->DisplayExtent, sizeof(int) * 6);
+}
+
+void Overlay::DisplayExtentOn()
+{
+
+}
+
+void Overlay::DisplayExtentOff()
+{
+
+}
+
+
+void Overlay::SetInputImageData(OverlayImageType::Pointer imageData)
+{
+	typedef itk::OrientImageFilter<OverlayImageType, OverlayImageType> OrienterType;
 	//re-orient
 	OrienterType::Pointer orienter = OrienterType::New();
 	orienter->UseImageDirectionOn();
@@ -81,17 +104,13 @@ void Overlay::SetInputImageData(ImageType::Pointer imageData)
 
 void Overlay::SetInputImageData(vtkImageData* imageData)
 {
-	if (imageData->GetScalarType() == VTK_DOUBLE) {
-		m_vtkOverlay = imageData;
-	}
-	else {
-		vtkSmartPointer<vtkImageCast> imageCast =
-			vtkSmartPointer<vtkImageCast>::New();
-		imageCast->SetOutputScalarTypeToDouble();
-		imageCast->SetInputData(imageData);
-		imageCast->Update();
-		m_vtkOverlay = imageCast->GetOutput();
-	}
+	vtkSmartPointer<vtkImageCast> imageCast =
+		vtkSmartPointer<vtkImageCast>::New();
+	imageCast->SetOutputScalarTypeToUnsignedChar();
+	//imageCast->SetOutputScalarTypeToDouble();
+	imageCast->SetInputData(imageData);
+	imageCast->Update();
+	m_vtkOverlay = imageCast->GetOutput();
 	//Measure2D();
 	//Measure3D();
 	emit signalOverlayUpdated();
@@ -112,7 +131,7 @@ void Overlay::SetInputImageData(const char* fileName)
 
 }
 
-void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double spacing[3], double origin[3], int type)
+void Overlay::Initialize(OverlayImageType::Pointer itkinputimage, int dim[3], double spacing[3], double origin[3], int type)
 {
 	DuplicatorType::Pointer duplicator = DuplicatorType::New();
 	duplicator->SetInputImage(itkinputimage);
@@ -126,9 +145,9 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 		std::cerr << err << std::endl;
 		return; // Since the goal of the example is to catch the exception, we declare this a success.
 	}
-	ImageType::Pointer m_itkOverlay = duplicator->GetOutput();
+	OverlayImageType::Pointer m_itkOverlay = duplicator->GetOutput();
 
-	itk::ImageRegionIterator<ImageType> itr(m_itkOverlay, m_itkOverlay->GetLargestPossibleRegion());
+	itk::ImageRegionIterator<OverlayImageType> itr(m_itkOverlay, m_itkOverlay->GetLargestPossibleRegion());
 
 	//Set all pixel to zero
 	while (!itr.IsAtEnd())
@@ -152,91 +171,40 @@ void Overlay::Initialize(ImageType::Pointer itkinputimage, int dim[3], double sp
 
 }
 
-void Overlay::SetDisplayExtent(int *extent)
-{
-	memcpy(this->DisplayExtent, extent, sizeof(int) * 6);
-}
-
-int * Overlay::GetDisplayExtent()
-{
-	return this->DisplayExtent;
-}
-
-void Overlay::GetDisplayExtent(int *extent)
-{
-	memcpy(extent, this->DisplayExtent, sizeof(int) * 6);
-}
-
-void Overlay::DisplayExtentOn()
-{
-	
-}
-
-void Overlay::DisplayExtentOff()
-{
-
-}
-
 void Overlay::SetPixel(int pos[3], double value)
 {
 		double * pixel = static_cast<double *>(m_vtkOverlay->GetScalarPointer(pos[0], pos[1], pos[2]));
 		if (pixel == nullptr) {
 			return;
 		}
-		//if (value != 0) {
-		//	cout << pos[0] << ' ' << pos[1] << ' ' << pos[2] << endl;
-		//}
 		pixel[0] = value;
-		//cout << pixel[0] << endl;
 }
 
 void Overlay::SetPixel(int pos[3], unsigned char value)
 {
-	unsigned char * pixel = static_cast<uchar *>(m_vtkOverlay->GetScalarPointer(pos[0], pos[1], pos[2]));
+	unsigned char * pixel = static_cast<unsigned char *>(m_vtkOverlay->GetScalarPointer(pos[0], pos[1], pos[2]));
 	if (pixel == nullptr)
 		return;
 	pixel[0] = value;
-	//cout << pixel[0] << endl;
 }
-bool Overlay::Update()
-{
-	if (!m_vtkOverlay)
-		return EXIT_FAILURE;
-	else
-		return EXIT_SUCCESS;
-}
-
 void Overlay::Initialize(vtkImageData * img)
 {
 	m_vtkOverlay = vtkSmartPointer<vtkImageData>::New();
 	m_vtkOverlay->SetExtent(img->GetExtent());
 	m_vtkOverlay->SetOrigin(img->GetOrigin());
 	m_vtkOverlay->SetSpacing(img->GetSpacing());
-	m_vtkOverlay->AllocateScalars(img->GetScalarType(), img->GetNumberOfScalarComponents());
+	m_vtkOverlay->AllocateScalars(VTK_UNSIGNED_CHAR, img->GetNumberOfScalarComponents());
+	
+	// Retrieve the entries from the image data and print them to the screen
+	vtkImageIterator<unsigned char> it(m_vtkOverlay, m_vtkOverlay->GetExtent());
+	while (!it.IsAtEnd()) {
+		for (unsigned char* valIt = it.BeginSpan(); valIt != it.EndSpan(); ++valIt) {
+			*valIt = 0;
+		}
+		it.NextSpan();
+	}
 	SetInputImageData(m_vtkOverlay);
-	//m_vtkOverlay->DeepCopy(img);
-	//
-	//vtkSmartPointer<vtkImageCast> castfilter = vtkSmartPointer<vtkImageCast>::New();
-	//castfilter->SetInputData(m_vtkOverlay);
-	//castfilter->SetOutputScalarTypeToDouble();
-	//castfilter->Update();
 
-	//m_vtkOverlay = castfilter->GetOutput();
-
-	//const int* extent = m_vtkOverlay->GetExtent();
-
-
-	//for (int i = extent[0]; i <= extent[1]; i++)
-	//{
-	//	for (int j = extent[2]; j <= extent[3]; j++)
-	//	{
-	//		for (int k = extent[4]; k <= extent[5]; k++)
-	//		{
-	//			double* pixel = static_cast<double*>(this->m_vtkOverlay->GetScalarPointer(i, j, k));
-	//			*pixel = 0;
-	//		}
-	//	}
-	//}
 
 	this->m_vtkOverlay->GetExtent(this->DisplayExtent);
 }
@@ -250,7 +218,7 @@ void Overlay::SetPixels(int* extent, vtkImageData* image)
 				for (int y = extent[2]; y <= extent[3]; ++y) {
 					for (int z = extent[4]; z <= extent[5]; ++z) {
 						int pos[3] = { x,y,z };
-						double pixelval = 0;
+						unsigned char pixelval = 0;
 						int _tmp = pos[orientation];
 						pos[orientation] = 0;
 						unsigned char* val = static_cast<unsigned char*>(
@@ -285,15 +253,13 @@ void Overlay::SetPixels(int* extent, vtkImageData* image)
 	emit signalOverlayUpdated();
 }
 
-void Overlay::SetPixels(vtkPoints* points, int label)
+void Overlay::SetPixels(vtkPoints* points, unsigned char label)
 {
 	for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i) {
 		const double* ijk_double = points->GetPoint(i);
-		int ijk[3] = { 
-			(double)ijk_double[0], 
-			(double)ijk_double[1], 
-			(double)ijk_double[2] };
-		SetPixel(ijk, (double)label);
+		int ijk[3];
+		std::copy(ijk_double, ijk_double + 3, ijk);
+		SetPixel(ijk, label);
 	}
 
 	m_vtkOverlay->Modified();
@@ -318,12 +284,10 @@ void Overlay::ReplacePixels(int* extent, vtkImageData* image)
 					int scalerLength = image->GetScalarSize();
 					int pos[3] = { x,y,z };
 					double pixelval = 0;
+					unsigned char* val = static_cast<unsigned char*>(
+						image->GetScalarPointer(pos[0], pos[1], pos[2]));
+					SetPixel(pos, *val);
 
-					if (image->GetScalarType() == VTK_FLOAT)
-					{
-						double val = image->GetScalarComponentAsFloat(pos[0], pos[1], pos[2], 0);
-						SetPixel(pos, val);
-					}
 				}
 			}
 		}
@@ -454,37 +418,37 @@ vtkImageData * Overlay::GetVTKOutput()
 	else
 		return this->m_vtkOverlay;
 }
-
-ImageType::Pointer Overlay::GetITKOutput(ImageType::Pointer format)
-{
-
-	//if (!m_vtkOverlay)
-	//	return NULL;
-	//else {
-	itk::VTKImageToImageFilter<itk::Image<double, 3>>::Pointer vtkImageToImageFilter =
-		itk::VTKImageToImageFilter<itk::Image<double, 3>>::New();
-	vtkImageToImageFilter->SetInput(this->GetOutput());
-	vtkImageToImageFilter->Update();
-
-	itk::CastImageFilter<itk::Image<double, 3>, ImageType>::Pointer castImageFilter =
-		itk::CastImageFilter<itk::Image<double, 3>, ImageType>::New();
-	castImageFilter->SetInput(vtkImageToImageFilter->GetOutput());
-	castImageFilter->Update();
-
-	//re-orient
-	OrienterType::Pointer orienter = OrienterType::New();
-	orienter->UseImageDirectionOn();
-	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-	orienter->SetInput(format);
-	orienter->Update();
-
-	m_itkOverlay = castImageFilter->GetOutput();
-	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
-	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
-	//}
-	return m_itkOverlay;
-
-}
+//
+//Overlay::OverlayImageType::Pointer Overlay::GetITKOutput(OverlayImageType::Pointer format)
+//{
+//
+//	//if (!m_vtkOverlay)
+//	//	return NULL;
+//	//else {
+//	itk::VTKImageToImageFilter<itk::Image<unsigned char, 3>>::Pointer vtkImageToImageFilter =
+//		itk::VTKImageToImageFilter<itk::Image<unsigned char, 3>>::New();
+//	vtkImageToImageFilter->SetInput(this->GetOutput());
+//	vtkImageToImageFilter->Update();
+//
+//	itk::CastImageFilter<itk::Image<unsigned char, 3>, OverlayImageType>::Pointer castImageFilter =
+//		itk::CastImageFilter<itk::Image<unsigned char, 3>, OverlayImageType>::New();
+//	castImageFilter->SetInput(vtkImageToImageFilter->GetOutput());
+//	castImageFilter->Update();
+//
+//	//re-orient
+//	OrienterType::Pointer orienter = OrienterType::New();
+//	orienter->UseImageDirectionOn();
+//	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+//	orienter->SetInput(format);
+//	orienter->Update();
+//
+//	m_itkOverlay = castImageFilter->GetOutput();
+//	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
+//	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
+//	//}
+//	return m_itkOverlay;
+//
+//}
 
 vtkLookupTable * Overlay::GetLookupTable()
 {

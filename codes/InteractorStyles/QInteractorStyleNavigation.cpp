@@ -26,12 +26,12 @@ void QInteractorStyleNavigation::UniqueEnable(bool flag)
 	// turn off
 	if (!flag && flag != initializationFlag) {
 		// turn off codes
-		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-		//	this, SLOT(slotChangeSlice()));
-		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-		//	this, SLOT(slotChangeSlice()));
-		//disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-		//	this, SLOT(slotChangeSlice()));
+		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()));
+		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()));
+		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+			this, SLOT(slotChangeSlice()));
 	}
 	if (flag != initializationFlag) {
 		// checking whether extent is equal to the old extent

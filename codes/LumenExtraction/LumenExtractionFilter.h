@@ -67,7 +67,7 @@ namespace itk
 class LumenExtractionFilter: public vtkImageAlgorithm
 {
 public:
-	typedef itk::Image<float, 3> ImageType;
+	typedef itk::Image<unsigned char, 3> ImageType;
 	typedef itk::ImageToVTKImageFilter<ImageType> ImageToVtkImageFilter;
 	typedef itk::VTKImageToImageFilter<ImageType> VTKImageToImageFilter;
 	typedef itk::LumenExtractionFilter<ImageType> LEFilter;

@@ -85,11 +85,11 @@ void InteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(
 {
 	// in case for double re-reading (generate the same contour twice)
 	// which made the contour blink and performance down
-	//int ijk[3];
-	//m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
-	//if (i == ijk[0] && j == ijk[1] && k == ijk[2]) {
-	//	return;
-	//}
+	int ijk[3];
+	m_imageViewer->GetFocalPointWithImageCoordinate(ijk);
+	if (i == ijk[0] && j == ijk[1] && k == ijk[2]) {
+		return;
+	}
 	AbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 	STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleVesselSegmentation, ReadFromPolydata());
 	//ReadFromPolydata();
@@ -462,8 +462,6 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 	m_imageViewer->Render();
 }
 
-#include <vtkNIFTIImageWriter.h>
-
 void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
@@ -486,12 +484,6 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 	imageThreshold->SetOutValue(0);
 	imageThreshold->Update();
 
-	vtkSmartPointer<vtkNIFTIImageWriter> w =
-		vtkSmartPointer<vtkNIFTIImageWriter>::New();
-	w->SetInputConnection(imageThreshold->GetOutputPort());
-	w->SetFileName("C:\\Users\\user\\Desktop\\h\\test.nii");
-	w->Write();
-
 	for (int i = extent[4]; i <= extent[5]; ++i) {
 
 		if (lumenMap->contains(i)) {
@@ -507,7 +499,6 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 		vtkSmartPointer<vtkMarchingSquares> marchingSquares =
 			vtkSmartPointer<vtkMarchingSquares>::New();
 		marchingSquares->SetInputConnection(imageThreshold->GetOutputPort());
-		//marchingSquares->SetInputData(m_imageViewer->GetOverlay()->GetOutput());
 		marchingSquares->CreateDefaultLocator();
 		marchingSquares->SetImageRange(extent[0], extent[1], extent[2], extent[3], i, i);
 		marchingSquares->SetValue(1, 1.00);

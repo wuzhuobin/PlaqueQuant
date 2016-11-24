@@ -696,7 +696,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = z;
-				double* val = static_cast<double *>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				unsigned char* val = static_cast<unsigned char*>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
@@ -744,7 +744,7 @@ void InteractorStylePaintBrush::WriteToImageData()
 				pos[1] = y;
 				pos[2] = z;
 				pos[GetSliceOrientation()] = 0;
-				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(pos));
+				unsigned char* val = static_cast<unsigned char*>(m_brush->GetOutput()->GetScalarPointer(pos));
 				pixelval = 0;
 				if (val == nullptr)
 					continue;

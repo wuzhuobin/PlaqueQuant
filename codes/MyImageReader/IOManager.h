@@ -14,13 +14,12 @@
 
 class MyImageManager;
 
-typedef itk::Image<float, 3> ImageType;
 
 class IOManager:public QObject
 {
 	Q_OBJECT
 public:
-
+	typedef itk::Image<float, 3> ImageType;
 	IOManager(QWidget* parent = nullptr);
 	IOManager(QObject* parent = nullptr, QWidget* mainWindow = nullptr);
 	~IOManager();

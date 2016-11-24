@@ -356,6 +356,7 @@ void MyImageViewer::SetOverlay(Overlay * overlay)
 	this->SegmentationOverlay = overlay;
 	SetLookupTable(SegmentationOverlay->GetLookupTable());
 	SetInputDataLayer(SegmentationOverlay->GetOutput());
+	
 }
 
 Overlay * MyImageViewer::GetOverlay()

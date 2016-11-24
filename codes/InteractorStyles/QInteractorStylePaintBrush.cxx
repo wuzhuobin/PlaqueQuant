@@ -13,7 +13,7 @@ void QInteractorStylePaintBrush::SetPaintBrushModeEnabled(bool flag)
 void QInteractorStylePaintBrush::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	InteractorStylePaintBrush::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	QInteractorStylePaintBrush::SetCurrentFocalPointWithImageCoordinate(i, j, k);
+	QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 }
 
 void QInteractorStylePaintBrush::SetPaintBrushLabel(int paintBrushLabel)

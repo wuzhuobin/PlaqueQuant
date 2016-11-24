@@ -9,12 +9,14 @@
 #include <qmap.h>
 
 #include <itkImage.h>
+#include <itkVTKImageToImageFilter.h>
+#include <itkCastImageFilter.h>
+#include <itkOrientImageFilter.h>
 
 #include "MeasurementFor3D.h"
 #include "MeasurementFor2D.h"
 #include "MaximumWallThickness.h"
 
-typedef itk::Image<float, 3> ImageType;
 
 /**
  * @class Overlay
@@ -22,13 +24,15 @@ typedef itk::Image<float, 3> ImageType;
  * @version
  * @since
  * A very important part of element for using other InteractorStyle
- * the vtkImageData scalar type now is set to float
+ * the vtkImageData scalar type now is set to unsigned char
  */
 class Overlay : public QObject
 {
 	Q_OBJECT
 
 public:
+
+	typedef itk::Image<unsigned char, 3> OverlayImageType;
 
 	static const int NUMBER_OF_COLOR = 7;
 	const int* m_overlayColor[NUMBER_OF_COLOR];
@@ -51,10 +55,15 @@ public:
 
 	Overlay(QObject* parent = NULL);
 	~Overlay();
-	/**
-	 * @deprecated
-	 */
-	bool Update();
+
+	void SetDisplayExtent(int*);
+	int* GetDisplayExtent();
+	void GetDisplayExtent(int*);
+
+	void DisplayExtentOn();
+	void DisplayExtentOff();
+
+
 	/**
 	 * It is supposed to use the first vtkImageData to initialize the overlay
 	 * it will deepcopy the img and set all voxels of the copy to 0
@@ -65,20 +74,14 @@ public:
 	 * @deprecated
 	 * don't use it
 	 */
-	void Initialize(ImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
+	void Initialize(OverlayImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
 
-	void SetDisplayExtent(int*);
-	int* GetDisplayExtent();
-	void GetDisplayExtent(int*);
-
-	void DisplayExtentOn();
-	void DisplayExtentOff();
 	/**
 	 * set input image data of overlay m_vtkOverlay using itk::image
 	 * convert itk::image to vtkImage 
 	 * @param	imageData the new input image
 	 */
-	void SetInputImageData(ImageType::Pointer imageData);
+	void SetInputImageData(OverlayImageType::Pointer imageData);
 	void SetInputImageData(vtkImageData* imageData);
 	void SetInputImageData(QString fileName);
 	void SetInputImageData(const char* fileName);
@@ -103,7 +106,7 @@ public:
 	/**
 	 * replace all the pixels specified by the @param points with the @param label
 	 */
-	void SetPixels(vtkPoints* points, int label);
+	void SetPixels(vtkPoints* points, unsigned char label);
 	void ReplacePixels(int* extent, vtkImageData* image);
 
 	void vtkShallowCopyImage(vtkImageData* image);
@@ -121,7 +124,8 @@ public:
 	 * @param	format set the output image direction the same as the format image
 	 * @return	m_itkOverlay
 	 */
-	ImageType::Pointer GetITKOutput(ImageType::Pointer format);
+	template<typename TImage>
+	OverlayImageType::Pointer GetITKOutput(typename TImage::Pointer format);
 	/**
 	 * Get the lookupTable of this overlay which is generate by the constant
 	 * @return	m_lookupTable
@@ -161,7 +165,7 @@ private:
 
 	// ImageData
 	vtkSmartPointer<vtkImageData> m_vtkOverlay;
-	ImageType::Pointer m_itkOverlay;
+	OverlayImageType::Pointer m_itkOverlay;
 
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
 
@@ -184,6 +188,39 @@ private:
 	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*> m_lumenPolyData;
 
 };
+
+template<typename TImage>
+inline Overlay::OverlayImageType::Pointer Overlay::GetITKOutput(typename TImage::Pointer format)
+{
+	typedef itk::OrientImageFilter<TImage, TImage> OrienterType;
+	typedef itk::CastImageFilter<OverlayImageType, OverlayImageType> CastImageFilter;
+	typedef itk::VTKImageToImageFilter<OverlayImageType> VTKImageToImageFilter;
+	//if (!m_vtkOverlay)
+	//	return NULL;
+	//else {
+	VTKImageToImageFilter::Pointer vtkImageToImageFilter =
+		VTKImageToImageFilter::New();
+	vtkImageToImageFilter->SetInput(this->GetOutput());
+	vtkImageToImageFilter->Update();
+
+	CastImageFilter::Pointer castImageFilter =
+		CastImageFilter::New();
+	castImageFilter->SetInput(vtkImageToImageFilter->GetOutput());
+	castImageFilter->Update();
+
+	//re-orient
+	OrienterType::Pointer orienter = OrienterType::New();
+	orienter->UseImageDirectionOn();
+	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	orienter->SetInput(format);
+	orienter->Update();
+
+	m_itkOverlay = castImageFilter->GetOutput();
+	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
+	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
+	//}
+	return m_itkOverlay;
+}
 
 #endif
 

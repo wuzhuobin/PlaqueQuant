@@ -240,11 +240,12 @@ void IOManager::slotOpenSegmentationWithDiaglog()
 
 void IOManager::slotOpenSegmentation(QString fileName)
 {
-	ImageType::Pointer _itkImage;
+	Overlay::OverlayImageType::Pointer _itkImage;
 	//vtkSmartPointer<vtkImageData> _vtkImage;
-	
-	ImageFileReader<Image<float, 3>>::Pointer reader =
-		ImageFileReader<Image<float, 3>>::New();
+	//ImageFileReader<itk::Image<float,3 >::Pointer reader =
+	//	ImageFileReader<itk::Image<float, 3 >::New();
+	ImageFileReader<Overlay::OverlayImageType>::Pointer reader =
+		ImageFileReader<Overlay::OverlayImageType>::New();
 	reader->SetFileName(fileName.toStdString());
 	reader->Update();
 	_itkImage = reader->GetOutput();
@@ -279,9 +280,9 @@ void IOManager::slotSaveSegmentaitonWithDiaglog()
 
 void IOManager::slotSaveSegmentation(QString path)
 {
-	ImageFileWriter<Image<float, 3>>::Pointer writer =
-		ImageFileWriter<Image<float, 3>>::New();
-	writer->SetInput(this->myImageManager->overlay->GetITKOutput(
+	ImageFileWriter<Overlay::OverlayImageType>::Pointer writer =
+		ImageFileWriter<Overlay::OverlayImageType>::New();
+	writer->SetInput(this->myImageManager->overlay->GetITKOutput<ImageType>(
 		this->myImageManager->listOfItkImages[0]));
 	writer->SetFileName(path.toStdString().c_str());
 	writer->Write();
