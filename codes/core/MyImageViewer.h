@@ -32,14 +32,33 @@ class MyImageViewer : public QObject, public vtkImageViewer2
 public:
 	static MyImageViewer *New();
 	vtkTypeMacro(MyImageViewer, vtkImageViewer2);
+	/**
+	 * @override
+	 * @param	os,
+	 * @param	indent
+	 */
 	void PrintSelf(ostream& os, vtkIndent indent);
-	// Text methods
+	/**
+	 * set the header by the MRI sequence name 
+	 * @param	file, the MRI sequence name
+	 */
 	virtual void InitializeHeader(std::string file);
 	virtual void InitializeHeader(QString file);
-
+	/**
+	 * Get the current focal point in image coordinate(extent), or in world coordinate
+	 * @param	coordinate, focal point's coordinate
+	 */
 	virtual void GetFocalPointWithImageCoordinate(int* coordinate);
 	virtual void GetFocalPointWithWorldCoordinate(double* coordinate);
+	/**
+	 * Get the current focal point in world coordinate
+	 * @return	world coordinate of the focal point, don't modify it 
+	 */
 	virtual double* GetFocalPointWithWorldCoordinate();
+	/**
+	 * Get the Cursor bound of the Cursor 3d in world coordinate, don't modify it 
+	 * @return	world coordinate of the cursor bound
+	 */
 	virtual double* GetCursorBoundWithWorldCoordinate();
 	/**
 	 * return the all black flag
@@ -48,13 +67,27 @@ public:
 	 */
 	virtual bool GetAllBlack();
 
-	// Description:
-	// Render the resulting image.
+	/**
+	 * @override
+	 * Render method
+	 */
 	virtual void Render(void);
 
-	// Description:
-	// Set/Get the input image to the viewer.
+	/**
+	 * Set/Get the input image to the viewer.
+	 * the GetInput() method return image after VOI extraction
+	 * @param	in, input image
+	 */
 	virtual void SetInputData(vtkImageData * in);
+	/**
+	 * Set/Get the input image to the viewer.
+	 * @return	return image after VOI extraction 
+	 */
+	virtual vtkImageData* GetInput();
+	/**
+	 * Get original input vtkImageData image before vtkExtractVOI filter
+	 * @return	original input
+	 */
 	virtual vtkImageData* GetOriginalInput();
 	// Set/Get Input Layer which is supposed to be the output of overlay
 	virtual void SetInputDataLayer(vtkImageData *in);
@@ -86,13 +119,20 @@ public:
 	virtual void SetAnnotationRenderer(vtkRenderer *arg);
 
 	/**
-	 * LookupTable
+	 * Get/Set method of LookupTable
+	 * @return	lookupTable
 	 */
 	virtual vtkLookupTable* GetLookupTable();
+	/**
+	 * Get/Set method of LookupTable
+	 * @param	LookupTable
+	 */
 	virtual void SetLookupTable(vtkLookupTable* LookupTable);
 
-	// Description:
-	// Attach an interactor for the internal render window.
+	/**
+	 * Attach an interactor for the internal render window.
+	 * @param	arg, interactor
+	 */
 	virtual void SetupInteractor(vtkRenderWindowInteractor* arg);
 
 	// Description:
@@ -223,9 +263,5 @@ protected:
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.
 	void operator=(const MyImageViewer&);  // Not implemented.
-	/**
-	 * @deprecated
-	 */
-	//void SetInputConnection(vtkAlgorithmOutput* input);
 };
 #endif // !__MYIMAGEVIEWER_H__

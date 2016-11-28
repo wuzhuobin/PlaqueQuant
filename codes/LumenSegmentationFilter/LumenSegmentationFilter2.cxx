@@ -80,7 +80,7 @@ void LumenSegmentationFilter2::ReorderPolyData(vtkPolyData * lumenWallPolyData)
 	vtkIdList* startPointFinder = vtkIdList::New();
 	// if the lumenWallPolyData has no cells
 	if (lumenWallPolyData->GetNumberOfCells() < 1) {
-		return;
+		throw std::exception("The lumenWallPolyData has no cells at all.");
 	}
 	lumenWallPolyData->GetCellPoints(0, startPointFinder);
 	l_looper = startPointFinder->GetId(1);
@@ -172,6 +172,10 @@ void LumenSegmentationFilter2::ReorderPolyData(vtkPolyData * lumenWallPolyData)
 			// Get other point of the cell
 			vtkIdType l_prevPtID;
 			lumenWallPolyData->GetCellPoints(l_looper, neighborPtID);
+			if (neighborPtID->GetNumberOfIds() < 0) {
+				throw std::exception("The lumenPolyData is not a loop.");
+			}
+
 			if (neighborPtID->GetId(0) != l_looper) {
 				l_prevPtID = neighborPtID->GetId(0);
 			}
@@ -251,6 +255,8 @@ LumenSegmentationFilter2::LumenSegmentationFilter2()
 	this->SetNumberOfInputPorts(1);
 	this->SetNumberOfOutputPorts(1);
 }
+
+//#include <vtkXMLPolyDataWriter.h>
 
 int LumenSegmentationFilter2::RequestData(vtkInformation * request, vtkInformationVector ** inputVector, vtkInformationVector * outputVector)
 {
@@ -333,7 +339,20 @@ int LumenSegmentationFilter2::RequestData(vtkInformation * request, vtkInformati
 	connectivityFilter->Update();
 	cerr << "number of extracted regions:" << connectivityFilter->GetNumberOfExtractedRegions() << endl;
 
-	ReorderPolyData(connectivityFilter->GetOutput());
+	//// Write the file
+	//vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+	//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	//writer->SetFileName("test.vtp");
+	//writer->SetInputData(connectivityFilter->GetOutput());
+	//writer->Write();
+
+
+	try {
+		ReorderPolyData(connectivityFilter->GetOutput());
+	}
+	catch (std::exception& e) {
+		cerr << e.what() << endl;
+	}
 
 	double toleranceInitial = 1;
 	int loopBreaker = 0;

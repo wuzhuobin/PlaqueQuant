@@ -324,6 +324,11 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 
 }
 
+vtkImageData * MyImageViewer::GetInput()
+{
+	return vtkImageViewer2::GetInput();
+}
+
 vtkImageData* MyImageViewer::GetOriginalInput()
 {
 	return vtkImageData::SafeDownCast( ImageExtractVOI->GetInput());
@@ -373,6 +378,16 @@ void MyImageViewer::SetImageVOI(int * extent)
 	extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
 	extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
 	extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
+	//cout << "new extent: ";
+	//for (int i = 0; i < 6; ++i) {
+	//	cout << extent[i] << ' ';
+	//}
+	//cout << endl;
+	//cout << "original extent: ";
+	//for (int i = 0; i < 6; ++i) {
+	//	cout << originalExtent[i] << ' ';
+	//}
+	//cout << endl;
 	ImageExtractVOI->SetVOI(extent);
 	Render();
 }

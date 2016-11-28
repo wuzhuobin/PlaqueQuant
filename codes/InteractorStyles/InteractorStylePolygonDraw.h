@@ -39,13 +39,13 @@ public:
 	 */
 	virtual void NewContour();
 
-	virtual void SetContourLabel(int contourLabel);
+	virtual void SetContourLabel(unsigned char contourLabel);
 	
 	virtual void SetSmoothCurveEnable();
 	virtual void SetPolygonEnable();
 	virtual void SetLineInterpolator(int i);
 	virtual void FillPolygon();
-	virtual void FillPolygon(std::list<vtkSmartPointer<vtkContourWidget>>* contour, int label);
+	virtual void FillPolygon(std::list<vtkSmartPointer<vtkContourWidget>>* contour, unsigned char label);
 
 protected:
 	InteractorStylePolygonDraw();
@@ -65,7 +65,7 @@ protected:
 
 
 	// defaule label
-	int m_contourLabel = 1;
+	unsigned char m_contourLabel = 1;
 
 	vtkSmartPointer<vtkContourLineInterpolator> m_interpolator = nullptr;
 	std::list<vtkSmartPointer<vtkContourWidget>> m_contours;

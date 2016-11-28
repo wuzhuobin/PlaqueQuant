@@ -6,6 +6,10 @@
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkImageCast.h>
 
+#include <itkImageToVTKImageFilter.h>
+#include <itkVTKImageToImageFilter.h>
+
+
 vtkStandardNewMacro(LumenExtractionFilter);
 
 LumenExtractionFilter::LumenExtractionFilter() 
@@ -52,11 +56,13 @@ int LumenExtractionFilter::RequestInformation(vtkInformation * request, vtkInfor
 
 	return vtkImageAlgorithm::RequestInformation(request, inputVector, outputVector);
 }
-
 //#include <qlist.h>
 int LumenExtractionFilter::RequestData(vtkInformation* request,
 	vtkInformationVector** inputVector,
 	vtkInformationVector* outputVector) {
+
+	typedef itk::VTKImageToImageFilter<InputImageType> VTKImageToImageFilter;
+	typedef itk::ImageToVTKImageFilter<InputImageType> ImageToVtkImageFilter;
 
 	// get the info objects
 	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
@@ -81,10 +87,11 @@ int LumenExtractionFilter::RequestData(vtkInformation* request,
 	itkToVtk->SetInput(CoreFilter->GetOutput());
 	itkToVtk->Update();
 
+
 	vtkSmartPointer<vtkImageCast> cast =
 		vtkSmartPointer<vtkImageCast>::New();
 	cast->SetInputData(itkToVtk->GetOutput());
-	cast->SetOutputScalarTypeToDouble();
+	cast->SetOutputScalarTypeToUnsignedChar();
 	cast->Update();
 
 	output->ShallowCopy(cast->GetOutput());

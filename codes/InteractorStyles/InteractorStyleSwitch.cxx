@@ -77,10 +77,6 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->Ruler->SetDistanceWidgetEnabled(false);
 	if (this->CurrentStyle != this->ROI)
 		this->ROI->SetROIWidgetEnabled(false);
-	//if (this->CurrentStyle != this->SmartContour)
-	//	this->SmartContour->SetSmartContourEnable(false);
-	//if (this->CurrentStyle != this->SmartContour2)
-	//	this->SmartContour2->SetSmartContour2Enable(false);
 
 	// some special cases need to use InternalUpdate() to enabled
 	if (this->CurrentStyle == this->Navigation)
@@ -98,10 +94,6 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->PaintBrush->SetPaintBrushModeEnabled(true);
 	if (this->CurrentStyle == this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(true);
-	//if (this->CurrentStyle == this->SmartContour)
-	//	this->SmartContour->SetSmartContourEnable(true);
-	//if (this->CurrentStyle == this->SmartContour2)
-	//	this->SmartContour2->SetSmartContour2Enable(true);
 }
 
 void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)

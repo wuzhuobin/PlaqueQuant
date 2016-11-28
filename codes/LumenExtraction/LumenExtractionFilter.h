@@ -1,7 +1,7 @@
 #ifndef __LUMEN_EXTRACTION_FILTER_H__
 #define __LUMEN_EXTRACTION_FILTER_H__
 
-#include "itkImage.h"
+//#include "itkImage.h"
 #include "itkImageToImageFilter.h"
 #include <itkConfidenceConnectedImageFilter.h>
 
@@ -61,16 +61,14 @@ namespace itk
 #endif
 
 #include <vtkImageAlgorithm.h>
-#include <itkImageToVTKImageFilter.h>
-#include <itkVTKImageToImageFilter.h>
 
 class LumenExtractionFilter: public vtkImageAlgorithm
 {
 public:
-	typedef itk::Image<unsigned char, 3> ImageType;
-	typedef itk::ImageToVTKImageFilter<ImageType> ImageToVtkImageFilter;
-	typedef itk::VTKImageToImageFilter<ImageType> VTKImageToImageFilter;
-	typedef itk::LumenExtractionFilter<ImageType> LEFilter;
+	typedef itk::Image<float, 3> InputImageType;
+	typedef itk::Image<unsigned char, 3> OutputImageType;
+	//typedef itk::LumenExtractionFilter<OutputImageType> LEFilter;
+	typedef itk::LumenExtractionFilter<InputImageType> LEFilter;
 	LEFilter::Pointer CoreFilter = nullptr;
 
 

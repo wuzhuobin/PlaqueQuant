@@ -69,12 +69,12 @@ void QInteractorStyleROI::ExtractVOI()
 {
 	int extent[6];
 	const double* bounds = m_roi->GetRepresentation()->GetBounds();
-
 	for (int i = 0; i < 3; ++i) {
 		extent[i*2] = (bounds[i*2] - GetOrigin()[i]) / GetSpacing()[i];
 		extent[i*2 + 1] = (bounds[i*2 + 1] - GetOrigin()[i]) / GetSpacing()[i];
-		extent[i*2] = extent[i*2] > GetExtent()[i*2] ? extent[i*2] : GetExtent()[i*2];
-		extent[i*2 + 1] = extent[i*2 + 1] < GetExtent()[i*2 + 1] ? extent[i*2 + 1] : GetExtent()[i*2 +1];
+		// not voi clamping, the extraction can be more flexible
+		//extent[i*2] = extent[i*2] > GetExtent()[i*2] ? extent[i*2] : GetExtent()[i*2];
+		//extent[i*2 + 1] = extent[i*2 + 1] < GetExtent()[i*2 + 1] ? extent[i*2 + 1] : GetExtent()[i*2 +1];
 	}
 	m_imageViewer->SetImageVOI(extent);
 	m_imageViewer->SetOverlayVOI(extent);

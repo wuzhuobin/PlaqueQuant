@@ -30,8 +30,6 @@ Copyright (C) 2016
 #include "QInteractorStylePaintBrush.h"
 #include "QInteractorStyleROI.h"
 #include "QInteractorStyleRuler.h"
-//#include "InteractorStyleSmartContour.h"
-//#include "InteractorStyleSmartContour2.h"
 #include "StyleSwitchMacro.h"
 
 class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
@@ -48,8 +46,6 @@ public:
 	vtkGetMacro(PaintBrush, QInteractorStylePaintBrush*);
 	vtkGetMacro(ROI, QInteractorStyleROI*);
 	vtkGetMacro(Ruler, QInteractorStyleRuler*);
-	//vtkGetMacro(SmartContour, InteractorStyleSmartContour*);
-	//vtkGetMacro(SmartContour2, InteractorStyleSmartContour2*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
@@ -62,8 +58,6 @@ public:
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
 	SetInteractorStyleMacro(Ruler);
-	//SetInteractorStyleMacro(SmartContour);
-	//SetInteractorStyleMacro(SmartContour2);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
@@ -73,8 +67,6 @@ public:
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
 	CurrentStyleMacro(Ruler);
-	//CurrentStyleMacro(SmartContour);
-	//CurrentStyleMacro(SmartContour2);
 
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
@@ -101,8 +93,6 @@ private:
 	QInteractorStylePaintBrush*	PaintBrush;
 	QInteractorStyleROI* ROI;
 	QInteractorStyleRuler* Ruler;
-	//InteractorStyleSmartContour* SmartContour;
-	//InteractorStyleSmartContour2* SmartContour2;
 	vtkInteractorStyle*	CurrentStyle;
 	std::list<vtkInteractorStyle*> allStyles;
 };

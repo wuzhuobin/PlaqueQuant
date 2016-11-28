@@ -70,8 +70,8 @@ public:
 	virtual void ReadFromPolydata(int type);
 	virtual void WriteToPolydata();
 
-	virtual void SetVesselWallLabel(int vesselWallLabel);
-	virtual void SetLumenWallLabel(int lumenWallLabel);
+	virtual void SetVesselWallLabel(unsigned char vesselWallLabel);
+	virtual void SetLumenWallLabel(unsigned char lumenWallLabel);
 	virtual void SetGenerateValue(int value);
 
 	virtual void SetSegmentationMode(int i);
@@ -107,8 +107,8 @@ protected:
 	// contour initial type
 	int m_contourType = CONTOUR;
 	// defaule label
-	int m_vesselWallLabel = 2;
-	int m_lumenWallLabel = 1;
+	unsigned char m_vesselWallLabel = 2;
+	unsigned char m_lumenWallLabel = 1;
 
 	/**
 	* When refering to using index to represnet the image

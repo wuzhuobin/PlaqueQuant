@@ -412,10 +412,10 @@
            <number>20</number>
           </property>
           <property name="value">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="sliderPosition">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

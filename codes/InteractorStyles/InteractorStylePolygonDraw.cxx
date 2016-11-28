@@ -125,7 +125,7 @@ void InteractorStylePolygonDraw::NewContour()
 }
 
 
-void InteractorStylePolygonDraw::SetContourLabel(int noSegLabel)
+void InteractorStylePolygonDraw::SetContourLabel(unsigned char noSegLabel)
 {
 	this->m_contourLabel = noSegLabel;
 }
@@ -202,7 +202,8 @@ void InteractorStylePolygonDraw::FillPolygon()
 	FillPolygon(&m_contours, m_contourLabel);
 }
 
-void InteractorStylePolygonDraw::FillPolygon(std::list<vtkSmartPointer<vtkContourWidget>> * contour, int label)
+void InteractorStylePolygonDraw::FillPolygon(
+	std::list<vtkSmartPointer<vtkContourWidget>> * contour, unsigned char label)
 {
 	for (list<vtkSmartPointer<vtkContourWidget>>::const_iterator cit = contour->cbegin();
 		cit != contour->cend(); ++cit) {
@@ -295,7 +296,7 @@ void InteractorStylePolygonDraw::FillPolygon(std::list<vtkSmartPointer<vtkContou
 			}
 		}
 
-		m_imageViewer->GetOverlay()->SetPixels(points, label);
+		m_imageViewer->GetOverlay()->SetPixels(points, (unsigned char)label);
 
 	}
 

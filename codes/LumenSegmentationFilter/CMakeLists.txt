@@ -20,7 +20,10 @@ set(
 	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter2.h
 )
 
-
+set(
+	LUMEN_SEGMENTATION_FILTER_TEST
+	LumenSegmentationFilterTest.cxx
+)
 
 add_library(
 	LumenSegmentationFilter 
@@ -42,6 +45,7 @@ set_target_properties(
     # RUNTIME_OUTPUT_DIRECTORY
 	# ${CMAKE_SOURCE_DIR}/bin
 )
+
 #Grouping in MSVC
 SOURCE_GROUP(
 	"Header Files" 
@@ -54,3 +58,20 @@ SOURCE_GROUP(
 	${LUMEN_SEGMENTATION_FILTER_SRC}
 	)
 
+
+add_executable(
+	LumenSegmentationFilterTest
+	${LUMEN_SEGMENTATION_FILTER_TEST}
+)
+
+target_link_libraries(
+	LumenSegmentationFilterTest
+	LumenSegmentationFilter
+	${VTK_LIBRARIES}
+)
+
+SOURCE_GROUP(
+	"Source Files" 
+	FILES 
+	${LUMEN_SEGMENTATION_FILTER_TEST}
+	)

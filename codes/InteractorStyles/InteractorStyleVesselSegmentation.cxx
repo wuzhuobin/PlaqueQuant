@@ -278,12 +278,12 @@ void InteractorStyleVesselSegmentation::WriteToPolydata()
 	}
 }
 
-void InteractorStyleVesselSegmentation::SetVesselWallLabel(int vesselWallLabel)
+void InteractorStyleVesselSegmentation::SetVesselWallLabel(unsigned char vesselWallLabel)
 {
 	this->m_vesselWallLabel = vesselWallLabel;
 }
 
-void InteractorStyleVesselSegmentation::SetLumenWallLabel(int lumenWallLabel)
+void InteractorStyleVesselSegmentation::SetLumenWallLabel(unsigned char lumenWallLabel)
 {
 	this->m_lumenWallLabel = lumenWallLabel;
 }
