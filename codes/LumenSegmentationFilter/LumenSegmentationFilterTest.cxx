@@ -19,7 +19,6 @@
 #include <vtkCleanPolyData.h>
 #include <exception>
 #include <list>
-#include <map>
 #include <memory>
 #include <vtkKdTreePointLocator.h>
 
@@ -233,69 +232,54 @@ void ReorderPolyDataqqq(vtkPolyData * lumenWallPolyData) {
 void ReorderPolyData(vtkPolyData * lumenWallPolyData) throw(std::exception)
 {
 	using namespace std;
-	//list<vtkCell*> cellsList;
-	//list<unique_ptr<vtkIdType[]>> cellsList;
-	list<vtkIdType*> cellsList;
-	//list<vtkCell*> newCellsList;
-	//list<unique_ptr<vtkIdType[]>> newCellsList;
-	list<vtkIdType*> newCellsList;
+	list<shared_ptr<vtkIdType>> cellsList;
+	list<shared_ptr<vtkIdType>> newCellsList;
 	vtkSmartPointer<vtkPoints> _points =
 		vtkSmartPointer<vtkPoints>::New();
-
-	list<vtkIdType> pointIds;
 	for (vtkIdType i = 0; i < lumenWallPolyData->GetNumberOfCells(); ++i) {
 		vtkCell* _cell = lumenWallPolyData->GetCell(i);
-		vtkIdType* _twoPoints = new vtkIdType[2];
-		_twoPoints[0] = _cell->GetPointId(0);
-		_twoPoints[1] = _cell->GetPointId(1);
-		//unique_ptrvtkIdType*> _twoPoints(new vtkIdType[2]);
-		cellsList.push_back(_twoPoints);
+		// when using array with shared_ptr, 
+		// destructor needed to be specified
+		cellsList.push_back(shared_ptr<vtkIdType>(new vtkIdType[2],
+			[](vtkIdType* ptr)->void{delete[] ptr;}));
+		cellsList.back().get()[0] = _cell->GetPointId(0);
+		cellsList.back().get()[1] = _cell->GetPointId(1);
 	}
 
+	newCellsList.push_back((cellsList.back()));
 
-	newCellsList.push_back(cellsList.back());
 	while (cellsList.size() > 1) {
 		cerr << cellsList.size() << endl;
-		for (list<vtkIdType*>::iterator it = cellsList.begin();
-			it != cellsList.end(); ++it) {
-			cerr << (*it)[0] << endl;
-			cerr << (*it)[1] << endl;
+		for (list<shared_ptr<vtkIdType>>::const_iterator cit = cellsList.cbegin();
+			cit != cellsList.cend(); ++cit) {
+			if (newCellsList.front().get()[0] == cit->get()[1]) {
 
-			if (newCellsList.front()[0] == (*it)[1]) {
-				newCellsList.push_front(*it);
-				it = cellsList.erase(it);
+				newCellsList.push_front(*cit);
+				cit = cellsList.erase(cit);
 				break;
 			}
-			else if (newCellsList.back()[1] == (*it)[0]) {
-				newCellsList.push_back(*it);
-				it = cellsList.erase(it);
+			else if (newCellsList.back().get()[1] == cit->get()[0]) {
+				newCellsList.push_back(*cit);
+				cit = cellsList.erase(cit);
+				break;
+
 			}
-			//if (newCellsList.front()->GetPointId(0) == (*cit)->GetPointId(1)) {
-			//	newCellsList.push_front(*cit);
-			//	cit = cellsList.erase(cit);
-			//	break;
-			//}
-			//else if (newCellsList.back()->GetPointId(1) == (*cit)->GetPointId(0)) {
-			//	newCellsList.push_back(*cit);
-			//	cit = cellsList.erase(cit);
-			//}
 		}
 	}
 
-	for (list<vtkIdType*>::const_iterator cit = newCellsList.cbegin();
+	for (list<shared_ptr<vtkIdType>>::const_iterator cit = newCellsList.cbegin();
 		cit != newCellsList.cend(); ++cit) {
 		const double* coordinate;
 		if (cit == newCellsList.cbegin()) {
-
 			coordinate =
-				lumenWallPolyData->GetPoint((*cit)[0]);
+				lumenWallPolyData->GetPoint(cit->get()[0]);
 			_points->InsertNextPoint(coordinate);
 		}
 		coordinate =
-			lumenWallPolyData->GetPoint((*cit)[1]);
+			lumenWallPolyData->GetPoint(cit->get()[1]);
 		_points->InsertNextPoint(coordinate);
 	}
-	lumenWallPolyData->DeepCopy(vtkSmartPointer<vtkPolyData>::New());
+
 	lumenWallPolyData->SetPoints(_points);
 }
 
@@ -311,35 +295,11 @@ int main( int argc, char *argv[] )
     contourRepresentation->GetLinesProperty()->SetColor(1, 0, 0); // Set color to red
     contourWidget->SetRepresentation(contourRepresentation);
  
-    //// Generate a set of points arranged in a circle
-    //int numPts = 10;
-    //vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    //for (int i = 0; i < numPts; i++)
-    //{
-    //    // Create numPts points evenly spread around a circumference of radius 0.1
-    //    const double angle = 2.0*vtkMath::Pi()*i/numPts;
-    //    points->InsertPoint(static_cast<vtkIdType>(i), 0.1*cos(angle), 0.1*sin(angle), 0.0 );
-    //}
- 
-    //// Create a cell array to connect the points into meaningful geometry
-    //vtkIdType* vertexIndices = new vtkIdType[numPts+1];
-    //for (int i = 0; i < numPts; i++) { vertexIndices[i] = static_cast<vtkIdType>(i); }
-    //// Set the last vertex to 0; this means the last line segment will join the 19th point (vertices[19])
-    //// with the first one (vertices[0]), thus closing the circle.
-    //vertexIndices[numPts] = 0;
-    //vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
-    //lines->InsertNextCell(numPts+1, vertexIndices);
- 
-    //// Create polydata to hold the geometry just created, and populate it
-    //vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
-    //polydata->SetPoints(points);
-    //polydata->SetLines(lines);
-
 	vtkSmartPointer<vtkPolyData> polydata;
 
 	vtkSmartPointer<vtkXMLPolyDataReader> reader =
 		vtkSmartPointer<vtkXMLPolyDataReader>::New();
-	reader->SetFileName("C:/Users/user/Desktop/h/test4.vtp");
+	reader->SetFileName("C:/Users/jieji/Desktop/reorder/test3.vtp");
 	reader->Update();
 
 	vtkSmartPointer<vtkCleanPolyData> clean =
@@ -356,7 +316,7 @@ int main( int argc, char *argv[] )
 		vtkSmartPointer<vtkCleanPolyData>::New();
 	clean1->SetInputData(polydata);
 	clean1->PointMergingOn();
-	//clean1->SetTolerance(0.05);
+	clean1->SetTolerance(0.1);
 	clean1->Update();
 	polydata = clean1->GetOutput();
  
@@ -384,6 +344,7 @@ int main( int argc, char *argv[] )
     contourWidget->SetInteractor(interactor);
     contourWidget->On(); // Turn on the interactor observer
     contourWidget->Initialize(polydata);
+	contourWidget->CloseLoop();
     renderer->ResetCamera(); // Reposition camera to fit the scene elements
  
     // Start the interaction
