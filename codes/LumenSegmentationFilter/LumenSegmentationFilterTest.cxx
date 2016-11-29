@@ -20,6 +20,7 @@
 #include <exception>
 #include <list>
 #include <map>
+#include <memory>
 #include <vtkKdTreePointLocator.h>
 
 
@@ -92,8 +93,10 @@ public:
 	}
 };
 
-
-void ReorderPolyData(vtkPolyData * lumenWallPolyData) {
+/**
+ * @deprecated
+ */
+void ReorderPolyDataqqq(vtkPolyData * lumenWallPolyData) {
 
 
 	if (lumenWallPolyData == nullptr) {
@@ -119,23 +122,35 @@ void ReorderPolyData(vtkPolyData * lumenWallPolyData) {
 
 
 	vtkIdType previousPointId = -1;
-	vtkIdType previousCellId = 0;
+	vtkIdType previousCellId = -1;
 	unsigned short numOfCells = 0;
 	vtkIdType* neighborCells = nullptr;
+	previousCellId = 0;
 
 	while (_pointsList.size() < lumenWallPolyData->GetNumberOfPoints())
 	{
 		vtkIdType numOfPoints = 0;
-		while (numOfPoints < 1)
-		{
-			if (previousCellId == lumenWallPolyData->GetNumberOfCells()) {
-				break;
-				//throw ReorderPolyDataExceptionHasNoPoints();
-			}
+
+		for (; previousCellId < lumenWallPolyData->GetNumberOfCells();
+			++previousCellId) {
 			lumenWallPolyData->GetCellPoints(previousCellId, numOfPoints, points);
-			++previousCellId;
+			if (numOfPoints >= 1) {
+				break;
+			}
 		}
-		previousPointId = (previousPointId == points[0] ? points[1] : points[0]);
+		//while (numOfPoints < 1)
+		//{
+		//	++previousCellId;
+		//	if (previousCellId == lumenWallPolyData->GetNumberOfCells()) {
+		//		break;
+		//		//throw ReorderPolyDataExceptionHasNoPoints();
+		//	}
+		//	lumenWallPolyData->GetCellPoints(previousCellId, numOfPoints, points);
+		//	cerr << previousCellId << endl;
+		//}
+		previousPointId = (previousPointId != points[0] ? points[0] : points[1]);
+		cerr << "points[0] " << points[0] << "points[1]" << points[1] << endl;
+		cerr << "previousPointId " << previousPointId <<  endl;
 		_pointsList.push_back(previousPointId);
 		lumenWallPolyData->GetPointCells(previousPointId, numOfCells, neighborCells);
 		if (numOfCells < 2) {
@@ -153,31 +168,54 @@ void ReorderPolyData(vtkPolyData * lumenWallPolyData) {
 			kdTreePointLocater->FindClosestNPoints(lumenWallPolyData->GetNumberOfPoints(),
 				lumenWallPolyData->GetPoint(previousPointId), closestPoints);
 			int id = 0;
-			while(true){
+			for (int id = 0; id < closestPoints->GetNumberOfIds(); ++id) {
 				if (_pointsList.cend() ==
 					std::find(_pointsList.cbegin(), _pointsList.cend(),
 						closestPoints->GetId(id))) {
+					for (std::list<vtkIdType>::const_iterator cit = _pointsList.cbegin();
+						cit != _pointsList.cend(); ++cit) {
+						cerr << *cit << ' ';
+					}
+					cerr << "id: " << id << endl;
+					cerr << "GetId(id): " << closestPoints->GetId(id) << endl;
 					previousPointId = closestPoints->GetId(id);
-					break;
 				}
-				++id;
 				if (id == closestPoints->GetNumberOfIds()) {
 					break;
 					break;
 				}
 			}
+			//while(true){
+			//	//for (std::list<vtkIdType>::const_iterator cit = _pointsList.cbegin();
+			//	//	cit != _pointsList.cend(); ++cit) {
+			//	//	cerr << *cit << ' ';
+			//	//}
+			//	cerr << endl;
+			//	if (_pointsList.cend() ==
+			//		std::find(_pointsList.cbegin(), _pointsList.cend(),
+			//			closestPoints->GetId(id))) {
+			//		cerr << "this is the cend()";
+			//		cerr << (*_pointsList.cend()) << endl;
+			//		previousPointId = closestPoints->GetId(id);
+			//		cerr << id << endl;
+			//		cerr << "Find cloest points" << endl;
+			//		cerr << previousPointId << endl;
+
+			//		break;
+			//	}
+			//	++id;
+			//	if (id == closestPoints->GetNumberOfIds()) {
+			//		break;
+			//		break;
+			//	}
+			//}
 
 		}
 		else {
 			cerr << previousCellId << endl;
-			cerr << neighborCells[0] << endl;
-			cerr << neighborCells[1] << endl;
-			if (neighborCells[0] != previousCellId) {
-				previousCellId = neighborCells[0];
-			}
-			else {
-				previousCellId = neighborCells[1];
-			}
+			//cerr << neighborCells[0] << endl;
+			//cerr << neighborCells[1] << endl;
+			previousCellId = (previousCellId != neighborCells[0] ? neighborCells[0] : neighborCells[1]);
 		}
 	}
 
@@ -185,11 +223,79 @@ void ReorderPolyData(vtkPolyData * lumenWallPolyData) {
 		vtkSmartPointer<vtkPoints>::New();
 	for (std::list<vtkIdType>::const_iterator cit = _pointsList.cbegin();
 		cit != _pointsList.cend(); ++cit) {
-		double coordinate[3];
-		memcpy(coordinate, lumenWallPolyData->GetPoint(*cit), sizeof(coordinate));
+		const double* coordinate = lumenWallPolyData->GetPoint(*cit);
 		_points->InsertNextPoint(coordinate[0], coordinate[1], coordinate[2]);
 	}
 	lumenWallPolyData->ShallowCopy(vtkSmartPointer<vtkPolyData>::New());
+	lumenWallPolyData->SetPoints(_points);
+}
+
+void ReorderPolyData(vtkPolyData * lumenWallPolyData) throw(std::exception)
+{
+	using namespace std;
+	//list<vtkCell*> cellsList;
+	//list<unique_ptr<vtkIdType[]>> cellsList;
+	list<vtkIdType*> cellsList;
+	//list<vtkCell*> newCellsList;
+	//list<unique_ptr<vtkIdType[]>> newCellsList;
+	list<vtkIdType*> newCellsList;
+	vtkSmartPointer<vtkPoints> _points =
+		vtkSmartPointer<vtkPoints>::New();
+
+	list<vtkIdType> pointIds;
+	for (vtkIdType i = 0; i < lumenWallPolyData->GetNumberOfCells(); ++i) {
+		vtkCell* _cell = lumenWallPolyData->GetCell(i);
+		vtkIdType* _twoPoints = new vtkIdType[2];
+		_twoPoints[0] = _cell->GetPointId(0);
+		_twoPoints[1] = _cell->GetPointId(1);
+		//unique_ptrvtkIdType*> _twoPoints(new vtkIdType[2]);
+		cellsList.push_back(_twoPoints);
+	}
+
+
+	newCellsList.push_back(cellsList.back());
+	while (cellsList.size() > 1) {
+		cerr << cellsList.size() << endl;
+		for (list<vtkIdType*>::iterator it = cellsList.begin();
+			it != cellsList.end(); ++it) {
+			cerr << (*it)[0] << endl;
+			cerr << (*it)[1] << endl;
+
+			if (newCellsList.front()[0] == (*it)[1]) {
+				newCellsList.push_front(*it);
+				it = cellsList.erase(it);
+				break;
+			}
+			else if (newCellsList.back()[1] == (*it)[0]) {
+				newCellsList.push_back(*it);
+				it = cellsList.erase(it);
+			}
+			//if (newCellsList.front()->GetPointId(0) == (*cit)->GetPointId(1)) {
+			//	newCellsList.push_front(*cit);
+			//	cit = cellsList.erase(cit);
+			//	break;
+			//}
+			//else if (newCellsList.back()->GetPointId(1) == (*cit)->GetPointId(0)) {
+			//	newCellsList.push_back(*cit);
+			//	cit = cellsList.erase(cit);
+			//}
+		}
+	}
+
+	for (list<vtkIdType*>::const_iterator cit = newCellsList.cbegin();
+		cit != newCellsList.cend(); ++cit) {
+		const double* coordinate;
+		if (cit == newCellsList.cbegin()) {
+
+			coordinate =
+				lumenWallPolyData->GetPoint((*cit)[0]);
+			_points->InsertNextPoint(coordinate);
+		}
+		coordinate =
+			lumenWallPolyData->GetPoint((*cit)[1]);
+		_points->InsertNextPoint(coordinate);
+	}
+	lumenWallPolyData->DeepCopy(vtkSmartPointer<vtkPolyData>::New());
 	lumenWallPolyData->SetPoints(_points);
 }
 
@@ -233,7 +339,7 @@ int main( int argc, char *argv[] )
 
 	vtkSmartPointer<vtkXMLPolyDataReader> reader =
 		vtkSmartPointer<vtkXMLPolyDataReader>::New();
-	reader->SetFileName("C:/Users/jieji/Desktop/reorder/test2.vtp");
+	reader->SetFileName("C:/Users/user/Desktop/h/test4.vtp");
 	reader->Update();
 
 	vtkSmartPointer<vtkCleanPolyData> clean =
@@ -242,12 +348,17 @@ int main( int argc, char *argv[] )
 	clean->SetInputConnection(reader->GetOutputPort());
 	clean->Update();
 
-	ReorderPolyData(clean->GetOutput());
 
 	polydata = clean->GetOutput();
+	ReorderPolyData(polydata);
 
-
-
+	vtkSmartPointer<vtkCleanPolyData> clean1 =
+		vtkSmartPointer<vtkCleanPolyData>::New();
+	clean1->SetInputData(polydata);
+	clean1->PointMergingOn();
+	//clean1->SetTolerance(0.05);
+	clean1->Update();
+	polydata = clean1->GetOutput();
  
     // Create the renderer to visualize the scene
     vtkSmartPointer<vtkRenderer> renderer =

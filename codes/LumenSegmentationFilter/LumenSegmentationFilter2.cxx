@@ -14,6 +14,7 @@
 #include <vtkKdTree.h>
 #include <vtkLine.h>
 #include <vtkCellArray.h>
+#include <list>
 
 //#include <vtkXMLPolyDataWriter.h>
 
@@ -46,6 +47,77 @@ void LumenSegmentationFilter2::SetVesselWallContourRepresentation(vtkContourRepr
 	this->vesselWallContourRepresentation = vesselWallContourRepresentation;
 }
 
+
+void LumenSegmentationFilter2::ReorderPolyData1(vtkPolyData * lumenWallPolyData)
+{
+	using namespace std;
+	//list<vtkCell*> cellsList;
+	//list<unique_ptr<vtkIdType[]>> cellsList;
+	list<vtkIdType*> cellsList;
+	//list<vtkCell*> newCellsList;
+	//list<unique_ptr<vtkIdType[]>> newCellsList;
+	list<vtkIdType*> newCellsList;
+	vtkSmartPointer<vtkPoints> _points =
+		vtkSmartPointer<vtkPoints>::New();
+
+	list<vtkIdType> pointIds;
+	for (vtkIdType i = 0; i < lumenWallPolyData->GetNumberOfCells(); ++i) {
+		vtkCell* _cell = lumenWallPolyData->GetCell(i);
+		vtkIdType* _twoPoints = new vtkIdType[2];
+		_twoPoints[0] = _cell->GetPointId(0);
+		_twoPoints[1] = _cell->GetPointId(1);
+		//unique_ptrvtkIdType*> _twoPoints(new vtkIdType[2]);
+		cellsList.push_back(_twoPoints);
+	}
+
+
+	newCellsList.push_back(cellsList.back());
+	while (cellsList.size() > 1) {
+		cerr << cellsList.size() << endl;
+		for (list<vtkIdType*>::iterator it = cellsList.begin();
+			it != cellsList.end(); ++it) {
+			cerr << (*it)[0] << endl;
+			cerr << (*it)[1] << endl;
+
+			if (newCellsList.front()[0] == (*it)[1]) {
+				newCellsList.push_front(*it);
+				it = cellsList.erase(it);
+				break;
+			}
+			else if (newCellsList.back()[1] == (*it)[0]) {
+				newCellsList.push_back(*it);
+				it = cellsList.erase(it);
+			}
+			//if (newCellsList.front()->GetPointId(0) == (*cit)->GetPointId(1)) {
+			//	newCellsList.push_front(*cit);
+			//	cit = cellsList.erase(cit);
+			//	break;
+			//}
+			//else if (newCellsList.back()->GetPointId(1) == (*cit)->GetPointId(0)) {
+			//	newCellsList.push_back(*cit);
+			//	cit = cellsList.erase(cit);
+			//}
+		}
+	}
+
+	for (list<vtkIdType*>::const_iterator cit = newCellsList.cbegin();
+		cit != newCellsList.cend(); ++cit) {
+		const double* coordinate;
+		if (cit == newCellsList.cbegin()) {
+
+			coordinate =
+				lumenWallPolyData->GetPoint((*cit)[0]);
+			_points->InsertNextPoint(coordinate);
+		}
+		coordinate =
+			lumenWallPolyData->GetPoint((*cit)[1]);
+		_points->InsertNextPoint(coordinate);
+	}
+	lumenWallPolyData = vtkPolyData::New();
+	//lumenWallPolyData->ShallowCopy(vtkSmartPointer<vtkPolyData>::New());
+	lumenWallPolyData->SetPoints(_points);
+}
+
 void LumenSegmentationFilter2::ReorderPolyData(vtkPolyData * lumenWallPolyData)
 {
 	//// Restructure lines only so that adjacent point has incremental vtkID
@@ -64,12 +136,6 @@ void LumenSegmentationFilter2::ReorderPolyData(vtkPolyData * lumenWallPolyData)
 	cleaner->Update();
 	lumenWallPolyData->DeepCopy(cleaner->GetOutput());
 	lumenWallPolyData->BuildLinks(); // build link for pushing cells
-
-						//vtkXMLPolyDataWriter* writer = vtkXMLPolyDataWriter::New();
-						//writer->SetFileName("../data/preRecon.vtp");
-						//writer->SetInputData(lumenWallPolyData);
-						//writer->Update();
-						//writer->Write();
 
 	int l_nextCell;
 	int l_nextPt;
@@ -256,7 +322,7 @@ LumenSegmentationFilter2::LumenSegmentationFilter2()
 	this->SetNumberOfOutputPorts(1);
 }
 
-//#include <vtkXMLPolyDataWriter.h>
+#include <vtkXMLPolyDataWriter.h>
 
 int LumenSegmentationFilter2::RequestData(vtkInformation * request, vtkInformationVector ** inputVector, vtkInformationVector * outputVector)
 {
@@ -339,16 +405,16 @@ int LumenSegmentationFilter2::RequestData(vtkInformation * request, vtkInformati
 	connectivityFilter->Update();
 	cerr << "number of extracted regions:" << connectivityFilter->GetNumberOfExtractedRegions() << endl;
 
-	//// Write the file
-	//vtkSmartPointer<vtkXMLPolyDataWriter> writer =
-	//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	//writer->SetFileName("test.vtp");
-	//writer->SetInputData(connectivityFilter->GetOutput());
-	//writer->Write();
+	// Write the file
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+		vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetFileName("test.vtp");
+	writer->SetInputData(connectivityFilter->GetOutput());
+	writer->Write();
 
 
 	try {
-		ReorderPolyData(connectivityFilter->GetOutput());
+		ReorderPolyData1(connectivityFilter->GetOutput());
 	}
 	catch (std::exception& e) {
 		cerr << e.what() << endl;

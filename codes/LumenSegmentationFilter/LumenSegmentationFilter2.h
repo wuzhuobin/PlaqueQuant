@@ -32,7 +32,7 @@ public:
 	void SetVesselWallContourRepresentation(vtkContourRepresentation* vesselWallContourRepresentation);
 
 	static void ReorderPolyData(vtkPolyData* lumenWallPolyData);
-
+	static void ReorderPolyData1(vtkPolyData* lumenWallPolyData);
 
 protected:
 	LumenSegmentationFilter2();
