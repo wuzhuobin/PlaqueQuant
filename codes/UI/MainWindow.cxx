@@ -177,6 +177,10 @@ void MainWindow::setActionsEnable( bool b )
 	//switch after open the image
 	//ui->actionOpenImage->setEnabled(!b);
 	//ui->menuRecentImage->setEnabled(!b);
+	ui->image1View->setEnabled(b);
+	ui->image2View->setEnabled(b);
+	ui->image3View->setEnabled(b);
+	ui->image4View->setEnabled(b);
 	ui->sliceScrollArea->setEnabled(b);
 	ui->actionSave->setEnabled(b);
 	ui->actionNavigation->setEnabled(b);

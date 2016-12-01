@@ -16,33 +16,40 @@ class QInteractorStyleLumenSeedsPlacer: public QAbstractNavigation,
 public:
 	vtkTypeMacro(QInteractorStyleLumenSeedsPlacer, InteractorStyleSeedsPlacer);
 	static QInteractorStyleLumenSeedsPlacer* New();
-	virtual void SetSeedsPlacerEnable(bool flag);
-	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+	void SetSeedsPlacerEnable(bool flag);
+	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
+	/**
+	 * temporary fix
+	 */
+	void SetTargetImages(
+		QList<vtkSmartPointer<vtkImageData>> listOfVtkImages, 
+		QList<QString> listOfModalityNames);
 
 public slots:
-	virtual void SlotClearAllSeeds();
-	virtual void SetFocalSeed(int i);
-	virtual void DeleteFocalSeed();
-	virtual void SaveWidgetToSeeds();
-	virtual void DropSeed();
+	void SlotClearAllSeeds();
+	void SetFocalSeed(int i);
+	void DeleteFocalSeed();
+	void SaveWidgetToSeeds();
+	void DropSeed();
 
-	virtual void ExtractLumen();
+	void ExtractLumen();
 	/**
 	 * @deprecated
+	 * method has already been moved to InteractorStyleVesselSegmentation
 	 */
-	virtual void ExtractLumenPolyData();
-	virtual void SetMultipier(double value);
-	virtual void SetNumberOfIteractions(int value);
-	virtual void SetInitialNeighborhoodRadius(int value);
+	void ExtractLumenPolyData();
+	void SetMultipier(double value);
+	void SetNumberOfIteractions(int value);
+	void SetInitialNeighborhoodRadius(int value);
 
 protected:
 	QInteractorStyleLumenSeedsPlacer(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
 	~QInteractorStyleLumenSeedsPlacer();
 
-	virtual void UniqueEnable(bool flag);
-	virtual void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
+	void UniqueEnable(bool flag);
+	void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
 
-	virtual void OnKeyPress();
+	void OnKeyPress();
 
 private:
 
@@ -51,6 +58,10 @@ private:
 	int m_numberOfIteractions = 3;
 	double m_multiplier = 2.1;
 	int m_initialNeighborhoodRadius = 1;
+
+
+	QList<vtkSmartPointer<vtkImageData>> m_listOfVtkImages;
+	QList<QString> m_listOfModalityNames;
 
 };
 

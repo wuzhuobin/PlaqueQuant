@@ -8,15 +8,12 @@
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkMath.h>
 #include <vtkPolygon.h>
-
 #include <vtkCleanPolyData.h>
-#include <vtkCenterOfMass.h>
-#include <vtkKdTree.h>
-#include <vtkLine.h>
-#include <vtkCellArray.h>
-#include <list>
+#include <vtkCallbackCommand.h>
 
-//#include <vtkXMLPolyDataWriter.h>
+
+#include "ReorderPointIdOfContourFilter.h"
+
 
 vtkStandardNewMacro(LumenSegmentationFilter2)
 
@@ -47,282 +44,13 @@ void LumenSegmentationFilter2::SetVesselWallContourRepresentation(vtkContourRepr
 	this->vesselWallContourRepresentation = vesselWallContourRepresentation;
 }
 
-
-void LumenSegmentationFilter2::ReorderPolyData1(vtkPolyData * lumenWallPolyData)
-{
-	using namespace std;
-	//list<vtkCell*> cellsList;
-	//list<unique_ptr<vtkIdType[]>> cellsList;
-	list<vtkIdType*> cellsList;
-	//list<vtkCell*> newCellsList;
-	//list<unique_ptr<vtkIdType[]>> newCellsList;
-	list<vtkIdType*> newCellsList;
-	vtkSmartPointer<vtkPoints> _points =
-		vtkSmartPointer<vtkPoints>::New();
-
-	list<vtkIdType> pointIds;
-	for (vtkIdType i = 0; i < lumenWallPolyData->GetNumberOfCells(); ++i) {
-		vtkCell* _cell = lumenWallPolyData->GetCell(i);
-		vtkIdType* _twoPoints = new vtkIdType[2];
-		_twoPoints[0] = _cell->GetPointId(0);
-		_twoPoints[1] = _cell->GetPointId(1);
-		//unique_ptrvtkIdType*> _twoPoints(new vtkIdType[2]);
-		cellsList.push_back(_twoPoints);
-	}
-
-
-	newCellsList.push_back(cellsList.back());
-	while (cellsList.size() > 1) {
-		cerr << cellsList.size() << endl;
-		for (list<vtkIdType*>::iterator it = cellsList.begin();
-			it != cellsList.end(); ++it) {
-			cerr << (*it)[0] << endl;
-			cerr << (*it)[1] << endl;
-
-			if (newCellsList.front()[0] == (*it)[1]) {
-				newCellsList.push_front(*it);
-				it = cellsList.erase(it);
-				break;
-			}
-			else if (newCellsList.back()[1] == (*it)[0]) {
-				newCellsList.push_back(*it);
-				it = cellsList.erase(it);
-			}
-			//if (newCellsList.front()->GetPointId(0) == (*cit)->GetPointId(1)) {
-			//	newCellsList.push_front(*cit);
-			//	cit = cellsList.erase(cit);
-			//	break;
-			//}
-			//else if (newCellsList.back()->GetPointId(1) == (*cit)->GetPointId(0)) {
-			//	newCellsList.push_back(*cit);
-			//	cit = cellsList.erase(cit);
-			//}
-		}
-	}
-
-	for (list<vtkIdType*>::const_iterator cit = newCellsList.cbegin();
-		cit != newCellsList.cend(); ++cit) {
-		const double* coordinate;
-		if (cit == newCellsList.cbegin()) {
-
-			coordinate =
-				lumenWallPolyData->GetPoint((*cit)[0]);
-			_points->InsertNextPoint(coordinate);
-		}
-		coordinate =
-			lumenWallPolyData->GetPoint((*cit)[1]);
-		_points->InsertNextPoint(coordinate);
-	}
-	lumenWallPolyData = vtkPolyData::New();
-	//lumenWallPolyData->ShallowCopy(vtkSmartPointer<vtkPolyData>::New());
-	lumenWallPolyData->SetPoints(_points);
-}
-
-void LumenSegmentationFilter2::ReorderPolyData(vtkPolyData * lumenWallPolyData)
-{
-	//// Restructure lines only so that adjacent point has incremental vtkID
-	double referenceDirection[3] = { 1,2,3 };
-
-	vtkSmartPointer<vtkPolyData> tmpHolder = vtkSmartPointer<vtkPolyData>::New();
-	vtkSmartPointer<vtkPoints> tmpPts = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray> tmpCellArr = vtkSmartPointer<vtkCellArray>::New();
-
-	// Clean the line before reconstruction to remove duplicated points and cells, which mess with the program
-	vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-	cleaner->SetInputData(lumenWallPolyData);
-	cleaner->PointMergingOn();
-	cleaner->ConvertLinesToPointsOn();
-	cleaner->ConvertPolysToLinesOn();
-	cleaner->Update();
-	lumenWallPolyData->DeepCopy(cleaner->GetOutput());
-	lumenWallPolyData->BuildLinks(); // build link for pushing cells
-
-	int l_nextCell;
-	int l_nextPt;
-	int l_looper = 0;
-	int startID = 0;
-	int l_prevID = -1;
-	// Start from a point that has cell
-	vtkIdList* startPointFinder = vtkIdList::New();
-	// if the lumenWallPolyData has no cells
-	if (lumenWallPolyData->GetNumberOfCells() < 1) {
-		throw std::exception("The lumenWallPolyData has no cells at all.");
-	}
-	lumenWallPolyData->GetCellPoints(0, startPointFinder);
-	l_looper = startPointFinder->GetId(1);
-	startID = l_looper;
-	tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
-
-
-	while (tmpPts->GetNumberOfPoints() < lumenWallPolyData->GetNumberOfPoints()) {
-		vtkIdList* neighborPtID = vtkIdList::New();
-		vtkIdList* neighborCellID = vtkIdList::New();
-		// First point deside direction
-		if (tmpPts->GetNumberOfPoints() == 1) {
-			// Get CenterOfMass
-			vtkSmartPointer<vtkCenterOfMass> comfilter = vtkSmartPointer<vtkCenterOfMass>::New();
-			comfilter->SetInputData(lumenWallPolyData);
-			comfilter->Update();
-			double* com = comfilter->GetCenter();
-
-			// Get neighbor cells
-			lumenWallPolyData->GetPointCells(l_looper, neighborCellID);
-			//cout « "Number of cell for pt " « l_looper « ": " « neighborCellID->GetNumberOfIds() « " "; //DEBUG
-			double *vectorLooper = (double*)malloc(sizeof(double) * 3);
-			double *vector1 = (double*)malloc(sizeof(double) * 3);
-			double *vector2 = (double*)malloc(sizeof(double) * 3);
-			vtkIdType neighborPtId1;
-			vtkIdType neighborPtId2;
-
-			lumenWallPolyData->GetCellPoints(neighborCellID->GetId(0), neighborPtID);
-			if (neighborPtID->GetId(0) != l_looper) {
-				neighborPtId1 = neighborPtID->GetId(0);
-			}
-			else {
-				neighborPtId1 = neighborPtID->GetId(1);
-			}
-			lumenWallPolyData->GetCellPoints(neighborCellID->GetId(1), neighborPtID);
-			if (neighborPtID->GetId(0) != l_looper) {
-				neighborPtId2 = neighborPtID->GetId(0);
-			}
-			else {
-				neighborPtId2 = neighborPtID->GetId(1);
-			}
-
-			memcpy(vectorLooper, lumenWallPolyData->GetPoint(l_looper), sizeof(double) * 3);
-			memcpy(vector1, lumenWallPolyData->GetPoint(neighborPtId1), sizeof(double) * 3);
-			memcpy(vector2, lumenWallPolyData->GetPoint(neighborPtId2), sizeof(double) * 3);
-
-			vtkMath::Subtract(vectorLooper, com, vectorLooper);
-			vtkMath::Subtract(vector1, com, vector1);
-			vtkMath::Subtract(vector2, com, vector2);
-			vtkMath::Normalize(vector1);
-			vtkMath::Normalize(vector2);
-
-			vtkMath::Cross(vector1, vectorLooper, vector1);
-			vtkMath::Cross(vector2, vectorLooper, vector2);
-
-			double d1 = vtkMath::Dot(vector1, referenceDirection);
-			double d2 = vtkMath::Dot(vector2, referenceDirection);
-
-			if (d1 >= d2) {
-				// if d1 follows direction
-				l_prevID = neighborCellID->GetId(1);
-			}
-			else if (d1 < d2) {
-				// if d2 follows direction
-				l_prevID = neighborCellID->GetId(0);
-			}
-			else if (d1*d2 > 0) {
-				// both same sign
-				std::cerr << "Both neighbor has same dot product with direction. Potential error of loop order direction" << endl;
-				l_prevID = neighborCellID->GetId(0);
-			}
-			else {
-				l_prevID = neighborCellID->GetId(0);
-			}
-
-			free(vectorLooper);
-			free(vector1);
-			free(vector2);
-		}
-
-		// Get neighbor cells
-		lumenWallPolyData->GetPointCells(l_looper, neighborCellID);
-		//cout « "Number of cell for pt " « l_looper « ": " « neighborCellID->GetNumberOfIds() « " " « endl; //DEBUG
-		// if it only has one cell
-		if (neighborCellID->GetNumberOfIds() == 1) {
-			// attemps to connect back to the loop
-			std::cerr << "Warning! Your input is not a loop, attempting to connect gap at ptID=" << l_looper << "." << endl;
-
-			// Get other point of the cell
-			vtkIdType l_prevPtID;
-			lumenWallPolyData->GetCellPoints(l_looper, neighborPtID);
-			if (neighborPtID->GetNumberOfIds() < 0) {
-				throw std::exception("The lumenPolyData is not a loop.");
-			}
-
-			if (neighborPtID->GetId(0) != l_looper) {
-				l_prevPtID = neighborPtID->GetId(0);
-			}
-			else {
-				l_prevPtID = neighborPtID->GetId(1);
-			}
-
-			vtkSmartPointer<vtkKdTree> l_kd = vtkSmartPointer<vtkKdTree>::New();
-			l_kd->BuildLocatorFromPoints(lumenWallPolyData);
-			l_kd->FindClosestNPoints(3, lumenWallPolyData->GetPoint(l_looper), neighborPtID);
-			// Get points of neighbor cells
-			vtkIdType l_tempLink[2];
-			l_tempLink[0] = l_looper;
-			for (int i = 0; i < 3; i++)
-			{
-				if (neighborPtID->GetId(i) != l_looper && neighborPtID->GetId(i) != l_prevPtID) {
-					l_looper = neighborPtID->GetId(i);
-					tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
-				}
-			}
-
-			l_tempLink[1] = l_looper;
-			l_prevID = lumenWallPolyData->InsertNextLinkedCell(VTK_LINE, 2, l_tempLink);
-		}
-		else {
-			if (neighborCellID->GetId(0) != l_prevID) {
-				l_nextCell = neighborCellID->GetId(0);
-				l_prevID = l_nextCell;
-			}
-			else {
-				l_nextCell = neighborCellID->GetId(1);
-				l_prevID = l_nextCell;
-			}
-			// Get points of neighbor cells
-			lumenWallPolyData->GetCellPoints(l_nextCell, neighborPtID);
-			//cout « "Number of pt for cell " « l_nextCell « ": " « neighborPtID->GetNumberOfIds() « "\n"; //DEBUG
-			if (neighborPtID->GetId(0) != l_looper) {
-				l_looper = neighborPtID->GetId(0);
-				tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
-			}
-			else
-			{
-				l_looper = neighborPtID->GetId(1);
-				tmpPts->InsertNextPoint(lumenWallPolyData->GetPoint(l_looper));
-			}
-		}
-
-		// Push the line into the new polydata
-		vtkSmartPointer<vtkLine> l_line = vtkSmartPointer<vtkLine>::New();
-		l_line->GetPointIds()->SetId(0, tmpPts->GetNumberOfPoints() - 2);
-		l_line->GetPointIds()->SetId(1, tmpPts->GetNumberOfPoints() - 1);
-		tmpCellArr->InsertNextCell(l_line);
-
-		neighborPtID->Delete();
-		neighborCellID->Delete();
-
-		if (l_looper == startID) {
-			// Break if reaching the end
-			break;
-		}
-	}
-	vtkSmartPointer<vtkLine> tmpline = vtkSmartPointer<vtkLine>::New();
-	tmpline->GetPointIds()->SetId(0, tmpPts->GetNumberOfPoints() - 1);
-	tmpline->GetPointIds()->SetId(1, 0);
-	tmpCellArr->InsertNextCell(tmpline);
-
-	tmpHolder->SetPoints(tmpPts);
-	tmpHolder->SetLines(tmpCellArr);
-
-	// Copy result to lumenWallPolyData
-	lumenWallPolyData->DeepCopy(tmpHolder);
-	
-}
-
 LumenSegmentationFilter2::LumenSegmentationFilter2()
 {
 	this->SetNumberOfInputPorts(1);
 	this->SetNumberOfOutputPorts(1);
 }
 
-#include <vtkXMLPolyDataWriter.h>
+//#include <vtkXMLPolyDataWriter.h>
 
 int LumenSegmentationFilter2::RequestData(vtkInformation * request, vtkInformationVector ** inputVector, vtkInformationVector * outputVector)
 {
@@ -403,29 +131,43 @@ int LumenSegmentationFilter2::RequestData(vtkInformation * request, vtkInformati
 	connectivityFilter->SetInputConnection(marchingSquares->GetOutputPort());
 	connectivityFilter->SetExtractionModeToLargestRegion();
 	connectivityFilter->Update();
-	cerr << "number of extracted regions:" << connectivityFilter->GetNumberOfExtractedRegions() << endl;
 
 	// Write the file
-	vtkSmartPointer<vtkXMLPolyDataWriter> writer =
-		vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	writer->SetFileName("test.vtp");
-	writer->SetInputData(connectivityFilter->GetOutput());
-	writer->Write();
+	//vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+	//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	//writer->SetFileName("test.vtp");
+	//writer->SetInputData(connectivityFilter->GetOutput());
+	//writer->Write();
 
 
-	try {
-		ReorderPolyData1(connectivityFilter->GetOutput());
-	}
-	catch (std::exception& e) {
-		cerr << e.what() << endl;
-	}
+	// vtkError handling
+	vtkSmartPointer<vtkCallbackCommand> errorCatch =
+		vtkSmartPointer<vtkCallbackCommand>::New();
+	// lambda function for handling error
+	errorCatch->SetCallback([](vtkObject *caller, unsigned long eid,
+		void *clientdata, void *calldata)->void {
+		// error catch and error display
+		char* ErrorMessage = static_cast<char *>(calldata);
+		vtkOutputWindowDisplayErrorText(ErrorMessage);
+		ReorderPointIdOfContourFilter* reorder =
+			ReorderPointIdOfContourFilter::SafeDownCast(caller);
+		// if error happened, skip this filer
+		reorder->SetOutput(reorder->GetInput());
+	});
+
+
+	vtkSmartPointer<ReorderPointIdOfContourFilter> reorder =
+		vtkSmartPointer<ReorderPointIdOfContourFilter>::New();
+	reorder->SetInputConnection(connectivityFilter->GetOutputPort());
+	reorder->AddObserver(vtkCommand::ErrorEvent, errorCatch);
+	reorder->Update();
+
 
 	double toleranceInitial = 1;
 	int loopBreaker = 0;
-
 	vtkSmartPointer<vtkCleanPolyData> clearPolyData =
 		vtkSmartPointer<vtkCleanPolyData>::New();
-	clearPolyData->SetInputConnection(connectivityFilter->GetOutputPort());
+	clearPolyData->SetInputConnection(reorder->GetOutputPort());
 	clearPolyData->ToleranceIsAbsoluteOn();
 	clearPolyData->SetAbsoluteTolerance(toleranceInitial);
 	clearPolyData->PointMergingOn();

@@ -31,12 +31,14 @@ Copyright (C) 2016
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkCenterOfMass.h>
 #include <vtkImageThreshold.h>
+#include <vtkCallbackCommand.h>
 
+
+#include "ReorderPointIdOfContourFilter.h"
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
 #include "InteractorStyleVesselSegmentation.h"
 #include "LumenSegmentationFilter2.h"
-//#include "LumenSegmentation.h"
 
 using namespace std;
 vtkStandardNewMacro(InteractorStyleVesselSegmentation);
@@ -200,8 +202,9 @@ void InteractorStyleVesselSegmentation::NewContour(int type, QList<vtkSmartPoint
 			SetRenderer(m_imageViewer->GetAnnotationRenderer());
 		_contour->ContinuousDrawOn();
 		_contour->FollowCursorOn();
-		_contour->Initialize((*cit));
 		_contour->EnabledOn();
+		// EnableOn() first
+		_contour->Initialize((*cit));
 		_contour->CloseLoop();
 
 
@@ -461,7 +464,7 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 	ReadFromPolydata(LUMEN);
 	m_imageViewer->Render();
 }
-
+#include<vtkXMLPolyDataWriter.h>
 void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
@@ -519,14 +522,49 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			_connectivityFilter->SetExtractionModeToSpecifiedRegions();
 			_connectivityFilter->Update();
 
-			LumenSegmentationFilter2::ReorderPolyData(_connectivityFilter->GetOutput());
+			vtkSmartPointer<vtkCleanPolyData> clean =
+				vtkSmartPointer<vtkCleanPolyData>::New();
+			clean->SetInputConnection(_connectivityFilter->GetOutputPort());
+			clean->PointMergingOn();
+			clean->Update();
+
+			// Write the file
+			vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+				vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+			writer->SetFileName(QString("test" + QString::number(i) + ".vtp").toStdString().c_str());
+			writer->SetInputConnection(clean->GetOutputPort());
+			writer->Write();
+
+			// vtkError handling
+			vtkSmartPointer<vtkCallbackCommand> errorCatch =
+				vtkSmartPointer<vtkCallbackCommand>::New();
+			// lambda function for handling error
+			errorCatch->SetCallback([](vtkObject *caller, unsigned long eid,
+				void *clientdata, void *calldata)->void {
+				// error catch and error display
+				char* ErrorMessage = static_cast<char *>(calldata);
+				vtkOutputWindowDisplayErrorText(ErrorMessage);
+				ReorderPointIdOfContourFilter* reorder =
+					ReorderPointIdOfContourFilter::SafeDownCast(caller);
+				// if error happened, skip this filer
+				reorder->SetOutput(reorder->GetInput());
+			});
+			vtkSmartPointer<ReorderPointIdOfContourFilter> reorder =
+				vtkSmartPointer<ReorderPointIdOfContourFilter>::New();
+			reorder->SetInputConnection(clean->GetOutputPort());
+			reorder->AddObserver(vtkCommand::ErrorEvent, errorCatch);
+			reorder->Update();
+			if(reorder->GetInput() == reorder->GetOutput()) {
+				string ErrorMessage = "Error in slice " + to_string(i);
+				vtkErrorMacro(<< ErrorMessage);
+			}
 
 			double toleranceInitial = 1;
 			int loopBreaker = 0;
 
 			vtkSmartPointer<vtkCleanPolyData> clearPolyData =
 				vtkSmartPointer<vtkCleanPolyData>::New();
-			clearPolyData->SetInputConnection(_connectivityFilter->GetOutputPort());
+			clearPolyData->SetInputConnection(reorder->GetOutputPort());
 			clearPolyData->ToleranceIsAbsoluteOn();
 			clearPolyData->SetAbsoluteTolerance(toleranceInitial);
 			clearPolyData->PointMergingOn();

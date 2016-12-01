@@ -22,11 +22,6 @@ int MyImageManager::getNumberOfImages()
 	return num;
 }
 
-//QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfViewerInputImages()
-//{
-//	return this->listOfVtkViewerInputImages;
-//}
-
 const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
 {
 	return this->listOfVtkImages;
@@ -75,7 +70,8 @@ Overlay* MyImageManager::getOverlay()
 int MyImageManager::GetModalityIndex(QString modalityName)
 {
 	for (int i = 0; i < this->getListOfModalityNames().size(); ++i) {
-		if (modalityName == this->getListOfModalityNames()[i] && this->getListOfVtkImages()[i] != NULL) {
+		if (modalityName == this->getListOfModalityNames()[i] &&
+			this->getListOfVtkImages()[i] != NULL) {
 			return i;
 		} else 
 			continue;

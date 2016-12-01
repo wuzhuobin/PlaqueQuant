@@ -104,9 +104,9 @@ public:
 	virtual void SetOverlayVOI(int* extent);
 	virtual void ResetOverlayVOI();
 
-	// Description:
-	// return DefaultWindowLevel
-	virtual double* GetDefaultWindowLevel();
+	//// Description:
+	//// return DefaultWindowLevel
+	//virtual double* GetDefaultWindowLevel();
 	
 	// Description:
 	// Get the internal render window, renderer, image actor, and
@@ -192,7 +192,7 @@ public slots:
 	/**
 	 * @slot
 	 * Setting and Getting all visibility of all actor, which means it will somehow look 
-	 * like turn off
+	 * like turn off, it will invoke Render()
 	 * it will also set AllBlackFlag = flag
 	 * @param	flag 
 	 */
@@ -254,8 +254,8 @@ protected:
 	vtkLookupTable* LookupTable = nullptr;
 
 
-	//Parameter
-	double DefaultWindowLevel[2] = { 0 };
+	////Parameter
+	//double DefaultWindowLevel[2] = { 0 };
 
 	// All Black flag
 	bool AllBlackFlag = false;
@@ -263,5 +263,8 @@ protected:
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.
 	void operator=(const MyImageViewer&);  // Not implemented.
+	void SetInputConnection(vtkAlgorithmOutput* input); // Not implemented
+
+
 };
 #endif // !__MYIMAGEVIEWER_H__

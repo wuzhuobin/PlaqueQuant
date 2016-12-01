@@ -8,16 +8,20 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
-set(
-    LUMEN_SEGMENTATION_FILTER_SRC
-	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter.cxx
-	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter2.cxx
+include_directories(
+	../ReorderPointIdOfContourFilter
 )
 
 set(
-	LUMEN_SEGMENTATION_FILTER_INC
-	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter.h
-	${PROJECT_SOURCE_DIR}/LumenSegmentationFilter2.h
+    LUMEN_SEGMENTATION_FILTER_CXX
+	LumenSegmentationFilter.cxx
+	LumenSegmentationFilter2.cxx
+)
+
+set(
+	LUMEN_SEGMENTATION_FILTER_H
+	LumenSegmentationFilter.h
+	LumenSegmentationFilter2.h
 )
 
 set(
@@ -28,34 +32,35 @@ set(
 add_library(
 	LumenSegmentationFilter 
 	SHARED
-	${LUMEN_SEGMENTATION_FILTER_SRC}
-	${LUMEN_SEGMENTATION_FILTER_INC}
+	${LUMEN_SEGMENTATION_FILTER_CXX}
+	${LUMEN_SEGMENTATION_FILTER_H}
 	)
 
 #link libraries
 target_link_libraries(
 	LumenSegmentationFilter
 	${VTK_LIBRARIES}
+	ReorderPointIdOfContourFilter
 	)
 set_target_properties(
     LumenSegmentationFilter
     PROPERTIES
     WINDOWS_EXPORT_ALL_SYMBOLS 
     true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_SOURCE_DIR}/bin
+    RUNTIME_OUTPUT_DIRECTORY
+	${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 
 #Grouping in MSVC
 SOURCE_GROUP(
 	"Header Files" 
 	FILES 
-	${LUMEN_SEGMENTATION_FILTER_INC}
+	${LUMEN_SEGMENTATION_FILTER_H}
 	)
 SOURCE_GROUP(
 	"Source Files" 
 	FILES 
-	${LUMEN_SEGMENTATION_FILTER_SRC}
+	${LUMEN_SEGMENTATION_FILTER_CXX}
 	)
 
 

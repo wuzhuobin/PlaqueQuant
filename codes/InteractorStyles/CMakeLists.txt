@@ -26,7 +26,8 @@ endif()
 
 #link other libraries
 link_directories(
-	${PROJECT_SOURCE_DIR}/lib
+	${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 	)
 
 include_directories(
@@ -99,8 +100,9 @@ add_library(
 
 target_link_libraries(
 	InteractorStyles
-	${VTK_LIBRARIES}
-	Qt5::Widgets
+	${LINK_LIBRARIE}
+	# ${VTK_LIBRARIES}
+	# Qt5::Widgets
 )
 
 source_group(

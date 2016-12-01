@@ -59,18 +59,18 @@ const QString IOManager::getFilePath()
 	return this->filePath;
 }
 
-bool IOManager::LoadImageData(QStringList fileNames)
+bool IOManager::loadImageData(QStringList fileNames)
 {
-	ImageType::Pointer _itkImage = NULL;
-	vtkSmartPointer<vtkImageData> _vtkImage = NULL;
-	vtkSmartPointer<vtkImageData> _vtkImageCopy = NULL;
+	ImageType::Pointer _itkImage = nullptr;
+	vtkSmartPointer<vtkImageData> _vtkImage = nullptr;
+	vtkSmartPointer<vtkImageData> _vtkImageCopy = nullptr;
 	// QMAP saving DICOM imformation
-	QMap<QString, QString>* DICOMHeader = NULL;
+	QMap<QString, QString>* DICOMHeader = nullptr;
 	if (fileNames.isEmpty()) {
-		_itkImage = NULL;
-		_vtkImage = NULL;
-		DICOMHeader = NULL;
-		_vtkImageCopy = NULL;
+		_itkImage = nullptr;
+		_vtkImage = nullptr;
+		DICOMHeader = nullptr;
+		_vtkImageCopy = nullptr;
 	}
 	// load Nifti Data
 	else if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
@@ -79,7 +79,7 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		reader->SetFileName(fileNames[0].toStdString());
 		reader->Update();
 		_itkImage = reader->GetOutput();
-		DICOMHeader = NULL;
+		DICOMHeader = nullptr;
 	}
 	// Load Dicom Data
 	else {
@@ -131,12 +131,9 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		connector->SetInput(_itkImage);
 		connector->Update();
 		_vtkImage = connector->GetOutput();
-		//_vtkImageCopy = vtkSmartPointer<vtkImageData>::New();
-		//_vtkImageCopy->DeepCopy(_vtkImage);
 	}
 
 	this->myImageManager->listOfItkImages.append( _itkImage);
-	//this->myImageManager->listOfVtkViewerInputImages.append(_vtkImageCopy);
 	this->myImageManager->listOfVtkImages.append(_vtkImage);
 	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 
@@ -157,10 +154,10 @@ void IOManager::setMyImageManager(MyImageManager * myImageManager)
 	this->myImageManager = myImageManager;
 }
 
-void IOManager::setUniqueKeys(QStringList keys)
-{
-	this->uniqueKeys = keys;
-}
+//void IOManager::setUniqueKeys(QStringList keys)
+//{
+//	this->uniqueKeys = keys;
+//}
 
 void IOManager::slotOpenWithWizard()
 {
@@ -175,7 +172,7 @@ void IOManager::slotOpenWithWizard(QString dir)
 	filePath = wizard.getDirectory();
 	this->listOfFileNames.clear();
 	for (int i = 0; i < 5; ++i) {
-		if (wizard.getFileNamesN(i + 1) == NULL) {
+		if (wizard.getFileNamesN(i + 1) == nullptr) {
 			addToListOfFileNames(QStringList());
 		}
 		else {
@@ -183,15 +180,6 @@ void IOManager::slotOpenWithWizard(QString dir)
 		}
 	}
 
-	//QStringList* wizardFileNames[5] = {
-	//	wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
-	//	wizard.getFileNames4(), wizard.getFileNames5() };
-	//for (int i = 0; i < 5; ++i) {
-	//	if (wizardFileNames[i] == NULL) {
-	//		wizardFileNames[i];
-	//	}
-	//	this->addToListOfFileNames(*wizardFileNames[i]);
-	//}
 	slotOpenMultiImages();
 }
 
@@ -225,7 +213,7 @@ void IOManager::slotOpenMultiImages()
 
 void IOManager::slotOpenOneImage(QStringList fileNames)
 {
-	this->LoadImageData(fileNames);
+	loadImageData(fileNames);
 	emit finishOpenOneImage();
 }
 
@@ -241,9 +229,6 @@ void IOManager::slotOpenSegmentationWithDiaglog()
 void IOManager::slotOpenSegmentation(QString fileName)
 {
 	Overlay::OverlayImageType::Pointer _itkImage;
-	//vtkSmartPointer<vtkImageData> _vtkImage;
-	//ImageFileReader<itk::Image<float,3 >::Pointer reader =
-	//	ImageFileReader<itk::Image<float, 3 >::New();
 	ImageFileReader<Overlay::OverlayImageType>::Pointer reader =
 		ImageFileReader<Overlay::OverlayImageType>::New();
 	reader->SetFileName(fileName.toStdString());
@@ -251,7 +236,7 @@ void IOManager::slotOpenSegmentation(QString fileName)
 	_itkImage = reader->GetOutput();
 	this->myImageManager->overlay->SetInputImageData(_itkImage);
 
-	//if (_itkImage.IsNotNull()) {
+	//if (_itkImage.IsNotnullptr()) {
 	//	// using the same m_orientation ITK_COORDINATE_ORIENTATION_RAI
 	//	OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
 	//		OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();

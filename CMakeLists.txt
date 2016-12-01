@@ -6,12 +6,6 @@ IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-# multi-processor build
-set(
-	CMAKE_CXX_FLAGS 
-	"${CMAKE_CXX_FLAGS} /MP"
-)
-
 #ITK
 find_package(ITK REQUIRED)
 if (NOT ITK_FOUND)
@@ -45,12 +39,34 @@ else()
   include(${QT_USE_FILE})
 endif()
 
+# multi-processor build
+set(
+	CMAKE_CXX_FLAGS 
+	"${CMAKE_CXX_FLAGS} /MP"
+)
+set(
+	CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+	${CMAKE_SOURCE_DIR}/lib
+)
+
+set(
+	CMAKE_LIBRARY_OUTPUT_DIRECTORY
+	${CMAKE_SOURCE_DIR}/lib
+)
+set(
+	CMAKE_RUNTIME_OUTPUT_DIRECTORY 
+	${CMAKE_SOURCE_DIR}/bin
+)
+
+link_directories(
+	${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+	)
 
 SET(
 	MAIN_INCLUDE_DIRS
 	### Directories for MOC Sources ###
 	${PROJECT_BINARY_DIR}
-	${PROJECT_BINARY_DIR}/include
 	${PROJECT_BINARY_DIR}/resources
 	${PROJECT_BINARY_DIR}/codes/UI
 	${PROJECT_BINARY_DIR}/codes/Core
@@ -68,14 +84,13 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/CenterlineBranching
 	${PROJECT_BINARY_DIR}/codes/MyImageReader
 	${PROJECT_BINARY_DIR}/codes/Managers
-	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/License
+	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/LumenSegmentationFilter
-	${PROJECT_BINARY_DIR}/codes/vtkImageToContourPolyData
+	${PROJECT_BINARY_DIR}/codes/ReorderPointIdOfContourFilter
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/resources
 	${PROJECT_SOURCE_DIR}/codes/UI
 	${PROJECT_SOURCE_DIR}/codes/Core
@@ -92,21 +107,16 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/MaximumWallThickness
 	${PROJECT_SOURCE_DIR}/codes/CenterlineBranching
 	${PROJECT_SOURCE_DIR}/codes/MyImageReader
-	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/License
+	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/LumenSegmentationFilter
-	${PEOJECT_SOURCE_DIR}/codes/vtkImageToContourPolyData
-	
+	${PROJECT_SOURCE_DIR}/codes/ReorderPointIdOfContourFilter
 	)
 
-SET(
-	CMAKE_LIBRARY_OUTPUT_DIRECTORY
-	${CMAKE_SOURCE_DIR}/lib
+include_directories(
+	${MAIN_INCLUDE_DIRS}
 )
-SET(
-	CMAKE_RUNTIME_OUTPUT_DIRECTORY 
-	${CMAKE_SOURCE_DIR}/bin
-)
+
 
 set(
 	LINK_LIBRARIE
@@ -129,12 +139,9 @@ set(
 	LumenExtraction
 	LumenSegmentationFilter
 	EncryptionAuthentication
-	vtkImageToContourPolyData
+	ReorderPointIdOfContourFilter
 )
 
-include_directories(
-	${MAIN_INCLUDE_DIRS}
-)
 add_subdirectory(codes/UI)
 add_subdirectory(codes/Widgets)
 add_subdirectory(codes/Main)
@@ -149,7 +156,7 @@ add_subdirectory(codes/LumenExtraction)
 add_subdirectory(codes/License)
 add_subdirectory(codes/LumenSegmentationFilter)
 add_subdirectory(codes/EncryptionAuthentication)
-add_subdirectory(codes/vtkImageToContourPolyData)
+add_subdirectory(codes/ReorderPointIdOfContourFilter)
 
 
 

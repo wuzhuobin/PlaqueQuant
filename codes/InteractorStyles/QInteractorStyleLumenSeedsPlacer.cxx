@@ -26,6 +26,21 @@ void QInteractorStyleLumenSeedsPlacer::SetCurrentFocalPointWithImageCoordinate(i
 	QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 }
 
+void QInteractorStyleLumenSeedsPlacer::SetTargetImages(
+	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages, 
+	QList<QString> listOfModalityNames)
+{
+	m_listOfModalityNames = listOfModalityNames;
+	m_listOfVtkImages = listOfVtkImages;
+
+	ui->comboBoxTargeImage->clear();
+	for (int i = 0; i < m_listOfModalityNames.size(); ++i) {
+		if (m_listOfVtkImages[i] != nullptr) {
+			ui->comboBoxTargeImage->addItem(m_listOfModalityNames[i]);
+		}
+	}
+}
+
 void QInteractorStyleLumenSeedsPlacer::UpdateWidgetToSeeds(int * oldImagePos, int* newImagePos)
 {
 	InteractorStyleSeedsPlacer::UpdateWidgetToSeeds(oldImagePos, newImagePos);
@@ -129,7 +144,11 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
 		IndexType index = {_seeds[i][0], _seeds[i][1], _seeds[i][2]};
 		lumenExtractionFilter->CoreFilter->AddSeed(index);
 	}
-	lumenExtractionFilter->SetInputData(m_imageViewer->GetOriginalInput());
+	//lumenExtractionFilter->SetInputData(m_imageViewer->GetOriginalInput());
+
+	int index = m_listOfModalityNames.indexOf(ui->comboBoxTargeImage->currentText());
+	lumenExtractionFilter->SetInputData(m_listOfVtkImages[index]);
+
 	lumenExtractionFilter->Update();
 
 	m_imageViewer->GetOverlay()->vtkShallowCopyImage(
@@ -177,7 +196,7 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumenPolyData()
 			_connectivityFilter->SetExtractionModeToSpecifiedRegions();
 			_connectivityFilter->Update();
 
-			LumenSegmentationFilter2::ReorderPolyData(_connectivityFilter->GetOutput());
+			//LumenSegmentationFilter2::ReorderPolyData(_connectivityFilter->GetOutput());
 
 			double toleranceInitial = 1;
 			int loopBreaker = 0;

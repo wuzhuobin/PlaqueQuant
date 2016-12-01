@@ -32,7 +32,7 @@ vtkStandardNewMacro(MyImageViewer);
 
 //----------------------------------------------------------------------------
 MyImageViewer::MyImageViewer(QObject* parent)
-	:vtkImageViewer2(), QObject(parent)
+	:QObject(parent)
 {
 	this->CursorActor = NULL;
 	this->AnnotationRenderer = NULL;
@@ -74,12 +74,13 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	CursorActor->GetProperty()->SetLineStipplePattern(0xf0f0);
 
 	//AnnotationRenderer
-	AnnotationRenderer->SetGlobalWarningDisplay(false);
 	AnnotationRenderer->SetLayer(1);
 
 	RenderWindow->SetNumberOfLayers(2);
 
 	this->InstallPipeline();
+	//this->UnInstallPipeline();
+
 }
 
 //----------------------------------------------------------------------------
@@ -142,6 +143,10 @@ void MyImageViewer::UpdateDisplayExtent()
 {
 	vtkImageViewer2::UpdateDisplayExtent();
 	vtkAlgorithm *input = this->GetInputAlgorithm();
+	if (!input || !this->ImageActor)
+	{
+		return;
+	}
 	vtkInformation* outInfo = input->GetOutputInformation(0);
 	int *w_ext = outInfo->Get(
 		vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
@@ -242,6 +247,7 @@ void MyImageViewer::UnInstallPipeline()
 	{
 		this->Renderer->RemoveActor(this->CursorActor);
 	}
+
 	// Text 
 	if (this->HeaderActor && this->Renderer) {
 		this->Renderer->RemoveActor(this->HeaderActor);
@@ -286,10 +292,12 @@ void MyImageViewer::UpdateOrientation()
 		}
 	}
 }
-
 //----------------------------------------------------------------------------
 void MyImageViewer::Render()
 {
+	if (AllBlackFlag) {
+		return;
+	}
 	if (this->FirstRender)
 	{
 		this->InitializeOrientationText();
@@ -309,8 +317,6 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 	ImageExtractVOI->Update();
 
 	Superclass::SetInputConnection(ImageExtractVOI->GetOutputPort());
-	//Superclass::SetInputData(in);
-
 	//Color Map
 	double* range = in->GetScalarRange();
 	this->SetColorWindow(range[1] - range[0]);
@@ -341,6 +347,7 @@ void MyImageViewer::SetInputDataLayer(vtkImageData *in)
 	OverlayExtractVOI->Update();
 
 	OverlayWindowLevel->SetInputConnection(OverlayExtractVOI->GetOutputPort());
+
 	// in case when LookupTable has not been set
 	if (this->LookupTable != NULL) {
 		int num = this->LookupTable->GetNumberOfTableValues();
@@ -584,6 +591,7 @@ void MyImageViewer::SetAllBlack(bool flag)
 	if (this->AllBlackFlag == flag) {
 		return;
 	}
+	Render();
 	this->AllBlackFlag = flag;
 	QList<vtkProp*>  props;
 	props += this->ImageActor;

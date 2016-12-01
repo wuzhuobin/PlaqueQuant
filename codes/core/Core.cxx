@@ -18,7 +18,6 @@
 Core::Core(QWidget* parent)
 	:Core(parent, parent)
 {
-	
 }
 
 Core::Core(QObject* parent, QWidget* mainWindow)
@@ -155,24 +154,29 @@ void Core::slotVisualizeAll2DViewers()
 	// Validate Patient Id and Information, if they are different, 
 	// a error message will pop up.
 	slotValidatePatientInformation();
-	slotChangeView(MULTIPLANAR_VIEW);
+
 	if (m_firstInitialize) {
 		for (int i = 0; i < NUMBER_OF_2DVIEWERS; ++i) {
 			m_2DimageViewer[i]->SetupInteractor(m_interactor[i]);
 			m_style[i]->SetImageViewer(m_2DimageViewer[i]);
 			m_interactor[i]->SetInteractorStyle(m_style[i]);
 		}
-		slotAddOverlayToImageViewer();
 		m_firstInitialize = false;
-		emit signalMultiPlanarView();
 	}
+	slotAddOverlayToImageViewer();
+	slotChangeView(MULTIPLANAR_VIEW);
+	emit signalMultiPlanarView();
 
+	// some special setting for every InteractorStyle
 	// reset slice to all viewer
 	const int* extent = m_2DimageViewer[DEFAULT_IMAGE]->GetInput()->GetExtent();
 	m_style[DEFAULT_IMAGE]->GetNavigation()->SetCurrentFocalPointWithImageCoordinate(
 		(extent[1] - extent[0]) / 2,
 		(extent[3] - extent[2]) / 2,
 		(extent[5] - extent[4]) / 2);
+	m_style[DEFAULT_IMAGE]->GetSeedsPlacer()->SetTargetImages(
+		m_imageManager->getListOfVtkImages(),
+		m_imageManager->getListOfModalityNames());
 
 	emit signalVisualizeAllViewers();
 }
