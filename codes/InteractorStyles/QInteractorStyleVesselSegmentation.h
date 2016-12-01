@@ -28,6 +28,9 @@ public slots:
 	virtual void SetGenerateValue(int value);
 	virtual void SetDilateValue(double value);
 	virtual void GenerateLumenWallContourWidget();
+	
+	void CleanOne();
+	void CleanAll();
 
 protected:
 	QInteractorStyleVesselSegmentation(int uiType = UNIQUE_UI, QWidget * parent = Q_NULLPTR);

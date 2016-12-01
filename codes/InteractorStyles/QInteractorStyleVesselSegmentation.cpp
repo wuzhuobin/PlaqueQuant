@@ -32,7 +32,8 @@ void QInteractorStyleVesselSegmentation::UniqueEnable(bool flag)
 
 	}
 	if (flag != initializationFlag) {
-
+		ui->fillSlicesBeginSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
+		ui->fillSliceEndSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
 	}
 	initializationFlag = flag;
 
@@ -121,6 +122,18 @@ void QInteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 	
 }
 
+void QInteractorStyleVesselSegmentation::CleanOne()
+{
+	CleanCurrentContour();
+	WriteToPolydata();
+}
+
+void QInteractorStyleVesselSegmentation::CleanAll()
+{
+	CleanAllContours();
+	WriteToPolydata();
+}
+
 QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiType, QWidget * parent)
 {
 	QNEW_UI();
@@ -144,6 +157,10 @@ QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiTyp
 		this, SLOT(SetGenerateValue(int)), Qt::QueuedConnection);
 	connect(ui->doubleSpinBoxVesselWallThickness, SIGNAL(valueChanged(double)),
 		this, SLOT(SetDilateValue(double)));
+	connect(ui->cleanOnePushButton, SIGNAL(clicked()),
+		this, SLOT(CleanOne()));
+	connect(ui->cleanAllPushButton, SIGNAL(clicked()),
+		this, SLOT(CleanAll()));
 	//connect(ui->autoLumenSegmentationHorizontalSlider, SIGNAL(valueChanged(int)),
 	//	this, SLOT(GenerateLumenWallContourWidget()), Qt::QueuedConnection);
 }

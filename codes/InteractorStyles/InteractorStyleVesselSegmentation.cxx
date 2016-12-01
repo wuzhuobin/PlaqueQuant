@@ -302,10 +302,11 @@ void InteractorStyleVesselSegmentation::SetSegmentationMode(int i)
 		return;
 	}
 	m_contourType = i;
-	if (m_currentContour != nullptr &&
-		m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
-		CleanCurrentContour();
-	}
+	CleanAllContours();
+	//if (m_currentContour != nullptr &&
+	//	m_currentContour->GetWidgetState() != vtkContourWidget::Manipulate) {
+	//	CleanCurrentContour();
+	//}
 	m_currentContour = nullptr;
 	ReadFromPolydata();
 }
@@ -337,29 +338,27 @@ void InteractorStyleVesselSegmentation::SetDilateValue(double value)
 
 void InteractorStyleVesselSegmentation::CleanCurrentContour()
 {
-
 	list<vtkSmartPointer<vtkContourWidget>>* _contourss[] =
 		{&m_contours, &m_vesselWallContourWidgets, &m_lumenWallContourWidgets};
-	int i = 0;
-	for (; i < 3; ++i) {
-		if (_contourss[i]->size() > 0 &&
-			_contourss[i]->back() == m_currentContour) {
-			_contourss[i]->back()->EnabledOff();
-			_contourss[i]->pop_back();
-			break;
-		}
+
+	if (_contourss[m_contourType]->size() > 0) {
+		_contourss[m_contourType]->back()->EnabledOff();
+		_contourss[m_contourType]->pop_back();
 	}
-	if (_contourss[i]->size() == 0) {
+
+	// none contours left, just set m_currentContour = nullptr
+	if (m_contours.size() == 0) {
 		m_currentContour = nullptr;
 	}
 	else {
-		m_currentContour = _contourss[i]->back();
+		m_currentContour = _contourss[m_contourType]->back();
 	}
 	m_imageViewer->Render();
 }
 
 void InteractorStyleVesselSegmentation::CleanAllContours()
 {
+	m_currentContour = nullptr;
 	CleanContours(0);
 	CleanContours(1);
 	CleanContours(2);
@@ -618,12 +617,7 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 		}
 
 	}
-	CleanContours(LUMEN);
-	CleanContours(VESSEL_WALL);
-
-	ReadFromPolydata(LUMEN);
-	ReadFromPolydata(VESSEL_WALL);
-	m_imageViewer->Render();
+	ReadFromPolydata();
 }
 
 void InteractorStyleVesselSegmentation::FillPolygon()

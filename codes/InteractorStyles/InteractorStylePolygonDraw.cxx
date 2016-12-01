@@ -136,6 +136,8 @@ void InteractorStylePolygonDraw::CleanCurrentContour()
 		m_contours.back()->EnabledOff();
 		m_contours.pop_back();
 	}
+
+	// none contours left, just set m_currentContour = nullptr
 	if (m_contours.size() == 0) {
 		m_currentContour = nullptr;
 	}

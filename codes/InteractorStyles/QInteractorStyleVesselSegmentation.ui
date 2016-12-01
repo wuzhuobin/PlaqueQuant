@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>277</width>
+    <width>285</width>
     <height>811</height>
    </rect>
   </property>
@@ -160,16 +160,16 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="generatePushButton">
+         <widget class="QPushButton" name="cleanOnePushButton">
           <property name="text">
-           <string>Generate</string>
+           <string>Clean One</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="clearContourPushButton">
+         <widget class="QPushButton" name="cleanAllPushButton">
           <property name="text">
-           <string>Clear</string>
+           <string>Clean all</string>
           </property>
          </widget>
         </item>
@@ -312,6 +312,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="generatePushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Generate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QGroupBox" name="groupBox_3">
         <property name="enabled">
          <bool>false</bool>
@@ -320,8 +330,8 @@
          <string>Slice Range</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="spinBox">
+         <item row="0" column="2">
+          <widget class="QSpinBox" name="fillSlicesBeginSpinBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -330,15 +340,22 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
+         <item row="0" column="3">
           <widget class="QLabel" name="label_3">
            <property name="text">
             <string>To:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
-          <widget class="QSpinBox" name="spinBox_2">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>From:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QSpinBox" name="fillSliceEndSpinBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -348,9 +365,9 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
+          <widget class="QPushButton" name="fillSlicesPushButton">
            <property name="text">
-            <string>From:</string>
+            <string>Fill Slices</string>
            </property>
           </widget>
          </item>
@@ -575,6 +592,7 @@
      <zorder>groupBox_3</zorder>
      <zorder>frame_6</zorder>
      <zorder>noSegmentationRadioButton</zorder>
+     <zorder>generatePushButton</zorder>
     </widget>
    </item>
    <item>
@@ -596,22 +614,6 @@
   <include location="../../resources/Project.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>autoLumenSegmentationHorizontalSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>autoLumenSegmentationSpinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>149</x>
-     <y>312</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>231</x>
-     <y>317</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>autoLumenSegmentationSpinBox</sender>
    <signal>valueChanged(int)</signal>
@@ -635,60 +637,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>233</y>
+     <x>142</x>
+     <y>258</y>
     </hint>
     <hint type="destinationlabel">
      <x>206</x>
      <y>317</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>vesselWallSegmentationRadioButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>163</x>
-     <y>252</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>214</x>
-     <y>383</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>noSegmentationRadioButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBox_3</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>53</x>
-     <y>266</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>22</x>
-     <y>423</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>noSegmentationRadioButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>frame_6</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>88</x>
-     <y>270</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>240</x>
-     <y>492</y>
     </hint>
    </hints>
   </connection>
@@ -699,18 +653,98 @@
    <slot>setHidden(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>271</y>
+     <x>153</x>
+     <y>236</y>
     </hint>
     <hint type="destinationlabel">
-     <x>230</x>
-     <y>540</y>
+     <x>249</x>
+     <y>674</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>autoLumenSegmentationHorizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>autoLumenSegmentationSpinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>149</x>
+     <y>312</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>231</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>noSegmentationRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>groupBox_3</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>41</x>
+     <y>492</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>noSegmentationRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_6</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>259</x>
+     <y>560</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>vesselWallSegmentationRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>groupBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>182</x>
+     <y>280</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>214</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>noSegmentationRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>generatePushButton</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>139</x>
+     <y>419</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

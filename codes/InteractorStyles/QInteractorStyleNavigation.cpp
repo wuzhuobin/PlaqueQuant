@@ -46,6 +46,7 @@ void QInteractorStyleNavigation::UniqueEnable(bool flag)
 				return;
 			}
 		}
+
 		QAbstractNavigation::getUi()->sliceSpinBoxX->setMinimum(extent[0]);
 		QAbstractNavigation::getUi()->sliceSpinBoxY->setMinimum(extent[2]);
 		QAbstractNavigation::getUi()->sliceSpinBoxZ->setMinimum(extent[4]);

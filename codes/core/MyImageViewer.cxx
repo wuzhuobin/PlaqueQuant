@@ -80,14 +80,19 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	RenderWindow->SetNumberOfLayers(2);
 
 	this->InstallPipeline();
+
 	// Error blocking fot windowLevel
 	// temporary fixation
-	vtkSmartPointer<vtkCallbackCommand> windowLevelErrorBlocker =
-		vtkSmartPointer<vtkCallbackCommand>::New();
-	this->WindowLevel->GetExecutive()->AddObserver(
-		vtkCommand::ErrorEvent, windowLevelErrorBlocker);
-	this->OverlayWindowLevel->GetExecutive()->AddObserver(
-		vtkCommand::ErrorEvent, windowLevelErrorBlocker);
+	//vtkSmartPointer<vtkCallbackCommand> windowLevelErrorBlocker =
+	//	vtkSmartPointer<vtkCallbackCommand>::New();
+	//this->WindowLevel->GetExecutive()->AddObserver(
+	//	vtkCommand::ErrorEvent, windowLevelErrorBlocker);
+	//this->OverlayWindowLevel->GetExecutive()->AddObserver(
+	//	vtkCommand::ErrorEvent, windowLevelErrorBlocker);
+	//this->WindowLevel->GetInputAlgorithm()->AddObserver(
+	//	vtkCommand::ErrorEvent, windowLevelErrorBlocker);
+	//this->OverlayWindowLevel->GetInputAlgorithm()->AddObserver(
+	//	vtkCommand::ErrorEvent, windowLevelErrorBlocker);
 }
 
 //----------------------------------------------------------------------------

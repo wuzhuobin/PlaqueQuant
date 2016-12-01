@@ -49,7 +49,7 @@ void MyThread::SetIndex( int * index )
 	m_index = index;
 }
 
-ImageType::Pointer MyThread::GetOutputImage()
+MyThread::ImageType::Pointer MyThread::GetOutputImage()
 {
 	return m_outputImage;
 }

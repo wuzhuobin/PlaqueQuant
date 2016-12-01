@@ -9,11 +9,11 @@
 
 typedef itk::VersorRigid3DTransformOptimizer									OptimizerType; 		//Optimizer
 typedef OptimizerType::ScalesType												OptimizerScalesType;
-typedef itk::MattesMutualInformationImageToImageMetric<ImageType, ImageType>	MetricType;			//Metric
-typedef itk::LinearInterpolateImageFunction <ImageType, double>					InterpolatorType;	//interpolation
-typedef itk::CenteredTransformInitializer<TransformType, ImageType, ImageType >	InitializerType;    //initializer
-typedef itk::ImageRegistrationMethod <ImageType, ImageType>						RegistrationType;	//registration method
-typedef itk::ResampleImageFilter <ImageType, ImageType>							ResampleFilterType;	//Resampler
+typedef itk::MattesMutualInformationImageToImageMetric<ImageRegistration::ImageType, ImageRegistration::ImageType>	MetricType;			//Metric
+typedef itk::LinearInterpolateImageFunction <ImageRegistration::ImageType, double>					InterpolatorType;	//interpolation
+typedef itk::CenteredTransformInitializer<ImageRegistration::TransformType, ImageRegistration::ImageType, ImageRegistration::ImageType >	InitializerType;    //initializer
+typedef itk::ImageRegistrationMethod <ImageRegistration::ImageType, ImageRegistration::ImageType>						RegistrationType;	//registration method
+typedef itk::ResampleImageFilter <ImageRegistration::ImageType, ImageRegistration::ImageType>							ResampleFilterType;	//Resampler
 
 
 ImageRegistration::ImageRegistration(QObject* parent) : QObject(parent)
@@ -152,7 +152,7 @@ bool ImageRegistration::Update()
 	return EXIT_SUCCESS;
 }
 
-TransformType::Pointer ImageRegistration::GetOutputTransform()
+ImageRegistration::TransformType::Pointer ImageRegistration::GetOutputTransform()
 {
 	if (m_finalTransform)
 	{
@@ -162,18 +162,18 @@ TransformType::Pointer ImageRegistration::GetOutputTransform()
 	return NULL;
 }
 
-ImageType::PointType ImageRegistration::GetOutputOrigin()
+ImageRegistration::ImageType::PointType ImageRegistration::GetOutputOrigin()
 {
 	return m_outputImage->GetOrigin();
 	return NULL;
 }
 
-ImageType::DirectionType ImageRegistration::GetOutputDirection()
+ImageRegistration::ImageType::DirectionType ImageRegistration::GetOutputDirection()
 {
 	return m_outputImage->GetDirection();
 }
 
-ImageType::Pointer ImageRegistration::GetOutput()
+ImageRegistration::ImageType::Pointer ImageRegistration::GetOutput()
 {
 	return m_outputImage;
 }

@@ -7,14 +7,14 @@
 #include <itkVersorRigid3DTransform.h>
 
 
-typedef itk::Image< float, 3 > ImageType;
-typedef itk::VersorRigid3DTransform <double> TransformType;		//TransformType
+
 class ImageRegistration : public QObject
 {
 	Q_OBJECT
 
 public:
-
+	typedef itk::Image< float, 3 > ImageType;
+	typedef itk::VersorRigid3DTransform <double> TransformType;		//TransformType
 
 	ImageRegistration(QObject* parent = NULL);
 	~ImageRegistration();
