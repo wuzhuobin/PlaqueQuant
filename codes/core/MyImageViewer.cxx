@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkProperty2D.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyleImage.h>
+#include <vtkCallbackCommand.h>
 
 #include <QList>
 using namespace std;
@@ -79,8 +80,14 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	RenderWindow->SetNumberOfLayers(2);
 
 	this->InstallPipeline();
-	//this->UnInstallPipeline();
-
+	// Error blocking fot windowLevel
+	// temporary fixation
+	vtkSmartPointer<vtkCallbackCommand> windowLevelErrorBlocker =
+		vtkSmartPointer<vtkCallbackCommand>::New();
+	this->WindowLevel->GetExecutive()->AddObserver(
+		vtkCommand::ErrorEvent, windowLevelErrorBlocker);
+	this->OverlayWindowLevel->GetExecutive()->AddObserver(
+		vtkCommand::ErrorEvent, windowLevelErrorBlocker);
 }
 
 //----------------------------------------------------------------------------
