@@ -295,9 +295,6 @@ void MyImageViewer::UpdateOrientation()
 //----------------------------------------------------------------------------
 void MyImageViewer::Render()
 {
-	if (AllBlackFlag) {
-		return;
-	}
 	if (this->FirstRender)
 	{
 		this->InitializeOrientationText();
@@ -322,8 +319,8 @@ void MyImageViewer::SetInputData(vtkImageData *in)
 	this->SetColorWindow(range[1] - range[0]);
 	this->SetColorLevel((range[1] + range[0])*0.5);
 
-	DefaultWindowLevel[0] = this->GetColorWindow();
-	DefaultWindowLevel[1] = this->GetColorLevel();
+	//DefaultWindowLevel[0] = this->GetColorWindow();
+	//DefaultWindowLevel[1] = this->GetColorLevel();
 
 	//Cursor
 	this->InitializeCursorBoundary();
@@ -591,7 +588,6 @@ void MyImageViewer::SetAllBlack(bool flag)
 	if (this->AllBlackFlag == flag) {
 		return;
 	}
-	Render();
 	this->AllBlackFlag = flag;
 	QList<vtkProp*>  props;
 	props += this->ImageActor;
@@ -610,6 +606,7 @@ void MyImageViewer::SetAllBlack(bool flag)
 			(*cit)->SetVisibility(!flag);
 		}
 	}
+	Render();
 	emit AllBlackAlready(flag);
 }
 
@@ -618,10 +615,10 @@ bool MyImageViewer::GetAllBlack()
 	return AllBlackFlag;
 }
 
-double* MyImageViewer::GetDefaultWindowLevel()
-{
-	return DefaultWindowLevel;
-}
+//double* MyImageViewer::GetDefaultWindowLevel()
+//{
+//	return DefaultWindowLevel;
+//}
 
 void MyImageViewer::InitializeHeader(string file)
 {

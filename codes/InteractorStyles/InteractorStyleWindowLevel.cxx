@@ -121,7 +121,7 @@ void InteractorStyleWindowLevel::OnLeftButtonUp()
 void InteractorStyleWindowLevel::OnKeyPress()
 {
 	std::string key = this->Interactor->GetKeySym();
-	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+// const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r" || key == "R") {
 		SetWindowLevel(255,	127.5);
 		//AbstractNavigation::OnKeyPress();
@@ -136,7 +136,7 @@ void InteractorStyleWindowLevel::OnKeyPress()
 void InteractorStyleWindowLevel::OnKeyDown()
 {
 	std::string key = this->Interactor->GetKeySym();
-	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+// const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r" || key == "R") {
 		//AbstractNavigation::OnKeyPress();
 
@@ -149,7 +149,7 @@ void InteractorStyleWindowLevel::OnKeyDown()
 void InteractorStyleWindowLevel::OnKeyRelease()
 {
 	std::string key = this->Interactor->GetKeySym();
-	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+// const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r" || key == "R") {
 		//AbstractNavigation::OnKeyPress();
 
@@ -162,7 +162,7 @@ void InteractorStyleWindowLevel::OnKeyRelease()
 void InteractorStyleWindowLevel::OnKeyUp()
 {
 	std::string key = this->Interactor->GetKeySym();
-	const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
+// const double*  windowLevel = m_imageViewer->GetDefaultWindowLevel();
 	if (key == "r" || key == "R") {
 		//AbstractNavigation::OnKeyPress();
 

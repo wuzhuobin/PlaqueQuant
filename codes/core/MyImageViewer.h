@@ -263,7 +263,13 @@ protected:
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.
 	void operator=(const MyImageViewer&);  // Not implemented.
-	void SetInputConnection(vtkAlgorithmOutput* input); // Not implemented
+	inline vtkAlgorithm* GetInputAlgorithm() {
+		return vtkImageViewer2::GetInputAlgorithm(); }
+	inline vtkInformation* GetInputInformation() { 
+		return vtkImageViewer2::GetInputInformation(); }
+	inline void SetInputConnection(vtkAlgorithmOutput* input) {
+		return vtkImageViewer2::SetInputConnection(input);
+	}
 
 
 };
