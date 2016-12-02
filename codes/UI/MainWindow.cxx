@@ -48,9 +48,13 @@ MainWindow::MainWindow()
 	connect(ui->actionOpenImage,	SIGNAL(triggered())					, ioManager,	SLOT(slotOpenWithWizard()));
 	
 	// Segmentation
-	connect(ui->actionSave,			SIGNAL(triggered())					,ioManager,		SLOT(slotSaveSegmentaitonWithDiaglog()));
-	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), ioManager,SLOT(slotOpenSegmentationWithDiaglog()));
-	
+	connect(ui->actionSaveSegmentation,			SIGNAL(triggered())					,ioManager,		SLOT(slotSaveSegmentaitonWithDiaglog()));
+	connect(ui->actionOpenSegmentation, SIGNAL(triggered()),
+		ioManager, SLOT(slotOpenSegmentationWithDiaglog()));
+	connect(ui->actionSaveContour, SIGNAL(triggered()),
+		ioManager, SLOT(slotSaveContourWithDiaglog()));
+
+
 	// different mode
 	widgetGroup.addAction(ui->actionNavigation);
 	widgetGroup.addAction(ui->actionWindowLevel);
@@ -182,7 +186,8 @@ void MainWindow::setActionsEnable( bool b )
 	ui->image3View->setEnabled(b);
 	ui->image4View->setEnabled(b);
 	ui->sliceScrollArea->setEnabled(b);
-	ui->actionSave->setEnabled(b);
+	ui->actionSaveSegmentation->setEnabled(b);
+	ui->actionSaveContour->setEnabled(b);
 	ui->actionNavigation->setEnabled(b);
 	ui->actionWindowLevel->setEnabled(b);
 	ui->actionContour->setEnabled(b);

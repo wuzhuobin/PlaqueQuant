@@ -52,6 +52,10 @@ public slots:
 
 	void slotSaveSegmentation(QString path);
 
+	void slotSaveContourWithDiaglog();
+	
+	void slotSaveContour(QString fileName);
+
 signals:
 	void finishOpenMultiImages();
 	void finishOpenOneImage();

@@ -418,37 +418,6 @@ vtkImageData * Overlay::GetVTKOutput()
 	else
 		return this->m_vtkOverlay;
 }
-//
-//Overlay::OverlayImageType::Pointer Overlay::GetITKOutput(OverlayImageType::Pointer format)
-//{
-//
-//	//if (!m_vtkOverlay)
-//	//	return NULL;
-//	//else {
-//	itk::VTKImageToImageFilter<itk::Image<unsigned char, 3>>::Pointer vtkImageToImageFilter =
-//		itk::VTKImageToImageFilter<itk::Image<unsigned char, 3>>::New();
-//	vtkImageToImageFilter->SetInput(this->GetOutput());
-//	vtkImageToImageFilter->Update();
-//
-//	itk::CastImageFilter<itk::Image<unsigned char, 3>, OverlayImageType>::Pointer castImageFilter =
-//		itk::CastImageFilter<itk::Image<unsigned char, 3>, OverlayImageType>::New();
-//	castImageFilter->SetInput(vtkImageToImageFilter->GetOutput());
-//	castImageFilter->Update();
-//
-//	//re-orient
-//	OrienterType::Pointer orienter = OrienterType::New();
-//	orienter->UseImageDirectionOn();
-//	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
-//	orienter->SetInput(format);
-//	orienter->Update();
-//
-//	m_itkOverlay = castImageFilter->GetOutput();
-//	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
-//	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
-//	//}
-//	return m_itkOverlay;
-//
-//}
 
 vtkLookupTable * Overlay::GetLookupTable()
 {

@@ -13,6 +13,10 @@
 #include <itkImageToVTKImageFilter.h>
 #include <itkImageFileWriter.h>
 
+#include <vtkAppendPolyData.h>
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkPointData.h>
+
 #include "RegistrationWizard.h"
 
 using namespace itk;
@@ -270,5 +274,56 @@ void IOManager::slotSaveSegmentation(QString path)
 	writer->SetInput(this->myImageManager->overlay->GetITKOutput<ImageType>(
 		this->myImageManager->listOfItkImages[0]));
 	writer->SetFileName(path.toStdString().c_str());
+	writer->Write();
+}
+
+void IOManager::slotSaveContourWithDiaglog()
+{
+	QString path = QFileDialog::getSaveFileName(dynamic_cast<QWidget*>(this->parent()),
+		QString(tr("Save Contours")), ".", tr("Serial vtkPolyData(*.vtp)"));
+	if (path.isEmpty())	return;
+	slotSaveContour(path);
+}
+
+void IOManager::slotSaveContour(QString fileName)
+{
+	vtkSmartPointer<vtkAppendPolyData> append =
+		vtkSmartPointer<vtkAppendPolyData>::New();
+
+
+	Overlay* overlay = this->myImageManager->getOverlay();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>*  contours[2] =
+	{ overlay->GetLumenPolyData(), overlay->GetVesselWallPolyData() };
+	for (int i = 0; i < 2; ++i) {
+
+
+
+		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
+			contours[i]->cbegin(); cit1 != contours[i]->cend();++cit1) {
+			
+			QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
+			for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
+				cit2 != _list->cend(); ++cit2) {
+
+				// set point data for classification
+				vtkSmartPointer<vtkUnsignedCharArray> scalars =
+					vtkSmartPointer<vtkUnsignedCharArray>::New();
+				scalars->SetNumberOfValues((*cit2)->GetNumberOfPoints());
+				scalars->SetNumberOfComponents(1);
+				scalars->FillComponent(0, i + 1);
+
+				(*cit2)->GetPointData()->SetScalars(scalars);
+				append->AddInputData(*cit2);
+			}
+
+
+		}
+	}
+	append->Update();
+
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+		vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetInputConnection(append->GetOutputPort());
+	writer->SetFileName(fileName.toStdString().c_str());
 	writer->Write();
 }

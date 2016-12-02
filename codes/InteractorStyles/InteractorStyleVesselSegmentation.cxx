@@ -33,6 +33,9 @@ Copyright (C) 2016
 #include <vtkImageThreshold.h>
 #include <vtkCallbackCommand.h>
 
+#include <vtkAppendPolyData.h>
+#include <vtkSurfaceReconstructionFilter.h>
+
 
 #include "ReorderPointIdOfContourFilter.h"
 #include "InteractorStylePolygonDraw.h"
@@ -463,7 +466,7 @@ void InteractorStyleVesselSegmentation::GenerateLumenPolydata()
 	ReadFromPolydata(LUMEN);
 	m_imageViewer->Render();
 }
-#include<vtkXMLPolyDataWriter.h>
+//#include<vtkXMLPolyDataWriter.h>
 void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 {
 	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
@@ -527,12 +530,12 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			clean->PointMergingOn();
 			clean->Update();
 
-			// Write the file
-			vtkSmartPointer<vtkXMLPolyDataWriter> writer =
-				vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-			writer->SetFileName(QString("test" + QString::number(i) + ".vtp").toStdString().c_str());
-			writer->SetInputConnection(clean->GetOutputPort());
-			writer->Write();
+			//// Write the file
+			//vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+			//	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+			//writer->SetFileName(QString("test" + QString::number(i) + ".vtp").toStdString().c_str());
+			//writer->SetInputConnection(clean->GetOutputPort());
+			//writer->Write();
 
 			// vtkError handling
 			vtkSmartPointer<vtkCallbackCommand> errorCatch =
@@ -627,6 +630,55 @@ void InteractorStyleVesselSegmentation::FillPolygon()
 	InteractorStylePolygonDraw::FillPolygon(
 		&m_lumenWallContourWidgets, m_lumenWallLabel);
 	InteractorStylePolygonDraw::FillPolygon();
+
+}
+
+void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int slice2)
+{
+	// using the bigger on as the end slice
+	if (slice1 > slice2) {
+		swap(slice1, slice2);
+	}
+	// camping
+	slice1 = max(slice1, GetExtent()[4]);
+	slice2 = min(slice2, GetExtent()[5]);
+
+
+
+
+	Overlay* overlay = m_imageViewer->GetOverlay();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>*  _contours[2] =
+	{  overlay->GetVesselWallPolyData(), overlay->GetLumenPolyData() };
+	unsigned char _labels[2] = { m_vesselWallLabel, m_lumenWallLabel };
+
+	vtkSmartPointer<vtkPolyData> _polyData[2];
+
+	for (int i = 0; i < 2; ++i) {
+		vtkSmartPointer<vtkAppendPolyData> append =
+			vtkSmartPointer<vtkAppendPolyData>::New();
+
+		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
+			_contours[i]->cbegin(); cit1 != _contours[i]->cend(); ++cit1) {
+
+			QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
+			for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
+				cit2 != _list->cend(); ++cit2) {
+
+				append->AddInputData(*cit2);
+			}
+
+
+		}
+		append->Update();
+
+		vtkSmartPointer<vtkSurfaceReconstructionFilter> surfaceReconstruction =
+			vtkSmartPointer<vtkSurfaceReconstructionFilter>::New();
+		surfaceReconstruction->SetInputConnection(append->GetOutputPort());
+		surfaceReconstruction->Update();
+
+	}
+
+
 
 }
 

@@ -768,7 +768,6 @@
     </widget>
     <addaction name="actionOpenImage"/>
     <addaction name="menuRecentImage"/>
-    <addaction name="actionSave"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -785,6 +784,11 @@
     </property>
     <addaction name="actionNavigation"/>
     <addaction name="actionWindowLevel"/>
+    <addaction name="actionRuler"/>
+    <addaction name="actionROI"/>
+    <addaction name="actionSeedsPlacer"/>
+    <addaction name="actionContour"/>
+    <addaction name="actionBrush"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -814,11 +818,10 @@
     <property name="title">
      <string>Segmentation</string>
     </property>
+    <addaction name="actionSaveSegmentation"/>
     <addaction name="actionOpenSegmentation"/>
-    <addaction name="actionROI"/>
-    <addaction name="actionSeedsPlacer"/>
-    <addaction name="actionContour"/>
-    <addaction name="actionRuler"/>
+    <addaction name="actionSaveContour"/>
+    <addaction name="actionOpenContour"/>
     <addaction name="actionCenterlineAlgorithm"/>
    </widget>
    <addaction name="menuFile"/>
@@ -845,7 +848,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpenImage"/>
-   <addaction name="actionSave"/>
+   <addaction name="actionSaveSegmentation"/>
    <addaction name="separator"/>
    <addaction name="actionNavigation"/>
    <addaction name="actionWindowLevel"/>
@@ -940,13 +943,13 @@
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="actionSaveSegmentation">
    <property name="icon">
     <iconset resource="../../resources/Project.qrc">
      <normaloff>:/icons/Save.png</normaloff>:/icons/Save.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Save</string>
+    <string>Save Segmentation</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -1222,7 +1225,7 @@
      <normaloff>:/icons/Draw.png</normaloff>:/icons/Draw.png</iconset>
    </property>
    <property name="text">
-    <string>Brush</string>
+    <string>Paint Brush</string>
    </property>
   </action>
   <action name="actionMultiPlanarView">
@@ -1256,10 +1259,20 @@
      <normaloff>:/icons/1476453573_Wand.ico</normaloff>:/icons/1476453573_Wand.ico</iconset>
    </property>
    <property name="text">
-    <string>SmartContour</string>
+    <string>Seeds Placer</string>
    </property>
    <property name="toolTip">
-    <string>Smart Contour</string>
+    <string>Seeds Placer</string>
+   </property>
+  </action>
+  <action name="actionOpenContour">
+   <property name="text">
+    <string>Open Contour</string>
+   </property>
+  </action>
+  <action name="actionSaveContour">
+   <property name="text">
+    <string>Save Contour</string>
    </property>
   </action>
  </widget>

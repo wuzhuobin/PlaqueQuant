@@ -80,6 +80,7 @@ public:
 	virtual void EnableVesselWallSegmentation();
 
 	virtual void FillPolygon();
+	virtual void FillPolygonThroughSlice(int slice1, int slice2);
 
 	virtual void SetContourFilterGenerateValues(int generateValues);
 	virtual void SetDilateValue(double value);

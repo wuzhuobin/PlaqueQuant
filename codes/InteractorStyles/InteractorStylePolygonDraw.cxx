@@ -25,6 +25,7 @@ Copyright (C) 2016
 #include <vtkBezierContourLineInterpolator.h>
 #include <vtkProperty.h>
 
+
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
 
@@ -289,7 +290,7 @@ void InteractorStylePolygonDraw::FillPolygon(
 			for (int y = bounds_int[2]; y <= bounds_int[3]; y++) {
 				for (int z = bounds_int[4]; z <= bounds_int[5]; z++) {
 					double p[3] = { x, y, z };
-					if (polygon->PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
+					if (vtkPolygon::PointInPolygon(p, polygon->GetPoints()->GetNumberOfPoints(),
 						static_cast<double*>(polygon->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n)) {
 						p[GetSliceOrientation()] = m_imageViewer->GetSlice();
 						points->InsertNextPoint(p[0], p[1], p[2]);
@@ -311,3 +312,5 @@ void InteractorStylePolygonDraw::FillPolygon(
 
 
 }
+
+
