@@ -10,6 +10,13 @@ public:
 	void PrintSelf(ostream& os, vtkIndent indent);
 
 	static ReorderPointIdOfContourFilter *New();
+	/**
+	 * Get/Set m_outputCellType, but not just support VTK_POLY_LINE AND VTK_POLYGON
+	 * @param	m_outputCellType
+	 * @return	m_outputCellType
+	 */
+	vtkGetMacro(OutputCellType, int);
+	vtkSetMacro(OutputCellType, int);
 
 protected:
 	ReorderPointIdOfContourFilter();
@@ -20,6 +27,9 @@ protected:
 private:
 	ReorderPointIdOfContourFilter(const ReorderPointIdOfContourFilter&);  // Not implemented.
 	void operator=(const ReorderPointIdOfContourFilter&);  // Not implemented.
+
+
+	int OutputCellType = VTK_POLY_LINE;
 
 };
 

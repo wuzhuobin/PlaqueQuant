@@ -5,6 +5,7 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkPolyLine.h>
+#include <vtkPolygon.h>
 #include <vtkCellArray.h>
 
 #include <list>
@@ -106,10 +107,10 @@ int ReorderPointIdOfContourFilter::RequestData(vtkInformation *vtkNotUsed(reques
 			}
 		}
 	}
-	// push the reorder points in vtkPoints
+	// push the reorder points into vtkPoints
+	// push vtkPoints into vtkPolyData
 	vtkSmartPointer<vtkPoints> _points =
 		vtkSmartPointer<vtkPoints>::New();
-
 	for (list<shared_ptr<vtkIdType>>::const_iterator cit = reorderPointPairList.cbegin();
 		cit != reorderPointPairList.cend(); ++cit) {
 		const double* coordinate;
@@ -122,19 +123,40 @@ int ReorderPointIdOfContourFilter::RequestData(vtkInformation *vtkNotUsed(reques
 			input->GetPoint(cit->get()[1]);
 		_points->InsertNextPoint(coordinate);
 	}
-	vtkSmartPointer<vtkPolyLine> polyLine =
-		vtkSmartPointer<vtkPolyLine>::New();
-	polyLine->GetPointIds()->SetNumberOfIds(_points->GetNumberOfPoints());
-	for (int i = 0; i < _points->GetNumberOfPoints(); ++i) {
-		polyLine->GetPointIds()->SetId(i, i);
-	}
-	
-	vtkSmartPointer<vtkCellArray> lines =
-		vtkSmartPointer<vtkCellArray>::New();
-	lines->InsertNextCell(polyLine);
-
-	output->SetLines(lines);
 	output->SetPoints(_points);
+
+	// push the reorder points into vtkCell
+	// push vtkCell into vtkPolyData
+	vtkSmartPointer<vtkCell> cell;
+	vtkSmartPointer<vtkCellArray> cellArray =
+		vtkSmartPointer<vtkCellArray>::New();
+	switch (OutputCellType)
+	{
+	case VTK_POLYGON:
+		cell =
+			vtkSmartPointer<vtkPolygon>::New();
+		cell->GetPointIds()->SetNumberOfIds(_points->GetNumberOfPoints());
+		for (int i = 0; i < _points->GetNumberOfPoints(); ++i) {
+			cell->GetPointIds()->SetId(i, i);
+		}
+		cellArray->InsertNextCell(cell);
+		output->SetPolys(cellArray);
+		break;
+
+	case VTK_POLY_LINE:
+	default:
+		cell =
+			vtkSmartPointer<vtkPolyLine>::New();
+		cell->GetPointIds()->SetNumberOfIds(_points->GetNumberOfPoints());
+		for (int i = 0; i < _points->GetNumberOfPoints(); ++i) {
+			cell->GetPointIds()->SetId(i, i);
+		}
+		cellArray->InsertNextCell(cell);
+		output->SetLines(cellArray);
+		break;
+	}
+
+
 	return 1;
 }
 

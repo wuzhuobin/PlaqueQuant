@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
 	vtkSmartPointer<vtkXMLPolyDataReader> reader =
 		vtkSmartPointer<vtkXMLPolyDataReader>::New();
-	reader->SetFileName("C:/Users/jieji/Desktop/reorder/test3.vtp");
+	reader->SetFileName("C:/Users/jieji/Desktop/reorder/reorder (3).vtp");
 	reader->Update();
 
 	vtkSmartPointer<vtkCleanPolyData> clean =
@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
 	reorder->SetInputConnection(clean->GetOutputPort());
 	reorder->AddObserver(vtkCommand::ErrorEvent, errorCatch);
 	reorder->Update();
+	reorder->GetOutput()->Print(cout);
 
 	vtkSmartPointer<vtkCleanPolyData> clean1 =
 		vtkSmartPointer<vtkCleanPolyData>::New();
@@ -72,6 +73,7 @@ int main(int argc, char *argv[])
 	clean1->PointMergingOn();
 	clean1->SetTolerance(0.05);
 	clean1->Update();
+	clean1->GetOutput()->Print(cout);
 	polydata = clean1->GetOutput();
 
 	// Create the renderer to visualize the scene
@@ -97,7 +99,7 @@ int main(int argc, char *argv[])
 	// Set up the contour widget within the visualization pipeline just assembled
 	contourWidget->SetInteractor(interactor);
 	contourWidget->On(); // Turn on the interactor observer
-	contourWidget->Initialize(polydata);
+	contourWidget->Initialize(clean1->GetOutput());
 	contourWidget->CloseLoop();
 	renderer->ResetCamera(); // Reposition camera to fit the scene elements
 

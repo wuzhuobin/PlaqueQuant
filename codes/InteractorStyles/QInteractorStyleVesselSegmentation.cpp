@@ -32,6 +32,8 @@ void QInteractorStyleVesselSegmentation::UniqueEnable(bool flag)
 
 	}
 	if (flag != initializationFlag) {
+		ui->fillSlicesBeginSpinBox->setValue(GetExtent()[4]);
+		ui->fillSliceEndSpinBox->setValue(GetExtent()[5]);
 		ui->fillSlicesBeginSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
 		ui->fillSliceEndSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
 	}
@@ -122,6 +124,14 @@ void QInteractorStyleVesselSegmentation::GenerateLumenWallContourWidget()
 	
 }
 
+void QInteractorStyleVesselSegmentation::FillPolygonThroughSlice()
+{
+	InteractorStyleVesselSegmentation::FillPolygonThroughSlice(
+		ui->fillSlicesBeginSpinBox->value(),
+		ui->fillSliceEndSpinBox->value());
+
+}
+
 void QInteractorStyleVesselSegmentation::CleanOne()
 {
 	CleanCurrentContour();
@@ -139,10 +149,12 @@ QInteractorStyleVesselSegmentation::QInteractorStyleVesselSegmentation(int uiTyp
 	QNEW_UI();
 	if (numOfMyself == 1) {
 		ui->vesselFrame->setHidden(true);
+
 	}
 	connect(ui->polygonRadionButton, SIGNAL(toggled(bool)), this, SLOT(SetPolygonEnable(bool)));
 	connect(ui->smoothCurveRadioButton, SIGNAL(toggled(bool)), this, SLOT(SetSmoothCurveEnable(bool)));
 	connect(ui->fillContourPushButton, SIGNAL(clicked()), this, SLOT(FillPolygon()));
+	connect(ui->fillSlicesPushButton, SIGNAL(clicked()), this, SLOT(FillPolygonThroughSlice()));
 	connect(ui->lumenSegmentationRadioButton, SIGNAL(toggled(bool)),
 		this, SLOT(EnableLumenSegmentation(bool)));
 	connect(ui->vesselWallSegmentationRadioButton, SIGNAL(toggled(bool)),

@@ -5,17 +5,22 @@
 
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 
-void main(int argc, char** argv) {
+int main(int argc, char** argv) {
 	QApplication app(argc, argv);
+	// MainWindow mainWind;
 	EncryptionAuthentication ea(0, QString(), QString(),
-		QDateTime(QDate(2016, 12, 12),
+		QDateTime(QDate(2015, 12, 12),
 			QTime(24, 0, 0)));
 
 	ea.enableExpiredDateTimeHint(true);
-	qDebug() << ea.authenticationExecAndKeyType(
-		EncryptionAuthentication::HAVING_KEY|
-		EncryptionAuthentication::EXPIRED_DATE_TIME
-	);
 
-	app.exec();
+	if (ea.authenticationExecAndKeyType(
+		EncryptionAuthentication::HAVING_KEY |
+		EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
+		return EXIT_FAILURE;
+	}
+	else {
+		// mainWnd.show(); 
+		return app.exec();
+	}
 }

@@ -28,6 +28,7 @@ public slots:
 	virtual void SetGenerateValue(int value);
 	virtual void SetDilateValue(double value);
 	virtual void GenerateLumenWallContourWidget();
+	virtual void FillPolygonThroughSlice();
 	
 	void CleanOne();
 	void CleanAll();
