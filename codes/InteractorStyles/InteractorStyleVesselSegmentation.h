@@ -56,17 +56,24 @@ public:
 	 */
 	virtual void NewContour(int type, QList<vtkSmartPointer<vtkPolyData>>* list);
 
-
 	/**
-	 * generate all contourWidget, it will automatically delete all 
+	 * generate all contourWidget of specifc slice, it will automatically delete all
+	 * contourWidgets beforhand
+	 * @param	type, the pre-setting contourWidget type
+	 * @param	slice, specific slice
+	 */
+	virtual void ReadFromPolydata(int type, int slice);
+	/**
+	 * generate all contourWidget of current slice, it will automatically delete all 
 	 * contourWidgets beforhand
 	 */
 	virtual void ReadFromPolydata();
 	/**
-	* for better performance please manually clear corresponding contourWidget
-	* manually, otherwise it will generate 2 times!
-	* @param	type, the pre-setting contourWidget type
-	*/
+	 * for better performance please manually clear corresponding contourWidget
+	 * manually, otherwise it will generate 2 times!
+	 * the method will generate contourWidgets of the current slice, 
+	 * @param	type, the pre-setting contourWidget type
+	 */
 	virtual void ReadFromPolydata(int type);
 	virtual void WriteToPolydata();
 

@@ -32,13 +32,17 @@ Copyright (C) 2016
 #include <vtkCenterOfMass.h>
 #include <vtkImageThreshold.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCellArray.h>
 
-//#include <vtkAppendPolyData.h>
+
+#include <vtkAppendPolyData.h>
+#include <vtkPolyDataToImageStencil.h>
 //#include <vtkSurfaceReconstructionFilter.h>
-//#include <vtkCellArray.h>
 //#include <vtkVoxelContoursToSurfaceFilter.h>
 //#include <vtkSelectEnclosedPoints.h>
-
+#include <vtkPolyDataToImageStencil.h>
+#include <vtkImageStencil.h>
+#include <vtkNIFTIImageWriter.h>
 
 #include "ReorderPointIdOfContourFilter.h"
 #include "InteractorStylePolygonDraw.h"
@@ -218,6 +222,25 @@ void InteractorStyleVesselSegmentation::NewContour(int type, QList<vtkSmartPoint
 
 }
 
+void InteractorStyleVesselSegmentation::ReadFromPolydata(int type, int slice)
+{
+	if (m_contourType == CONTOUR) {
+		return;
+	}
+	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY)
+		return;
+	Overlay* overlay = m_imageViewer->GetOverlay();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* maps[2] = {
+		overlay->GetVesselWallPolyData(),
+		overlay->GetLumenPolyData()
+	};
+
+	if (maps[type - 1]->contains(slice)) {
+		QList<vtkSmartPointer<vtkPolyData>>* list = maps[type - 1]->value(slice);
+		NewContour(type, list);
+	}
+}
+
 void InteractorStyleVesselSegmentation::ReadFromPolydata()
 {
 	CleanContours(1);
@@ -231,21 +254,7 @@ void InteractorStyleVesselSegmentation::ReadFromPolydata()
 
 void InteractorStyleVesselSegmentation::ReadFromPolydata(int type)
 {
-	if (m_contourType == CONTOUR) {
-		return;
-	}
-	if (GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY)
-		return;
-	Overlay* overlay = m_imageViewer->GetOverlay();
-	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* maps[2] = {
-		overlay->GetVesselWallPolyData(),
-		overlay->GetLumenPolyData()
-	};
-
-	if (maps[type - 1]->contains(GetSlice())) {
-		QList<vtkSmartPointer<vtkPolyData>>* list = maps[type - 1]->value(GetSlice());
-		NewContour(type, list);
-	}
+	ReadFromPolydata(type, GetSlice());
 }
 
 void InteractorStyleVesselSegmentation::WriteToPolydata()
@@ -286,28 +295,29 @@ void InteractorStyleVesselSegmentation::WriteToPolydata()
 				continue;
 			}
 
-			vtkSmartPointer<vtkPoints> _points =
-				vtkSmartPointer<vtkPoints>::New();
+			//vtkSmartPointer<vtkPoints> _points =
+			//	vtkSmartPointer<vtkPoints>::New();
 
-			vtkSmartPointer<vtkPolygon> _polygon =
-				vtkSmartPointer<vtkPolygon>::New();
-			_polygon->GetPointIds()->SetNumberOfIds(_contourRep->GetNumberOfNodes());
-			for (int j = 0; j < _contourRep->GetNumberOfNodes(); ++j) {
-				double worldCoordinate[3];
-				if (_contourRep->GetNthNodeWorldPosition(j, worldCoordinate)) {
-					_points->InsertNextPoint(worldCoordinate);
-					_polygon->GetPointIds()->SetId(j, j);
+			//vtkSmartPointer<vtkPolygon> _polygon =
+			//	vtkSmartPointer<vtkPolygon>::New();
+			//_polygon->GetPointIds()->SetNumberOfIds(_contourRep->GetNumberOfNodes());
+			//for (int j = 0; j < _contourRep->GetNumberOfNodes(); ++j) {
+			//	double worldCoordinate[3];
+			//	if (_contourRep->GetNthNodeWorldPosition(j, worldCoordinate)) {
+			//		_points->InsertNextPoint(worldCoordinate);
+			//		_polygon->GetPointIds()->SetId(j, j);
 
-				}
-			}
-			vtkSmartPointer<vtkCellArray> _polygons =
-				vtkSmartPointer<vtkCellArray>::New();
-			_polygons->InsertNextCell(_polygon);
+			//	}
+			//}
+			//vtkSmartPointer<vtkCellArray> _polygons =
+			//	vtkSmartPointer<vtkCellArray>::New();
+			//_polygons->InsertNextCell(_polygon);
 			
 			vtkSmartPointer<vtkPolyData> _nodePolyData =
 				vtkSmartPointer<vtkPolyData>::New();
-			_nodePolyData->SetPoints(_points);
-			_nodePolyData->SetPolys(_polygons);
+			//_nodePolyData->SetPoints(_points);
+			//_nodePolyData->SetPolys(_polygons);
+			_contourRep->GetNodePolyData(_nodePolyData);
 
 			*_qlist += _nodePolyData;
 		}
@@ -578,7 +588,7 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			vtkSmartPointer<ReorderPointIdOfContourFilter> reorder =
 				vtkSmartPointer<ReorderPointIdOfContourFilter>::New();
 			reorder->SetInputConnection(clean->GetOutputPort());
-			reorder->SetOutputCellType(VTK_POLYGON);
+			reorder->SetOutputCellType(VTK_POLY_LINE);
 			reorder->AddObserver(vtkCommand::ErrorEvent, errorCatch);
 			reorder->Update();
 			if(reorder->GetInput() == reorder->GetOutput()) {
@@ -619,17 +629,24 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			centerOfMassFilter->Update();
 			centerOfMassFilter->GetCenter(center);
 
-			vtkSmartPointer<vtkTransform> trans1 =
-				vtkSmartPointer<vtkTransform>::New();
-			trans1->Translate(-center[0], -center[1], -center[2]);
-			vtkSmartPointer<vtkTransform> trans2 =
-				vtkSmartPointer<vtkTransform>::New();
-			trans2->Scale(1 + m_dilateValue, 1 + m_dilateValue, 1);
-			trans2->Concatenate(trans1);
+			//vtkSmartPointer<vtkTransform> trans1 =
+			//	vtkSmartPointer<vtkTransform>::New();
+			//trans1->Translate(-center[0], -center[1], -center[2]);
+			//vtkSmartPointer<vtkTransform> trans2 =
+			//	vtkSmartPointer<vtkTransform>::New();
+			//trans2->Scale(1 + m_dilateValue, 1 + m_dilateValue, 1);
+			//trans2->Concatenate(trans1);
+			//vtkSmartPointer<vtkTransform> trans3 =
+			//	vtkSmartPointer<vtkTransform>::New();
+			//trans3->Translate(center);
+			//trans3->Concatenate(trans2);
+			//trans3->Update();
+
 			vtkSmartPointer<vtkTransform> trans3 =
 				vtkSmartPointer<vtkTransform>::New();
 			trans3->Translate(center);
-			trans3->Concatenate(trans2);
+			trans3->Scale(1 + m_dilateValue, 1 + m_dilateValue, 1);
+			trans3->Translate(-center[0], -center[1], -center[2]);
 			trans3->Update();
 
 			vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyDataFilter =
@@ -655,6 +672,78 @@ void InteractorStyleVesselSegmentation::FillPolygon()
 	InteractorStylePolygonDraw::FillPolygon(
 		&m_lumenWallContourWidgets, m_lumenWallLabel);
 	InteractorStylePolygonDraw::FillPolygon();
+
+}
+
+void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int slice2)
+{
+	if (m_imageViewer->GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
+		return;
+	}
+	// using the bigger on as the end slice
+	if (slice1 > slice2) {
+		swap(slice1, slice2);
+	}
+	// camping
+	slice1 = max(slice1, GetExtent()[4]);
+	slice2 = min(slice2, GetExtent()[5]);
+
+
+	Overlay* overlay = m_imageViewer->GetOverlay();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>*  _contours[2] =
+	{ overlay->GetVesselWallPolyData(), overlay->GetLumenPolyData() };
+	unsigned char _labels[2] = { m_vesselWallLabel, m_lumenWallLabel };
+
+	for (int index = 0; index < 1; ++index) {
+		vtkSmartPointer<vtkAppendPolyData> append =
+			vtkSmartPointer<vtkAppendPolyData>::New();
+
+		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
+			_contours[index]->cbegin(); cit1 != _contours[index]->cend(); ++cit1) {
+			// only filling the extent between slice1 and slice2
+			if (cit1.key() < slice1 || cit1.key() > slice2) {
+				continue;
+			}
+
+			QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
+			for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
+				cit2 != _list->cend(); ++cit2) {
+
+				append->AddInputData(*cit2);
+			}
+
+
+		}
+		append->Update();
+
+		vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
+			vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+		pol2stenc->SetInputConnection(append->GetOutputPort());
+		pol2stenc->SetOutputOrigin(GetOrigin());
+		pol2stenc->SetOutputSpacing(GetSpacing());
+		pol2stenc->SetOutputWholeExtent(m_imageViewer->GetOriginalInput()->GetExtent());
+		pol2stenc->Update();
+
+		vtkSmartPointer<vtkImageStencil> imgstenc =
+			vtkSmartPointer<vtkImageStencil>::New();
+		imgstenc->SetInputData(m_imageViewer->GetOverlay()->GetVTKOutput());
+		imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
+		imgstenc->ReverseStencilOff();
+		imgstenc->SetBackgroundValue(0);
+		imgstenc->Update();
+
+		//vtkSmartPointer<vtkNIFTIImageWriter> w =
+		//	vtkSmartPointer<vtkNIFTIImageWriter>::New();
+		//w->SetInputConnection(imgstenc->GetOutputPort());
+		//w->SetFileName("asdf.nii");
+		//w->Write();
+
+
+		m_imageViewer->GetOverlay()->vtkShallowCopyImage(imgstenc->GetOutput());
+
+	}
+
+
 
 }
 
@@ -803,152 +892,157 @@ void InteractorStyleVesselSegmentation::FillPolygon()
 //
 //}
 
-void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int slice2)
-{
-	if (m_imageViewer->GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
-		return;
-	}
-	// using the bigger on as the end slice
-	if (slice1 > slice2) {
-		swap(slice1, slice2);
-	}
-	// camping
-	slice1 = max(slice1, GetExtent()[4]);
-	slice2 = min(slice2, GetExtent()[5]);
-
-
-	Overlay* overlay = m_imageViewer->GetOverlay();
-	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>*  _contours[2] =
-	{ overlay->GetVesselWallPolyData(), overlay->GetLumenPolyData() };
-	unsigned char _labels[2] = { m_vesselWallLabel, m_lumenWallLabel };
-
-	for (int index = 0; index < 2; ++index) {
-
-		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
-			_contours[index]->cbegin(); cit1 != _contours[index]->cend(); ++cit1) {
-			// only filling the extent between slice1 and slice2
-			if (cit1.key() < slice1 || cit1.key() > slice2) {
-				continue;
-			}
-
-		//	QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
-		//	for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
-		//		cit2 != _list->cend(); ++cit2) {
-
-		//		vtkSmartPointer<vtkOrientedGlyphContourRepresentation> contourRep =
-		//			vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New();
-		//		contourRep->SetLineInterpolator(this->m_interpolator);
-		//		
-		//		for (vtkIdType id = 0; id < (*cit2)->GetNumberOfPoints(); ++id) {
-		//			contourRep->AddNodeAtWorldPosition((*cit2)->GetPoint(id));
-		//		}
-		//		contourRep->
-
-		//	}
-
-
-		//}
-
-		//vtkSmartPointer<vtkPolyData> polyDataInWorldCoordinate =
-		//	append->GetOutput();
-		//vtkSmartPointer<vtkPolyData> polyDataInImageCoordinate =
-		//	vtkSmartPointer<vtkPolyData>::New();
-		//vtkSmartPointer<vtkPoints> points =
-		//	vtkSmartPointer<vtkPoints>::New();
-
-
-		//vtkPoints* contourPoints = polyDataInWorldCoordinate->GetPoints();
-		//int numPoints = contourPoints->GetNumberOfPoints();
-		//points->SetNumberOfPoints(numPoints);
-		//for (int i = 0; i < numPoints; ++i)
-		//{
-		//	double pt[3];
-		//	contourPoints->GetPoint(i, pt);
-		//	//pt[0] = static_cast<int>((pt[0] - GetOrigin()[0]) / GetSpacing()[0] + 0.5);
-		//	//pt[1] = static_cast<int>((pt[1] - GetOrigin()[1]) / GetSpacing()[1] + 0.5);
-		//	//pt[2] = static_cast<int>((pt[2] - GetOrigin()[2]) / GetSpacing()[2] + 0.5);
-		//	pt[0] = round((pt[0] - GetOrigin()[0]) / GetSpacing()[0]);
-		//	pt[1] = round((pt[1] - GetOrigin()[1]) / GetSpacing()[1]);
-		//	pt[2] = round((pt[2] - GetOrigin()[2]) / GetSpacing()[2]);
-		//	points->SetPoint(i, pt);
-		//}
-		//polyDataInImageCoordinate->SetPolys(polyDataInWorldCoordinate->GetPolys());
-		//polyDataInImageCoordinate->SetPoints(points);
-
-		//vtkSmartPointer<vtkVoxelContoursToSurfaceFilter> contoursToSurface =
-		//	vtkSmartPointer<vtkVoxelContoursToSurfaceFilter>::New();
-		//contoursToSurface->SetInputData(polyDataInImageCoordinate);
-		////contoursToSurface->SetSpacing(GetSpacing()[0], GetSpacing()[1], GetSpacing()[2]);
-		//contoursToSurface->Update();
-
-
-
-		//vtkSmartPointer<vtkPolyData> _surface =
-		//	contoursToSurface->GetOutput();
-		//vtkSmartPointer<vtkPolyData> _overlayPolyData =
-		//	vtkSmartPointer<vtkPolyData>::New();
-		//vtkSmartPointer<vtkPoints> _overlayPoints =
-		//	vtkSmartPointer<vtkPoints>::New();
-		//vtkSmartPointer<vtkPoints> insidePoints =
-		//	vtkSmartPointer<vtkPoints>::New();
-		//int bounds[6];
-
-
-		//bounds[0] = max(static_cast<int>(_surface->GetBounds()[0] + 0.5), GetExtent()[0]);
-		//bounds[2] = max(static_cast<int>(_surface->GetBounds()[2] + 0.5), GetExtent()[2]);
-		//bounds[4] = max(static_cast<int>(_surface->GetBounds()[4] + 0.5), GetExtent()[4]);
-		//bounds[1] = min(static_cast<int>(_surface->GetBounds()[1] + 0.5), GetExtent()[1]);
-		//bounds[3] = min(static_cast<int>(_surface->GetBounds()[3] + 0.5), GetExtent()[3]);
-		//bounds[5] = min(static_cast<int>(_surface->GetBounds()[5] + 0.5), GetExtent()[5]);
-
-		//cout << "bounds: ";
-		//for (int i = 0; i < 6; ++i) {
-		//	cout << bounds[i] << ' ';
-		//}
-		//cout << endl;
-
-		//for (int i = bounds[0]; i <= bounds[1]; ++i) {
-		//	for (int j = bounds[2]; j <= bounds[3]; ++j) {
-		//		for (int k = bounds[4]; k <= bounds[5]; ++k) {
-		//			_overlayPoints->InsertNextPoint(i, j, k);
-		//		}
-		//	}
-		//}
-		//_overlayPolyData->SetPoints(_overlayPoints);
-
-		//vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints =
-		//	vtkSmartPointer<vtkSelectEnclosedPoints>::New();
-		//selectEnclosedPoints->SetSurfaceData(_surface);
-		//selectEnclosedPoints->SetInputData(_overlayPolyData);
-		//selectEnclosedPoints->Update();
-		//selectEnclosedPoints->GetOutput()->Print(cout);
-
-		//for (vtkIdType i = 0; i < _overlayPolyData->GetNumberOfPoints(); i++)
-		//{
-		//	if (selectEnclosedPoints->IsInside(i)) {
-		//		//std::cout << "Point " << i << ": " << 
-		//		//	_overlayPolyData->GetPoint(i)[0] << ' ' <<
-		//		//	_overlayPolyData->GetPoint(i)[1] << ' ' << 
-		//		//	_overlayPolyData->GetPoint(i)[2] << ' ' <<
-		//		//	std::endl;
-		//		insidePoints->InsertNextPoint(_overlayPolyData->GetPoint(i));
-		//	}
-		//}
-
-		//////// Write the file
-		////vtkSmartPointer<vtkXMLPolyDataWriter> writer =
-		////	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-		////writer->SetFileName("aaa.vtp");
-		////writer->SetInputConnection(selectEnclosedPoints->GetOutputPort());
-		////writer->Write();
-
-
-
-
-		m_imageViewer->GetOverlay()->SetPixels(insidePoints,
-			_labels[index]);
-	}
-
-
-
-}
+//void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int slice2)
+//{
+//	if (m_imageViewer->GetSliceOrientation() != vtkImageViewer2::SLICE_ORIENTATION_XY) {
+//		return;
+//	}
+//	// using the bigger on as the end slice
+//	if (slice1 > slice2) {
+//		swap(slice1, slice2);
+//	}
+//	// camping
+//	slice1 = max(slice1, GetExtent()[4]);
+//	slice2 = min(slice2, GetExtent()[5]);
+//
+//
+//	Overlay* overlay = m_imageViewer->GetOverlay();
+//	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>*  _contours[2] =
+//	{ overlay->GetVesselWallPolyData(), overlay->GetLumenPolyData() };
+//	unsigned char _labels[2] = { m_vesselWallLabel, m_lumenWallLabel };
+//
+//
+//	std::list<vtkSmartPointer<vtkContourWidget>>* _widgets[2] = 
+//	{&m_vesselWallContourWidgets, &m_lumenWallContourWidgets };
+//
+//	for (int index = 0; index < 2; ++index) {
+//
+//		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
+//			_contours[index]->cbegin(); cit1 != _contours[index]->cend(); ++cit1) {
+//			// only filling the extent between slice1 and slice2
+//			if (cit1.key() < slice1 || cit1.key() > slice2) {
+//				continue;
+//			}
+//
+//			QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
+//			for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
+//				cit2 != _list->cend(); ++cit2) {
+//				ReadFromPolydata(index + 1, cit1.key());
+//				InteractorStylePolygonDraw::FillPolygon(_widgets[index], _labels[index]);
+//		//		vtkSmartPointer<vtkOrientedGlyphContourRepresentation> contourRep =
+//		//			vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New();
+//		//		contourRep->SetLineInterpolator(this->m_interpolator);
+//		//		
+//		//		for (vtkIdType id = 0; id < (*cit2)->GetNumberOfPoints(); ++id) {
+//		//			contourRep->AddNodeAtWorldPosition((*cit2)->GetPoint(id));
+//		//		}
+//		//		contourRep->
+//
+//			}
+//
+//
+//		}
+//
+//		//vtkSmartPointer<vtkPolyData> polyDataInWorldCoordinate =
+//		//	append->GetOutput();
+//		//vtkSmartPointer<vtkPolyData> polyDataInImageCoordinate =
+//		//	vtkSmartPointer<vtkPolyData>::New();
+//		//vtkSmartPointer<vtkPoints> points =
+//		//	vtkSmartPointer<vtkPoints>::New();
+//
+//
+//		//vtkPoints* contourPoints = polyDataInWorldCoordinate->GetPoints();
+//		//int numPoints = contourPoints->GetNumberOfPoints();
+//		//points->SetNumberOfPoints(numPoints);
+//		//for (int i = 0; i < numPoints; ++i)
+//		//{
+//		//	double pt[3];
+//		//	contourPoints->GetPoint(i, pt);
+//		//	//pt[0] = static_cast<int>((pt[0] - GetOrigin()[0]) / GetSpacing()[0] + 0.5);
+//		//	//pt[1] = static_cast<int>((pt[1] - GetOrigin()[1]) / GetSpacing()[1] + 0.5);
+//		//	//pt[2] = static_cast<int>((pt[2] - GetOrigin()[2]) / GetSpacing()[2] + 0.5);
+//		//	pt[0] = round((pt[0] - GetOrigin()[0]) / GetSpacing()[0]);
+//		//	pt[1] = round((pt[1] - GetOrigin()[1]) / GetSpacing()[1]);
+//		//	pt[2] = round((pt[2] - GetOrigin()[2]) / GetSpacing()[2]);
+//		//	points->SetPoint(i, pt);
+//		//}
+//		//polyDataInImageCoordinate->SetPolys(polyDataInWorldCoordinate->GetPolys());
+//		//polyDataInImageCoordinate->SetPoints(points);
+//
+//		//vtkSmartPointer<vtkVoxelContoursToSurfaceFilter> contoursToSurface =
+//		//	vtkSmartPointer<vtkVoxelContoursToSurfaceFilter>::New();
+//		//contoursToSurface->SetInputData(polyDataInImageCoordinate);
+//		////contoursToSurface->SetSpacing(GetSpacing()[0], GetSpacing()[1], GetSpacing()[2]);
+//		//contoursToSurface->Update();
+//
+//
+//
+//		//vtkSmartPointer<vtkPolyData> _surface =
+//		//	contoursToSurface->GetOutput();
+//		//vtkSmartPointer<vtkPolyData> _overlayPolyData =
+//		//	vtkSmartPointer<vtkPolyData>::New();
+//		//vtkSmartPointer<vtkPoints> _overlayPoints =
+//		//	vtkSmartPointer<vtkPoints>::New();
+//		//vtkSmartPointer<vtkPoints> insidePoints =
+//		//	vtkSmartPointer<vtkPoints>::New();
+//		//int bounds[6];
+//
+//
+//		//bounds[0] = max(static_cast<int>(_surface->GetBounds()[0] + 0.5), GetExtent()[0]);
+//		//bounds[2] = max(static_cast<int>(_surface->GetBounds()[2] + 0.5), GetExtent()[2]);
+//		//bounds[4] = max(static_cast<int>(_surface->GetBounds()[4] + 0.5), GetExtent()[4]);
+//		//bounds[1] = min(static_cast<int>(_surface->GetBounds()[1] + 0.5), GetExtent()[1]);
+//		//bounds[3] = min(static_cast<int>(_surface->GetBounds()[3] + 0.5), GetExtent()[3]);
+//		//bounds[5] = min(static_cast<int>(_surface->GetBounds()[5] + 0.5), GetExtent()[5]);
+//
+//		//cout << "bounds: ";
+//		//for (int i = 0; i < 6; ++i) {
+//		//	cout << bounds[i] << ' ';
+//		//}
+//		//cout << endl;
+//
+//		//for (int i = bounds[0]; i <= bounds[1]; ++i) {
+//		//	for (int j = bounds[2]; j <= bounds[3]; ++j) {
+//		//		for (int k = bounds[4]; k <= bounds[5]; ++k) {
+//		//			_overlayPoints->InsertNextPoint(i, j, k);
+//		//		}
+//		//	}
+//		//}
+//		//_overlayPolyData->SetPoints(_overlayPoints);
+//
+//		//vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints =
+//		//	vtkSmartPointer<vtkSelectEnclosedPoints>::New();
+//		//selectEnclosedPoints->SetSurfaceData(_surface);
+//		//selectEnclosedPoints->SetInputData(_overlayPolyData);
+//		//selectEnclosedPoints->Update();
+//		//selectEnclosedPoints->GetOutput()->Print(cout);
+//
+//		//for (vtkIdType i = 0; i < _overlayPolyData->GetNumberOfPoints(); i++)
+//		//{
+//		//	if (selectEnclosedPoints->IsInside(i)) {
+//		//		//std::cout << "Point " << i << ": " << 
+//		//		//	_overlayPolyData->GetPoint(i)[0] << ' ' <<
+//		//		//	_overlayPolyData->GetPoint(i)[1] << ' ' << 
+//		//		//	_overlayPolyData->GetPoint(i)[2] << ' ' <<
+//		//		//	std::endl;
+//		//		insidePoints->InsertNextPoint(_overlayPolyData->GetPoint(i));
+//		//	}
+//		//}
+//
+//		//////// Write the file
+//		////vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+//		////	vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+//		////writer->SetFileName("aaa.vtp");
+//		////writer->SetInputConnection(selectEnclosedPoints->GetOutputPort());
+//		////writer->Write();
+//
+//
+//
+//
+//		//m_imageViewer->GetOverlay()->SetPixels(insidePoints,
+//		//	_labels[index]);
+//	}
+//
+//
+//
+//}
