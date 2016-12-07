@@ -45,7 +45,27 @@ public:
 	virtual void SetPolygonEnable();
 	virtual void SetLineInterpolator(int i);
 	virtual void FillPolygon();
-	virtual void FillPolygon(std::list<vtkSmartPointer<vtkContourWidget>>* contour, unsigned char label);
+
+	virtual void FillPolygon(
+		std::list<vtkSmartPointer<vtkContourWidget>>* contour, 
+		unsigned char label);
+	virtual void FillPolygon(
+		std::list<vtkSmartPointer<vtkPolygon>>* contourPolygon, 
+		unsigned char label);
+
+	//virtual void FillPolygon(
+	//	std::list<vtkSmartPointer<vtkContourWidget>>* contour, 
+	//	unsigned char label,
+	//	int slice);
+
+	/**
+	 * Because the index of the sliceOrientation is wrong, it need to be specified
+	 */
+	virtual void FillPolygon(
+		std::list<vtkSmartPointer<vtkPolygon>>* contourPolygon, 
+		unsigned char label,
+		int slice);
+
 
 protected:
 	InteractorStylePolygonDraw();

@@ -18,6 +18,7 @@
 #include <vtkCleanPolyData.h>
 #include "ReorderPointIdOfContourFilter.h"
 #include <vtkXMLPolyDataWriter.h>
+#include <vtkXMLPolyDataWriter.h>
 #include <vtkCallbackCommand.h>
 
 int main(int argc, char *argv[])
@@ -75,6 +76,13 @@ int main(int argc, char *argv[])
 	clean1->Update();
 	clean1->GetOutput()->Print(cout);
 	polydata = clean1->GetOutput();
+
+
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+		vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetFileName("C:/Users/jieji/Desktop/reorder/reorder (4).vtp");
+	writer->SetInputConnection(clean1->GetOutputPort());
+	writer->Write();
 
 	// Create the renderer to visualize the scene
 	vtkSmartPointer<vtkRenderer> renderer =

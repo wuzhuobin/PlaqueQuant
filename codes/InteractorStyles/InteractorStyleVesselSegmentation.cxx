@@ -35,14 +35,16 @@ Copyright (C) 2016
 #include <vtkCellArray.h>
 
 
-#include <vtkAppendPolyData.h>
-#include <vtkPolyDataToImageStencil.h>
+//#include <vtkAppendPolyData.h>
+//#include <vtkPolyDataToImageStencil.h>
 //#include <vtkSurfaceReconstructionFilter.h>
 //#include <vtkVoxelContoursToSurfaceFilter.h>
 //#include <vtkSelectEnclosedPoints.h>
-#include <vtkPolyDataToImageStencil.h>
-#include <vtkImageStencil.h>
-#include <vtkNIFTIImageWriter.h>
+//#include <vtkPolyDataToImageStencil.h>
+//#include <vtkImageStencil.h>
+//#include <vtkNIFTIImageWriter.h>
+#include <vtkParametricFunctionSource.h>
+#include <vtkParametricSpline.h>
 
 #include "ReorderPointIdOfContourFilter.h"
 #include "InteractorStylePolygonDraw.h"
@@ -619,7 +621,7 @@ void InteractorStyleVesselSegmentation::GenerateVesselWallPolyData()
 			(*(*lumenMap)[i]) += _lumenPolyData;
 
 
-			// Dilate part
+			// Dilate part using scaling instead of image dilate
 			// generate polydata 
 			double center[3];
 			vtkSmartPointer<vtkCenterOfMass> centerOfMassFilter =
@@ -694,9 +696,9 @@ void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int 
 	{ overlay->GetVesselWallPolyData(), overlay->GetLumenPolyData() };
 	unsigned char _labels[2] = { m_vesselWallLabel, m_lumenWallLabel };
 
-	for (int index = 0; index < 1; ++index) {
-		vtkSmartPointer<vtkAppendPolyData> append =
-			vtkSmartPointer<vtkAppendPolyData>::New();
+	for (int index = 0; index < 2; ++index) {
+
+		list<vtkSmartPointer<vtkPolygon>> contourPolygons;
 
 		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
 			_contours[index]->cbegin(); cit1 != _contours[index]->cend(); ++cit1) {
@@ -708,29 +710,47 @@ void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int 
 			QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
 			for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
 				cit2 != _list->cend(); ++cit2) {
+				
+				contourPolygons.push_back(vtkSmartPointer<vtkPolygon>::New());
+				
+				vtkSmartPointer<vtkParametricSpline> spline =
+					vtkSmartPointer<vtkParametricSpline>::New();
+				spline->SetPoints((*cit2)->GetPoints());
+				//spline->ClosedOn();
+				//min((*cit2)->GetNumberOfPoints() * 100, (vtkIdType)500)
+				vtkSmartPointer<vtkParametricFunctionSource> functionSource =
+					vtkSmartPointer<vtkParametricFunctionSource>::New();
+				functionSource->SetWResolution(99);
+				functionSource->SetVResolution(99);
+				functionSource->SetUResolution(99);
 
-				append->AddInputData(*cit2);
+				functionSource->SetParametricFunction(spline);
+				functionSource->Update();
+
+
+
+				double lastPoint[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
+				for (vtkIdType id = 0; id < functionSource->GetOutput()->GetNumberOfPoints(); ++id) {
+
+					double displayCoordinate[3];
+					const double* worldCoordinate = functionSource->GetOutput()->GetPoint(id);
+
+					//Take one image data 1 to be reference
+					displayCoordinate[0] = ((worldCoordinate[0] - GetOrigin()[0]) / GetSpacing()[0]);
+					displayCoordinate[1] = ((worldCoordinate[1] - GetOrigin()[1]) / GetSpacing()[1]);
+					displayCoordinate[2] = cit1.key();
+					double d = vtkMath::Distance2BetweenPoints(lastPoint, displayCoordinate);
+					if (d < 1E-5)
+						continue;
+					memcpy(lastPoint, displayCoordinate, sizeof(displayCoordinate));
+					contourPolygons.back()->GetPoints()->InsertNextPoint(displayCoordinate);
+
+				}
 			}
-
-
 		}
-		append->Update();
 
-		vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
-			vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-		pol2stenc->SetInputConnection(append->GetOutputPort());
-		pol2stenc->SetOutputOrigin(GetOrigin());
-		pol2stenc->SetOutputSpacing(GetSpacing());
-		pol2stenc->SetOutputWholeExtent(m_imageViewer->GetOriginalInput()->GetExtent());
-		pol2stenc->Update();
 
-		vtkSmartPointer<vtkImageStencil> imgstenc =
-			vtkSmartPointer<vtkImageStencil>::New();
-		imgstenc->SetInputData(m_imageViewer->GetOverlay()->GetVTKOutput());
-		imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
-		imgstenc->ReverseStencilOff();
-		imgstenc->SetBackgroundValue(0);
-		imgstenc->Update();
+		InteractorStylePolygonDraw::FillPolygon(&contourPolygons, _labels[index]);
 
 		//vtkSmartPointer<vtkNIFTIImageWriter> w =
 		//	vtkSmartPointer<vtkNIFTIImageWriter>::New();
@@ -739,7 +759,6 @@ void InteractorStyleVesselSegmentation::FillPolygonThroughSlice(int slice1, int 
 		//w->Write();
 
 
-		m_imageViewer->GetOverlay()->vtkShallowCopyImage(imgstenc->GetOutput());
 
 	}
 

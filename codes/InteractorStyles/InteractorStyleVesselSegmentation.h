@@ -47,8 +47,8 @@ public:
 	virtual void NewContour();
 	/**
 	 * @override
- 	 * For better performance, NewContour() will not invoke EnabledOn()
-	 * it need to be enable manually
+	 * it will automatically Enable contourWidget automatically before using 
+	 * vtkPoints to initialize itself
 	 * @param	type, it specifies the type of the contourWidget, CONTOUR_TYPE
 	 * @param	list, it will generate multiple contourWidgets, the number of 
 	 *			contourWidgets equals the size of list
