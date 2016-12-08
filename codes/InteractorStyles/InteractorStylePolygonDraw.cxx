@@ -264,7 +264,6 @@ void InteractorStylePolygonDraw::FillPolygon(
 	FillPolygon(&contourPolygons, label );
 }
 
-#include <vtkXMLPolyDataWriter.h>
 void InteractorStylePolygonDraw::FillPolygon(
 	std::list<vtkSmartPointer<vtkPolygon>>* contourPolygon, unsigned char label) {
 
@@ -283,14 +282,6 @@ void InteractorStylePolygonDraw::FillPolygon(
 		int bounds[6];
 		std::copy((*cit)->GetPoints()->GetBounds(), (*cit)->GetPoints()->GetBounds() + 6, bounds);
 			
-		vtkSmartPointer<vtkPolyData> po = vtkSmartPointer<vtkPolyData>::New();
-		po->SetPoints((*cit)->GetPoints());
-
-		vtkSmartPointer<vtkXMLPolyDataWriter> w = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-		w->SetFileName("contourPoints.vtp");
-		w->SetInputData(po);
-		w->Write();
-
 		// doing clamping
 		for (int boundIndex = 0; boundIndex < 3; ++boundIndex) {
 			bounds[2 * boundIndex] =
@@ -312,10 +303,6 @@ void InteractorStylePolygonDraw::FillPolygon(
 				}
 			}
 		}
-		po->SetPoints(fillPoints);
-		w->SetFileName("fillPoints.vtp");
-		w->SetInputData(po);
-		w->Write();
 
 	}
 
@@ -343,6 +330,15 @@ void InteractorStylePolygonDraw::FillPolygon(
 		if ((*cit) == nullptr || (*cit)->GetPoints()->GetNumberOfPoints() < 3) {
 			continue;
 		}
+
+		const double* lastPoint =
+			(*cit)->GetPoints()->GetPoint((*cit)->GetPoints()->GetNumberOfPoints() - 1);
+		const double* firstPoint = (*cit)->GetPoints()->GetPoint(0);
+		// remove duplicate last point
+		// without this, pointsInPolygon may be wrong
+		while (std::equal(lastPoint, lastPoint + 3, firstPoint)) {
+			(*cit)->GetPoints()->SetNumberOfPoints((*cit)->GetPoints()->GetNumberOfPoints() - 1);
+		}
 		//Test whether the points are inside the polygon or not
 		double normalVector[3];
 		(*cit)->ComputeNormal((*cit)->GetPoints()->GetNumberOfPoints(),
@@ -359,10 +355,6 @@ void InteractorStylePolygonDraw::FillPolygon(
 			bounds[2 * boundIndex + 1] =
 				min(bounds[2 * boundIndex + 1] + 3, GetExtent()[2 * boundIndex + 1]);
 		}
-
-		// for using overlay::SetPixels()
-		//bounds[GetSliceOrientation() * 2] = slice;
-		//bounds[GetSliceOrientation() * 2 + 1] = slice;
 
 		for (int x = bounds[0]; x <= bounds[1]; x++) {
 			for (int y = bounds[2]; y <= bounds[3]; y++) {

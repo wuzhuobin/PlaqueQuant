@@ -14,6 +14,9 @@ int main(int argc, char** argv) {
 
 	ea.enableExpiredDateTimeHint(true);
 
+	//if (ea.authenticationExec(
+	//	EncryptionAuthentication::HAVING_KEY |
+	//	EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
 	if (ea.authenticationExecAndKeyType(
 		EncryptionAuthentication::HAVING_KEY |
 		EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {

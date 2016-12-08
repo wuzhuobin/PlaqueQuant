@@ -5,14 +5,14 @@
 // error output
 #ifndef _DEBUG
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
-extern const bool WARNING = 0;
+extern const int WARNING = 0;
 #else
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
-extern const bool WARNING = 1;
+extern const int WARNING = 1;
 #endif // !_DEBUG
  
 
-#define PLAQUEQUANT_VERSION "2.0"
+extern const char* PLAQUEQUANT_VERSION = "2.0";
 
 int main( int argc, char** argv )
 {
