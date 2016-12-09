@@ -7,11 +7,18 @@
  * API class for using the Vikey USB authentication
  * API class for using the Vikey USB authentication system. The class is derived from 
  * QWidget. And this API class can only be used under Windows OS.
+ * 
+ * Updated Log:
+ * version 1.0.0
+ * Original one provided authentication method for having key, soft id, hard id
+ * product name, expired date time
  *
+ * version 1.1.0
+ * user password can be used in authentication as well
  * 
  * @class	EncryptionAuthentication
  * @author	WUZHUOBIN
- * @version	1.0.0
+ * @version	1.1.0
  * @since	2016.11.17
  *
  */
@@ -27,6 +34,7 @@ public:
 	 * @see	#authenticationByProductName();
 	 * @see	#authenticationByHavingKey();
 	 * @see	#authenticationByExpiredDateTime();
+	 * @see	#authenticationByUserPassword();
 	 */
 	enum AUTHENTICATION_FLAG
 	{
@@ -52,7 +60,9 @@ public:
 		// Wrong product name
 		PRODUCT_NAME = 0X08,
 		// software is expired
-		EXPIRED_DATE_TIME = 0X10
+		EXPIRED_DATE_TIME = 0X10,
+		// user password
+		USER_PASSWORD = 0X20
 	};
 	/**
 	 * Constructor
@@ -60,19 +70,23 @@ public:
 	 * reloadViKey() @see #reloadViKey() when the class is constructed for initialization.
 	 * If the parameters are using the default initialzation value, it will directly pass
 	 * the authentication.
-	 * @param	hardID setting the m_hardID. Checked by 
-	 *				   authenticationByHardID @see #authenticationByHardID(). 
-	 * @param	softID setting the m_softID. Checked by 
-	 *				   authenticationBySoftID @see #authenticationBySoftID().
-	 * @param	productName setting the m_productName. Checked by 
-	 *						authenticationByProductName @see #authenticationByProductName()
-	 *						authenticationByProductNameAndKeyType
-	 *						@see #authenticationByProductNameAndKeyType()
-	 * @param	expiredDateTime settting the m_expiredDateTime. Checked by 
-	 *							authenticationByExpiredDateTime 
-	 *							@see #authenticationByExpiredDateTime() &&
-	 *							authenticationByExpiredDateTimeAndKeytype()
-	 *							@see #authenticationByExpiredDateTimeAndKeytype()
+	 * @param	hardID,setting the m_hardID. Checked by 
+	 *			authenticationByHardID @see #authenticationByHardID(). 
+	 * @param	softID,setting the m_softID. Checked by 
+	 *			authenticationBySoftID @see #authenticationBySoftID().
+	 * @param	productName, setting the m_productName. Checked by 
+	 *			authenticationByProductName @see #authenticationByProductName()
+	 *			authenticationByProductNameAndKeyType
+	 *			@see #authenticationByProductNameAndKeyType()
+	 * @param	expiredDateTime, settting the m_expiredDateTime. Checked by 
+	 *			authenticationByExpiredDateTime 
+	 *			@see #authenticationByExpiredDateTime() &&
+	 *			authenticationByExpiredDateTimeAndKeytype()
+	 *			@see #authenticationByExpiredDateTimeAndKeytype()
+	 * @param	userPassword, setting the m_userPassword. checked by 
+	 *			authenticationByUserPassword
+	 *			@see #authenticationByUserPassword
+	 * @param	AdminPassword, setting the m_adminPassword. 
 	 * @param	parent the parent QWidget
 	 */
 	EncryptionAuthentication(
@@ -80,6 +94,8 @@ public:
 		QString softID = QString(),
 		QString productName = QString(),
 		QDateTime expiredDateTime = QDateTime(), 
+		QString userPassword = "11111111",
+		QString AdminPassword = "00000000",
 		QWidget* parent = nullptr);
 	/**
 	 * Destructor
@@ -111,6 +127,7 @@ public:
 	 * @see #authenticationByProductName();
 	 * @see #authenticationByHavingKey();
 	 * @see #authenticationByExpiredDateTime();
+	 * @see #authenticationByUserPassword();
 	 * @param	errorCode NORMAL if this is the only input, it will always pass
 	 *					  HAVING_KEY pass only one right key is inserted
 	 *					  SOFT_ID pass only usb key with right soft_id
@@ -118,6 +135,8 @@ public:
 	 *				      PRODUCT_NAME pass only usb key with right product name
 	 *					  EXPIRED_DATE_TIME pass only the usb key's clock before 
 	 *									    expiredDateTime
+	 *					  USER_PASSWORD pass only the usb key's can be login with
+	 *					  m_userPassword successfully
 	 * @return	NORMAL, authentication passed
 	 *			others, a or by bit value of the AUTHENTICATION_ERROR_CODE, 
 	 *			please refer to @see #AUTHENTICATION_ERROR_CODE
@@ -226,12 +245,16 @@ private:
 	 *			FAIL,  incorrect product name
 	 */
 	int authenticationByProductNameAndKeyType();
+	/**
+	 * authenticationByUserPassword, checking whether the m_userPassword can be used in 
+	 * login the usb key. if m_userPassword can be used in login, it return SUCCESSFUL
+	 * @return	SUCCESSFUL, if the m_userPassword is corret
+	 *			FAIL, if not
+	 */
+	int authenticationByUserPassword();
+
 
 	bool  m_expiredDateTimeHintFlag = true;
-	// default user password of the usb key, if it has not been modified
-	QString m_userPassWord = "11111111";
-	// default admin password of the usb key, if it has not been modified
-	QString m_adminPassWord = "00000000";
 
 	// @see	Vikey.h
 	// please refer to the Vikey.h and its manual
@@ -241,6 +264,8 @@ private:
 	QString m_softID;
 	QString m_productName;
 	QDateTime m_expiredDateTime;
+	QString m_userPassWord;
+	QString m_adminPassWord;
 
 	QMessageBox m_messageBox;
 

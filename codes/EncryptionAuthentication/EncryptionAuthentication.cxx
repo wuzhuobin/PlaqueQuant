@@ -15,12 +15,16 @@ EncryptionAuthentication::EncryptionAuthentication(
 	QString softID,
 	QString productName,
 	QDateTime expiredDateTime,
+	QString userPassword, 
+	QString adminPassword,
 	QWidget * parent)
 	:
 	m_hardID(hardID),
 	m_softID(softID),
 	m_productName(productName),
 	m_expiredDateTime(expiredDateTime),
+	m_userPassWord(userPassword),
+	m_adminPassWord(adminPassword),
 	m_messageBox(QMessageBox::Critical, "Please check your USB key.", "", 
 		QMessageBox::Cancel|QMessageBox::Retry, this),
 	QWidget(parent)
@@ -29,12 +33,13 @@ EncryptionAuthentication::EncryptionAuthentication(
 		m_expiredDateTime.toString("hh:mm:ss dd/MMM/yyyy") + ".";
 	m_messages[HAVING_KEY] = "Please insert your USB key, and make sure only one key inserted.";
 	m_messages[SOFT_ID] = "Please insert USB key with right Soft ID " + m_softID;
-	m_messages[HARD_ID] = "Please insert USB key with right Hard ID(Unique ID).";
+	m_messages[HARD_ID] = "Please insert USB key with right Hard ID(Unique ID) " + m_hardID;
 	m_messages[PRODUCT_NAME] = "Please insert USB key for product's name is " +
 		m_productName;
 	m_messages[EXPIRED_DATE_TIME] = "This product has already been expired at " + 
 		m_expiredDateTime.toString("hh:mm:ss dd/MMM/yyyy") +
 		"." + "Please ask the manufacture for a renewed version. ";
+	m_messages[USER_PASSWORD] = "Please insert USB key with right User Password";
 
 	reloadViKey();
 	
@@ -90,6 +95,13 @@ int EncryptionAuthentication::authenticationExec(int errorCode)
 				message += '\n';
 				message += m_messages[PRODUCT_NAME];
 				authenticationPass |= PRODUCT_NAME;
+			}
+		}
+		if (errorCode & USER_PASSWORD) {
+			if (!authenticationByUserPassword()) {
+				message += '\n';
+				message += m_messages[USER_PASSWORD];
+				authenticationPass |= USER_PASSWORD;
 			}
 		}
 		// The only different between authenticationExecAndKeyType and authenticationExec
@@ -164,6 +176,13 @@ int EncryptionAuthentication::authenticationExecAndKeyType(int errorCode)
 				message += '\n';
 				message += m_messages[PRODUCT_NAME];
 				authenticationPass |= PRODUCT_NAME;
+			}
+		}
+		if (errorCode & USER_PASSWORD) {
+			if (!authenticationByUserPassword()) {
+				message += '\n';
+				message += m_messages[USER_PASSWORD];
+				authenticationPass |= USER_PASSWORD;
 			}
 		}
 		// The only different between authenticationExecAndKeyType and authenticationExec
@@ -368,12 +387,7 @@ int EncryptionAuthentication::authenticationByExpiredDateTimeAndKeytype()
 		}
 	}
 	else {
-		if (QDateTime() > m_expiredDateTime) {
-			return FAIL;
-		}
-		else{
-			return SUCCESSFUL;
-		}
+		return SUCCESSFUL;
 	}
 }
 
@@ -399,6 +413,20 @@ int EncryptionAuthentication::authenticationByProductNameAndKeyType()
 		else {
 			return FAIL;
 		}
+	}
+	else {
+		VikeyLogoff(index);
+		return SUCCESSFUL;
+	}
+}
+
+int EncryptionAuthentication::authenticationByUserPassword()
+{
+	WORD index = 0;
+	if (VikeyUserLogin(index, const_cast<char*>(m_userPassWord.toStdString().c_str())))
+	{
+		VikeyLogoff(index);
+		return FAIL;
 	}
 	else {
 		VikeyLogoff(index);
