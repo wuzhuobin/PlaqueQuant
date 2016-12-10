@@ -1,6 +1,6 @@
 #include <QApplication>
-#include "keyconfirm.hpp"
 #include "MainWindow.h"
+#include "EncryptionAuthentication.h"
 
 // error output
 #ifndef _DEBUG
@@ -26,18 +26,39 @@ int main( int argc, char** argv )
 	 // keyconfirm.show();
 	 // return app.exec();
   //}
+
+
   vtkObject::SetGlobalWarningDisplay(WARNING);
   MainWindow mainWnd;
   mainWnd.SetVersion(PLAQUEQUANT_VERSION);
   mainWnd.setWindowTitle(QString("Plaque Quant v") + QString(PLAQUEQUANT_VERSION));
-  mainWnd.show();
 
-  if (argc==2)
-  {
-	  QString folder = argv[1];
-	  folder.replace("\\","/");
-	  //mainWnd.slotOpenImage(folder);
+  EncryptionAuthentication ea(0, QString(), QString(),
+	  QDateTime(QDate(2017, 01, 10),
+		  QTime(24, 0, 0)),
+	  "68686868");
+
+  ea.enableExpiredDateTimeHint(false);
+
+
+  if (ea.authenticationExecAndKeyType(
+	  EncryptionAuthentication::HAVING_KEY |
+	  EncryptionAuthentication::USER_PASSWORD |
+	  EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
+	  return EXIT_FAILURE;
+  }
+  else {
+	  //if (argc == 2)
+	  //{
+		 // qstring folder = argv[1];
+		 // folder.replace("\\", "/");
+		 // //mainwnd.slotopenimage(folder);
+	  //}
+	  mainWnd.show();
+	  return app.exec();
   }
 
-  return app.exec();
+
+
+
 }

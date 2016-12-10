@@ -9,9 +9,9 @@ int main(int argc, char** argv) {
 	QApplication app(argc, argv);
 	// MainWindow mainWind;
 	EncryptionAuthentication ea(0, QString(), QString(),
-		QDateTime(QDate(2016, 12, 12),
+		QDateTime(QDate(2017, 01, 10),
 			QTime(24, 0, 0)), 
-		"11111111");
+		"68686868");
 
 	ea.enableExpiredDateTimeHint(false);
 

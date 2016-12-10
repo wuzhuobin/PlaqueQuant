@@ -88,6 +88,7 @@ SET(
 	${PROJECT_BINARY_DIR}/codes/LumenExtraction
 	${PROJECT_BINARY_DIR}/codes/LumenSegmentationFilter
 	${PROJECT_BINARY_DIR}/codes/ReorderPointIdOfContourFilter
+	${PROJECT_BINARY_DIR}/codes/EncryptionAuthentication
 
 	### Directories for headers ###
 	${PROJECT_SOURCE_DIR}
@@ -111,6 +112,7 @@ SET(
 	${PROJECT_SOURCE_DIR}/codes/LumenExtraction
 	${PROJECT_SOURCE_DIR}/codes/LumenSegmentationFilter
 	${PROJECT_SOURCE_DIR}/codes/ReorderPointIdOfContourFilter
+	${PROJECT_SOURCE_DIR}/codes/EncryptionAuthentication
 	)
 
 include_directories(
@@ -140,6 +142,7 @@ set(
 	LumenSegmentationFilter
 	EncryptionAuthentication
 	ReorderPointIdOfContourFilter
+	EncryptionAuthentication
 )
 
 add_subdirectory(codes/UI)
