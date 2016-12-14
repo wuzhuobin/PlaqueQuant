@@ -29,8 +29,6 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PaintBrush = QInteractorStylePaintBrush::New();
 	ROI = QInteractorStyleROI::New();
 	Ruler = QInteractorStyleRuler::New();
-	//SmartContour = InteractorStyleSmartContour::New();
-	//SmartContour2 = InteractorStyleSmartContour2::New();
 
 	allStyles.push_back(InteractorStyleTesting);
 	allStyles.push_back(WindowLevel);
@@ -40,8 +38,6 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	allStyles.push_back(PaintBrush);
 	allStyles.push_back(ROI);
 	allStyles.push_back(Ruler);
-	//allStyles.push_back(SmartContour);
-	//allStyles.push_back(SmartContour2);
 
 	this->CurrentStyle = 0;
 }

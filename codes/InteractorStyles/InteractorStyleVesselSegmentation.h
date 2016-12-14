@@ -119,9 +119,9 @@ protected:
 	unsigned char m_lumenWallLabel = 1;
 
 	/**
-	* When refering to using index to represnet the image
-	* Always first vessel wall then lumen
-	*/
+	 * When refering to using index to represnet the image
+	 * Always first vessel wall then lumen
+	 */
 	std::list<vtkSmartPointer<vtkContourWidget>> m_vesselWallContourWidgets;
 	std::list<vtkSmartPointer<vtkContourWidget>> m_lumenWallContourWidgets;
 

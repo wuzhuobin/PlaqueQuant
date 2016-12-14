@@ -25,6 +25,7 @@ Copyright (C) 2016
 #include <vtkBezierContourLineInterpolator.h>
 #include <vtkProperty.h>
 
+#include <vtkIncrementalOctreePointLocator.h>
 
 #include "InteractorStylePolygonDraw.h"
 #include "MyImageViewer.h"
@@ -78,9 +79,6 @@ void InteractorStylePolygonDraw::OnKeyPress()
 	else if (key == "Return" ) {
 		this->FillPolygon();
 	}
-	else if (key == "G") {
-		CleanCurrentContour();
-	}
 	else {
 		AbstractNavigation::OnKeyPress();
 	}
@@ -113,15 +111,15 @@ void InteractorStylePolygonDraw::NewContour()
 	m_currentContour->SetRepresentation(
 		vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New());
 
-	m_currentContourRep = vtkOrientedGlyphContourRepresentation::SafeDownCast(
-		m_currentContour->GetContourRepresentation());
-	m_currentContourRep->GetLinesProperty()->SetColor(0, 255, 0);
 
 	m_currentContour->SetInteractor(this->Interactor);
 	m_currentContour->SetCurrentRenderer(m_imageViewer->GetAnnotationRenderer());
 	m_currentContour->ContinuousDrawOn();
 	m_currentContour->FollowCursorOn();
 
+	m_currentContourRep = vtkOrientedGlyphContourRepresentation::SafeDownCast(
+		m_currentContour->GetContourRepresentation());
+	m_currentContourRep->GetLinesProperty()->SetColor(0, 255, 0);
 	m_currentContourRep->SetLineInterpolator(m_interpolator);
 	m_currentContourRep->AlwaysOnTopOn();
 }

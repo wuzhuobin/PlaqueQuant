@@ -42,18 +42,18 @@ find_library(
     PATHS
     ${PROJECT_SOURCE_DIR}/"DLL(X64)"
 )
-# file(
-#     COPY
-#     "DLL(X64)/ViKey.dll"
-#     DESTINATION
-#     ${EXECUTABLE_OUTPUT_PATH}/Release
-# )
-# file(
-#     COPY
-#     "DLL(X64)/ViKey.dll"
-#     DESTINATION
-#     ${EXECUTABLE_OUTPUT_PATH}/Debug
-# )
+file(
+    COPY
+    "DLL(X64)/ViKey.dll"
+    DESTINATION
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
+)
+file(
+    COPY
+    "DLL(X64)/ViKey.dll"
+    DESTINATION
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+)
 
 add_library(
     EncryptionAuthentication

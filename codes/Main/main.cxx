@@ -6,9 +6,11 @@
 #ifndef _DEBUG
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 extern const int WARNING = 0;
+extern const int ENCRYPTION_AUTHENTICATION_DISABLED = 0;
 #else
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 extern const int WARNING = 1;
+extern const int ENCRYPTION_AUTHENTICATION_DISABLED = 1;
 #endif // !_DEBUG
  
 
@@ -40,8 +42,12 @@ int main( int argc, char** argv )
 
   ea.enableExpiredDateTimeHint(false);
 
-
-  if (ea.authenticationExecAndKeyType(
+  if (ENCRYPTION_AUTHENTICATION_DISABLED) {
+	  mainWnd.show();
+	  return app.exec();
+  }
+  else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&
+	  ea.authenticationExecAndKeyType(
 	  EncryptionAuthentication::HAVING_KEY |
 	  EncryptionAuthentication::USER_PASSWORD |
 	  EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
