@@ -43,7 +43,6 @@ public:
 	static AbstractInteractorStyleImage *New();
 	
 	virtual void SetImageViewer(vtkImageViewer2* imageViewer);
-	//virtual vtkActor* PickActor(int x, int y);
 	virtual void SetCurrentSlice(int slice);
 	virtual void EnableSynchronalZooming(bool flag);
 

@@ -19,7 +19,6 @@ Copyright (C) 2016
 #define ABSTRACT_INTERACTOR_STYLE_H
 
 
-//#include <vtkActor.h>
 #include <list>
 /**
  * Macro for iterate specified @param STYLE_NAME class to run its @param METHOD
@@ -39,10 +38,6 @@ for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
 class AbstractInteractorStyle
 {
 public:
-	//virtual void SetOrientation(int);
-	//
-	//int GetOrientation();
-
 	//vtkActor* PickActor(int x, int y);
 
 protected:
@@ -56,7 +51,6 @@ protected:
 	virtual void OnRightButtonUp();
 	virtual void OnMiddleButtonUp();
 	
-	//int			m_orientation;
 
 	bool m_rightFunctioning = false;
 	bool m_leftFunctioning = false;
