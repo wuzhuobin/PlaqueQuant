@@ -19,7 +19,6 @@ Copyright (C) 2016
 #define ABSTRACT_INTERACTOR_STYLE_IMAGE_H
 
 
-/// VTK
 #include <vtkInteractorStyleImage.h>
 #include <vtkImageViewer2.h>
 
@@ -53,17 +52,20 @@ protected:
 	virtual void AddSynchronalViewer(vtkImageViewer2* imageViewer);
 	virtual void SynchronalZooming();
 	
-	virtual void OnMouseWheelForward();
-	virtual void OnMouseWheelBackward();
-	virtual void OnLeftButtonDown();
-	virtual void OnLeftButtonUp();
-	virtual void OnRightButtonDown();
-	virtual void OnRightButtonUp();
-	virtual void OnMiddleButtonDown();
-	virtual void OnMiddleButtonUp();
-	virtual void OnMouseMove();
-	virtual void OnChar();
-	virtual void OnKeyPress();
+	void OnMouseWheelForward();
+	void OnMouseWheelBackward();
+	void OnLeftButtonDown();
+	void OnLeftButtonUp();
+	void OnLeftDoubleClick();
+	void OnRightButtonDown();
+	void OnRightButtonUp();
+	void OnRightDoubleClick();
+	void OnMiddleButtonDown();
+	void OnMiddleButtonUp();
+	void OnMiddleDoubleClick();
+	void OnMouseMove();
+	void OnChar();
+	void OnKeyPress();
 
 	virtual int GetSlice();
 	virtual int GetMinSlice();
@@ -77,12 +79,10 @@ protected:
 	vtkImageViewer2* m_imageViewer;
 
 private:
-	bool m_synchronalZoomingFlag = true;
-
-	int PreviousPosition[2];
-
-	bool CheckMoveDistance();
 	const static int RESET_PIXEL_DISTANCE = 5;
+	bool CheckMoveDistance();
+	bool m_synchronalZoomingFlag = true;
+	int PreviousPosition[2] = { 0,0 };
 
 };
 

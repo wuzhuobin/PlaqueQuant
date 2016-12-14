@@ -38,27 +38,31 @@ for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
 class AbstractInteractorStyle
 {
 public:
-	//vtkActor* PickActor(int x, int y);
 
 protected:
 	AbstractInteractorStyle();
 	virtual ~AbstractInteractorStyle();
 
+	virtual void OnMouseWheelForward() = 0;
+	virtual void OnMouseWheelBackward() = 0;
 	virtual void OnLeftButtonDown();
-	virtual void OnRightButtonDown();
-	virtual void OnMiddleButtonDown();
 	virtual void OnLeftButtonUp();
+	virtual void OnLeftDoubleClick() = 0;
+	virtual void OnRightButtonDown();
 	virtual void OnRightButtonUp();
+	virtual void OnRightDoubleClick() = 0;
+	virtual void OnMiddleButtonDown();
 	virtual void OnMiddleButtonUp();
-	
+	virtual void OnMiddleDoubleClick() = 0;
+	virtual void OnMouseMove() = 0;
+	virtual void OnChar() = 0;
+	virtual void OnKeyPress() = 0;
+
+
 
 	bool m_rightFunctioning = false;
 	bool m_leftFunctioning = false;
 	bool m_middleFunctioning = false;
-	bool m_rightDoubleClick = false;
-	bool m_leftDoubleClick = false;
-	bool m_middleDoubleClick = false;
-
 
 	unsigned short NumberOfLeftClicks = 0;
 	unsigned short NumberOfRightClicks = 0;

@@ -30,7 +30,6 @@ std::list<vtkImageViewer2*> AbstractInteractorStyleImage::m_synchronalViewers;
 
 AbstractInteractorStyleImage::AbstractInteractorStyleImage() : vtkInteractorStyleImage()
 {
-	//m_middleFunctioning = false;
 }
 
 AbstractInteractorStyleImage::~AbstractInteractorStyleImage()
@@ -77,20 +76,6 @@ void AbstractInteractorStyleImage::SynchronalZooming()
 	//}
 }
 
-//vtkActor * AbstractInteractorStyleImage::PickActor(int x, int y)
-//{
-//	vtkSmartPointer<vtkPropPicker> picker = vtkSmartPointer<vtkPropPicker>::New();
-//	if (this->m_imageViewer->GetRenderer()) {
-//		picker->Pick(x, y, 0, this->m_imageViewer->GetRenderer());
-//	}
-//	if (picker->GetActor()) {
-//		return picker->GetActor();
-//	}
-//	else {
-//		return nullptr;
-//	}
-//}
-
 int AbstractInteractorStyleImage::GetSlice()
 {
 	return m_imageViewer->GetSlice();
@@ -126,22 +111,6 @@ int * AbstractInteractorStyleImage::GetExtent()
 	return m_imageViewer->GetInput()->GetExtent();
 }
 
-bool AbstractInteractorStyleImage::CheckMoveDistance()
-{
-	int pickPosition[2];
-	this->GetInteractor()->GetEventPosition(pickPosition);
-
-	int xdist = pickPosition[0] - this->PreviousPosition[0];
-	int ydist = pickPosition[1] - this->PreviousPosition[1];
-
-	this->PreviousPosition[0] = pickPosition[0];
-	this->PreviousPosition[1] = pickPosition[1];
-
-	int moveDistance = (int)sqrt((double)(xdist*xdist + ydist*ydist));
-
-	return (moveDistance <= RESET_PIXEL_DISTANCE);
-}
-
 void AbstractInteractorStyleImage::OnMouseWheelForward()
 {
 	vtkInteractorStyleImage::OnMouseWheelForward();
@@ -163,7 +132,7 @@ void AbstractInteractorStyleImage::OnLeftButtonDown()
 	}
 	if (this->NumberOfLeftClicks == 2)
 	{
-		m_leftDoubleClick = true;
+		OnLeftDoubleClick();
 		this->NumberOfLeftClicks = 0;
 	}
 	AbstractInteractorStyle::OnLeftButtonDown();
@@ -174,6 +143,10 @@ void AbstractInteractorStyleImage::OnLeftButtonUp()
 {
 	AbstractInteractorStyle::OnLeftButtonUp();
 	//vtkInteractorStyleImage::OnLeftButtonUp();
+}
+
+void AbstractInteractorStyleImage::OnLeftDoubleClick()
+{
 }
 
 void AbstractInteractorStyleImage::OnRightButtonDown()
@@ -189,7 +162,7 @@ void AbstractInteractorStyleImage::OnRightButtonDown()
 
 	if (this->NumberOfRightClicks == 2)
 	{
-		m_rightDoubleClick = true;
+		OnRightDoubleClick();
 		this->NumberOfRightClicks = 0;
 	}
 
@@ -201,6 +174,10 @@ void AbstractInteractorStyleImage::OnRightButtonUp()
 {
 	AbstractInteractorStyle::OnRightButtonUp();
 	vtkInteractorStyleImage::OnRightButtonUp();
+}
+
+void AbstractInteractorStyleImage::OnRightDoubleClick()
+{
 }
 
 void AbstractInteractorStyleImage::OnMiddleButtonDown()
@@ -216,7 +193,7 @@ void AbstractInteractorStyleImage::OnMiddleButtonDown()
 
 	if (this->NumberOfMiddleClicks == 2)
 	{
-		m_middleDoubleClick = true;
+		OnMiddleDoubleClick();
 		this->NumberOfMiddleClicks = 0;
 	}
 	AbstractInteractorStyle::OnMiddleButtonDown();
@@ -227,6 +204,10 @@ void AbstractInteractorStyleImage::OnMiddleButtonUp()
 {
 	AbstractInteractorStyle::OnMiddleButtonUp();
 	vtkInteractorStyleImage::OnMiddleButtonUp();
+}
+
+void AbstractInteractorStyleImage::OnMiddleDoubleClick()
+{
 }
 
 void AbstractInteractorStyleImage::OnMouseMove()
@@ -244,3 +225,18 @@ void AbstractInteractorStyleImage::OnKeyPress()
 	vtkInteractorStyleImage::OnKeyPress();
 }
 
+bool AbstractInteractorStyleImage::CheckMoveDistance()
+{
+	int pickPosition[2];
+	this->GetInteractor()->GetEventPosition(pickPosition);
+
+	int xdist = pickPosition[0] - this->PreviousPosition[0];
+	int ydist = pickPosition[1] - this->PreviousPosition[1];
+
+	this->PreviousPosition[0] = pickPosition[0];
+	this->PreviousPosition[1] = pickPosition[1];
+
+	int moveDistance = (int)sqrt((double)(xdist*xdist + ydist*ydist));
+
+	return (moveDistance <= RESET_PIXEL_DISTANCE);
+}
