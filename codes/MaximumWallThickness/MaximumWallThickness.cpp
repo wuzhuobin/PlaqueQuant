@@ -1,17 +1,3 @@
-/*
-Author:		Wong, Matthew Lun
-Date:		06th, August 2016
-Occupation:	Chinese University of Hong Kong,
-Department of Imaging and Inteventional Radiology,
-Junior Research Assistant
-
-This class calculates the distance between two circular boundaries with the mutual center within
-the inner bound.
-
-Wong Matthew Lun, Lok Ka Hei
-Copyright (C) 2016
-*/
-
 #include <vtkCenterOfMass.h>
 #include <vtkConnectivityFilter.h>
 #include <vtkImageCast.h>

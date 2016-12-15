@@ -39,7 +39,7 @@ vtkStandardNewMacro(InteractorStyleSmartContour2);
 using namespace std;
 
 InteractorStyleSmartContour2::InteractorStyleSmartContour2()
-	:AbstractInteractorStyleImage()
+	:AbstractNavigation()
 {
 	this->m_lastSlice = -1;
 }
@@ -51,12 +51,12 @@ InteractorStyleSmartContour2::~InteractorStyleSmartContour2()
 
 void InteractorStyleSmartContour2::OnLeftButtonDown()
 {
-	AbstractInteractorStyleImage::OnLeftButtonDown();
+	AbstractNavigation::OnLeftButtonDown();
 }
 
 void InteractorStyleSmartContour2::OnRightButtonDown()
 {
-	AbstractInteractorStyleImage::OnRightButtonDown();
+	AbstractNavigation::OnRightButtonDown();
 }
 
 void InteractorStyleSmartContour2::OnMouseMove()
@@ -85,7 +85,7 @@ void InteractorStyleSmartContour2::OnKeyPress()
 		if (m_ContourIsOnFlag)
 			this->FillPolygon();
 	}
-	AbstractInteractorStyleImage::OnKeyPress();
+	AbstractNavigation::OnKeyPress();
 }
 
 void InteractorStyleSmartContour2::SetLumenImage(vtkSmartPointer<vtkImageData> lumen)

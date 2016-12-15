@@ -19,28 +19,53 @@ Copyright (C) 2016
 
 #pragma once
 
-#include <QTime>
-
 #include <vtkContourWidget.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkOrientedGlyphContourRepresentation.h>
-#include "AbstractInteractorStyleImage.h"
+
+#include "AbstractNavigation.h"
 
 
-class InteractorStylePolygonDraw : public AbstractInteractorStyleImage
+class InteractorStylePolygonDraw : public AbstractNavigation
 {
 public:
-	vtkTypeMacro(InteractorStylePolygonDraw, AbstractInteractorStyleImage);
+
+	vtkTypeMacro(InteractorStylePolygonDraw, AbstractNavigation);
 	static InteractorStylePolygonDraw* New();
 
-	void SetPolygonModeEnabled(bool b);
-	void SetVesselWallLabel(int vesselWallLabel);
-	void SetLumenWallLabel(int lumenWallLabel);
-	void EnableAutoLumenSegmentation(bool flag);
-	void SetContourFilterGenerateValues(int generateValues);
-	void GenerateLumenWallContourWidget();
-	void SetLineInterpolator(int i);
-	void FillPolygon();
+	virtual void SetPolygonModeEnabled(bool b);
+	/**
+	 * For better performance, NewContour() will not invoke EnabledOn()
+	 * it need to be enable manually
+	 */
+	virtual void NewContour();
+
+	virtual void SetContourLabel(unsigned char contourLabel);
+	
+	virtual void SetSmoothCurveEnable();
+	virtual void SetPolygonEnable();
+	virtual void SetLineInterpolator(int i);
+	virtual void FillPolygon();
+
+	virtual void FillPolygon(
+		std::list<vtkSmartPointer<vtkContourWidget>>* contour, 
+		unsigned char label);
+	virtual void FillPolygon(
+		std::list<vtkSmartPointer<vtkPolygon>>* contourPolygon, 
+		unsigned char label);
+
+	//virtual void FillPolygon(
+	//	std::list<vtkSmartPointer<vtkContourWidget>>* contour, 
+	//	unsigned char label,
+	//	int slice);
+
+	/**
+	 * Because the index of the sliceOrientation is wrong, it need to be specified
+	 */
+	virtual void FillPolygon(
+		std::list<vtkSmartPointer<vtkPolygon>>* contourPolygon, 
+		unsigned char label,
+		int slice);
+
 
 protected:
 	InteractorStylePolygonDraw();
@@ -51,28 +76,24 @@ protected:
 	virtual void OnMouseMove();
 	virtual void OnKeyPress();
 
+	/**
+	 * For using delete contours one by one
+	 * if all contour is deleted, it set m_currentContour = nullptr
+	 */
+	virtual void CleanCurrentContour();
+	virtual void CleanAllContours();
+	virtual void SetAllContoursEnabled(int flag);
 
-private:
-	bool CheckDoubleClicked();
-	void DisplayPolygon(vtkObject*, long unsigned, void*);
+	bool m_polygonDrawEnabledFlag = false;
 
 
-	QTime m_timer;
-	int m_firstClickTimeStamp;
-	int m_generateValue = 60;
+	// defaule label
+	unsigned char m_contourLabel = 1;
 
-	bool DOUBLE_CLICKED_FLAG;
-	bool CONTOUR_IS_ON_FLAG;
-	bool AUTO_LUMEN_SEGMENTATION_ENABLE_FLAG;
+	vtkSmartPointer<vtkContourLineInterpolator> m_interpolator = nullptr;
+	std::list<vtkSmartPointer<vtkContourWidget>> m_contours;
 
-	int vesselWallLabel = 1;
-	int lumenWallLabel = 1;
-	vtkContourLineInterpolator* m_interpolator;
-
-	vtkContourWidget* m_vesselWallContourWidget;
-	vtkOrientedGlyphContourRepresentation* m_vesselWallContourRepresentation;
-	vtkContourWidget* m_lumenWallContourWidget;
-	vtkOrientedGlyphContourRepresentation* m_lumenWallContourRepresentation;
-	vtkSmartPointer<vtkCallbackCommand> m_callbackFunction;
+	vtkContourWidget* m_currentContour = nullptr;
+	vtkOrientedGlyphContourRepresentation* m_currentContourRep = nullptr;
 
 };

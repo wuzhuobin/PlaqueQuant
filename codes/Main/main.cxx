@@ -1,12 +1,20 @@
 #include <QApplication>
-#include "keyconfirm.hpp"
 #include "MainWindow.h"
+#include "EncryptionAuthentication.h"
 
-////Hide the cmd
+// error output
+#ifndef _DEBUG
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+extern const int WARNING = 0;
+extern const int ENCRYPTION_AUTHENTICATION_DISABLED = 0;
+#else
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+extern const int WARNING = 1;
+extern const int ENCRYPTION_AUTHENTICATION_DISABLED = 1;
+#endif // !_DEBUG
  
-#define PLAQUEQUANT_VERSION "2.0"
+
+extern const char* PLAQUEQUANT_VERSION = "2.0";
 
 int main( int argc, char** argv )
 {
@@ -21,17 +29,42 @@ int main( int argc, char** argv )
 	 // return app.exec();
   //}
 
+
+  vtkObject::SetGlobalWarningDisplay(WARNING);
   MainWindow mainWnd;
   mainWnd.SetVersion(PLAQUEQUANT_VERSION);
   mainWnd.setWindowTitle(QString("Plaque Quant v") + QString(PLAQUEQUANT_VERSION));
-  mainWnd.show();
-  
-  if (argc==2)
-  {
-	  QString folder = argv[1];
-	  folder.replace("\\","/");
-	  //mainWnd.slotOpenImage(folder);
+
+  EncryptionAuthentication ea(0, QString(), QString(),
+	  QDateTime(QDate(2017, 01, 10),
+		  QTime(24, 0, 0)),
+	  "68686868");
+
+  ea.enableExpiredDateTimeHint(false);
+
+  if (ENCRYPTION_AUTHENTICATION_DISABLED) {
+	  mainWnd.show();
+	  return app.exec();
+  }
+  else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&
+	  ea.authenticationExecAndKeyType(
+	  EncryptionAuthentication::HAVING_KEY |
+	  EncryptionAuthentication::USER_PASSWORD |
+	  EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
+	  return EXIT_FAILURE;
+  }
+  else {
+	  //if (argc == 2)
+	  //{
+		 // qstring folder = argv[1];
+		 // folder.replace("\\", "/");
+		 // //mainwnd.slotopenimage(folder);
+	  //}
+	  mainWnd.show();
+	  return app.exec();
   }
 
-  return app.exec();
+
+
+
 }

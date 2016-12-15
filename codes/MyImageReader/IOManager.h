@@ -1,32 +1,31 @@
 #ifndef IO_MANAGER_H
 #define IO_MANAGER_H
 
-#include <QWidget>
+#include <QObject>
 #include <QString>
 #include <QList>
 #include <QStringList>
 
 #include <itkImage.h>
 
-//#include "ImageData.h"
 #include "ImageRegistration.h"
 
 
 class MyImageManager;
 
-typedef itk::Image<float, 3> ImageType;
 
-class IOManager:public QWidget
+class IOManager:public QObject
 {
 	Q_OBJECT
 public:
-
-	IOManager(QWidget* parent = NULL);
+	typedef itk::Image<float, 3> ImageType;
+	IOManager(QWidget* parent = nullptr);
+	IOManager(QObject* parent = nullptr, QWidget* mainWindow = nullptr);
 	~IOManager();
 
 	void enableRegistration(bool flag);
-	virtual void setMyImageManager(MyImageManager* myImageManager);
-	virtual void setUniqueKeys(QStringList keys);
+	void setMyImageManager(MyImageManager* myImageManager);
+	//void setUniqueKeys(QStringList keys);
 
 	void setListOfFileNames(QList<QStringList> listOfFileNames);
 	void addToListOfFileNames(QStringList fineNames);
@@ -37,31 +36,25 @@ public:
 
 public slots:
 
-	virtual void slotOpenWithWizard();
+	void slotOpenWithWizard();
 
-	virtual void slotOpenWithWizard(QString dir);
+	void slotOpenWithWizard(QString dir);
 
-	virtual void slotOpenMultiImages();
+	void slotOpenMultiImages();
 
-	//virtual void slotOpenOneImage();
-	virtual void slotOpenOneImage(QStringList fileNames);
+	void slotOpenOneImage(QStringList fileNames);
 
-	//virtual void slotOpenSegmentation();
-	virtual void slotOpenSegmentationWithDiaglog();
+	void slotOpenSegmentationWithDiaglog();
 
-	virtual void slotOpenSegmentation(QString fileName);
+	void slotOpenSegmentation(QString fileName);
 
-	virtual void slotSaveSegmentaitonWithDiaglog();
+	void slotSaveSegmentaitonWithDiaglog();
 
-	virtual void slotSaveSegmentation(QString path);
-	//virtual void slotSaveImage(QString uniqueName, QString path);
-	//virtual void slotSaveImage(int index, QString path);
+	void slotSaveSegmentation(QString path);
 
-	//virtual void slotSaveSemgentation(QString uniqueName, QString path);
-	//virtual void slotSaveSemgentation(int index, QString path);
-
-
-	//void addFileNames(QStringList fileNames);
+	void slotSaveContourWithDiaglog();
+	
+	void slotSaveContour(QString fileName);
 
 signals:
 	void finishOpenMultiImages();
@@ -69,15 +62,11 @@ signals:
 	void finishOpenSegmentation();
 
 protected:
-	virtual bool LoadImageData(QStringList fileNames);
-	//virtual bool SaveImageData(Image*, QString);
+	bool loadImageData(QStringList fileNames);
 
 
 	ImageType::Pointer imageAlignment(ImageType::Pointer alignedTo,
 		ImageType::Pointer toBeAligned);
-
-	//virtual Overlay* LoadSegmentation();
-	//virtual bool SaveSegmentation(Overlay*, QString);
 
 private:
 	QList<QStringList> listOfFileNames;

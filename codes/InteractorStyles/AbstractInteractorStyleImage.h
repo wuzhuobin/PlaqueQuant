@@ -19,50 +19,53 @@ Copyright (C) 2016
 #define ABSTRACT_INTERACTOR_STYLE_IMAGE_H
 
 
-/// VTK
 #include <vtkInteractorStyleImage.h>
-#include <vtkObjectFactory.h>
+#include <vtkImageViewer2.h>
 
-#include <list>
+#include "AbstractInteractorStyle.h"
 
-#include "MyImageViewer.h"
 
-class AbstractInteractorStyleImage : public vtkInteractorStyleImage
+
+#ifndef VIEWER_CONSTITERATOR(METHOD)
+#define VIEWER_CONSTITERATOR(METHOD) \
+for(std::list<vtkImageViewer2*>::const_iterator cit = \
+	m_synchronalViewers.cbegin(); cit != m_synchronalViewers.cend(); ++cit){\
+	(*cit)->##METHOD; \
+}
+#endif // !VIEWER_CONSTITERATOR(METHOD)
+
+class AbstractInteractorStyleImage : public vtkInteractorStyleImage, 
+	public AbstractInteractorStyle
 {
 public:
 	vtkTypeMacro(AbstractInteractorStyleImage, vtkInteractorStyleImage);
 	static AbstractInteractorStyleImage *New();
 	
-	virtual void SetImageViewer(MyImageViewer* imageViewer);
-	virtual void AddSynchronalViewer(MyImageViewer* imageViewer);
-	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
-	virtual void SynchronizedZooming();
-	virtual vtkActor* PickActor(int x, int y);
+	virtual void SetImageViewer(vtkImageViewer2* imageViewer);
 	virtual void SetCurrentSlice(int slice);
-	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-
+	virtual void EnableSynchronalZooming(bool flag);
 
 protected:
 	AbstractInteractorStyleImage();
 	~AbstractInteractorStyleImage();
+
+	virtual void AddSynchronalViewer(vtkImageViewer2* imageViewer);
+	virtual void SynchronalZooming();
 	
-	virtual void OnMouseWheelForward();
-	virtual void OnMouseWheelBackward();
-	virtual void OnLeftButtonDown();
-	virtual void OnLeftButtonUp();
-	virtual void OnRightButtonDown();
-	virtual void OnRightButtonUp();
-	virtual void OnMiddleButtonDown();
-	virtual void OnMiddleButtonUp();
-	virtual void OnMouseMove();
-	virtual void OnChar();
-	virtual void OnKeyPress();
-
-	void MoveSliceForward();
-	void MoveSliceBackward();
-
-	MyImageViewer* m_imageViewer;
-	std::list<MyImageViewer*> m_synchronalViewers;
+	void OnMouseWheelForward();
+	void OnMouseWheelBackward();
+	void OnLeftButtonDown();
+	void OnLeftButtonUp();
+	void OnLeftDoubleClick();
+	void OnRightButtonDown();
+	void OnRightButtonUp();
+	void OnRightDoubleClick();
+	void OnMiddleButtonDown();
+	void OnMiddleButtonUp();
+	void OnMiddleDoubleClick();
+	void OnMouseMove();
+	void OnChar();
+	void OnKeyPress();
 
 	virtual int GetSlice();
 	virtual int GetMinSlice();
@@ -72,9 +75,15 @@ protected:
 	virtual double* GetSpacing();
 	virtual int* GetExtent();
 
-	bool m_rightFunctioning;
-	bool m_leftFunctioning;
-	bool m_middleFunctioning;
+	static std::list<vtkImageViewer2*> m_synchronalViewers;
+	vtkImageViewer2* m_imageViewer;
+
+private:
+	const static int RESET_PIXEL_DISTANCE = 5;
+	bool CheckMoveDistance();
+	bool m_synchronalZoomingFlag = true;
+	int PreviousPosition[2] = { 0,0 };
+
 };
 
 #endif //ABSTRACT_INTERACTOR_STYLE_IMAGE_H

@@ -18,17 +18,16 @@
 MainWindow::MainWindow() 
 	:widgetGroup(this), viewerGroup(this), viewGroup(this), m_InfoDialog(this)
 {
-	m_core = new Core(this);
 	this->ui = new Ui::MainWindow;
 	this->ui->setupUi(this);
 
+	m_core = new Core(this);
 	this->imageManager = m_core->GetMyImageManager();
 	this->ioManager = m_core->GetIOManager();
 
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
 	m_measurementWidget = new MeasurementWidget(this);
-	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	ui->measurementDockWidget->setWidget(m_measurementWidget);
 	ui->widgetDockWidget->setWidget(m_moduleWidget);
 	this->tabifyDockWidget(ui->widgetDockWidget, ui->measurementDockWidget);
@@ -49,9 +48,13 @@ MainWindow::MainWindow()
 	connect(ui->actionOpenImage,	SIGNAL(triggered())					, ioManager,	SLOT(slotOpenWithWizard()));
 	
 	// Segmentation
-	connect(ui->actionSave,			SIGNAL(triggered())					,ioManager,		SLOT(slotSaveSegmentaitonWithDiaglog()));
-	connect(ui->actionOpenSegmentation, SIGNAL(triggered()), ioManager,SLOT(slotOpenSegmentationWithDiaglog()));
-	
+	connect(ui->actionSaveSegmentation,			SIGNAL(triggered())					,ioManager,		SLOT(slotSaveSegmentaitonWithDiaglog()));
+	connect(ui->actionOpenSegmentation, SIGNAL(triggered()),
+		ioManager, SLOT(slotOpenSegmentationWithDiaglog()));
+	connect(ui->actionSaveContour, SIGNAL(triggered()),
+		ioManager, SLOT(slotSaveContourWithDiaglog()));
+
+
 	// different mode
 	widgetGroup.addAction(ui->actionNavigation);
 	widgetGroup.addAction(ui->actionWindowLevel);
@@ -59,15 +62,16 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionBrush);
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
-	widgetGroup.addAction(ui->actionSmartContour);
+	widgetGroup.addAction(ui->actionSeedsPlacer);
 	widgetGroup.setExclusive(true);
+	connect(&widgetGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotChangeMode(QAction*)));
 	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel,	SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
 	connect(ui->actionContour,		SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
 	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
 	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
-	connect(ui->actionSmartContour, SIGNAL(triggered()), this->m_core, SLOT(slotSmartContourMode()));
+	connect(ui->actionSeedsPlacer, SIGNAL(triggered()), this->m_core, SLOT(slotSeedsPlacerMode()));
 
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
@@ -79,12 +83,8 @@ MainWindow::MainWindow()
 	connect(this->m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
 	// slice 
-	connect(this->ui->xSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceX(int)), Qt::DirectConnection);
-	connect(this->ui->ySpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceY(int)), Qt::DirectConnection);
-	connect(this->ui->zSpinBox, SIGNAL(valueChanged(int)),this->m_core, SLOT(slotChangeSliceZ(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceX(int)),ui->xSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceY(int)),ui->ySpinBox, SLOT(setValue(int)), Qt::DirectConnection);
-	connect(this->m_core, SIGNAL(signalChangeSliceZ(int)),ui->zSpinBox, SLOT(setValue(int)), Qt::DirectConnection);
+	ui->sliceScrollArea->setWidget(
+		m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetNavigation());
 
 	// UI
 	connect(ui->actionExit,		SIGNAL(triggered()), this, SLOT(slotExit()));
@@ -125,7 +125,6 @@ MainWindow::MainWindow()
 	connect(ui->LLBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 	connect(ui->LRBtn2, SIGNAL(clicked()), ui->actionFourViews, SLOT(trigger()));
 
-	//connect(ioManager, SIGNAL(finishOpenSegmentation()), this, SLOT(addOverlay2ImageViewer()));
 
 	//3D view
 	connect(ui->updateBtn, SIGNAL(clicked()), 
@@ -138,8 +137,6 @@ MainWindow::MainWindow()
 	ui->URBtn2->setHidden(true);
 	ui->LLBtn2->setHidden(true);
 	ui->LRBtn2->setHidden(true);
-	ui->viewGridLayout->removeWidget(ui->windowlevelwidget);
-	ui->windowlevelwidget->setHidden(true);
 
 	//Recent Image
 	createRecentImageActions();
@@ -184,7 +181,13 @@ void MainWindow::setActionsEnable( bool b )
 	//switch after open the image
 	//ui->actionOpenImage->setEnabled(!b);
 	//ui->menuRecentImage->setEnabled(!b);
-	ui->actionSave->setEnabled(b);
+	ui->image1View->setEnabled(b);
+	ui->image2View->setEnabled(b);
+	ui->image3View->setEnabled(b);
+	ui->image4View->setEnabled(b);
+	ui->sliceScrollArea->setEnabled(b);
+	ui->actionSaveSegmentation->setEnabled(b);
+	ui->actionSaveContour->setEnabled(b);
 	ui->actionNavigation->setEnabled(b);
 	ui->actionWindowLevel->setEnabled(b);
 	ui->actionContour->setEnabled(b);
@@ -192,7 +195,7 @@ void MainWindow::setActionsEnable( bool b )
 	ui->actionRemoveContour->setEnabled(b);
 	ui->actionRuler->setEnabled(b);
 	ui->actionROI->setEnabled(b);
-	ui->actionSmartContour->setEnabled(b);
+	ui->actionSeedsPlacer->setEnabled(b);
 	ui->actionInformation->setEnabled(b);
 	ui->actionImage1->setEnabled(b);
 	ui->actionImage2->setEnabled(b);
@@ -254,6 +257,12 @@ bool MainWindow::slotVisualizeImage()
 	//Enable Actions 
 	setActionsEnable(true);
 
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPaintBrush());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetRuler());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetSeedsPlacer());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPolygonDraw());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetROI());
+
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
 	// update DICOM header imformation
@@ -263,9 +272,9 @@ bool MainWindow::slotVisualizeImage()
 	ChangeBaseImageULMenu.clear();
 	ChangeBaseImageURMenu.clear();
 	ChangeBaseImageLLMenu.clear();
-	for (int i = 0; i < this->imageManager->getListOfViewerInputImages().size(); i++)
+	for (int i = 0; i < this->imageManager->getListOfVtkImages().size(); i++)
 	{
-		if (this->imageManager->getListOfViewerInputImages()[i] != NULL) {
+		if (this->imageManager->getListOfVtkImages()[i] != NULL) {
 			ChangeBaseImageULMenu.addAction(
 				imageManager->getListOfModalityNames()[i])->setData(0);
 			ChangeBaseImageURMenu.addAction(
@@ -289,8 +298,36 @@ bool MainWindow::slotVisualizeImage()
 
 
 	/// Initialize Module widget ui
-	this->m_moduleWidget->UdateTargetImageComboBox();
+	//this->m_moduleWidget->UdateTargetImageComboBox();
 	return 0;
+}
+
+void MainWindow::slotChangeMode(QAction* action)
+{
+	ui->widgetDockWidget->setEnabled(true);
+	if (action == ui->actionContour) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetPolygonDraw());
+	}
+	else if (action == ui->actionSeedsPlacer) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetSeedsPlacer());
+	}
+	else if (action == ui->actionRuler) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetRuler());
+	}
+	else if (action == ui->actionBrush) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+			Core::DEFAULT_IMAGE)->GetPaintBrush());
+	}
+	else if (action == ui->actionROI) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+		Core::DEFAULT_IMAGE)->GetROI());
+	}
+	else {
+		m_moduleWidget->setWidget(nullptr);
+	}
 }
 
 void MainWindow::adjustForCurrentFile(const QString &filePath)

@@ -51,6 +51,8 @@ SET(UI_QT_INC
 	${PROJECT_SOURCE_DIR}/MainWindow.h
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.h
 	${PROJECT_SOURCE_DIR}/MeasurementWidget.hpp
+	${PROJECT_SOURCE_DIR}//LabelWidget.h
+	
 )
 
 SET(UI_QT_SRC 
@@ -60,6 +62,8 @@ SET(UI_QT_SRC
 	${PROJECT_SOURCE_DIR}/MainWindow.cxx
 	${PROJECT_SOURCE_DIR}/MyProgressDialog.cxx
 	${PROJECT_SOURCE_DIR}/MeasurementWidget.cpp
+	${PROJECT_SOURCE_DIR}//LabelWidget.cxx
+
 )
 
 SET(UI_QT_UI 
@@ -67,6 +71,7 @@ SET(UI_QT_UI
 	${PROJECT_SOURCE_DIR}/InfoDialog.ui
 	${PROJECT_SOURCE_DIR}/MainWindow.ui
 	${PROJECT_SOURCE_DIR}/MeasurementWidget.ui
+	${PROJECT_SOURCE_DIR}//LabelWidget.ui
 )
 
 #Generate moc and ui file

@@ -14,79 +14,36 @@ Copyright (C) 2016
 #include <vtkImageInterpolator.h>
 #include <vtkInteractorStyle.h>
 #include "InteractorStyleSwitch.h"
-#include "MainWindow.h"
-#include "ui_MainWindow.h"
 
 vtkStandardNewMacro(InteractorStyleSwitch);
 
 InteractorStyleSwitch::InteractorStyleSwitch()
 {
 	InteractorStyleTesting = vtkInteractorStyleImage::New();
-	WindowLevel = InteractorStyleWindowLevel::New();
-	Navigation = InteractorStyleNavigation::New();
-	PolygonDraw = InteractorStylePolygonDraw::New();
-	PaintBrush = InteractorStylePaintBrush::New();
-	ROI = InteractorStyleROI::New();
-	Ruler = InteractorStyleRuler::New();
-	SmartContour = InteractorStyleSmartContour::New();
-	SmartContour2 = InteractorStyleSmartContour2::New();
+	// The first instance of QInteractorStyleNavigation should have control 
+	// of the ui
+	Navigation = QInteractorStyleNavigation::New();
+	WindowLevel = QInteractorStyleWindowLevel::New();
+	PolygonDraw = QInteractorStyleVesselSegmentation::New();
+	SeedsPlacer = QInteractorStyleLumenSeedsPlacer::New();
+	PaintBrush = QInteractorStylePaintBrush::New();
+	ROI = QInteractorStyleROI::New();
+	Ruler = QInteractorStyleRuler::New();
 
 	allStyles.push_back(InteractorStyleTesting);
 	allStyles.push_back(WindowLevel);
 	allStyles.push_back(Navigation);
 	allStyles.push_back(PolygonDraw);
+	allStyles.push_back(SeedsPlacer);
 	allStyles.push_back(PaintBrush);
 	allStyles.push_back(ROI);
 	allStyles.push_back(Ruler);
-	allStyles.push_back(SmartContour);
-	allStyles.push_back(SmartContour2);
 
 	this->CurrentStyle = 0;
 }
 
 InteractorStyleSwitch::~InteractorStyleSwitch()
 {
-	//if (InteractorStyleTesting != NULL) {
-	//	InteractorStyleTesting->Delete();
-	//	InteractorStyleTesting = 0;
-	//}
-
-	//if (WindowLevel != NULL) {
-	//	WindowLevel->Delete();
-	//	WindowLevel = NULL;
-	//}
-
-	//if (Navigation != NULL) {
-	//	Navigation->Delete();
-	//	Navigation = NULL;
-	//}
-
-	//if (PolygonDraw != NULL) {
-	//	PolygonDraw->Delete();
-	//	PolygonDraw = NULL;
-	//}
-
-	//if (PaintBrush != NULL) {
-	//	PaintBrush->Delete();
-	//	PaintBrush = NULL;
-	//}
-
-	//if (ROI != NULL) {
-	//	ROI->Delete();
-	//	ROI = NULL;
-	//}
-	//if (Ruler != NULL) {
-	//	Ruler->Delete();
-	//	Ruler = NULL;
-	//}
-	//if (SmartContour != NULL) {
-	//	SmartContour->Delete();
-	//	SmartContour = NULL;
-	//}
-	//if (SmartContour2 != NULL) {
-	//	SmartContour2->Delete();
-	//	SmartContour2 = NULL;
-	//}
 	/* Do not modifiy the lower code£¡ */
 	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 		it != allStyles.end(); ++it) {
@@ -101,30 +58,38 @@ InteractorStyleSwitch::~InteractorStyleSwitch()
 
 void InteractorStyleSwitch::InternalUpdate()
 {
-	MainWindow* mainwnd = MainWindow::GetMainWindow();
-
+	if (this->CurrentStyle != this->Navigation)
+		this->Navigation->SetNavigationModeEnabled(false);
+	if (this->CurrentStyle != this->WindowLevel)
+		this->WindowLevel->SetWindowLevelModeEnabled(false);
 	if (this->CurrentStyle != this->PolygonDraw) 
 		this->PolygonDraw->SetPolygonModeEnabled(false);
+	if (this->CurrentStyle != this->SeedsPlacer)
+		this->SeedsPlacer->SetSeedsPlacerEnable(false);
+
 	if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
 	if (this->CurrentStyle != this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(false);
 	if (this->CurrentStyle != this->ROI)
-		this->ROI->SetPlaneWidgetEnabled(false);
-	if (this->CurrentStyle != this->SmartContour)
-		this->SmartContour->SetSmartContourEnable(false);
-	if (this->CurrentStyle != this->SmartContour2)
-		this->SmartContour2->SetSmartContour2Enable(false);
+		this->ROI->SetROIWidgetEnabled(false);
 
 	// some special cases need to use InternalUpdate() to enabled
+	if (this->CurrentStyle == this->Navigation)
+		this->Navigation->SetNavigationModeEnabled(true);
+	if (this->CurrentStyle == this->WindowLevel)
+		this->WindowLevel->SetWindowLevelModeEnabled(true);
+	if (this->CurrentStyle == this->PolygonDraw)
+		this->PolygonDraw->SetPolygonModeEnabled(true);
+	if (this->CurrentStyle == this->SeedsPlacer)
+		this->SeedsPlacer->SetSeedsPlacerEnable(true);
+
 	if (this->CurrentStyle == this->ROI)
-		this->ROI->SetPlaneWidgetEnabled(true);
+		this->ROI->SetROIWidgetEnabled(true);
+	if (this->CurrentStyle == this->PaintBrush)
+		this->PaintBrush->SetPaintBrushModeEnabled(true);
 	if (this->CurrentStyle == this->Ruler)
 		this->Ruler->SetDistanceWidgetEnabled(true);
-	if (this->CurrentStyle == this->SmartContour)
-		this->SmartContour->SetSmartContourEnable(true);
-	if (this->CurrentStyle == this->SmartContour2)
-		this->SmartContour2->SetSmartContour2Enable(true);
 }
 
 void InteractorStyleSwitch::SetAutoAdjustCameraClippingRange(int value)
@@ -171,58 +136,10 @@ void InteractorStyleSwitch::SetImageViewer(MyImageViewer* imageViewer)
 	//this->imageViewer = imageViewer;
 	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
 		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style = 
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
+		AbstractNavigation* _style = 
+			AbstractNavigation::SafeDownCast(*it);
 		if (_style != NULL) {
 			_style->SetImageViewer(imageViewer);
-		}
-	}
-}
-
-void InteractorStyleSwitch::AddSynchronalViewer(MyImageViewer * imageViewer)
-{
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
-		if (_style != NULL) {
-			_style->AddSynchronalViewer(imageViewer);
-		}
-	}
-}
-
-void InteractorStyleSwitch::SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers)
-{
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
-		if (_style != NULL) {
-			_style->SetSynchronalViewers(synchronalViewers);
-		}
-	}
-}
-
-void InteractorStyleSwitch::SetCurrentSlice(int slice)
-{
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
-		if (_style != NULL) {
-			_style->SetCurrentSlice(slice);
-		}
-	}
-}
-
-void InteractorStyleSwitch::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
-{
-	for (std::list<vtkInteractorStyle*>::iterator it = allStyles.begin();
-		it != allStyles.end(); ++it) {
-		AbstractInteractorStyleImage* _style =
-			dynamic_cast<AbstractInteractorStyleImage*>(*it);
-		if (_style != NULL) {
-			_style->SetCurrentFocalPointWithImageCoordinate(i, j, k);
 		}
 	}
 }
@@ -272,4 +189,19 @@ void InteractorStyleSwitch::SetInteractor(vtkRenderWindowInteractor *iren)
 	}
 }
 
+//void InteractorStyleSwitch::SetInteractorStyleToNavigation()
+//{
+//
+//	if (!this->CurrentStyleIsNavigation()) {
+//		if (this->CurrentStyle) {
+//			this->CurrentStyle->SetInteractor(0);
+//		}
+//		this->CurrentStyle = (vtkInteractorStyle*) this->Navigation;
+//	}
+//	if (this->CurrentStyle) {
+//		this->CurrentStyle->SetInteractor(this->Interactor);
+//		this->CurrentStyle->SetTDxStyle(this->TDxStyle);
+//	}
+//	this->InternalUpdate();
+//}
 

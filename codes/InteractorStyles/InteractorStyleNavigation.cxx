@@ -25,8 +25,13 @@ Copyright (C) 2016
 
 vtkStandardNewMacro(InteractorStyleNavigation);
 
+void InteractorStyleNavigation::SetNavigationModeEnabled(bool flag)
+{
+	m_navigationModeEnableFlag = flag;
+}
+
 InteractorStyleNavigation::InteractorStyleNavigation()
-	:AbstractInteractorStyleImage()
+	:AbstractNavigation()
 {
 }
 
@@ -36,25 +41,22 @@ InteractorStyleNavigation::~InteractorStyleNavigation()
 
 void InteractorStyleNavigation::OnMouseMove()
 {
-	//if (m_rightFunctioning) {
-	//	this->SynchronizedZooming();
-	//}
+	AbstractNavigation::OnMouseMove();
 	if (m_leftFunctioning) {
 		this->CalculateIndex();
-		return;
+		SetCurrentFocalPointWithImageCoordinate(m_index[0], m_index[1], m_index[2]);
 	}
-	AbstractInteractorStyleImage::OnMouseMove();
-
 	if (m_rightFunctioning) {
-		SynchronizedZooming();
+		SynchronalZooming();
 	}
 }
 
 
 void InteractorStyleNavigation::OnLeftButtonUp()
 {
+	AbstractInteractorStyle::OnLeftButtonUp();
 	this->CalculateIndex();
-	AbstractInteractorStyleImage::OnLeftButtonUp();
+	SetCurrentFocalPointWithImageCoordinate(m_index[0], m_index[1], m_index[2]);
 }
 
 void InteractorStyleNavigation::OnChar()
@@ -63,17 +65,13 @@ void InteractorStyleNavigation::OnChar()
 	{
 	case 'R':
 	case 'r':
-		AbstractInteractorStyleImage::OnChar();
-		SynchronizedZooming();
+		AbstractNavigation::OnChar();
+		SynchronalZooming();
 		break;
 	default:
+		AbstractNavigation::OnChar();
 		break;
 	}
-}
-
-void InteractorStyleNavigation::SynchronizedZooming()
-{
-	AbstractInteractorStyleImage::SynchronizedZooming();
 }
 
 void InteractorStyleNavigation::CalculateIndex()
@@ -90,15 +88,13 @@ void InteractorStyleNavigation::CalculateIndex()
 	//Check if valid pick
 	if (picked[0] == 0.0&&picked[1] == 0.0)
 		return;
-	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
 		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] +
 			GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
+			m_index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
 		}
-		SetCurrentFocalPointWithImageCoordinate(index[0], index[1], index[2]);
 	}
 
 }

@@ -50,7 +50,7 @@ SET(
 	QT_SRC
 	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
 	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
-	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
+	# ${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
 	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
@@ -63,7 +63,7 @@ SET(
 	QT_INC
 	${PROJECT_SOURCE_DIR}/AbstractFilter.h
 	${PROJECT_SOURCE_DIR}/ExtractCenterline.h
-	${PROJECT_SOURCE_DIR}/ImageRegistration.h
+	# ${PROJECT_SOURCE_DIR}/ImageRegistration.h
 	${PROJECT_SOURCE_DIR}/ReportGenerator.h
 	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
 	${PROJECT_SOURCE_DIR}/SurfaceCreator.h

@@ -64,6 +64,7 @@ void InteractorStyleSmartContour::ReloadSeedFromList()
 }
 
 InteractorStyleSmartContour::InteractorStyleSmartContour()
+	:AbstractNavigation()
 {
 	m_seedWidget = vtkSmartPointer<MySeedWidget>::New();
 	m_seedRep = vtkSmartPointer<MySeedRepresentation>::New();
@@ -83,7 +84,7 @@ void InteractorStyleSmartContour::OnMouseMove()
 		UpdateSeedWidgetBefore();
 	}
 
-	AbstractInteractorStyleImage::OnMouseMove();
+	AbstractNavigation::OnMouseMove();
 }
 
 void InteractorStyleSmartContour::OnLeftButtonDown()
@@ -102,12 +103,12 @@ void InteractorStyleSmartContour::OnLeftButtonDown()
 	//	return;
 	//}
 
-	AbstractInteractorStyleImage::OnLeftButtonDown();
+	AbstractNavigation::OnLeftButtonDown();
 }
 
 void InteractorStyleSmartContour::OnLeftButtonUp()
 {
-	AbstractInteractorStyleImage::OnLeftButtonUp();
+	AbstractNavigation::OnLeftButtonUp();
 	
 	if (m_renderingFlag) {
 		m_renderingFlag = false;
@@ -130,14 +131,14 @@ void InteractorStyleSmartContour::OnKeyPress()
 
 	}
 	else {
-		AbstractInteractorStyleImage::OnKeyPress();
+		AbstractNavigation::OnKeyPress();
 	}
 }
 
 
 void InteractorStyleSmartContour::OnLeave()
 {
-	AbstractInteractorStyleImage::OnLeave();
+	AbstractNavigation::OnLeave();
 }
 
 void InteractorStyleSmartContour::CalculateIndex()
@@ -162,43 +163,43 @@ void InteractorStyleSmartContour::UpdateSeedWidgetBefore()
 {
 	ClearAllSeedWidget();
 
-	for (vector<int*>::const_iterator cit = ModuleWidget::SeedIJKList.cbegin();
-	cit != ModuleWidget::SeedIJKList.cend(); ++cit) {
-		int* imagePos = (*cit);
-		double worldPos[3];
-		for (int pos = 0; pos < 3; ++pos) {
-			worldPos[pos] = (imagePos[pos] * GetSpacing()[pos]) + GetOrigin()[pos];
-		}
-		if (imagePos[GetSliceOrientation()] == m_imageViewer->GetSlice()) {
-			vtkHandleWidget* newSeed = m_seedWidget->CreateNewHandle();
-			newSeed->GetHandleRepresentation()->SetWorldPosition(worldPos);
-			newSeed->EnabledOn();
-		}
+	//for (vector<int*>::const_iterator cit = ModuleWidget::SeedIJKList.cbegin();
+	//cit != ModuleWidget::SeedIJKList.cend(); ++cit) {
+	//	int* imagePos = (*cit);
+	//	double worldPos[3];
+	//	for (int pos = 0; pos < 3; ++pos) {
+	//		worldPos[pos] = (imagePos[pos] * GetSpacing()[pos]) + GetOrigin()[pos];
+	//	}
+	//	if (imagePos[GetSliceOrientation()] == m_imageViewer->GetSlice()) {
+	//		vtkHandleWidget* newSeed = m_seedWidget->CreateNewHandle();
+	//		newSeed->GetHandleRepresentation()->SetWorldPosition(worldPos);
+	//		newSeed->EnabledOn();
+	//	}
 
-	}
+	//}
 	m_imageViewer->Render();
 }
 
 void InteractorStyleSmartContour::UpdateSeedWidgetAfter()
 {
-	for (int i = m_seedRep->GetNumberOfSeeds() - 1; i >= 0; --i) {
-		double* worldPos = new double[3]; // #MemLeakHere
-		m_seedWidget->GetSeedRepresentation()->GetSeedWorldPosition(i, worldPos);
-		int* imagePos = new int[3]; // #MemLeakHere
-		for (int pos = 0; pos < 3; ++pos) {
-			imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos] + 0.5;
-		}
+	//for (int i = m_seedRep->GetNumberOfSeeds() - 1; i >= 0; --i) {
+	//	double* worldPos = new double[3]; // #MemLeakHere
+	//	m_seedWidget->GetSeedRepresentation()->GetSeedWorldPosition(i, worldPos);
+	//	int* imagePos = new int[3]; // #MemLeakHere
+	//	for (int pos = 0; pos < 3; ++pos) {
+	//		imagePos[pos] = (worldPos[pos] - GetOrigin()[pos]) / GetSpacing()[pos] + 0.5;
+	//	}
 
-		// Check if seeds already exist
-		if (find_if(ModuleWidget::SeedIJKList.begin(), ModuleWidget::SeedIJKList.end(), [&imagePos](int* index) -> bool {
-			return (index[0] == imagePos[0] && index[1] == imagePos[1] && index[2] == imagePos[2]);
-		}) == ModuleWidget::SeedIJKList.end()) {
-			ModuleWidget::SeedIJKList.push_back(imagePos);
-			ModuleWidget::SeedCoordinatesList.push_back(worldPos);
-		}
-	}
+	//	// Check if seeds already exist
+	//	if (find_if(ModuleWidget::SeedIJKList.begin(), ModuleWidget::SeedIJKList.end(), [&imagePos](int* index) -> bool {
+	//		return (index[0] == imagePos[0] && index[1] == imagePos[1] && index[2] == imagePos[2]);
+	//	}) == ModuleWidget::SeedIJKList.end()) {
+	//		ModuleWidget::SeedIJKList.push_back(imagePos);
+	//		ModuleWidget::SeedCoordinatesList.push_back(worldPos);
+	//	}
+	//}
 
-	MainWindow::GetMainWindow()->GetModuleWidget()->UpdateSeedListView();
+	//MainWindow::GetMainWindow()->GetModuleWidget()->UpdateSeedListView();
 }
 
 void InteractorStyleSmartContour::UpdateFocalSeed()
@@ -249,7 +250,7 @@ void InteractorStyleSmartContour::OnChar()
 {
 	char key = this->Interactor->GetKeyCode();
 	cout << __func__ << ' ' << key << endl;
-	AbstractInteractorStyleImage::OnChar();
+	AbstractNavigation::OnChar();
 	switch (key)
 	{
 	case 'P':
@@ -263,7 +264,7 @@ void InteractorStyleSmartContour::OnChar()
 		ClearAllSeedWidget();
 		break;
 	default:
-		AbstractInteractorStyleImage::OnChar();
+		AbstractNavigation::OnChar();
 		break;
 	}
 }

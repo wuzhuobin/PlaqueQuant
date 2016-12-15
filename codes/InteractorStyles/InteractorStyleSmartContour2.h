@@ -19,20 +19,20 @@ Copyright (C) 2016
 
 #pragma once
 
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 #include <vtkContourWidget.h>
 #include <vtkRenderWindowInteractor.h>
 
 
-class InteractorStyleSmartContour2 : public AbstractInteractorStyleImage
+class InteractorStyleSmartContour2 : public AbstractNavigation
 {
 public:
 	enum CONTOUR_TYPE {
 		VESSEL_WALL = 0,
 		LUMEN = 1
 	};
-	vtkTypeMacro(InteractorStyleSmartContour2, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStyleSmartContour2, AbstractNavigation);
 	static InteractorStyleSmartContour2* New();
 
 	void SetVesselWallImage(vtkSmartPointer<vtkImageData> vesslWall);

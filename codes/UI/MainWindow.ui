@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>1212</width>
     <height>900</height>
    </rect>
   </property>
@@ -70,7 +70,10 @@
           <number>1</number>
          </property>
          <item>
-          <widget class="QVTKWidget" name="image3View">
+          <widget class="QVTKWidget" name="image3View" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -211,7 +214,10 @@
           <number>1</number>
          </property>
          <item>
-          <widget class="QVTKWidget" name="image4View">
+          <widget class="QVTKWidget" name="image4View" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -328,208 +334,44 @@
             <number>3</number>
            </property>
            <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>x:</string>
-             </property>
-            </widget>
+            <widget class="QWidget" name="sliceWidget" native="true"/>
            </item>
            <item>
-            <widget class="QSpinBox" name="xSpinBox">
+            <widget class="QScrollArea" name="sliceScrollArea">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
-             </property>
-             <property name="maximum">
-              <number>9999</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>y:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="ySpinBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximum">
-              <number>9999</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>z:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="zSpinBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximum">
-              <number>999</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="windowlevelwidget" native="true">
-             <property name="enabled">
-              <bool>true</bool>
              </property>
              <property name="minimumSize">
               <size>
-               <width>0</width>
-               <height>0</height>
+               <width>450</width>
+               <height>30</height>
               </size>
              </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
              </property>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="2">
-               <widget class="QDoubleSpinBox" name="windowDoubleSpinBoxUR">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QDoubleSpinBox" name="windowDoubleSpinBoxLR">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="levelDoubleSpinBoxLL">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QDoubleSpinBox" name="levelDoubleSpinBoxUR">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QDoubleSpinBox" name="windowDoubleSpinBoxUL">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="levelDoubleSpinBoxUL">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QDoubleSpinBox" name="windowDoubleSpinBoxLL">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QDoubleSpinBox" name="levelDoubleSpinBoxLR">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <double>9999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="4">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-                <property name="maximumSize">
-                 <size>
-                  <width>51</width>
-                  <height>100</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents_2">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>450</width>
+                <height>30</height>
+               </rect>
+              </property>
+             </widget>
             </widget>
            </item>
            <item>
@@ -601,7 +443,10 @@
           <number>1</number>
          </property>
          <item>
-          <widget class="QVTKWidget" name="image1View">
+          <widget class="QVTKWidget" name="image1View" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -780,7 +625,10 @@
           <number>1</number>
          </property>
          <item>
-          <widget class="QVTKWidget" name="image2View">
+          <widget class="QVTKWidget" name="image2View" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -905,7 +753,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>1212</width>
      <height>23</height>
     </rect>
    </property>
@@ -920,7 +768,6 @@
     </widget>
     <addaction name="actionOpenImage"/>
     <addaction name="menuRecentImage"/>
-    <addaction name="actionSave"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -928,6 +775,7 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionInformation"/>
     <addaction name="actionHelp"/>
    </widget>
    <widget class="QMenu" name="menuInteraction">
@@ -936,6 +784,11 @@
     </property>
     <addaction name="actionNavigation"/>
     <addaction name="actionWindowLevel"/>
+    <addaction name="actionRuler"/>
+    <addaction name="actionROI"/>
+    <addaction name="actionSeedsPlacer"/>
+    <addaction name="actionContour"/>
+    <addaction name="actionBrush"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -965,11 +818,11 @@
     <property name="title">
      <string>Segmentation</string>
     </property>
+    <addaction name="actionSaveSegmentation"/>
     <addaction name="actionOpenSegmentation"/>
-    <addaction name="actionROI"/>
-    <addaction name="actionSmartContour"/>
-    <addaction name="actionContour"/>
-    <addaction name="actionRuler"/>
+    <addaction name="actionSaveContour"/>
+    <addaction name="actionOpenContour"/>
+    <addaction name="actionCenterlineAlgorithm"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -995,14 +848,14 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpenImage"/>
-   <addaction name="actionSave"/>
+   <addaction name="actionSaveSegmentation"/>
    <addaction name="separator"/>
    <addaction name="actionNavigation"/>
    <addaction name="actionWindowLevel"/>
    <addaction name="actionRuler"/>
    <addaction name="separator"/>
    <addaction name="actionROI"/>
-   <addaction name="actionSmartContour"/>
+   <addaction name="actionSeedsPlacer"/>
    <addaction name="actionContour"/>
    <addaction name="actionBrush"/>
    <addaction name="separator"/>
@@ -1090,13 +943,13 @@
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="actionSaveSegmentation">
    <property name="icon">
     <iconset resource="../../resources/Project.qrc">
      <normaloff>:/icons/Save.png</normaloff>:/icons/Save.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Save</string>
+    <string>Save Segmentation</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -1167,6 +1020,11 @@
    </property>
    <property name="text">
     <string>Four Views</string>
+   </property>
+  </action>
+  <action name="actionInformation">
+   <property name="text">
+    <string>Information</string>
    </property>
   </action>
   <action name="actionAddOverlay">
@@ -1367,7 +1225,7 @@
      <normaloff>:/icons/Draw.png</normaloff>:/icons/Draw.png</iconset>
    </property>
    <property name="text">
-    <string>Brush</string>
+    <string>Paint Brush</string>
    </property>
   </action>
   <action name="actionMultiPlanarView">
@@ -1392,7 +1250,7 @@
     <string>Centerline Algorithm</string>
    </property>
   </action>
-  <action name="actionSmartContour">
+  <action name="actionSeedsPlacer">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1401,10 +1259,20 @@
      <normaloff>:/icons/1476453573_Wand.ico</normaloff>:/icons/1476453573_Wand.ico</iconset>
    </property>
    <property name="text">
-    <string>SmartContour</string>
+    <string>Seeds Placer</string>
    </property>
    <property name="toolTip">
-    <string>Smart Contour</string>
+    <string>Seeds Placer</string>
+   </property>
+  </action>
+  <action name="actionOpenContour">
+   <property name="text">
+    <string>Open Contour</string>
+   </property>
+  </action>
+  <action name="actionSaveContour">
+   <property name="text">
+    <string>Save Contour</string>
    </property>
   </action>
  </widget>

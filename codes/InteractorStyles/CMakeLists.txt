@@ -17,7 +17,6 @@ include(${VTK_USE_FILE})
 if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
   # Instruct CMake to run moc automatically when needed.
   # set(CMAKE_AUTOMOC ON)
-  find_package(Qt5PrintSupport REQUIRED)
   find_package(Qt5Widgets REQUIRED QUIET)
   # add_definitions(-DQT5_IS_LOADED)
 else()
@@ -27,7 +26,8 @@ endif()
 
 #link other libraries
 link_directories(
-	${PROJECT_SOURCE_DIR}/lib
+	${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 	)
 
 include_directories(
@@ -37,47 +37,72 @@ include_directories(
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_SRC 
-	${PROJECT_SOURCE_DIR}/Abstract*.cxx
+	${PROJECT_SOURCE_DIR}/Abstract*.c*
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	ABSTRACT_INTERACTORS_H 
-	${PROJECT_SOURCE_DIR}/Abstract*.h
+	${PROJECT_SOURCE_DIR}/Abstract*.h*
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	INTERACTORS_SRC  
-	${PROJECT_SOURCE_DIR}/InteractorStyle*.cxx 
-	${PROJECT_SOURCE_DIR}/LumenSegmentation.cxx
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.cxx
-	${PROJECT_SOURCE_DIR}/MyBorderWidget.cxx
+	${PROJECT_SOURCE_DIR}/InteractorStyle*.c* 
 	PARENT_SCOPE
 	)
 file(
 	GLOB 
 	INTERACTORS_INC  
-	${PROJECT_SOURCE_DIR}/InteractorStyle*.h 
-	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h 
-	${PROJECT_SOURCE_DIR}/LumenSegmentation.h
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
-	${PROJECT_SOURCE_DIR}/MyPlaneWidget2.h
-	${PROJECT_SOURCE_DIR}/MyBorderWidget.h
+	${PROJECT_SOURCE_DIR}/InteractorStyle*.h*
+	${PROJECT_SOURCE_DIR}/StyleSwitchMacro.h*
 	PARENT_SCOPE
 	)
+file(
+	GLOB
+	QINTERACTORS_SRC
+	${PROJECT_SOURCE_DIR}/QAbstract*.c*
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.c*
+	)
+file(
+	GLOB
+	QINTERACTORS_INC
+	${PROJECT_SOURCE_DIR}/QAbstract*.h*
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.h*
+	)
+qt5_wrap_cpp(
+	QINTERACTORS_INC_MOC
+	${QINTERACTORS_INC}
+	)
+file(
+	GLOB
+	QINTERACTORS_UI
+	${PROJECT_SOURCE_DIR}/QAbstract*.ui
+	${PROJECT_SOURCE_DIR}/QInteractorStyle*.ui
+)
+qt5_wrap_ui(
+	QINTERACTORS_UI_SRC
+	${QINTERACTORS_UI}
+)
 add_library(
 	InteractorStyles
 	${ABSTRACT_INTERACTORS_SRC}
 	${ABSTRACT_INTERACTORS_H}
 	${INTERACTORS_INC}
 	${INTERACTORS_SRC}
+	${QINTERACTORS_INC}
+	${QINTERACTORS_SRC}
+	${QINTERACTORS_INC_MOC}
+	${QINTERACTORS_UI}
+	${QINTERACTORS_UI_SRC}
 )
 
 target_link_libraries(
 	InteractorStyles
-	${VTK_LIBRARIES}
+	${LINK_LIBRARIE}
+	# ${VTK_LIBRARIES}
+	# Qt5::Widgets
 )
 
 source_group(
@@ -91,4 +116,15 @@ source_group(
 	FILES
 	${ABSTRACT_INTERACTORS_SRC}
 	${INTERACTORS_SRC}
+	)
+SOURCE_GROUP(
+	"Generated FIles" 
+	FILES
+	${QINTERACTORS_INC_MOC}
+	${QINTERACTORS_UI_SRC}
+)
+SOURCE_GROUP(
+	"Forms FIles" 	
+	FILES 
+	${QINTERACTORS_UI}
 	)

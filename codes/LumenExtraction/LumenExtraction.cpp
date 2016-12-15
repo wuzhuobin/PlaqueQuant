@@ -15,7 +15,7 @@
 #include <itkImageFileWriter.h>
 #include <itkIndex.h>
 #include <itkLabelMapToBinaryImageFilter.h>
-#include <itkVTKImageToImageFilter.h>		
+#include "itkBinaryDilateImageFilter.h"
 #include <itkVotingBinaryIterativeHoleFillingImageFilter.h>
 #include <vtkImageCast.h>
 
@@ -41,7 +41,7 @@ LumenExtraction::~LumenExtraction()
 	m_lumenSurface->Delete();
 	m_dilatedSurface->Delete();
 	m_dilatedVtkImage->Delete();
-	m_itkLumenImage->Delete();
+	//m_itkLumenImage->Delete();
 }
 
 void LumenExtraction::ClearAllSeeds()

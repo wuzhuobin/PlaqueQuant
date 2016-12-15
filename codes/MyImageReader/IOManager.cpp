@@ -13,11 +13,19 @@
 #include <itkImageToVTKImageFilter.h>
 #include <itkImageFileWriter.h>
 
+#include <vtkAppendPolyData.h>
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkPointData.h>
+
 #include "RegistrationWizard.h"
 
 using namespace itk;
-IOManager::IOManager(QWidget* parent) 
-	:registration(parent), QWidget(parent)
+IOManager::IOManager(QObject* parent, QWidget* mainWindow)
+	:registration(mainWindow), QObject(parent)
+{
+}
+IOManager::IOManager(QWidget* parent)
+	: IOManager(parent, parent)
 {
 }
 
@@ -55,18 +63,18 @@ const QString IOManager::getFilePath()
 	return this->filePath;
 }
 
-bool IOManager::LoadImageData(QStringList fileNames)
+bool IOManager::loadImageData(QStringList fileNames)
 {
-	ImageType::Pointer _itkImage = NULL;
-	vtkSmartPointer<vtkImageData> _vtkImage = NULL;
-	vtkSmartPointer<vtkImageData> _vtkImageCopy = NULL;
+	ImageType::Pointer _itkImage = nullptr;
+	vtkSmartPointer<vtkImageData> _vtkImage = nullptr;
+	vtkSmartPointer<vtkImageData> _vtkImageCopy = nullptr;
 	// QMAP saving DICOM imformation
-	QMap<QString, QString>* DICOMHeader = NULL;
+	QMap<QString, QString>* DICOMHeader = nullptr;
 	if (fileNames.isEmpty()) {
-		_itkImage = NULL;
-		_vtkImage = NULL;
-		DICOMHeader = NULL;
-		_vtkImageCopy = NULL;
+		_itkImage = nullptr;
+		_vtkImage = nullptr;
+		DICOMHeader = nullptr;
+		_vtkImageCopy = nullptr;
 	}
 	// load Nifti Data
 	else if (fileNames.size() == 1 && fileNames[0].contains(".nii")) {
@@ -75,7 +83,7 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		reader->SetFileName(fileNames[0].toStdString());
 		reader->Update();
 		_itkImage = reader->GetOutput();
-		DICOMHeader = NULL;
+		DICOMHeader = nullptr;
 	}
 	// Load Dicom Data
 	else {
@@ -127,19 +135,16 @@ bool IOManager::LoadImageData(QStringList fileNames)
 		connector->SetInput(_itkImage);
 		connector->Update();
 		_vtkImage = connector->GetOutput();
-		_vtkImageCopy = vtkSmartPointer<vtkImageData>::New();
-		_vtkImageCopy->DeepCopy(_vtkImage);
 	}
 
 	this->myImageManager->listOfItkImages.append( _itkImage);
-	this->myImageManager->listOfVtkViewerInputImages.append(_vtkImageCopy);
 	this->myImageManager->listOfVtkImages.append(_vtkImage);
 	this->myImageManager->listOfDICOMHeader.append(DICOMHeader);
 
 	return true;
 }
 
-ImageType::Pointer IOManager::imageAlignment(ImageType::Pointer alignedTo, ImageType::Pointer toBeAligned)
+IOManager::ImageType::Pointer IOManager::imageAlignment(ImageType::Pointer alignedTo, ImageType::Pointer toBeAligned)
 {
 	this->registration.SetFixedImage(alignedTo);
 	this->registration.SetMovingImage(toBeAligned);
@@ -153,16 +158,16 @@ void IOManager::setMyImageManager(MyImageManager * myImageManager)
 	this->myImageManager = myImageManager;
 }
 
-void IOManager::setUniqueKeys(QStringList keys)
-{
-	this->uniqueKeys = keys;
-}
+//void IOManager::setUniqueKeys(QStringList keys)
+//{
+//	this->uniqueKeys = keys;
+//}
 
 void IOManager::slotOpenWithWizard()
 {
 	this->slotOpenWithWizard("");
 }
-#include <qdebug.h>
+
 void IOManager::slotOpenWithWizard(QString dir)
 {
 	RegistrationWizard wizard(dir);
@@ -171,7 +176,7 @@ void IOManager::slotOpenWithWizard(QString dir)
 	filePath = wizard.getDirectory();
 	this->listOfFileNames.clear();
 	for (int i = 0; i < 5; ++i) {
-		if (wizard.getFileNamesN(i + 1) == NULL) {
+		if (wizard.getFileNamesN(i + 1) == nullptr) {
 			addToListOfFileNames(QStringList());
 		}
 		else {
@@ -179,15 +184,6 @@ void IOManager::slotOpenWithWizard(QString dir)
 		}
 	}
 
-	//QStringList* wizardFileNames[5] = {
-	//	wizard.getFileNames1(), wizard.getFileNames2(), wizard.getFileNames3(),
-	//	wizard.getFileNames4(), wizard.getFileNames5() };
-	//for (int i = 0; i < 5; ++i) {
-	//	if (wizardFileNames[i] == NULL) {
-	//		wizardFileNames[i];
-	//	}
-	//	this->addToListOfFileNames(*wizardFileNames[i]);
-	//}
 	slotOpenMultiImages();
 }
 
@@ -214,21 +210,21 @@ void IOManager::slotOpenMultiImages()
 		slotOpenOneImage(*cit);
 	}
 	this->myImageManager->overlay->Initialize(
-		this->myImageManager->listOfVtkViewerInputImages[0]);
+		this->myImageManager->listOfVtkImages[0]);
 
 	emit finishOpenMultiImages();
 }
 
 void IOManager::slotOpenOneImage(QStringList fileNames)
 {
-	this->LoadImageData(fileNames);
+	loadImageData(fileNames);
 	emit finishOpenOneImage();
 }
 
 void IOManager::slotOpenSegmentationWithDiaglog()
 {
-	QString path = QFileDialog::getOpenFileName(this, QString(tr("Open Segmentation")), 
-		".", tr("NlFTI Images (*.nii)"));
+	QString path = QFileDialog::getOpenFileName(dynamic_cast<QWidget*>(this->parent()),
+		QString(tr("Open Segmentation")), ".", tr("NlFTI Images (*.nii)"));
 	if (path.isEmpty()) return;
 	this->slotOpenSegmentation(path);
 	emit finishOpenSegmentation();
@@ -236,17 +232,15 @@ void IOManager::slotOpenSegmentationWithDiaglog()
 
 void IOManager::slotOpenSegmentation(QString fileName)
 {
-	ImageType::Pointer _itkImage;
-	//vtkSmartPointer<vtkImageData> _vtkImage;
-	
-	ImageFileReader<Image<float, 3>>::Pointer reader =
-		ImageFileReader<Image<float, 3>>::New();
+	Overlay::OverlayImageType::Pointer _itkImage;
+	ImageFileReader<Overlay::OverlayImageType>::Pointer reader =
+		ImageFileReader<Overlay::OverlayImageType>::New();
 	reader->SetFileName(fileName.toStdString());
 	reader->Update();
 	_itkImage = reader->GetOutput();
 	this->myImageManager->overlay->SetInputImageData(_itkImage);
 
-	//if (_itkImage.IsNotNull()) {
+	//if (_itkImage.IsNotnullptr()) {
 	//	// using the same m_orientation ITK_COORDINATE_ORIENTATION_RAI
 	//	OrientImageFilter<Image<float, 3>, Image<float, 3>>::Pointer orienter =
 	//		OrientImageFilter<Image<float, 3>, Image<float, 3>>::New();
@@ -266,8 +260,8 @@ void IOManager::slotOpenSegmentation(QString fileName)
 
 void IOManager::slotSaveSegmentaitonWithDiaglog()
 {
-	QString path = QFileDialog::getSaveFileName(this, QString(tr("Save Segmentation")),
-		".", tr("NlFTI Images (*.nii)"));
+	QString path = QFileDialog::getSaveFileName(dynamic_cast<QWidget*>(this->parent()), 
+		QString(tr("Save Segmentation")), ".", tr("NlFTI Images (*.nii)"));
 	if (path.isEmpty())	return;
 	slotSaveSegmentation(path);
 	
@@ -275,10 +269,61 @@ void IOManager::slotSaveSegmentaitonWithDiaglog()
 
 void IOManager::slotSaveSegmentation(QString path)
 {
-	ImageFileWriter<Image<float, 3>>::Pointer writer =
-		ImageFileWriter<Image<float, 3>>::New();
-	writer->SetInput(this->myImageManager->overlay->GetITKOutput(
+	ImageFileWriter<Overlay::OverlayImageType>::Pointer writer =
+		ImageFileWriter<Overlay::OverlayImageType>::New();
+	writer->SetInput(this->myImageManager->overlay->GetITKOutput<ImageType>(
 		this->myImageManager->listOfItkImages[0]));
 	writer->SetFileName(path.toStdString().c_str());
+	writer->Write();
+}
+
+void IOManager::slotSaveContourWithDiaglog()
+{
+	QString path = QFileDialog::getSaveFileName(dynamic_cast<QWidget*>(this->parent()),
+		QString(tr("Save Contours")), ".", tr("Serial vtkPolyData(*.vtp)"));
+	if (path.isEmpty())	return;
+	slotSaveContour(path);
+}
+
+void IOManager::slotSaveContour(QString fileName)
+{
+	vtkSmartPointer<vtkAppendPolyData> append =
+		vtkSmartPointer<vtkAppendPolyData>::New();
+
+
+	Overlay* overlay = this->myImageManager->getOverlay();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>*  contours[2] =
+	{ overlay->GetLumenPolyData(), overlay->GetVesselWallPolyData() };
+	for (int i = 0; i < 2; ++i) {
+
+
+
+		for (QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>::const_iterator cit1 =
+			contours[i]->cbegin(); cit1 != contours[i]->cend();++cit1) {
+			
+			QList<vtkSmartPointer<vtkPolyData>>* _list = cit1.value();
+			for (QList<vtkSmartPointer<vtkPolyData>>::const_iterator cit2 = _list->cbegin();
+				cit2 != _list->cend(); ++cit2) {
+
+				// set point data for classification
+				vtkSmartPointer<vtkUnsignedCharArray> scalars =
+					vtkSmartPointer<vtkUnsignedCharArray>::New();
+				scalars->SetNumberOfValues((*cit2)->GetNumberOfPoints());
+				scalars->SetNumberOfComponents(1);
+				scalars->FillComponent(0, i + 1);
+
+				(*cit2)->GetPointData()->SetScalars(scalars);
+				append->AddInputData(*cit2);
+			}
+
+
+		}
+	}
+	append->Update();
+
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer =
+		vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetInputConnection(append->GetOutputPort());
+	writer->SetFileName(fileName.toStdString().c_str());
 	writer->Write();
 }

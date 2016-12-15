@@ -6,21 +6,33 @@
 #include <vtkLookupTable.h>
 
 #include <QObject>
+#include <qmap.h>
 
 #include <itkImage.h>
+#include <itkVTKImageToImageFilter.h>
+#include <itkCastImageFilter.h>
+#include <itkOrientImageFilter.h>
 
 #include "MeasurementFor3D.h"
 #include "MeasurementFor2D.h"
 #include "MaximumWallThickness.h"
 
-typedef itk::Image<float, 3> ImageType;
 
-
+/**
+ * @class Overlay
+ * @author WUZHUOBIN
+ * @version
+ * @since
+ * A very important part of element for using other InteractorStyle
+ * the vtkImageData scalar type now is set to unsigned char
+ */
 class Overlay : public QObject
 {
 	Q_OBJECT
 
 public:
+
+	typedef itk::Image<unsigned char, 3> OverlayImageType;
 
 	static const int NUMBER_OF_COLOR = 7;
 	const int* m_overlayColor[NUMBER_OF_COLOR];
@@ -43,10 +55,15 @@ public:
 
 	Overlay(QObject* parent = NULL);
 	~Overlay();
-	/**
-	 * @deprecated
-	 */
-	bool Update();
+
+	void SetDisplayExtent(int*);
+	int* GetDisplayExtent();
+	void GetDisplayExtent(int*);
+
+	void DisplayExtentOn();
+	void DisplayExtentOff();
+
+
 	/**
 	 * It is supposed to use the first vtkImageData to initialize the overlay
 	 * it will deepcopy the img and set all voxels of the copy to 0
@@ -55,21 +72,16 @@ public:
 	void Initialize(vtkImageData* img);
 	/**
 	 * @deprecated
+	 * don't use it
 	 */
-	void Initialize(ImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
+	void Initialize(OverlayImageType::Pointer, int dim[3], double spacing[3], double origin[3], int type);
 
-	void SetDisplayExtent(int*);
-	int* GetDisplayExtent();
-	void GetDisplayExtent(int*);
-
-	void DisplayExtentOn();
-	void DisplayExtentOff();
 	/**
 	 * set input image data of overlay m_vtkOverlay using itk::image
 	 * convert itk::image to vtkImage 
 	 * @param	imageData the new input image
 	 */
-	void SetInputImageData(ImageType::Pointer imageData);
+	void SetInputImageData(OverlayImageType::Pointer imageData);
 	void SetInputImageData(vtkImageData* imageData);
 	void SetInputImageData(QString fileName);
 	void SetInputImageData(const char* fileName);
@@ -94,9 +106,10 @@ public:
 	/**
 	 * replace all the pixels specified by the @param points with the @param label
 	 */
-	void SetPixels(vtkPoints* points, int label);
+	void SetPixels(vtkPoints* points, unsigned char label);
 	void ReplacePixels(int* extent, vtkImageData* image);
 
+	void vtkShallowCopyImage(vtkImageData* image);
 
 
 	vtkImageData* GetOutput();
@@ -111,7 +124,8 @@ public:
 	 * @param	format set the output image direction the same as the format image
 	 * @return	m_itkOverlay
 	 */
-	ImageType::Pointer GetITKOutput(ImageType::Pointer format);
+	template<typename TImage>
+	OverlayImageType::Pointer GetITKOutput(typename TImage::Pointer format);
 	/**
 	 * Get the lookupTable of this overlay which is generate by the constant
 	 * @return	m_lookupTable
@@ -137,27 +151,76 @@ public:
 	MeasurementFor2DIntegrated GetMeasurementFor2D(int slice);
 	QStringList Get2DMeasurementsStrings(int slice);
 
+	// Get contour PolyData*
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetVesselWallPolyData();
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetLumenPolyData();
+	std::map<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetVesselWallPolyDataSTD();
+	std::map<int, QList<vtkSmartPointer<vtkPolyData>>*>* GetLumenPolyDataSTD();
+
+
 signals:
 	void signalOverlayUpdated();
 
 private:
 
+	// ImageData
 	vtkSmartPointer<vtkImageData> m_vtkOverlay;
-	ImageType::Pointer m_itkOverlay;
+	OverlayImageType::Pointer m_itkOverlay;
+
 	vtkSmartPointer<vtkLookupTable> m_lookupTable;
 
 	int DisplayExtent[6];
 
 	// 3D parts data
+	// volumeofTotalPlaque, volumeOfLumen, volumeOfVesselWall, volumeOfCalcification
+	// volumeOfHemorrhage, volumeOfLRNC, volumeOfLM
 	MeasurementFor3D m_measurementFor3D;
 
-	QList<MeasurementFor2DIntegrated*> m_measurementFor2D;
-
+	// 2D parts data
+	// using QMap for the case that the extent do not begin at 0
 	// lumen area, vessel area, NMI, distance, distance error imfo
-	QList<QStringList> m_2DMeasurements;
+	QMap<int, MeasurementFor2DIntegrated*> m_measurementFor2D;
+	QMap<int, QStringList> m_2DMeasurements;
 	QStringList m_volumeStrings;
 
+	// contour parts
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*> m_vesselWallPolyData;
+	QMap<int, QList<vtkSmartPointer<vtkPolyData>>*> m_lumenPolyData;
+
 };
+
+template<typename TImage>
+inline Overlay::OverlayImageType::Pointer Overlay::GetITKOutput(typename TImage::Pointer format)
+{
+	typedef itk::OrientImageFilter<TImage, TImage> OrienterType;
+	typedef itk::CastImageFilter<OverlayImageType, OverlayImageType> CastImageFilter;
+	typedef itk::VTKImageToImageFilter<OverlayImageType> VTKImageToImageFilter;
+	//if (!m_vtkOverlay)
+	//	return NULL;
+	//else {
+	VTKImageToImageFilter::Pointer vtkImageToImageFilter =
+		VTKImageToImageFilter::New();
+	vtkImageToImageFilter->SetInput(this->GetOutput());
+	vtkImageToImageFilter->Update();
+
+	CastImageFilter::Pointer castImageFilter =
+		CastImageFilter::New();
+	castImageFilter->SetInput(vtkImageToImageFilter->GetOutput());
+	castImageFilter->Update();
+
+	//re-orient
+	OrienterType::Pointer orienter = OrienterType::New();
+	orienter->UseImageDirectionOn();
+	orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+	orienter->SetInput(format);
+	orienter->Update();
+
+	m_itkOverlay = castImageFilter->GetOutput();
+	m_itkOverlay->SetDirection(orienter->GetOutput()->GetDirection());
+	m_itkOverlay->SetOrigin(orienter->GetOutput()->GetOrigin());
+	//}
+	return m_itkOverlay;
+}
 
 #endif
 

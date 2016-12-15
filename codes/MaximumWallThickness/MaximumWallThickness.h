@@ -1,19 +1,6 @@
-/*
-Author:		Wong, Matthew Lun
-Date:		06th, August 2016
-Occupation:	Chinese University of Hong Kong,
-Department of Imaging and Inteventional Radiology,
-Junior Research Assistant
-
-This class calculates the distance between two circular boundaries with the mutual center within
-the inner bound.
-
-Wong Matthew Lun, Lok Ka Hei
-Copyright (C) 2016
-*/
-
 #ifndef MAXIMUMWALLTHICKNESS_H
 #define MAXIMUMWALLTHICKNESS_H
+#endif // !MAXIUMWALLTHICKNESS_H
 
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
@@ -65,7 +52,7 @@ public:
 	std::vector<DistanceLoopPair>	GetDistanceLoopPairVect();
 
 	/* Two ways to specify the region of interest
-	1. Set image slice number, then default extent is extracted from SegmentationOverlay of mainwnd
+	1. Set image slice number, then default extent is extracted from Overlay of mainwnd
 	2. Directly set slice image
 	*/
 	void SetLumemIntensity(int i);

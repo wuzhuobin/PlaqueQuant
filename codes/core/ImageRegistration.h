@@ -1,7 +1,6 @@
 #ifndef IMAGEREGISTRATION_H
 #define IMAGEREGISTRATION_H
 
-#include "Define.h"
 #include <QObject>
 
 #include "itkVersorRigid3DTransform.h"
@@ -12,20 +11,24 @@
 #include "itkResampleImageFilter.h"
 #include "itkCenteredTransformInitializer.h"
 
-//Registration
-typedef itk::VersorRigid3DTransform <double>									TransformType;		//TransformType
-typedef itk::VersorRigid3DTransformOptimizer									OptimizerType; 		//Optimizer
-typedef OptimizerType::ScalesType												OptimizerScalesType;
-typedef itk::MattesMutualInformationImageToImageMetric<ImageType, ImageType>	MetricType;			//Metric
-typedef itk::LinearInterpolateImageFunction <ImageType, double>					InterpolatorType;	//interpolation
-typedef itk::CenteredTransformInitializer<TransformType, ImageType, ImageType >	InitializerType;    //initializer
-typedef itk::ImageRegistrationMethod <ImageType, ImageType>						RegistrationType;	//registration method
-typedef itk::ResampleImageFilter <ImageType, ImageType>							ResampleFilterType;	//Resampler
 
 
 class ImageRegistration : public QObject
 {
-	Q_OBJECT
+	Q_OBJECT;
+	//Registration
+	typedef float										PixelType;
+	const static unsigned int							ImageDimension = 3;
+	typedef itk::Image< PixelType, ImageDimension >		ImageType;
+	typedef itk::VersorRigid3DTransform <double>									TransformType;		//TransformType
+	typedef itk::VersorRigid3DTransformOptimizer									OptimizerType; 		//Optimizer
+	typedef OptimizerType::ScalesType												OptimizerScalesType;
+	typedef itk::MattesMutualInformationImageToImageMetric<ImageType, ImageType>	MetricType;			//Metric
+	typedef itk::LinearInterpolateImageFunction <ImageType, double>					InterpolatorType;	//interpolation
+	typedef itk::CenteredTransformInitializer<TransformType, ImageType, ImageType >	InitializerType;    //initializer
+	typedef itk::ImageRegistrationMethod <ImageType, ImageType>						RegistrationType;	//registration method
+	typedef itk::ResampleImageFilter <ImageType, ImageType>							ResampleFilterType;	//Resampler
+
 
 public:
 	ImageRegistration(QObject* parent = NULL);

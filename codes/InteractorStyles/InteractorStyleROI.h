@@ -7,7 +7,7 @@ class InteractorStyleROI :
 	public InteractorStyleNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleROI, InteractorStyleNavigation);
+	//vtkTypeMacro(InteractorStyleROI, InteractorStyleNavigation);
 	static InteractorStyleROI* New();
 	void SetPlaneWidgetEnabled(bool flag);
 	void OnMouseMove();

@@ -1,12 +1,9 @@
 #ifndef __MYIMAGEVIEWER_H__
 #define __MYIMAGEVIEWER_H__
 
-#include <vtkObjectFactory.h>
 #include <vtkImageViewer2.h>
-#include <vtkDistanceWidget.h>
 #include <vtkTextActor.h>
 #include <vtkImageMapToWindowLevelColors.h>
-#include <vtkPlane.h>
 #include <vtkLogLookupTable.h>
 #include <vtkImageActor.h>
 #include <vtkCursor3D.h>
@@ -14,7 +11,7 @@
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include <vtkInteractorStyleImage.h>
+#include <vtkExtractVOI.h>
 
 #include <QObject>
 #include <QString>
@@ -22,6 +19,7 @@
 #include "Overlay.h"
 
 /**
+ * 
  * @class	MyImageViewer
  * @author	WUZHUOBIN
  * @version	
@@ -34,25 +32,63 @@ class MyImageViewer : public QObject, public vtkImageViewer2
 public:
 	static MyImageViewer *New();
 	vtkTypeMacro(MyImageViewer, vtkImageViewer2);
+	/**
+	 * @override
+	 * @param	os,
+	 * @param	indent
+	 */
 	void PrintSelf(ostream& os, vtkIndent indent);
-	// Text methods
+	/**
+	 * set the header by the MRI sequence name 
+	 * @param	file, the MRI sequence name
+	 */
 	virtual void InitializeHeader(std::string file);
 	virtual void InitializeHeader(QString file);
-
+	/**
+	 * Get the current focal point in image coordinate(extent), or in world coordinate
+	 * @param	coordinate, focal point's coordinate
+	 */
 	virtual void GetFocalPointWithImageCoordinate(int* coordinate);
 	virtual void GetFocalPointWithWorldCoordinate(double* coordinate);
+	/**
+	 * Get the current focal point in world coordinate
+	 * @return	world coordinate of the focal point, don't modify it 
+	 */
 	virtual double* GetFocalPointWithWorldCoordinate();
+	/**
+	 * Get the Cursor bound of the Cursor 3d in world coordinate, don't modify it 
+	 * @return	world coordinate of the cursor bound
+	 */
 	virtual double* GetCursorBoundWithWorldCoordinate();
-
+	/**
+	 * return the all black flag
+	 * @return	true, if in all black
+	 *			false, if not
+	 */
 	virtual bool GetAllBlack();
 
-	// Description:
-	// Render the resulting image.
+	/**
+	 * @override
+	 * Render method
+	 */
 	virtual void Render(void);
 
-	// Description:
-	// Set/Get the input image to the viewer.
+	/**
+	 * Set/Get the input image to the viewer.
+	 * the GetInput() method return image after VOI extraction
+	 * @param	in, input image
+	 */
 	virtual void SetInputData(vtkImageData * in);
+	/**
+	 * Set/Get the input image to the viewer.
+	 * @return	return image after VOI extraction 
+	 */
+	virtual vtkImageData* GetInput();
+	/**
+	 * Get original input vtkImageData image before vtkExtractVOI filter
+	 * @return	original input
+	 */
+	virtual vtkImageData* GetOriginalInput();
 	// Set/Get Input Layer which is supposed to be the output of overlay
 	virtual void SetInputDataLayer(vtkImageData *in);
 	virtual vtkImageData *GetInputLayer();
@@ -60,9 +96,17 @@ public:
 	virtual void SetOverlay(Overlay* overlay);
 	virtual Overlay* GetOverlay();
 
-	// Description:
-	// return DefaultWindowLevel
-	virtual double* GetDefaultWindowLevel();
+
+
+	virtual void SetImageVOI(int* extent);
+	virtual void ResetImageVOI();
+
+	virtual void SetOverlayVOI(int* extent);
+	virtual void ResetOverlayVOI();
+
+	//// Description:
+	//// return DefaultWindowLevel
+	//virtual double* GetDefaultWindowLevel();
 	
 	// Description:
 	// Get the internal render window, renderer, image actor, and
@@ -75,13 +119,20 @@ public:
 	virtual void SetAnnotationRenderer(vtkRenderer *arg);
 
 	/**
-	 * LookupTable
+	 * Get/Set method of LookupTable
+	 * @return	lookupTable
 	 */
 	virtual vtkLookupTable* GetLookupTable();
+	/**
+	 * Get/Set method of LookupTable
+	 * @param	LookupTable
+	 */
 	virtual void SetLookupTable(vtkLookupTable* LookupTable);
 
-	// Description:
-	// Attach an interactor for the internal render window.
+	/**
+	 * Attach an interactor for the internal render window.
+	 * @param	arg, interactor
+	 */
 	virtual void SetupInteractor(vtkRenderWindowInteractor* arg);
 
 	// Description:
@@ -123,6 +174,7 @@ public slots:
      */
 	virtual void SetFocalPointWithImageCoordinate(int i, int j, int k);
 	/**
+	 * @deprecated
 	 * @slot
 	 * set the window level and window width of the image
 	 * or the same saying image contrast
@@ -130,6 +182,7 @@ public slots:
 	 */
 	virtual void SetColorLevel(double level);
 	/**
+     * @deprecated
 	 * @slot
 	 * set the window level and window width of the image
 	 * or the same saying image contrast
@@ -139,7 +192,7 @@ public slots:
 	/**
 	 * @slot
 	 * Setting and Getting all visibility of all actor, which means it will somehow look 
-	 * like turn off
+	 * like turn off, it will invoke Render()
 	 * it will also set AllBlackFlag = flag
 	 * @param	flag 
 	 */
@@ -157,47 +210,52 @@ signals:
 	void AllBlackAlready(bool flag);
 
 protected:
-	MyImageViewer(QObject* parent = NULL);
+	MyImageViewer(QObject* parent = nullptr);
 	~MyImageViewer();
 
 	// Text Method
 	virtual void ResizeHeaderAndOrientationText();
 	virtual void InitializeIntensityText(QString IntText);
 	virtual void InitializeOrientationText();
+	// Cursor method
+	virtual void InitializeCursorBoundary();
 
 	virtual void InstallPipeline();
 	virtual void UnInstallPipeline();
 	virtual void UpdateOrientation();
 
+	vtkExtractVOI* ImageExtractVOI;
+	vtkExtractVOI* OverlayExtractVOI;
+
+
 	//OrientationText
-	vtkTextActor*	OrientationTextActor[4] = { NULL };
+	vtkTextActor*	OrientationTextActor[4] = { nullptr };
 
 	//Header
-	vtkTextActor* HeaderActor = NULL;
+	vtkTextActor* HeaderActor = nullptr;
 
 	// IntensityText
-	vtkTextActor* IntTextActor = NULL;
+	vtkTextActor* IntTextActor = nullptr;
 
 	// Overlay
-	Overlay* SegmentationOverlay = NULL;
+	Overlay* SegmentationOverlay = nullptr;
+	vtkImageMapToWindowLevelColors* OverlayWindowLevel = nullptr;
+	vtkImageActor* OverlayActor = nullptr;
 
 	//Cursor
-	vtkCursor3D*		 Cursor3D = NULL;
-	vtkPolyDataMapper* CursorMapper = NULL;
-	vtkActor*			 CursorActor = NULL;
-	virtual void InitializeCursorBoundary();
+	vtkCursor3D*		 Cursor3D = nullptr;
+	vtkPolyDataMapper* CursorMapper = nullptr;
+	vtkActor*			 CursorActor = nullptr;
 
 	//Label and Annotation
-	vtkImageMapToWindowLevelColors* OverlayWindowLevel = NULL;
-	vtkImageActor* OverlayActor = NULL;
-	vtkRenderer* AnnotationRenderer = NULL;
+	vtkRenderer* AnnotationRenderer = nullptr;
 
 	// LookupTable for OverlayActor
-	vtkLookupTable* LookupTable = NULL;
+	vtkLookupTable* LookupTable = nullptr;
 
 
-	//Parameter
-	double DefaultWindowLevel[2] = { 0 };
+	////Parameter
+	//double DefaultWindowLevel[2] = { 0 };
 
 	// All Black flag
 	bool AllBlackFlag = false;
@@ -205,5 +263,14 @@ protected:
 private:
 	MyImageViewer(const MyImageViewer&);  // Not implemented.
 	void operator=(const MyImageViewer&);  // Not implemented.
+	inline vtkAlgorithm* GetInputAlgorithm() {
+		return vtkImageViewer2::GetInputAlgorithm(); }
+	inline vtkInformation* GetInputInformation() { 
+		return vtkImageViewer2::GetInputInformation(); }
+	inline void SetInputConnection(vtkAlgorithmOutput* input) {
+		return vtkImageViewer2::SetInputConnection(input);
+	}
+
+
 };
 #endif // !__MYIMAGEVIEWER_H__

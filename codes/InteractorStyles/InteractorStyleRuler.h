@@ -15,13 +15,11 @@ class InteractorStyleRuler :
 	public InteractorStyleNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleRuler, InteractorStyleNavigation);
+	//vtkTypeMacro(InteractorStyleRuler, InteractorStyleNavigation);
 	static InteractorStyleRuler* New();
 	void SetDistanceWidgetEnabled(bool flag);
 	void EnableMaximumWallThickneesLabel(bool flag);
-	void SetCurrentSlice(int slice);
 	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-	void AddSynchronalRuler(InteractorStyleRuler* ruler);
 
 protected:
 	InteractorStyleRuler();

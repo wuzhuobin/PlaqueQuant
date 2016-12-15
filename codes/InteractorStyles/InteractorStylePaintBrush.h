@@ -20,7 +20,7 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_PAINTBRUSH_H
 #define INTERACTOR_STYLE_PAINTBRUSH_H
 
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 
 //Extra
@@ -32,7 +32,7 @@ Copyright (C) 2016
 // Our codes
 
 
-class InteractorStylePaintBrush : public AbstractInteractorStyleImage
+class InteractorStylePaintBrush : public AbstractNavigation
 {
 public:
 	enum BRUSH_SHAPE
@@ -40,17 +40,17 @@ public:
 		SQUARE = 0,
 		CIRCLE = 1
 	};
-	vtkTypeMacro(InteractorStylePaintBrush, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStylePaintBrush, AbstractNavigation);
 	static InteractorStylePaintBrush* New();
-	void SetPaintBrushModeEnabled(bool b);
-	void SetPaintBrushLabel(int paintBrushLabel);
-	void SetDrawColor(int r, int g, int b);
-	void SetDrawColor(const int* rgb);
-	void SetDrawOpacity(int opacity);
+	virtual void SetPaintBrushModeEnabled(bool b);
+	virtual void SetPaintBrushLabel(int paintBrushLabel);
+	virtual void SetDrawColor(int r, int g, int b);
+	virtual void SetDrawColor(const int* rgb);
+	virtual void SetDrawOpacity(int opacity);
 
-	void SetBrushShape(int brushShape);
-	void SetBrushSize(int size);
-	void EnableEraserMode(bool flag);
+	virtual void SetBrushShape(int brushShape);
+	virtual void SetBrushSize(int size);
+	virtual void EnableEraserMode(bool flag);
 
 
 protected:
@@ -99,11 +99,6 @@ private:
 	int m_brushShape = SQUARE;
 	bool m_eraserModeFlag = false;
 
-	////PaintBrush
-	//QComboBox*  m_drawBrushShapeComboBox;
-	//QSpinBox*	m_drawBrushSizeSpinBox;
-	//QCheckBox*	m_drawVolumetricCheckBox;
-	//QCheckBox*	m_drawIsotropicCheckBox;
 };
 
 

@@ -21,34 +21,41 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE_WINDOW_LEVEL_H
 #define INTERACTOR_STYLE_WINDOW_LEVEL_H
 #include <vtkInteractorStyleImage.h>
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 
-class InteractorStyleWindowLevel : public AbstractInteractorStyleImage
+class InteractorStyleWindowLevel : public AbstractNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleWindowLevel, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStyleWindowLevel, AbstractNavigation);
 	static InteractorStyleWindowLevel* New();
-	//void SetWindowLevelSpinBox(QDoubleSpinBox* w, QDoubleSpinBox* l);
+
+	virtual void SetWindowLevelModeEnabled(bool flag);
 
 	virtual void SetWindow(double window);
 	virtual void SetLevel(double level);
 	virtual void SetWindowLevel(double window, double level);
+	virtual void WindowLevel();
 
 protected:
 	InteractorStyleWindowLevel();
 	~InteractorStyleWindowLevel();
 
 	virtual void OnMouseMove();
+	virtual void OnLeftButtonDown();
+	virtual void OnLeftButtonUp();
 	virtual void OnKeyPress();
+	virtual void OnKeyDown();
+	virtual void OnKeyRelease();
+	virtual void OnKeyUp();
 	virtual void OnChar();
 
 private:
-	void WindowLevel();
 	double m_window;
 	double m_level;
-	//QDoubleSpinBox* m_wlDoubleSpinBox[2];
-
+	
+	bool m_windowLevelEnabledFlag = false;
+	vtkImageProperty* propertyTMP = nullptr;
 
 };
 

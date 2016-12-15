@@ -1,5 +1,10 @@
 #include "ImageRegistration.h"
 
+typedef float										PixelType;
+const static unsigned int							ImageDimension = 3;
+typedef itk::Image< PixelType, ImageDimension >		ImageType;
+typedef itk::VersorRigid3DTransform <double>									TransformType;		//TransformType
+
 ImageRegistration::ImageRegistration(QObject* parent) : QObject(parent)
 {
 	m_fixedImage	 = NULL;

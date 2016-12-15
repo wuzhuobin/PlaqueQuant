@@ -2,13 +2,13 @@
 
 using namespace itk;
 MyImageManager::MyImageManager(QObject* parent)
-	:overlay(new Overlay(parent)), QObject(parent)
+	:QObject(parent)
 {
+	overlay = new Overlay(parent);
 }
 
 MyImageManager::~MyImageManager()
 {
-	delete overlay;
 	allClear();
 }
 
@@ -20,11 +20,6 @@ int MyImageManager::getNumberOfImages()
 			++num;
 	}
 	return num;
-}
-
-QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfViewerInputImages()
-{
-	return this->listOfVtkViewerInputImages;
 }
 
 const QList<vtkSmartPointer<vtkImageData>> MyImageManager::getListOfVtkImages()
@@ -75,7 +70,8 @@ Overlay* MyImageManager::getOverlay()
 int MyImageManager::GetModalityIndex(QString modalityName)
 {
 	for (int i = 0; i < this->getListOfModalityNames().size(); ++i) {
-		if (modalityName == this->getListOfModalityNames()[i] && this->getListOfViewerInputImages()[i] != NULL) {
+		if (modalityName == this->getListOfModalityNames()[i] &&
+			this->getListOfVtkImages()[i] != NULL) {
 			return i;
 		} else 
 			continue;
@@ -97,7 +93,7 @@ void MyImageManager::allClear()
 	}
 
 	this->listOfItkImages.clear();
-	this->listOfVtkViewerInputImages.clear();
+	//this->listOfVtkViewerInputImages.clear();
 	this->listOfVtkImages.clear();
 	this->listOfDICOMHeader.clear();
 	this->listOfModalityNames.clear();

@@ -31,7 +31,7 @@ vtkStandardNewMacro(InteractorStylePaintBrush);
 #define SEGMENTATION_SQUARE 0
 
 InteractorStylePaintBrush::InteractorStylePaintBrush()
-	:AbstractInteractorStyleImage()
+	:AbstractNavigation()
 {
 
 
@@ -80,6 +80,7 @@ void InteractorStylePaintBrush::SetDrawColor(const int* rgb)
 {
 	SetDrawColor(rgb[0], rgb[1], rgb[2]);
 }
+
 void InteractorStylePaintBrush::SetDrawOpacity(int opacity)
 {
 	this->m_opacity = opacity;
@@ -136,18 +137,13 @@ void InteractorStylePaintBrush::OnLeftButtonDown()
 	//	return;
 
 	// Project picked world point to plane and obtain ijk index
-	double index[3];
 	if (m_imageViewer->GetInput() != NULL) {
 		picked[GetSliceOrientation()] = GetOrigin()[GetSliceOrientation()] + GetSlice() * GetSpacing()[GetSliceOrientation()];
 		for (int i = 0; i < 3; i++)
 		{
-			index[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i];
+			draw_index_old[i] = (picked[i] - GetOrigin()[i]) / GetSpacing()[i] + 0.5;
 		}
 	}
-	draw_index_old[0] = (int)(index[0] + 0.5);
-	draw_index_old[1] = (int)(index[1] + 0.5);
-	draw_index_old[2] = (int)(index[2] + 0.5);
-	// 
 	if (m_rightFunctioning == true)
 	{
 		m_rightFunctioning = false;
@@ -176,7 +172,7 @@ void InteractorStylePaintBrush::OnRightButtonUp()
 		this->Render();
 		m_isDraw = true;
 	}
-	AbstractInteractorStyleImage::OnRightButtonUp();
+	AbstractNavigation::OnRightButtonUp();
 }
 
 void InteractorStylePaintBrush::OnRightButtonDown()
@@ -229,7 +225,7 @@ void InteractorStylePaintBrush::OnRightButtonDown()
 	this->Draw(false);
 	this->Render();
 	m_rightFunctioning = true;
-	AbstractInteractorStyleImage::OnRightButtonDown();
+	AbstractNavigation::OnRightButtonDown();
 }
 
 void InteractorStylePaintBrush::OnLeave()
@@ -238,7 +234,7 @@ void InteractorStylePaintBrush::OnLeave()
 		this->m_borderWidget->Off();
 	}
 
-	AbstractInteractorStyleImage::OnLeave();
+	AbstractNavigation::OnLeave();
 }
 
 void InteractorStylePaintBrush::OnMouseMove()
@@ -257,7 +253,7 @@ void InteractorStylePaintBrush::OnMouseMove()
 	this->Render();
 
 	if (!m_rightFunctioning && !m_leftFunctioning)
-		AbstractInteractorStyleImage::OnMouseMove();
+		AbstractNavigation::OnMouseMove();
 }
 
 
@@ -289,6 +285,8 @@ void InteractorStylePaintBrush::SetPaintBrushModeEnabled(bool b)
 
 	if (b)
 	{
+
+
 		m_retangleRep = vtkBorderRepresentation::New();
 		m_borderWidget = vtkBorderWidget::New();
 		m_borderWidget->SetInteractor(this->GetInteractor());
@@ -698,7 +696,7 @@ void InteractorStylePaintBrush::ReadfromImageData()
 				pos[0] = x;
 				pos[1] = y;
 				pos[2] = z;
-				double* val = static_cast<double *>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
+				unsigned char* val = static_cast<unsigned char*>(m_imageViewer->GetInputLayer()->GetScalarPointer(pos));
 				if (val == nullptr)
 					continue;
 				if (*val > 0) {
@@ -746,7 +744,7 @@ void InteractorStylePaintBrush::WriteToImageData()
 				pos[1] = y;
 				pos[2] = z;
 				pos[GetSliceOrientation()] = 0;
-				uchar* val = static_cast<uchar *>(m_brush->GetOutput()->GetScalarPointer(pos));
+				unsigned char* val = static_cast<unsigned char*>(m_brush->GetOutput()->GetScalarPointer(pos));
 				pixelval = 0;
 				if (val == nullptr)
 					continue;

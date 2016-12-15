@@ -5,9 +5,23 @@
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
+#include "itkImage.h"
+#include <itkLabelObject.h>
+#include <itkLabelMap.h>
+#include <itkLabelImageToLabelMapFilter.h>
+#include <itkLabelMapToLabelImageFilter.h>
+#include <itkMaskImageFilter.h>
+#include <itkOtsuThresholdImageFilter.h>
+#include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkInvertIntensityImageFilter.h>
+#include "itkConnectedComponentImageFilter.h"
+#include "itkLabelShapeKeepNObjectsImageFilter.h"
+#include <itkSubtractImageFilter.h>
+#include <itkChangeLabelImageFilter.h>
+#include "itkImageToVTKImageFilter.h"
+
 
 #include <SurfaceCreator.h>
-#include <Define.h>
 using namespace std;
 
 
@@ -15,6 +29,22 @@ using namespace std;
 
 class VesselSegmentation
 {
+	typedef itk::Image<float, 3>														FloatImageType;
+	typedef itk::Image< unsigned short, 3 >												UnsignedShortImageType;
+	typedef itk::LabelObject<unsigned long, 3>											LabelObjectType;
+	typedef itk::LabelMap<LabelObjectType>												LabelMapType;
+	typedef itk::LabelImageToLabelMapFilter<FloatImageType, LabelMapType>				LabelImageToLabelMapFilterType;
+	typedef itk::MaskImageFilter<FloatImageType, FloatImageType, FloatImageType>			MaskImageFilterType;
+	typedef itk::OtsuThresholdImageFilter<FloatImageType, FloatImageType>				OtsuThresholdImageFilterType;
+	typedef itk::OtsuMultipleThresholdsImageFilter<FloatImageType, FloatImageType>		OtsuMultipleThresholdsImageFilterType;
+	typedef itk::InvertIntensityImageFilter<FloatImageType, FloatImageType>				InvertIntensityImageFilterType;
+	typedef itk::ConnectedComponentImageFilter<FloatImageType, UnsignedShortImageType>	ConnectedComponentImageFilterType;
+	typedef itk::LabelShapeKeepNObjectsImageFilter<UnsignedShortImageType>				LabelShapeKeepNObjectsImageFilterType;
+	typedef itk::ChangeLabelImageFilter<FloatImageType, FloatImageType>					ChangeLabelImageFilterType;
+	typedef itk::SubtractImageFilter<FloatImageType, FloatImageType>						SubtractImageFilterType;
+	typedef itk::ImageToVTKImageFilter<FloatImageType>									ImageToVTKImageType;
+	typedef itk::BinaryThresholdImageFilter<FloatImageType, FloatImageType>								BinarThresholdImageFilterType;
+
 public:
 	VesselSegmentation();
 	~VesselSegmentation();

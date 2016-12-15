@@ -23,14 +23,13 @@ Copyright (C) 2016
 
 #include <list>
 
-#include "InteractorStyleNavigation.h"
-#include "InteractorStyleWindowLevel.h"
-#include "InteractorStylePolygonDraw.h"
-#include "InteractorStylePaintBrush.h"
-#include "InteractorStyleROI.h"
-#include "InteractorStyleRuler.h"
-#include "InteractorStyleSmartContour.h"
-#include "InteractorStyleSmartContour2.h"
+#include "QInteractorStyleNavigation.h"
+#include "QInteractorStyleWindowLevel.h"
+#include "QInteractorStyleVesselSegmentation.h"
+#include "QInteractorStyleLumenSeedsPlacer.h"
+#include "QInteractorStylePaintBrush.h"
+#include "QInteractorStyleROI.h"
+#include "QInteractorStyleRuler.h"
 #include "StyleSwitchMacro.h"
 
 class InteractorStyleSwitch : public vtkInteractorStyleSwitchBase
@@ -40,44 +39,38 @@ public:
 	static InteractorStyleSwitch* New();
 
 	vtkGetMacro(InteractorStyleTesting, vtkInteractorStyleImage*);
-	vtkGetMacro(WindowLevel, InteractorStyleWindowLevel*);
-	vtkGetMacro(Navigation, InteractorStyleNavigation*);
-	vtkGetMacro(PolygonDraw, InteractorStylePolygonDraw*);
-	vtkGetMacro(PaintBrush, InteractorStylePaintBrush*);
-	vtkGetMacro(ROI, InteractorStyleROI*);
-	vtkGetMacro(Ruler, InteractorStyleRuler*);
-	vtkGetMacro(SmartContour, InteractorStyleSmartContour*);
-	vtkGetMacro(SmartContour2, InteractorStyleSmartContour2*);
+	vtkGetMacro(WindowLevel, QInteractorStyleWindowLevel*);
+	vtkGetMacro(Navigation, QInteractorStyleNavigation*);
+	vtkGetMacro(PolygonDraw, QInteractorStyleVesselSegmentation*);
+	vtkGetMacro(SeedsPlacer, QInteractorStyleLumenSeedsPlacer*);
+	vtkGetMacro(PaintBrush, QInteractorStylePaintBrush*);
+	vtkGetMacro(ROI, QInteractorStyleROI*);
+	vtkGetMacro(Ruler, QInteractorStyleRuler*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
 	SetInteractorStyleMacro(InteractorStyleTesting);
 	SetInteractorStyleMacro(Navigation);
+	//void SetInteractorStyleToNavigation();
 	SetInteractorStyleMacro(WindowLevel);
 	SetInteractorStyleMacro(PolygonDraw);
+	SetInteractorStyleMacro(SeedsPlacer);
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
 	SetInteractorStyleMacro(Ruler);
-	SetInteractorStyleMacro(SmartContour);
-	SetInteractorStyleMacro(SmartContour2);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
 	CurrentStyleMacro(WindowLevel);
 	CurrentStyleMacro(PolygonDraw);
+	CurrentStyleMacro(SeedsPlacer);
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
 	CurrentStyleMacro(Ruler);
-	CurrentStyleMacro(SmartContour);
-	CurrentStyleMacro(SmartContour2);
 
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
 	virtual void SetImageViewer(MyImageViewer* m_imageViewer);
-	virtual void AddSynchronalViewer(MyImageViewer * imageViewer);
-	virtual void SetSynchronalViewers(std::list<MyImageViewer*> synchronalViewers);
-	virtual void SetCurrentSlice(int slice);
-	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 	virtual void SetEnabled(int);
 	virtual void SetEnabledOn();
@@ -93,14 +86,13 @@ protected:
 private:
 
 	vtkInteractorStyleImage* InteractorStyleTesting;
-	InteractorStyleNavigation*	Navigation;
-	InteractorStyleWindowLevel* WindowLevel;
-	InteractorStylePolygonDraw* PolygonDraw;
-	InteractorStylePaintBrush*	PaintBrush;
-	InteractorStyleROI* ROI;
-	InteractorStyleRuler* Ruler;
-	InteractorStyleSmartContour* SmartContour;
-	InteractorStyleSmartContour2* SmartContour2;
+	QInteractorStyleNavigation*	Navigation;
+	QInteractorStyleWindowLevel* WindowLevel;
+	QInteractorStyleVesselSegmentation* PolygonDraw;
+	QInteractorStyleLumenSeedsPlacer* SeedsPlacer;
+	QInteractorStylePaintBrush*	PaintBrush;
+	QInteractorStyleROI* ROI;
+	QInteractorStyleRuler* Ruler;
 	vtkInteractorStyle*	CurrentStyle;
 	std::list<vtkInteractorStyle*> allStyles;
 };

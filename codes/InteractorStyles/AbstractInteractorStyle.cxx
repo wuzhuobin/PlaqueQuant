@@ -16,28 +16,14 @@ Copyright (C) 2016
 
 #include "AbstractInteractorStyle.h"
 
-#include <vtkSmartPointer.h>
-
+std::list<AbstractInteractorStyle*> AbstractInteractorStyle::m_abstractInteractorStyles;
 
 AbstractInteractorStyle::AbstractInteractorStyle() {
-	m_rightFunctioning = false;
-	m_leftFunctioning = false;
-	m_middleFunctioning = false;
+	m_abstractInteractorStyles.push_back(this);
 }
 
 AbstractInteractorStyle::~AbstractInteractorStyle() {
-
-}
-
-
-int AbstractInteractorStyle::GetOrientation()
-{
-	return m_orientation;
-}
-
-void AbstractInteractorStyle::SetOrientation(int i)
-{
-	m_orientation = i;
+	m_abstractInteractorStyles.remove(this);
 }
 
 void AbstractInteractorStyle::OnLeftButtonDown()
@@ -60,9 +46,17 @@ void AbstractInteractorStyle::OnLeftButtonUp()
 	m_leftFunctioning = false;
 }
 
+void AbstractInteractorStyle::OnLeftDoubleClick()
+{
+}
+
 void AbstractInteractorStyle::OnRightButtonUp()
 {
 	m_rightFunctioning = false;
+}
+
+void AbstractInteractorStyle::OnRightDoubleClick()
+{
 }
 
 void AbstractInteractorStyle::OnMiddleButtonUp()
@@ -70,7 +64,6 @@ void AbstractInteractorStyle::OnMiddleButtonUp()
 	m_middleFunctioning = false;
 }
 
-vtkActor * AbstractInteractorStyle::PickActor(int x, int y)
+void AbstractInteractorStyle::OnMiddleDoubleClick()
 {
-	return NULL;
 }

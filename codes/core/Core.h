@@ -1,36 +1,34 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
-#include <QWidget>
+#include <qobject.h>
 
 #include <vtkSmartPointer.h>
 
 #include "MyImageViewer.h"
 #include "InteractorStyleSwitch.h"
 #include "InteractorStyleSwitch3D.h"
-#include "LumenExtraction.h"
 #include "MyImageManager.h"
 #include "IOManager.h"
-#include "MyWidgetManager.h"
 
 
-class Core:public QWidget
+class Core:public QObject
 {
 	Q_OBJECT
 public:
 	Core(QWidget* parent = nullptr);
+	Core(QObject* parent = nullptr, QWidget* mainWindow = nullptr);
 	~Core();
 
 	void Initialization();
 
 	// Get functions
 	vtkSmartPointer<vtkPolyData> GetCenterlinePD();
-	vtkSmartPointer<InteractorStyleSwitch> Get2DInteractorStyle(int);
+	InteractorStyleSwitch* Get2DInteractorStyle(int);
 	vtkLookupTable*		GetLookupTable();
 	vtkRenderWindow*	GetRenderWindow(int num);
 	IOManager*			GetIOManager();
 	MyImageManager*		GetMyImageManager();
-	MyWidgetManager*	GetMyWidgetManager();
 
 	void RenderAllViewer();
 	void DisplayErrorMessage(std::string str);
@@ -64,7 +62,7 @@ public:
 	};
 
 	const static int DEFAULT_IMAGE = 0;
-	const static int VIEWER_NUM = 3;
+	const static int NUMBER_OF_2DVIEWERS = 3;
 
 	int* ConvertBoundsToExtent(double* bounds, bool clamping = true);
 	double* ConvertExtentToBounds(int* extent);
@@ -84,59 +82,14 @@ public:
 	virtual void slotMultiPlanarView();
 	virtual void slotChangeView(int viewMode);
 
-	// Viewers's slice position
-	virtual void slotChangeSlice(int slice);
-	virtual void slotChangeSlices(int* ijk);
-	virtual void slotChangeSlices(int, int, int);
-	virtual void slotChangeSliceX(int x);
-	virtual void slotChangeSliceY(int y);
-	virtual void slotChangeSliceZ(int z);
-	virtual void slotChangeFocalPointWithImageCoordinate(int i, int j, int k);
-
 	// mode stuff
 	virtual void slotNavigationMode();
 	virtual void slotWindowLevelMode();
 	virtual void slotBrushMode();
 	virtual void slotContourMode();
 	virtual void slotROIMode();
-	virtual void slotSmartContourMode();
-	virtual void slotSmartContour2Mode();
+	virtual void slotSeedsPlacerMode();
 	virtual void slotRulerMode();
-
-	// Paint Brush 
-	virtual void slotSetBrushSize(int size);
-	virtual void slotSetBrushShape(int shape);
-	virtual void slotSetPaintBrushToEraser(bool flag);
-	// set layer color actually both Contour and paintBrush depend on it
-	virtual void slotSetImageLayerColor(int layer);
-
-	// Semi-Auto Lumen Segmenation 
-	virtual void slotFillContour();
-	virtual void slotClearContour();
-	virtual void slotEnableAutoLumenSegmentation(bool flag);
-	virtual void slotSetContourFilterGenerateValues(int generateValues);
-	virtual void slotSetLineInterpolatorToSmoothCurve(bool flag);
-	virtual void slotSetLineInterpolatorToPolygon(bool flag);
-
-	// Lumen Extraction
-	virtual void slotExtractLumen();
-	virtual void slotExtractLumenDilateLabel(vtkImageData*);
-	virtual void slotSetExtractLumenSeedList(std::vector<int *>);
-	virtual void slotSetExtractLumenInputImage(vtkImageData*);
-	virtual void slotSetExtractLumenDilationValue(int val);
-	virtual void slotSetExtractLumenInitialNeighborhoodRadius(int val);
-	virtual void slotSetExtractLumenMultiplier(double);
-	virtual void slotDrawSegmentation();
-
-	// ROI 
-	virtual void slotChangeROI();
-	virtual void slotSelectROI();
-	virtual void slotResetROI();
-	
-	// Ruler
-	virtual void slotEnableMaximumWallThickneesLabel(bool flag);
-
-
 
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();
@@ -151,34 +104,23 @@ signals:
 	void signalVisualizeAllViewers();
 	void signalMultiPlanarView();
 	void signalSegmentationView();
-	void signalChangeSliceX(int);
-	void signalChangeSliceY(int);
-	void signalChangeSliceZ(int);
 
 private:
-	void ModeChangeUpdate(INTERACTION_MODE);
-
 	// viewer
-	vtkSmartPointer<MyImageViewer> m_2DimageViewer[VIEWER_NUM];
-	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[VIEWER_NUM];
-	vtkSmartPointer<InteractorStyleSwitch> m_style[VIEWER_NUM];
+	vtkSmartPointer<MyImageViewer> m_2DimageViewer[NUMBER_OF_2DVIEWERS];
+	vtkSmartPointer<vtkRenderWindowInteractor> m_interactor[NUMBER_OF_2DVIEWERS];
+	vtkSmartPointer<InteractorStyleSwitch> m_style[NUMBER_OF_2DVIEWERS];
 	vtkRenderWindow*			m_3DimageViewer;
 	vtkRenderer*				m_3DDataRenderer;
 	vtkRenderer*				m_3DAnnotationRenderer;
 	vtkRenderWindowInteractor*  m_3Dinteractor;
 	InteractorStyleSwitch3D*	m_style3D;
 
-	// widget
-	MyWidgetManager* m_widgetManager = NULL;
-
 	// Data
 	MyImageManager* m_imageManager;
 	IOManager*		m_ioManager;
 	vtkSmartPointer<vtkPolyData> m_centerlinePD;
 
-
-	// Filter
-	LumenExtraction* m_lumenExtractionFilter;
 
 
 	bool m_firstInitialize = true;

@@ -6,7 +6,13 @@
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "itkImage.h"
-#include "Define.h"
+#include "itkConfidenceConnectedImageFilter.h"
+#include <itkConnectedThresholdImageFilter.h>
+#include "itkBinaryBallStructuringElement.h"
+#include "itkImageToVTKImageFilter.h"
+#include <itkVTKImageToImageFilter.h>
+
+
 
 using namespace std;
 
@@ -17,6 +23,21 @@ using namespace std;
 
 class LumenExtraction
 {
+	// For Lumen extraction
+	typedef float										PixelType;
+	const static unsigned int							ImageDimension = 3;
+	typedef itk::Image< PixelType, ImageDimension >		ImageType;
+	typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
+
+	typedef unsigned char							LabelPixelType;
+	typedef itk::Image<LabelPixelType, 3>			LabelImageType;
+	typedef itk::ImageToVTKImageFilter<ImageType>		ConnectorType;
+	typedef itk::VTKImageToImageFilter<ImageType>	VTKImageToImageType;
+	typedef itk::BinaryBallStructuringElement<	ImageType::PixelType, 2>                  StructuringElementType;
+	typedef itk::CastImageFilter<ImageType, LabelImageType> ImageToLabelImageCastFilterType;
+	typedef itk::CastImageFilter<LabelImageType, ImageType> LabelImageToImageCastFilterType;
+	typedef itk::ConnectedThresholdImageFilter< ImageType, ImageType > ConnectedThresholdImageFilterType;
+	typedef itk::ConfidenceConnectedImageFilter<ImageType, ImageType> ConfidenceConnectedFilterType;
 public:
 	LumenExtraction();
 	~LumenExtraction();

@@ -68,26 +68,10 @@ void InteractorStyleRuler::EnableMaximumWallThickneesLabel(bool flag)
 	UpdateMaximumWallThicknessLabel();
 }
 
-void InteractorStyleRuler::SetCurrentSlice(int slice)
-{
-	InteractorStyleNavigation::SetCurrentSlice(slice);
-	
-}
-
 void InteractorStyleRuler::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	InteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	for (std::list<InteractorStyleRuler*>::const_iterator cit = rulers.cbegin();
-		cit != rulers.cend(); ++cit) {
-		(*cit)->UpdateMaximumWallThicknessLabel();
-	}
-}
-
-void InteractorStyleRuler::AddSynchronalRuler(InteractorStyleRuler * ruler)
-{
-	if (std::find(rulers.cbegin(), rulers.cend(), ruler) == rulers.cend()) {
-		rulers.push_back(ruler);
-	}
+	STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleRuler, UpdateMaximumWallThicknessLabel());
 }
 
 InteractorStyleRuler::~InteractorStyleRuler()
@@ -122,10 +106,11 @@ void InteractorStyleRuler::UpdateMaximumWallThicknessLabel()
 		return;
 	}
 	int currentSlice = GetSlice();
+	m_imageViewer->GetOverlay()->Measure2D(currentSlice);
 
 	MaximumWallThickness* maximumWallThickness =
 		m_imageViewer->GetOverlay()->GetMeasurementFor2D(currentSlice).mwt;
-	if (m_imageViewer->GetOverlay()->Get2DMeasurementsStrings(currentSlice)[4] != "Normal") {
+	if ((m_imageViewer->GetOverlay()->Get2DMeasurementsStrings(currentSlice))[4] != "Normal") {
 		if (m_imageViewer->GetAnnotationRenderer()->HasViewProp(this->m_lineActor)) {
 			m_imageViewer->GetAnnotationRenderer()->RemoveActor(this->m_lineActor);
 

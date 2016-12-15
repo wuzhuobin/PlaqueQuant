@@ -9,9 +9,6 @@
 #include <QActionGroup>
 #include <QMenu>
 
-
-#include "ui_MainWindow.h"
-
 #include <vtkPolyData.h>
 
 //Own Class
@@ -20,7 +17,7 @@
 #include "IOManager.h"
 #include "Core.h"
 
-
+namespace Ui { class MainWindow; }
 class ModuleWidget;
 class MeasurementWidget;
 class MainWindow : public QMainWindow
@@ -79,11 +76,13 @@ public slots:
 	//Visualization
 	bool slotVisualizeImage();
 
+	virtual void slotChangeMode(QAction* action);
+
 
 
 private:
 	//UI
-	Ui_MainWindow* ui;
+	Ui::MainWindow* ui;
 	void setActionsEnable(bool b);
 
 	//menu for changing images

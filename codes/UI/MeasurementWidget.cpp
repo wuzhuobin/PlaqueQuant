@@ -4,12 +4,15 @@
 #include <QFileInfo>
 
 #include <vtkWindowToImageFilter.h>
+#include <vtkRenderWindow.h>
 #include <vtkImageResize.h>
 #include <vtkPNGWriter.h>
 
 #include "Overlay.h"
 #include "ReportGenerator.h"
 #include "MainWindow.h"
+#include "ui_MainWindow.h"
+#include "ui_QAbstractNavigation.h"
 
 MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent) 
 {
@@ -31,7 +34,8 @@ MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent)
 		this, SLOT(slotUpdate3DMeasurements()));
 	connect(overlay, SIGNAL(signalOverlayUpdated()),
 		this, SLOT(slotUpdate2DMeasurements()));
-	connect(core, SIGNAL(signalChangeSliceZ(int)),
+	connect(core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetNavigation()->
+		QAbstractNavigation::getUi()->sliceHorizontalSliderZ, SIGNAL(valueChanged(int)),
 		this, SLOT(slotUpdate2DMeasurements(int)));
 
 	// generate report
@@ -41,12 +45,6 @@ MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent)
 
 MeasurementWidget::~MeasurementWidget() {
 	
-}
-
-void MeasurementWidget::setMainWindow(MainWindow * mainWnd)
-{
-	m_mainWnd = mainWnd;
-
 }
 
 void MeasurementWidget::slotUpdate3DMeasurements()
@@ -66,7 +64,7 @@ void MeasurementWidget::slotUpdate3DMeasurements()
 
 void MeasurementWidget::slotUpdate2DMeasurements()
 {
-	slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
+	//slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
 }
 
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)
@@ -74,12 +72,11 @@ void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 	m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure2D(slice);
 	QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->
 		Get2DMeasurementsStrings(slice);
-
 	for (int i = 0; i < 4; ++i) {
-		ui.measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem(_2DMeasurements[i]));
+		ui.measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem((_2DMeasurements)[i]));
 	}
 
-	ui.MWTTextBrowser->setText(_2DMeasurements[4]);
+	ui.MWTTextBrowser->setText((_2DMeasurements)[4]);
 }
 
 void MeasurementWidget::slotUpdateImformation()
@@ -179,6 +176,7 @@ void MeasurementWidget::GenerateReport()
 	writer->Update();
 	writer->Write();
 	//3d
+
 	windowToImageFilter->SetInput(m_mainWnd->GetRenderWindow(4));
 	writer->SetFileName(_3dResult.toStdString().c_str());
 	writer->Update();

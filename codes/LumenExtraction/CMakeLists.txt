@@ -17,17 +17,6 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
-if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
-  # Instruct CMake to run moc automatically when needed.
-  # set(CMAKE_AUTOMOC ON)
-  find_package(Qt5PrintSupport REQUIRED)
-  find_package(Qt5Widgets REQUIRED QUIET)
-  # add_definitions(-DQT5_IS_LOADED)
-else()
-  find_package(Qt4 REQUIRED)
-  include(${QT_USE_FILE})
-endif()
-
 #link other libraries
 link_directories(
 	${PROJECT_SOURCE_DIR}/lib
@@ -40,39 +29,51 @@ include_directories(
 set(
     LUMENEXTRATION_SRC
 	${PROJECT_SOURCE_DIR}/LumenExtraction.cpp
+	${PROJECT_SOURCE_DIR}/LumenExtractionFilter.cpp
+	
 )
 
 set(
 	LUMENEXTRATION_INC
 	${PROJECT_SOURCE_DIR}/LumenExtraction.h
+	${PROJECT_SOURCE_DIR}/LumenExtractionFilter.h
+	${PROJECT_SOURCE_DIR}/LumenExtractionFilter.hxx
 )
 
 
 
 add_library(
 	LumenExtraction 
+	SHARED
 	${LUMENEXTRATION_SRC}
 	${LUMENEXTRATION_INC}
 	)
-
-add_executable(
-    LumenExtraction_test
-    main.cpp
-)
 
 #link libraries
 target_link_libraries(
 	LumenExtraction
 	${ITK_LIBRARIES}  
 	${VTK_LIBRARIES}
-	Qt5::Core 
-
 	)
+
+set_target_properties(
+    LumenExtraction
+    PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS 
+    true
+    # RUNTIME_OUTPUT_DIRECTORY
+	# ${CMAKE_SOURCE_DIR}/bin
+)
+
+add_executable(
+    LumenExtraction_test
+    main.cpp
+)
+
 target_link_libraries(
 	LumenExtraction_test
 	${ITK_LIBRARIES}  
 	${VTK_LIBRARIES}
-	Qt5::Core 
 	LumenExtraction
 	)
 #Grouping in MSVC

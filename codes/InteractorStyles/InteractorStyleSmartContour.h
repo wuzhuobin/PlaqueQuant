@@ -18,7 +18,7 @@ Copyright (C) 2016
 #ifndef INTERACTOR_STYLE__NAVIGATION_H
 #define INTERACTOR_STYLE__NAVIGATION_H
 
-#include "AbstractInteractorStyleImage.h"
+#include "AbstractNavigation.h"
 
 #include <vtkEvent.h>
 #include <vtkSeedWidget.h>
@@ -76,10 +76,10 @@ protected:
 	static void CompletedAction(vtkAbstractWidget *w) {};
 };
 
-class InteractorStyleSmartContour : public AbstractInteractorStyleImage
+class InteractorStyleSmartContour : public AbstractNavigation
 {
 public:
-	vtkTypeMacro(InteractorStyleSmartContour, AbstractInteractorStyleImage);
+	vtkTypeMacro(InteractorStyleSmartContour, AbstractNavigation);
 	static InteractorStyleSmartContour* New();
 
 	void SetSmartContourEnable(bool flag);
