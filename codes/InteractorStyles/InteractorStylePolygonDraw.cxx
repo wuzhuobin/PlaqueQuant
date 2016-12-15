@@ -48,8 +48,6 @@ InteractorStylePolygonDraw::~InteractorStylePolygonDraw()
 void InteractorStylePolygonDraw::OnLeftButtonDown()
 {
 	AbstractNavigation::OnLeftButtonDown();
-	if (m_leftDoubleClick) {
-	}
 }
 
 void InteractorStylePolygonDraw::OnRightButtonDown()

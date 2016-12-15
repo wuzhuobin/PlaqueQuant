@@ -46,12 +46,24 @@ void AbstractInteractorStyle::OnLeftButtonUp()
 	m_leftFunctioning = false;
 }
 
+void AbstractInteractorStyle::OnLeftDoubleClick()
+{
+}
+
 void AbstractInteractorStyle::OnRightButtonUp()
 {
 	m_rightFunctioning = false;
 }
 
+void AbstractInteractorStyle::OnRightDoubleClick()
+{
+}
+
 void AbstractInteractorStyle::OnMiddleButtonUp()
 {
 	m_middleFunctioning = false;
+}
+
+void AbstractInteractorStyle::OnMiddleDoubleClick()
+{
 }

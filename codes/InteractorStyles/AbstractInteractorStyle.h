@@ -43,20 +43,15 @@ protected:
 	AbstractInteractorStyle();
 	virtual ~AbstractInteractorStyle();
 
-	virtual void OnMouseWheelForward() = 0;
-	virtual void OnMouseWheelBackward() = 0;
 	virtual void OnLeftButtonDown();
 	virtual void OnLeftButtonUp();
-	virtual void OnLeftDoubleClick() = 0;
+	virtual void OnLeftDoubleClick();
 	virtual void OnRightButtonDown();
 	virtual void OnRightButtonUp();
-	virtual void OnRightDoubleClick() = 0;
+	virtual void OnRightDoubleClick();
 	virtual void OnMiddleButtonDown();
 	virtual void OnMiddleButtonUp();
-	virtual void OnMiddleDoubleClick() = 0;
-	virtual void OnMouseMove() = 0;
-	virtual void OnChar() = 0;
-	virtual void OnKeyPress() = 0;
+	virtual void OnMiddleDoubleClick();
 
 
 
@@ -64,9 +59,9 @@ protected:
 	bool m_leftFunctioning = false;
 	bool m_middleFunctioning = false;
 
-	unsigned short NumberOfLeftClicks = 0;
-	unsigned short NumberOfRightClicks = 0;
-	unsigned short NumberOfMiddleClicks = 0;
+	unsigned short m_numberOfLeftClicks = 0;
+	unsigned short m_numberOfRightClicks = 0;
+	unsigned short m_numberOfMiddleClicks = 0;
 
 	static std::list<AbstractInteractorStyle*> m_abstractInteractorStyles;
 

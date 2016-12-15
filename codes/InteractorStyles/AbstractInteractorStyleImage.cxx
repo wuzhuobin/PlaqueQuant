@@ -123,17 +123,17 @@ void AbstractInteractorStyleImage::OnMouseWheelBackward()
 
 void AbstractInteractorStyleImage::OnLeftButtonDown()
 {
-	this->NumberOfLeftClicks++;
+	this->m_numberOfLeftClicks++;
 
 	// Reset numClicks - If mouse moved further than resetPixelDistance
 	if (CheckMoveDistance())
 	{
-		this->NumberOfLeftClicks = 1;
+		this->m_numberOfLeftClicks = 1;
 	}
-	if (this->NumberOfLeftClicks == 2)
+	if (this->m_numberOfLeftClicks == 2)
 	{
 		OnLeftDoubleClick();
-		this->NumberOfLeftClicks = 0;
+		this->m_numberOfLeftClicks = 0;
 	}
 	AbstractInteractorStyle::OnLeftButtonDown();
 	//vtkInteractorStyleImage::OnLeftButtonDown();
@@ -151,19 +151,19 @@ void AbstractInteractorStyleImage::OnLeftDoubleClick()
 
 void AbstractInteractorStyleImage::OnRightButtonDown()
 {
-	this->NumberOfRightClicks++;
+	this->m_numberOfRightClicks++;
 
 	// Reset numClicks - If mouse moved further than resetPixelDistance
 	if (CheckMoveDistance())
 	{
-		this->NumberOfRightClicks = 1;
+		this->m_numberOfRightClicks = 1;
 	}
 
 
-	if (this->NumberOfRightClicks == 2)
+	if (this->m_numberOfRightClicks == 2)
 	{
 		OnRightDoubleClick();
-		this->NumberOfRightClicks = 0;
+		this->m_numberOfRightClicks = 0;
 	}
 
 	AbstractInteractorStyle::OnRightButtonDown();
@@ -182,19 +182,19 @@ void AbstractInteractorStyleImage::OnRightDoubleClick()
 
 void AbstractInteractorStyleImage::OnMiddleButtonDown()
 {
-	this->NumberOfMiddleClicks++;
+	this->m_numberOfMiddleClicks++;
 
 	// Reset numClicks - If mouse moved further than resetPixelDistance
 	if (CheckMoveDistance())
 	{
-		this->NumberOfMiddleClicks = 1;
+		this->m_numberOfMiddleClicks = 1;
 	}
 
 
-	if (this->NumberOfMiddleClicks == 2)
+	if (this->m_numberOfMiddleClicks == 2)
 	{
 		OnMiddleDoubleClick();
-		this->NumberOfMiddleClicks = 0;
+		this->m_numberOfMiddleClicks = 0;
 	}
 	AbstractInteractorStyle::OnMiddleButtonDown();
 	vtkInteractorStyleImage::OnMiddleButtonDown();
