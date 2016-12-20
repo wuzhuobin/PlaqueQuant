@@ -4,9 +4,9 @@
 
 vtkStandardNewMacro(QInteractorStyleVesselSegmentation);
 QSETUP_UI_SRC(QInteractorStyleVesselSegmentation);
-void QInteractorStyleVesselSegmentation::UniqueEnable(bool flag)
+void QInteractorStyleVesselSegmentation::uniqueInvoke(bool flag)
 {
-	QAbstractNavigation::UniqueEnable(flag);
+	QAbstractNavigation::uniqueInvoke(flag);
 	if (flag && flag != initializationFlag) {
 		// turn on codes
 
@@ -45,7 +45,7 @@ void QInteractorStyleVesselSegmentation::UniqueEnable(bool flag)
 void QInteractorStyleVesselSegmentation::SetPolygonModeEnabled(bool flag)
 {
 	InteractorStyleVesselSegmentation::SetPolygonModeEnabled(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 void QInteractorStyleVesselSegmentation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {

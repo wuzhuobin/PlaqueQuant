@@ -17,7 +17,7 @@ using namespace std;
 void QInteractorStyleLumenSeedsPlacer::SetSeedsPlacerEnable(bool flag)
 {
 	InteractorStyleSeedsPlacer::SetSeedsPlacerEnable(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 
 void QInteractorStyleLumenSeedsPlacer::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
@@ -275,9 +275,9 @@ QInteractorStyleLumenSeedsPlacer::~QInteractorStyleLumenSeedsPlacer()
 
 }
 
-void QInteractorStyleLumenSeedsPlacer::UniqueEnable(bool flag)
+void QInteractorStyleLumenSeedsPlacer::uniqueInvoke(bool flag)
 {
-	QAbstractNavigation::UniqueEnable(flag);
+	QAbstractNavigation::uniqueInvoke(flag);
 
 	if (flag && flag != initializationFlag) {
 		// turn on codes

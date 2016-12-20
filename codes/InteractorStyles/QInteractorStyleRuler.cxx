@@ -7,9 +7,9 @@
 vtkStandardNewMacro(QInteractorStyleRuler);
 QSETUP_UI_SRC(QInteractorStyleRuler);
 
-void QInteractorStyleRuler::UniqueEnable(bool flag)
+void QInteractorStyleRuler::uniqueInvoke(bool flag)
 {
-	QAbstractNavigation::UniqueEnable(flag);
+	QAbstractNavigation::uniqueInvoke(flag);
 	if (flag && flag != initializationFlag) {
 		// turn on codes
 
@@ -43,7 +43,7 @@ void QInteractorStyleRuler::UniqueEnable(bool flag)
 void QInteractorStyleRuler::SetDistanceWidgetEnabled(bool flag)
 {
 	InteractorStyleRuler::SetDistanceWidgetEnabled(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 
 void QInteractorStyleRuler::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)

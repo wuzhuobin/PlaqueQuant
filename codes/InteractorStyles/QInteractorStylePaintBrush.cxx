@@ -8,7 +8,7 @@ QSETUP_UI_SRC(QInteractorStylePaintBrush);
 void QInteractorStylePaintBrush::SetPaintBrushModeEnabled(bool flag)
 {
 	InteractorStylePaintBrush::SetPaintBrushModeEnabled(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 
 void QInteractorStylePaintBrush::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
@@ -71,9 +71,9 @@ QInteractorStylePaintBrush::~QInteractorStylePaintBrush()
 	QDELETE_UI();
 }
 
-void QInteractorStylePaintBrush::UniqueEnable(bool flag)
+void QInteractorStylePaintBrush::uniqueInvoke(bool flag)
 {
-	QAbstractNavigation::UniqueEnable(flag);
+	QAbstractNavigation::uniqueInvoke(flag);
 	
 	if (flag && flag != initializationFlag) {
 		// turn on codes

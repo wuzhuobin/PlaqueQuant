@@ -16,7 +16,7 @@ QInteractorStyleWindowLevel::~QInteractorStyleWindowLevel()
 	QDELETE_UI();
 }
 
-void QInteractorStyleWindowLevel::UniqueEnable(bool flag)
+void QInteractorStyleWindowLevel::uniqueInvoke(bool flag)
 {
 	if (flag && flag != initializationFlag) {
 		// turn on codes
@@ -49,7 +49,7 @@ void QInteractorStyleWindowLevel::UniqueEnable(bool flag)
 void QInteractorStyleWindowLevel::SetWindowLevelModeEnabled(bool flag)
 {
 	InteractorStyleWindowLevel::SetWindowLevelModeEnabled(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 
 void QInteractorStyleWindowLevel::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)

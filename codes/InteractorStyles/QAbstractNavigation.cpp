@@ -9,8 +9,9 @@ QAbstractNavigation::QAbstractNavigation(int uiType, QWidget * parent)
 	// The first instance of QAbstractNavigation will have control of the UI widget
 	QNEW_UI();
 	if (numOfMyself == 1) {
-
+		uniqueInitialization();
 	}
+	initialization();
 }
 
 QAbstractNavigation::~QAbstractNavigation()
@@ -33,15 +34,6 @@ void QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, 
 	}
 	if (ui->sliceSpinBoxZ->value() != k) {
 		ui->sliceSpinBoxZ->setValue(k);
-	}
-}
-void QAbstractNavigation::UniqueEnable(bool flag)
-{
-	QAbstractInteractorStyle::UniqueEnable(flag);
-	// run any way for once
-	// I don't know why i need to do this
-	if (flag != initializationFlag) {
-
 	}
 }
 

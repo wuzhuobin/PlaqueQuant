@@ -5,9 +5,9 @@
 vtkStandardNewMacro(QInteractorStyleNavigation);
 QSETUP_UI_SRC(QInteractorStyleNavigation);
 
-void QInteractorStyleNavigation::UniqueEnable(bool flag)
+void QInteractorStyleNavigation::uniqueInvoke(bool flag)
 {
-	QAbstractNavigation::UniqueEnable(flag);
+	QAbstractNavigation::uniqueInvoke(flag);
 
 	if (flag && flag != initializationFlag) {
 		// turn on codes
@@ -68,7 +68,7 @@ void QInteractorStyleNavigation::UniqueEnable(bool flag)
 void QInteractorStyleNavigation::SetNavigationModeEnabled(bool flag)
 {
 	InteractorStyleNavigation::SetNavigationModeEnabled(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 
 void QInteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
