@@ -27,8 +27,12 @@ public:
 	void setMyImageManager(MyImageManager* myImageManager);
 	//void setUniqueKeys(QStringList keys);
 
-	void setListOfFileNames(QList<QStringList> listOfFileNames);
-	void addToListOfFileNames(QStringList fineNames);
+	/**
+	 * @brief	add a file name to #listOfFileNames
+	 * @param	fileNames	a image fileName.
+	 */
+	void addToListOfFileNames(QStringList fileNames);
+	void cleanListsOfFileNames();
 	const QList<QStringList> getListOfFileNames();
 
 	void setFilePath(QString filePath);

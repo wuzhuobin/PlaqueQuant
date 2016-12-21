@@ -4,44 +4,44 @@
 
 vtkStandardNewMacro(QInteractorStyleVesselSegmentation);
 QSETUP_UI_SRC(QInteractorStyleVesselSegmentation);
-void QInteractorStyleVesselSegmentation::uniqueInvoke(bool flag)
-{
-	QAbstractNavigation::uniqueInvoke(flag);
-	if (flag && flag != initializationFlag) {
-		// turn on codes
-
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-	}
-	// turn off
-	if (!flag && flag != initializationFlag) {
-		// turn off codes
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-
-	}
-	if (flag != initializationFlag) {
-		ui->fillSlicesBeginSpinBox->setValue(GetExtent()[4]);
-		ui->fillSliceEndSpinBox->setValue(GetExtent()[5]);
-		ui->fillSlicesBeginSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
-		ui->fillSliceEndSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
-	}
-	initializationFlag = flag;
-
-
-
-}
+//void QInteractorStyleVesselSegmentation::uniqueInvoke(bool flag)
+//{
+//	QAbstractNavigation::uniqueInvoke(flag);
+//	if (flag && flag != initializationFlag) {
+//		// turn on codes
+//
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//	}
+//	// turn off
+//	if (!flag && flag != initializationFlag) {
+//		// turn off codes
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//
+//	}
+//	if (flag != initializationFlag) {
+//		ui->fillSlicesBeginSpinBox->setValue(GetExtent()[4]);
+//		ui->fillSliceEndSpinBox->setValue(GetExtent()[5]);
+//		ui->fillSlicesBeginSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
+//		ui->fillSliceEndSpinBox->setRange(GetExtent()[4], GetExtent()[5]);
+//	}
+//	initializationFlag = flag;
+//
+//
+//
+//}
 void QInteractorStyleVesselSegmentation::SetPolygonModeEnabled(bool flag)
 {
 	InteractorStyleVesselSegmentation::SetPolygonModeEnabled(flag);

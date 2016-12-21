@@ -22,8 +22,6 @@ MainWindow::MainWindow()
 	this->ui->setupUi(this);
 
 	m_core = new Core(this);
-	this->imageManager = m_core->GetMyImageManager();
-	this->ioManager = m_core->GetIOManager();
 
 	//Initialize
 	m_moduleWidget = new ModuleWidget(this);
@@ -45,14 +43,14 @@ MainWindow::MainWindow()
 	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,			SLOT(slotVisualizeImage()));
 	
 	// Open Image
-	connect(ui->actionOpenImage,	SIGNAL(triggered())					, ioManager,	SLOT(slotOpenWithWizard()));
+	connect(ui->actionOpenImage,	SIGNAL(triggered())					, m_core->GetIOManager(),	SLOT(slotOpenWithWizard()));
 	
 	// Segmentation
-	connect(ui->actionSaveSegmentation,			SIGNAL(triggered())					,ioManager,		SLOT(slotSaveSegmentaitonWithDiaglog()));
+	connect(ui->actionSaveSegmentation,			SIGNAL(triggered())					, m_core->GetIOManager(),		SLOT(slotSaveSegmentaitonWithDiaglog()));
 	connect(ui->actionOpenSegmentation, SIGNAL(triggered()),
-		ioManager, SLOT(slotOpenSegmentationWithDiaglog()));
+		m_core->GetIOManager(), SLOT(slotOpenSegmentationWithDiaglog()));
 	connect(ui->actionSaveContour, SIGNAL(triggered()),
-		ioManager, SLOT(slotSaveContourWithDiaglog()));
+		m_core->GetIOManager(), SLOT(slotSaveContourWithDiaglog()));
 
 
 	// different mode
@@ -155,6 +153,19 @@ MainWindow* MainWindow::GetMainWindow()
 }
 
 
+void MainWindow::openOneImage(QString img)
+{
+	IOManager* io = m_core->GetIOManager();
+	QStringList imgs(img);
+	io->cleanListsOfFileNames();
+	io->addToListOfFileNames(imgs);
+	io->addToListOfFileNames(QStringList());
+	io->addToListOfFileNames(QStringList());
+	io->addToListOfFileNames(QStringList());
+	io->addToListOfFileNames(QStringList());
+	io->slotOpenMultiImages();
+}
+
 Core* MainWindow::GetCore()
 {
 	return this->m_core;
@@ -230,7 +241,7 @@ void MainWindow::slotOpenRecentImage()
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (action)
 	{
-		ioManager->slotOpenWithWizard(action->data().toString());
+		m_core->GetIOManager()->slotOpenWithWizard(action->data().toString());
 	}
 }
 
@@ -253,7 +264,7 @@ void MainWindow::createRecentImageActions()
 /* Visualization and initialize Module widget UI */
 bool MainWindow::slotVisualizeImage()
 {	
-	adjustForCurrentFile(ioManager->getFilePath());
+	adjustForCurrentFile(m_core->GetIOManager()->getFilePath());
 	//Enable Actions 
 	setActionsEnable(true);
 
@@ -272,15 +283,15 @@ bool MainWindow::slotVisualizeImage()
 	ChangeBaseImageULMenu.clear();
 	ChangeBaseImageURMenu.clear();
 	ChangeBaseImageLLMenu.clear();
-	for (int i = 0; i < this->imageManager->getListOfVtkImages().size(); i++)
+	for (int i = 0; i < m_core->GetMyImageManager()->getListOfVtkImages().size(); i++)
 	{
-		if (this->imageManager->getListOfVtkImages()[i] != NULL) {
+		if (m_core->GetMyImageManager()->getListOfVtkImages()[i] != NULL) {
 			ChangeBaseImageULMenu.addAction(
-				imageManager->getListOfModalityNames()[i])->setData(0);
+				m_core->GetMyImageManager()->getListOfModalityNames()[i])->setData(0);
 			ChangeBaseImageURMenu.addAction(
-				imageManager->getListOfModalityNames()[i])->setData(1);
+				m_core->GetMyImageManager()->getListOfModalityNames()[i])->setData(1);
 			ChangeBaseImageLLMenu.addAction(
-				imageManager->getListOfModalityNames()[i])->setData(2);
+				m_core->GetMyImageManager()->getListOfModalityNames()[i])->setData(2);
 		}
 
 	}
@@ -473,7 +484,7 @@ void MainWindow::dropEvent( QDropEvent *ev )
 		QString folder = url.toLocalFile();
 		folder.replace("\\","/");
 		
-		ioManager->slotOpenWithWizard(folder);
+		m_core->GetIOManager()->slotOpenWithWizard(folder);
 
 	}
 }
@@ -507,10 +518,10 @@ vtkRenderWindow * MainWindow::GetRenderWindow(int i)
 	return nullptr;
 }
 
-ModuleWidget* MainWindow::GetModuleWidget()
-{
-	return this->m_moduleWidget;
-}
+//ModuleWidget* MainWindow::GetModuleWidget()
+//{
+//	return this->m_moduleWidget;
+//}
 
 void MainWindow::SetVersion(QString version)
 {

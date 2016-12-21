@@ -46,7 +46,7 @@ protected:
 	QInteractorStyleLumenSeedsPlacer(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
 	~QInteractorStyleLumenSeedsPlacer();
 
-	void uniqueInvoke(bool flag);
+	//void uniqueInvoke(bool flag);
 	void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
 
 	void OnKeyPress();

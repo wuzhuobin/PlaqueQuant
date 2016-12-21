@@ -27,7 +27,7 @@ protected:
 	QInteractorStylePaintBrush(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
 	~QInteractorStylePaintBrush();
 
-	virtual void uniqueInvoke(bool flag);
+	//virtual void uniqueInvoke(bool flag);
 
 private:
 	Ui::QInteractorStylePaintBrush* ui = nullptr;

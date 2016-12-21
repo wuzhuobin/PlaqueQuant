@@ -28,10 +28,13 @@ public:
 	~MainWindow();
 	static MainWindow* GetMainWindow();
 
+
+	void openOneImage(QString img);
+
 	//// Get Functions
 	Core*						GetCore();
 	vtkRenderWindow*			GetRenderWindow(int i);
-	ModuleWidget*				GetModuleWidget();
+	//ModuleWidget*				GetModuleWidget();
 
 	// Titile
 	void SetVersion(QString);
@@ -107,10 +110,6 @@ private:
 	// UI related
 	void DisplayErrorMessage(std::string);
 	QString m_version;
-
-	//Data
-	MyImageManager* imageManager;
-	IOManager* ioManager;
 
 	// Core
 	Core* m_core;

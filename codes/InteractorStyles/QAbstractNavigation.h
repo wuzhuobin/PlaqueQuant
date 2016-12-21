@@ -11,7 +11,6 @@
  */
 #ifndef __QABSTRACT_NAVIGATION_H__
 #define __QABSTRACT_NAVIGATION_H__
-
 #include "QAbstractInteractorStyle.h"
 
 namespace Ui { class QAbstractNavigation;}
@@ -50,30 +49,32 @@ protected:
 	/**
 	* @brief	Destructor.
 	*/
-	~QAbstractNavigation();
+	virtual ~QAbstractNavigation();
 	/**
-	 * @override
-	 * @brief	abstract funtion to enable once.
-	 * @see #uniqueInvoke()
-	 *
-	 * The #uniqueEnable() function used to guarantee only enable once
-	 */
-	virtual void uniqueEnable() {};
+	* @override
+	* @brief	abstract funtion to enable once.
+	* @see #uniqueInvoke()
+	*
+	* The #uniqueEnable() function used to guarantee only enable once.
+	* For the connection of the spinbox
+	*/
+	virtual void uniqueEnable();
 	/**
-	 * @override
-	 * @brief	abstract funtion to disable once.
-	 * @see #uniqueInvoke()
-	 *
-	 * The #uniqueDisable() function used to guarantee only disable once
-	 */
-	virtual void uniqueDisable() {};
+	* @override
+	* @brief	abstract funtion to disable once.
+	* @see #uniqueInvoke()
+	*
+	* The #uniqueDisable() function used to guarantee only disable once
+	* For the disconnection of the spinbox
+	*/
+	virtual void uniqueDisable();
 	/**
-	 * @override
-	 * @brief	abstract funtion to call once.
-	 * @see #uniqueInvoke()
-	 *
-	 * The #uniqueCall() function used to guarantee only call once
-	 */
+	* @override
+	* @brief	abstract funtion to call once.
+	* @see #uniqueInvoke()
+	*
+	* The #uniqueCall() function used to guarantee only call once.
+	*/
 	virtual void uniqueCall() {};
 	
 

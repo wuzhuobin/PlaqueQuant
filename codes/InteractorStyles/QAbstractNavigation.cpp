@@ -19,6 +19,30 @@ QAbstractNavigation::~QAbstractNavigation()
 	QDELETE_UI();
 }
 
+void QAbstractNavigation::uniqueEnable()
+{
+	connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+		this, SLOT(slotChangeSlice()),
+		static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+	connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+		this, SLOT(slotChangeSlice()),
+		static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+	connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+		this, SLOT(slotChangeSlice()),
+		static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+
+}
+
+void QAbstractNavigation::uniqueDisable()
+{
+	disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+		this, SLOT(slotChangeSlice()));
+	disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+		this, SLOT(slotChangeSlice()));
+	disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+		this, SLOT(slotChangeSlice()));
+}
+
 void QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(int * ijk)
 {
 	SetCurrentFocalPointWithImageCoordinate(ijk[0], ijk[1], ijk[2]);

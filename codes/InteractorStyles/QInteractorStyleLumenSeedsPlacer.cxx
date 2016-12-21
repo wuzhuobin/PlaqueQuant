@@ -274,39 +274,39 @@ QInteractorStyleLumenSeedsPlacer::~QInteractorStyleLumenSeedsPlacer()
 	QDELETE_UI();
 
 }
-
-void QInteractorStyleLumenSeedsPlacer::uniqueInvoke(bool flag)
-{
-	QAbstractNavigation::uniqueInvoke(flag);
-
-	if (flag && flag != initializationFlag) {
-		// turn on codes
-
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-	}
-	// turn off
-	if (!flag && flag != initializationFlag) {
-		// turn off codes
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-	}
-	if (flag != initializationFlag) {
-
-	}
-	initializationFlag = flag;
-}
+//
+//void QInteractorStyleLumenSeedsPlacer::uniqueInvoke(bool flag)
+//{
+//	QAbstractNavigation::uniqueInvoke(flag);
+//
+//	if (flag && flag != initializationFlag) {
+//		// turn on codes
+//
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//	}
+//	// turn off
+//	if (!flag && flag != initializationFlag) {
+//		// turn off codes
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//	}
+//	if (flag != initializationFlag) {
+//
+//	}
+//	initializationFlag = flag;
+//}
 
 void QInteractorStyleLumenSeedsPlacer::OnKeyPress()
 {
