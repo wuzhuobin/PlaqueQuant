@@ -9,6 +9,8 @@
 #include <GPUVolumeRenderingFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
+#include <itkVTKImageToImageFilter.h>
+#include <itkImageToVTKImageFilter.h>
 #include <vtkClipPolyData.h>
 #include <vtkExtractVOI.h>
 #include <vtkRendererCollection.h>
@@ -311,20 +313,19 @@ void Core::slotBrushMode()
 	
 }
 
-#include <itkVTKImageToImageFilter.h>
-#include <itkImageToVTKImageFilter.h>
+
 void Core::slotGenerateCenterlineBtn()
 {
 	// Extract VOI
-	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
-	voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
-	voi->Update();
+	//vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	//voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
+	//voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
+	//voi->Update();
 
 	// Threshold the iamge
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
-	thres->SetInputData(voi->GetOutput());
-	thres->ThresholdBetween(LABEL_LUMEN - 0.1, LABEL_LUMEN + 0.1);
+	thres->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
+	thres->ThresholdBetween(LABEL_LUMEN, LABEL_LUMEN);
 	thres->SetOutValue(0);
 	thres->SetInValue(VTK_SHORT_MAX);
 	thres->SetOutputScalarTypeToUnsignedShort();
@@ -352,7 +353,7 @@ void Core::slotGenerateCenterlineBtn()
 	dilationFilter->Update();
 	i2v->SetInput(dilationFilter->GetOutput());
 	i2v->Update();
-	
+
 	// Generate surface for centerline calculation
 	SurfaceCreator* surfaceCreator = new SurfaceCreator();
 	surfaceCreator->SetInput(i2v->GetOutput());
@@ -402,7 +403,7 @@ void Core::slotGenerateCenterlineBtn()
 		GPUVolumeRenderingFilter* volumeRenderingFilter =
 			GPUVolumeRenderingFilter::New();
 
-		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
 		volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
 		volumeRenderingFilter->GetVolume()->SetPickable(1);
 		volumeRenderingFilter->Update();
@@ -424,7 +425,7 @@ void Core::slotGenerateCenterlineBtn()
 		GPUVolumeRenderingFilter* volumeRenderingFilter =
 			GPUVolumeRenderingFilter::New();
 
-		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
 		volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
 		volumeRenderingFilter->GetVolume()->SetPickable(1);
 		volumeRenderingFilter->Update();
@@ -478,7 +479,7 @@ void Core::slotUpdate3DLabelBtn()
 	GPUVolumeRenderingFilter* volumeRenderingFilter =
 		GPUVolumeRenderingFilter::New();
 
-	volumeRenderingFilter->SetInputData(voi->GetOutput());
+	volumeRenderingFilter->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
 	volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
 	volumeRenderingFilter->GetVolume()->SetPickable(1);
 	//volumeRenderingFilter->GetVolumeProperty()->SetInterpolationTypeToLinear();
