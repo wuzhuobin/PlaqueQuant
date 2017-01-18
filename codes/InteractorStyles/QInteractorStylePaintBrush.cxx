@@ -8,7 +8,7 @@ QSETUP_UI_SRC(QInteractorStylePaintBrush);
 void QInteractorStylePaintBrush::SetPaintBrushModeEnabled(bool flag)
 {
 	InteractorStylePaintBrush::SetPaintBrushModeEnabled(flag);
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 
 void QInteractorStylePaintBrush::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
@@ -71,36 +71,36 @@ QInteractorStylePaintBrush::~QInteractorStylePaintBrush()
 	QDELETE_UI();
 }
 
-void QInteractorStylePaintBrush::UniqueEnable(bool flag)
-{
-	QAbstractNavigation::UniqueEnable(flag);
-	
-	if (flag && flag != initializationFlag) {
-		// turn on codes
-
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()),
-			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-	}
-	// turn off
-	if (!flag && flag != initializationFlag) {
-		// turn off codes
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-			this, SLOT(slotChangeSlice()));
-
-	}
-	if (flag != initializationFlag) {
-
-	}
-	initializationFlag = flag;
-}
+//void QInteractorStylePaintBrush::uniqueInvoke(bool flag)
+//{
+//	QAbstractNavigation::uniqueInvoke(flag);
+//	
+//	if (flag && flag != initializationFlag) {
+//		// turn on codes
+//
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()),
+//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
+//	}
+//	// turn off
+//	if (!flag && flag != initializationFlag) {
+//		// turn off codes
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
+//			this, SLOT(slotChangeSlice()));
+//
+//	}
+//	if (flag != initializationFlag) {
+//
+//	}
+//	initializationFlag = flag;
+//}

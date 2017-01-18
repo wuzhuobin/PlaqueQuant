@@ -25,7 +25,7 @@ void QInteractorStyleROI::SetROIWidgetEnabled(bool flag)
 		m_roi->EnabledOff();
 	}
 	m_imageViewer->Render();
-	UniqueEnable(flag);
+	uniqueInvoke(flag);
 }
 void QInteractorStyleROI::slotUpdateROISpinBoxes(double * values)
 {

@@ -36,7 +36,7 @@ public slots:
 protected:
 	QInteractorStyleVesselSegmentation(int uiType = UNIQUE_UI, QWidget * parent = Q_NULLPTR);
 	~QInteractorStyleVesselSegmentation();
-	virtual void UniqueEnable(bool flag);
+	//virtual void uniqueInvoke(bool flag);
 
 
 private:

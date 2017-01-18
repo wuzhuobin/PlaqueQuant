@@ -2,15 +2,19 @@
 #include "MainWindow.h"
 #include "EncryptionAuthentication.h"
 
+
+//#undef _DEBUG
+
+
 // error output
 #ifndef _DEBUG
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
-extern const int WARNING = 0;
-extern const int ENCRYPTION_AUTHENTICATION_DISABLED = 0;
+extern const bool WARNING = false;
+extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
 #else
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
-extern const int WARNING = 1;
-extern const int ENCRYPTION_AUTHENTICATION_DISABLED = 1;
+extern const bool WARNING = true;
+extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = true;
 #endif // !_DEBUG
  
 
@@ -19,16 +23,6 @@ extern const char* PLAQUEQUANT_VERSION = "2.0";
 int main( int argc, char** argv )
 {
   QApplication app( argc, argv );
-
-  /// Check license
-  //keyConfirm keyconfirm;
-  //// if license not found, display ID and stop process
-  //if (!keyconfirm.checkLicence()) {
-	 // keyconfirm.setWindowTitle(QString("Plaque Quant v") + QString(PLAQUEQUANT_VERSION) + QString(" License Check"));
-	 // keyconfirm.show();
-	 // return app.exec();
-  //}
-
 
   vtkObject::SetGlobalWarningDisplay(WARNING);
   MainWindow mainWnd;
@@ -43,7 +37,15 @@ int main( int argc, char** argv )
   ea.enableExpiredDateTimeHint(false);
 
   if (ENCRYPTION_AUTHENTICATION_DISABLED) {
+
+
 	  mainWnd.show();
+	  // For debug only
+	  QString img = "C:/Users/jieji/Desktop/work/PlaqueQuant/JackyData/nifti_corrected/CUBE T1 corrected.nii";
+	  //QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
+		  //"nifti_corrected/CUBE_T1_corrected.nii";
+	  img.replace('\\', '/');
+	  mainWnd.openOneImage(img);
 	  return app.exec();
   }
   else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&

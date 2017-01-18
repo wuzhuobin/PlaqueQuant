@@ -25,7 +25,7 @@ protected:
 	QInteractorStyleRuler(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
 	~QInteractorStyleRuler ();
 
-	virtual void UniqueEnable(bool flag);
+	//virtual void uniqueInvoke(bool flag);
 
 private:
 

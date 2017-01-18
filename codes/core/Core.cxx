@@ -316,14 +316,14 @@ void Core::slotBrushMode()
 void Core::slotGenerateCenterlineBtn()
 {
 	// Extract VOI
-	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
-	voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
-	voi->Update();
+	//vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	//voi->SetInputData(this->m_imageManager->getOverlay()->GetVTKOutput());
+	//voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
+	//voi->Update();
 
 	// Threshold the iamge
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
-	thres->SetInputData(voi->GetOutput());
+	thres->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
 	thres->ThresholdBetween(LABEL_LUMEN - 0.1, LABEL_LUMEN + 0.1);
 	thres->SetOutValue(0);
 	thres->SetInValue(VTK_SHORT_MAX);
@@ -402,7 +402,7 @@ void Core::slotGenerateCenterlineBtn()
 		GPUVolumeRenderingFilter* volumeRenderingFilter =
 			GPUVolumeRenderingFilter::New();
 
-		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
 		volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
 		volumeRenderingFilter->GetVolume()->SetPickable(1);
 		volumeRenderingFilter->Update();
@@ -424,7 +424,7 @@ void Core::slotGenerateCenterlineBtn()
 		GPUVolumeRenderingFilter* volumeRenderingFilter =
 			GPUVolumeRenderingFilter::New();
 
-		volumeRenderingFilter->SetInputData(voi->GetOutput());
+		volumeRenderingFilter->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
 		volumeRenderingFilter->SetLookUpTable(this->m_2DimageViewer[0]->GetLookupTable());
 		volumeRenderingFilter->GetVolume()->SetPickable(1);
 		volumeRenderingFilter->Update();

@@ -38,14 +38,14 @@ void IOManager::enableRegistration(bool flag)
 	this->registrationFlag = flag;
 }
 
-void IOManager::setListOfFileNames(QList<QStringList> listOfFileNames)
-{
-	this->listOfFileNames = listOfFileNames;
-}
-
 void IOManager::addToListOfFileNames(QStringList fileNames)
 {
 	this->listOfFileNames.append(fileNames);
+}
+
+void IOManager::cleanListsOfFileNames()
+{
+	this->listOfFileNames.clear();
 }
 
 const QList<QStringList> IOManager::getListOfFileNames()
