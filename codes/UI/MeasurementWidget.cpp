@@ -122,7 +122,7 @@ void MeasurementWidget::GenerateReport()
 
 	//General 
 	//Basic Information to fill
-	QFileInfo fileInfo("./report.pdf");
+	QFileInfo fileInfo("report.pdf");
 	QString ReportName = "Plaque Quantification Report";
 	QString PatientName = ui.patientTableWidget->item(0,0)->text();
 	QString PatientID = ui.patientTableWidget->item(1, 0)->text();
@@ -306,7 +306,7 @@ void MeasurementWidget::GenerateReport()
 	//Update
 	reportGenerator->Update();
 
-	QDesktopServices::openUrl(fileInfo.absoluteFilePath());
+	QDesktopServices::openUrl(QUrl("file:///" + fileInfo.absoluteFilePath(), QUrl::TolerantMode));
 
 	delete reportGenerator;
 
