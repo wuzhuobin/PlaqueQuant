@@ -9,6 +9,7 @@
 // error output
 #ifndef _DEBUG
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+
 extern const bool WARNING = false;
 extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
 #else
