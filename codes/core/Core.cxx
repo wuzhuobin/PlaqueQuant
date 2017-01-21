@@ -329,11 +329,8 @@ void Core::slotGenerateCenterlineBtn()
 	// Threshold the iamge
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
 	thres->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
-<<<<<<< HEAD
 	thres->ThresholdBetween(LABEL_LUMEN - 0.1, LABEL_LUMEN + 0.1);
-=======
 	thres->ThresholdBetween(LABEL_LUMEN, LABEL_LUMEN);
->>>>>>> ver6
 	thres->SetOutValue(0);
 	thres->SetInValue(VTK_SHORT_MAX);
 	thres->SetOutputScalarTypeToUnsignedShort();
