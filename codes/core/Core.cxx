@@ -9,11 +9,8 @@
 #include <GPUVolumeRenderingFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
-<<<<<<< HEAD
-=======
 #include <itkVTKImageToImageFilter.h>
 #include <itkImageToVTKImageFilter.h>
->>>>>>> ver6
 #include <vtkClipPolyData.h>
 #include <vtkExtractVOI.h>
 #include <vtkRendererCollection.h>
@@ -358,11 +355,7 @@ void Core::slotGenerateCenterlineBtn()
 	dilationFilter->Update();
 	i2v->SetInput(dilationFilter->GetOutput());
 	i2v->Update();
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> ver6
 	// Generate surface for centerline calculation
 	SurfaceCreator* surfaceCreator = new SurfaceCreator();
 	surfaceCreator->SetInput(i2v->GetOutput());
