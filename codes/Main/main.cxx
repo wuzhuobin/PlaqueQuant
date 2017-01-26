@@ -47,7 +47,6 @@ int main( int argc, char** argv )
 	  img.replace('\\', '/');
 	  mainWnd.openOneImage(img);
 	  return app.exec();
-<<<<<<< HEAD
   }
   else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&
 	  ea.authenticationExecAndKeyType(
@@ -56,16 +55,6 @@ int main( int argc, char** argv )
 	  EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
 	  return EXIT_FAILURE;
   }
-=======
-  }
-  else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&
-	  ea.authenticationExecAndKeyType(
-	  EncryptionAuthentication::HAVING_KEY |
-	  EncryptionAuthentication::USER_PASSWORD |
-	  EncryptionAuthentication::EXPIRED_DATE_TIME) != EncryptionAuthentication::NORMAL) {
-	  return EXIT_FAILURE;
-  }
->>>>>>> ver6
   else {
 	  //if (argc == 2)
 	  //{
@@ -76,8 +65,6 @@ int main( int argc, char** argv )
 	  mainWnd.show();
 	  return app.exec();
   }
-
-
 
 
 }
