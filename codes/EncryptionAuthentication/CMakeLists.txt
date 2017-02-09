@@ -57,7 +57,7 @@ file(
 
 add_library(
     EncryptionAuthentication
-    SHARED
+    # SHARED
     ${VIKEY_H}
     ${ENCRYPTION_AUTHENTICATION_H}
     ${ENCRYPTION_AUTHENTICATION_CXX}
@@ -69,14 +69,14 @@ target_link_libraries(
     ${VIKEY_LIB}
    	Qt5::Widgets
 )
-set_target_properties(
-    EncryptionAuthentication
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_SOURCE_DIR}/bin
-)
+# set_target_properties(
+#     EncryptionAuthentication
+#     PROPERTIES
+#     WINDOWS_EXPORT_ALL_SYMBOLS 
+#     true
+#     # RUNTIME_OUTPUT_DIRECTORY
+# 	# ${CMAKE_SOURCE_DIR}/bin
+# )
 
 # include(GenerateExportHeader)
 

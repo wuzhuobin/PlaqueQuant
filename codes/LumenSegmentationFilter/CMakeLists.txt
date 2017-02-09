@@ -31,7 +31,7 @@ set(
 
 add_library(
 	LumenSegmentationFilter 
-	SHARED
+	# SHARED
 	${LUMEN_SEGMENTATION_FILTER_CXX}
 	${LUMEN_SEGMENTATION_FILTER_H}
 	)
@@ -42,14 +42,14 @@ target_link_libraries(
 	${VTK_LIBRARIES}
 	ReorderPointIdOfContourFilter
 	)
-set_target_properties(
-    LumenSegmentationFilter
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    RUNTIME_OUTPUT_DIRECTORY
-	${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-)
+# set_target_properties(
+#     LumenSegmentationFilter
+#     PROPERTIES
+#     WINDOWS_EXPORT_ALL_SYMBOLS 
+#     true
+#     RUNTIME_OUTPUT_DIRECTORY
+# 	${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+# )
 
 #Grouping in MSVC
 SOURCE_GROUP(

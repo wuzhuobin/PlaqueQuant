@@ -44,7 +44,7 @@ set(
 
 add_library(
 	LumenExtraction 
-	SHARED
+	# SHARED
 	${LUMENEXTRATION_SRC}
 	${LUMENEXTRATION_INC}
 	)
@@ -56,14 +56,14 @@ target_link_libraries(
 	${VTK_LIBRARIES}
 	)
 
-set_target_properties(
-    LumenExtraction
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_SOURCE_DIR}/bin
-)
+# set_target_properties(
+#     LumenExtraction
+#     PROPERTIES
+#     WINDOWS_EXPORT_ALL_SYMBOLS 
+#     true
+#     # RUNTIME_OUTPUT_DIRECTORY
+# 	# ${CMAKE_SOURCE_DIR}/bin
+# )
 
 add_executable(
     LumenExtraction_test
