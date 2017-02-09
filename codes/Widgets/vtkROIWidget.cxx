@@ -413,9 +413,9 @@ void vtkROIWidget::UpdateBorderWidgets()
 		}
 
 		// if user is interacting with that borderwidget, skips that particular widget
-		if (this->m_borderWidgets[i]->GetRepresentation()->GetInteractionState() == vtkBorderRepresentation::Inside) {
-			continue;
-		}
+		//if (this->m_borderWidgets[i]->GetRepresentation()->GetInteractionState() == vtkBorderRepresentation::Inside) {
+		//	continue;
+		//}
 
 		// Check if the cursor is within the ROI widget#vtkROIWidgetModified
 		if (m_cursorPos[i] < corner1[i] || m_cursorPos[i] > corner2[i]) {
