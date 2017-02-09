@@ -41,9 +41,9 @@ int main( int argc, char** argv )
 
 	  mainWnd.show();
 	  // For debug only
-	  QString img = "C:/Users/jieji/Desktop/work/PlaqueQuant/JackyData/nifti_corrected/CUBE T1 corrected.nii";
-	  //QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
-		  //"nifti_corrected/CUBE_T1_corrected.nii";
+	  //QString img = "C:/Users/jieji/Desktop/work/PlaqueQuant/JackyData/nifti_corrected/CUBE T1 corrected.nii";
+	  QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
+		  "nifti_corrected/CUBE_T1_corrected.nii";
 	  img.replace('\\', '/');
 	  mainWnd.openOneImage(img);
 	  return app.exec();

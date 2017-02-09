@@ -5,6 +5,10 @@
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkCleanPolyData.h>
 
+#include <vtkvmtkPolyDataCenterlines.h>
+#include <vtkIdList.h>
+
+
 #include "LumenSegmentationFilter2.h"
 #include "ui_QInteractorStyleLumenSeedsPlacer.h"
 #include "ui_QAbstractNavigation.h"
@@ -64,6 +68,10 @@ void QInteractorStyleLumenSeedsPlacer::SlotClearAllSeeds()
 	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleLumenSeedsPlacer, ClearAllSeedWidget());
 	ui->listWidgetSeedList->clear();
 	m_imageViewer->Render();
+}
+
+void QInteractorStyleLumenSeedsPlacer::SlotCentreLine()
+{
 }
 
 void QInteractorStyleLumenSeedsPlacer::SetFocalSeed(int i)
@@ -126,6 +134,36 @@ void QInteractorStyleLumenSeedsPlacer::SaveWidgetToSeeds()
 void QInteractorStyleLumenSeedsPlacer::DropSeed()
 {
 	InteractorStyleSeedsPlacer::DropSeed();
+}
+
+void QInteractorStyleLumenSeedsPlacer::CenterLine()
+{
+	if (m_seeds.size() < 2) {
+		return;
+	}
+	//QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+
+	//vtkSmartPointer<vtkIdList> sourceIds = vtkSmartPointer<vtkIdList>::New();
+	//sourceIds->SetNumberOfIds(1);
+	//sourceIds->SetId(0, _seeds[0]);
+	//sourceIds->getid
+
+	//vtkSmartPointer<vtkIdList> targetIds = vtkSmartPointer<vtkIdList>::New();
+	//targetIds->SetNumberOfIds(1);
+	//targetIds->SetId(0, CapCenterIds->GetId(0));
+
+
+
+	//else {
+	//	vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlinesFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
+	//	centerlinesFilter->SetInputData(cappedSurface);
+	//	centerlinesFilter->SetSourceSeedIds(targetIds);
+	//	centerlinesFilter->SetTargetSeedIds(targetIds);
+	//	centerlinesFilter->SetAppendEndPointsToCenterlines(1);
+	//	centerlinesFilter->SetRadiusArrayName("Radius");
+	//	centerlinesFilter->Update();
+
+	//}
 }
 
 void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
@@ -263,6 +301,7 @@ QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, Q
 			this, SLOT(SetNumberOfIteractions(int)));
 		connect(ui->initialNeighbodhoodSpinBox, SIGNAL(valueChanged(int)),
 			this, SLOT(SetInitialNeighborhoodRadius(int)));
+
 
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),

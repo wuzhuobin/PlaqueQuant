@@ -296,6 +296,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButtonCenterLine">
+          <property name="text">
+           <string>Center Line</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="checkBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">

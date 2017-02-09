@@ -27,10 +27,13 @@ public:
 
 public slots:
 	void SlotClearAllSeeds();
+	void SlotCentreLine();
 	void SetFocalSeed(int i);
 	void DeleteFocalSeed();
 	void SaveWidgetToSeeds();
 	void DropSeed();
+
+	void CenterLine();
 
 	void ExtractLumen();
 	/**
