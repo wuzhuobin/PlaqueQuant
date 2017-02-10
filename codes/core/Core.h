@@ -90,6 +90,7 @@ public:
 	virtual void slotROIMode();
 	virtual void slotSeedsPlacerMode();
 	virtual void slotRulerMode();
+	virtual void slotObliqueViewMode();
 
 	// Button slots
 	virtual void slotGenerateCenterlineBtn();

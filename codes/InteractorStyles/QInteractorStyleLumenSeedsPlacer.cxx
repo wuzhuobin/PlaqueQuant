@@ -49,7 +49,7 @@ void QInteractorStyleLumenSeedsPlacer::UpdateWidgetToSeeds(int * oldImagePos, in
 {
 	InteractorStyleSeedsPlacer::UpdateWidgetToSeeds(oldImagePos, newImagePos);
 	ui->listWidgetSeedList->clear();
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
 	//for (QList<int*>::ConstIterator cit = _seeds.cbegin(); cit != _seeds.cend(); ++cit) {
 	//	ui->listWidgetSeedList->insertItem()
 	//}
@@ -78,7 +78,7 @@ void QInteractorStyleLumenSeedsPlacer::SetFocalSeed(int i)
 {
 	if (i < 0)
 		return;
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
 	int imageCoordinate[3];
 	double worldCoordinate[3];
 
@@ -101,12 +101,12 @@ void QInteractorStyleLumenSeedsPlacer::SetFocalSeed(int i)
 
 void QInteractorStyleLumenSeedsPlacer::DeleteFocalSeed()
 {
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
 	int i = ui->listWidgetSeedList->currentRow();
 	if (i >= 0 && i < _seeds.size()) {
 		ui->listWidgetSeedList->removeItemWidget(
 			ui->listWidgetSeedList->takeItem(i));
-		m_seeds.remove(_seeds[i]);
+		m_seeds[m_currentSeedsType].remove(_seeds[i]);
 		delete _seeds[i];
 	}
 	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleLumenSeedsPlacer, ClearAllSeedWidget());
@@ -118,7 +118,7 @@ void QInteractorStyleLumenSeedsPlacer::SaveWidgetToSeeds()
 {
 	InteractorStyleSeedsPlacer::SaveWidgetToSeeds();
 	ui->listWidgetSeedList->clear();
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
 	//for (QList<int*>::ConstIterator cit = _seeds.cbegin(); cit != _seeds.cend(); ++cit) {
 	//	ui->listWidgetSeedList->insertItem()
 	//}
@@ -138,7 +138,7 @@ void QInteractorStyleLumenSeedsPlacer::DropSeed()
 
 void QInteractorStyleLumenSeedsPlacer::CenterLine()
 {
-	if (m_seeds.size() < 2) {
+	if (m_seeds[m_currentSeedsType].size() < 2) {
 		return;
 	}
 	//QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
@@ -177,7 +177,7 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
 	lumenExtractionFilter->CoreFilter->SetMultiplier(m_multiplier);
 	lumenExtractionFilter->CoreFilter->SetInitialNeighborhoodRadius(2);
 
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds);
+	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
 	for (int i = 0; i < _seeds.size(); ++i) {
 		IndexType index = {_seeds[i][0], _seeds[i][1], _seeds[i][2]};
 		lumenExtractionFilter->CoreFilter->AddSeed(index);

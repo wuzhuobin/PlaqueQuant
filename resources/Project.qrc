@@ -49,5 +49,6 @@
     <file>icons/UpperRightView.png</file>
     <file>icons/WindowLevel.png</file>
     <file>icons/yellowbox.png</file>
+	<file>icons/aami10-90-512.png</file>
   </qresource>
 </RCC>

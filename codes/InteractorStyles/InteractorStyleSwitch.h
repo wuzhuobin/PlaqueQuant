@@ -23,6 +23,7 @@ Copyright (C) 2016
 
 #include <list>
 
+#include "QInteractorStyleObliqueViewSeedsPlacer.h"
 #include "QInteractorStyleNavigation.h"
 #include "QInteractorStyleWindowLevel.h"
 #include "QInteractorStyleVesselSegmentation.h"
@@ -46,6 +47,7 @@ public:
 	vtkGetMacro(PaintBrush, QInteractorStylePaintBrush*);
 	vtkGetMacro(ROI, QInteractorStyleROI*);
 	vtkGetMacro(Ruler, QInteractorStyleRuler*);
+	vtkGetMacro(ObliqueView, QInteractorStyleObliqueViewSeedsPlacer*);
 
 	void SetInteractor(vtkRenderWindowInteractor *iren);
 
@@ -58,6 +60,7 @@ public:
 	SetInteractorStyleMacro(PaintBrush);
 	SetInteractorStyleMacro(ROI);
 	SetInteractorStyleMacro(Ruler);
+	SetInteractorStyleMacro(ObliqueView);
 
 	CurrentStyleMacro(InteractorStyleTesting);
 	CurrentStyleMacro(Navigation);
@@ -67,6 +70,7 @@ public:
 	CurrentStyleMacro(PaintBrush);
 	CurrentStyleMacro(ROI);
 	CurrentStyleMacro(Ruler);
+	CurrentStyleMacro(ObliqueView);
 
 	virtual void SetDefaultRenderer(vtkRenderer* renderer);
 	virtual void SetCurrentRenderer(vtkRenderer* renderer);
@@ -93,6 +97,7 @@ private:
 	QInteractorStylePaintBrush*	PaintBrush;
 	QInteractorStyleROI* ROI;
 	QInteractorStyleRuler* Ruler;
+	QInteractorStyleObliqueViewSeedsPlacer* ObliqueView;
 	vtkInteractorStyle*	CurrentStyle;
 	std::list<vtkInteractorStyle*> allStyles;
 };

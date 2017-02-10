@@ -79,6 +79,14 @@ class InteractorStyleSeedsPlacer : public AbstractNavigation
 public:                                                                                                                                                                             
 	vtkTypeMacro(InteractorStyleSeedsPlacer, AbstractNavigation);
 	static InteractorStyleSeedsPlacer* New();
+	
+	enum SeedsType {
+		SegmentationSeeds = 0,
+		ObliqueViewSeeds = 1
+	};
+
+	void SetCurrentSeedsType(SeedsType);
+	SeedsType GetCurrentSeedsType();
 
 	void SetSeedsPlacerEnable(bool flag);
 	void SetFocalSeed(int i);
@@ -111,9 +119,12 @@ protected:
 	* Using a static list to save all seeds and it will be shared by all other
 	* InteractorStyleSeedsPlacer instances
 	*/
-	static std::list<int*> m_seeds;
+	static std::list<int*> m_seeds[2];
 	static int m_oldSeedsSize;
-	static void ClearAllSeeds();
+	void ClearAllSeeds();
+
+	/* This property decide which type of seeds this placer is controlling */
+	SeedsType m_currentSeedsType;
 
 private:
 	friend class SeedsPlacerWidget;

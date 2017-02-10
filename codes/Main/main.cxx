@@ -7,7 +7,7 @@
 
 
 // error output
-#ifndef _DEBUG
+#ifdef _DEBUG
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 extern const bool WARNING = false;
 extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
@@ -42,10 +42,10 @@ int main( int argc, char** argv )
 	  mainWnd.show();
 	  // For debug only
 	  //QString img = "C:/Users/jieji/Desktop/work/PlaqueQuant/JackyData/nifti_corrected/CUBE T1 corrected.nii";
-	  QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
+	/*  QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
 		  "nifti_corrected/CUBE_T1_corrected.nii";
-	  img.replace('\\', '/');
-	  mainWnd.openOneImage(img);
+	  img.replace('\\', '/');*/
+	  //mainWnd.openOneImage(img);
 	  return app.exec();
   }
   else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&

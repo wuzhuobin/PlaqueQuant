@@ -560,6 +560,15 @@ void Core::slotRulerMode()
 	}
 }
 
+void Core::slotObliqueViewMode()
+{
+	for (int i = 0; i < NUMBER_OF_2DVIEWERS;i++)
+	{
+		m_style[i]->GetObliqueView()->SetCurrentSeedsType(InteractorStyleSeedsPlacer::ObliqueViewSeeds);
+		m_style[i]->SetInteractorStyleToObliqueView();
+	}
+}
+
 void Core::slotROIMode()
 {
 	// force user into ROI mode
@@ -572,6 +581,8 @@ void Core::slotSeedsPlacerMode()
 {
 	for (int i = 0; i < NUMBER_OF_2DVIEWERS; i++)
 	{
+		m_style[i]->GetSeedsPlacer()->SetCurrentSeedsType(InteractorStyleSeedsPlacer::SegmentationSeeds);
 		m_style[i]->SetInteractorStyleToSeedsPlacer();
+
 	}
 }

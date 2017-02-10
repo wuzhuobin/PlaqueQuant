@@ -61,15 +61,17 @@ MainWindow::MainWindow()
 	widgetGroup.addAction(ui->actionRuler);
 	widgetGroup.addAction(ui->actionROI);
 	widgetGroup.addAction(ui->actionSeedsPlacer);
+	widgetGroup.addAction(ui->actionObliqueView);
 	widgetGroup.setExclusive(true);
 	connect(&widgetGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotChangeMode(QAction*)));
 	connect(ui->actionNavigation,	SIGNAL(triggered()), this->m_core, SLOT(slotNavigationMode()));
 	connect(ui->actionWindowLevel,	SIGNAL(triggered()), this->m_core, SLOT(slotWindowLevelMode()));
 	connect(ui->actionContour,		SIGNAL(triggered()), this->m_core, SLOT(slotContourMode()));
 	connect(ui->actionBrush,		SIGNAL(triggered()), this->m_core, SLOT(slotBrushMode()));
-	connect(ui->actionRuler,		SIGNAL(triggered()),	this->m_core, SLOT(slotRulerMode()));
-	connect(ui->actionROI,			SIGNAL(triggered()),		this->m_core, SLOT(slotROIMode()));
-	connect(ui->actionSeedsPlacer, SIGNAL(triggered()), this->m_core, SLOT(slotSeedsPlacerMode()));
+	connect(ui->actionRuler,		SIGNAL(triggered()), this->m_core, SLOT(slotRulerMode()));
+	connect(ui->actionROI,			SIGNAL(triggered()), this->m_core, SLOT(slotROIMode()));
+	connect(ui->actionSeedsPlacer,	SIGNAL(triggered()), this->m_core, SLOT(slotSeedsPlacerMode()));
+	connect(ui->actionObliqueView,	SIGNAL(triggered()), this->m_core, SLOT(slotObliqueViewMode()));
 
 	// view
 	viewGroup.addAction(ui->actionMultiPlanarView);
@@ -273,6 +275,7 @@ bool MainWindow::slotVisualizeImage()
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetSeedsPlacer());
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPolygonDraw());
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetROI());
+	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetObliqueView());
 
 	//connected to slotNavigationMode()
 	ui->actionNavigation->trigger();
@@ -336,6 +339,11 @@ void MainWindow::slotChangeMode(QAction* action)
 		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
 		Core::DEFAULT_IMAGE)->GetROI());
 	}
+	else if (action == ui->actionObliqueView) {
+		m_moduleWidget->setWidget(m_core->Get2DInteractorStyle(
+		Core::DEFAULT_IMAGE)->GetObliqueView());
+	}
+
 	else {
 		m_moduleWidget->setWidget(nullptr);
 	}

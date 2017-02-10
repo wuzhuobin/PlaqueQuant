@@ -49,17 +49,19 @@ MeasurementWidget::~MeasurementWidget() {
 
 void MeasurementWidget::slotUpdate3DMeasurements()
 {
-	m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();
-	ui.measurement3DTableWidget->clearContents();
-	QStringList volumes = m_mainWnd->GetCore()->GetMyImageManager()->
-		getOverlay()->Get3DMeasurementsStrings();
-	int numOfVolumes = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->GetLookupTable()->
-		GetNumberOfColors();
-	for (int i = 0; i < numOfVolumes; ++i) {
-		ui.measurement3DTableWidget->setItem(i, 0,
-			new QTableWidgetItem(volumes[i]));
+	if (this->isTopLevel())
+	{
+		m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();
+		ui.measurement3DTableWidget->clearContents();
+		QStringList volumes = m_mainWnd->GetCore()->GetMyImageManager()->
+			getOverlay()->Get3DMeasurementsStrings();
+		int numOfVolumes = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->GetLookupTable()->
+			GetNumberOfColors();
+		for (int i = 0; i < numOfVolumes; ++i) {
+			ui.measurement3DTableWidget->setItem(i, 0,
+				new QTableWidgetItem(volumes[i]));
+		}
 	}
-
 }
 
 void MeasurementWidget::slotUpdate2DMeasurements()
@@ -69,14 +71,17 @@ void MeasurementWidget::slotUpdate2DMeasurements()
 
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 {
-	m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure2D(slice);
-	QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->
-		Get2DMeasurementsStrings(slice);
-	for (int i = 0; i < 4; ++i) {
-		ui.measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem((_2DMeasurements)[i]));
-	}
+	if (false)
+	{
+		m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure2D(slice);
+		QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->
+			Get2DMeasurementsStrings(slice);
+		for (int i = 0; i < 4; ++i) {
+			ui.measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem((_2DMeasurements)[i]));
+		}
 
-	ui.MWTTextBrowser->setText((_2DMeasurements)[4]);
+		ui.MWTTextBrowser->setText((_2DMeasurements)[4]);
+	}
 }
 
 void MeasurementWidget::slotUpdateImformation()

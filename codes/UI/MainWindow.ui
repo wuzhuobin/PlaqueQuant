@@ -754,7 +754,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -858,6 +858,7 @@
    <addaction name="actionSeedsPlacer"/>
    <addaction name="actionContour"/>
    <addaction name="actionBrush"/>
+   <addaction name="actionObliqueView"/>
    <addaction name="separator"/>
    <addaction name="actionMultiPlanarView"/>
    <addaction name="actionAllAxialView"/>
@@ -1273,6 +1274,21 @@
   <action name="actionSaveContour">
    <property name="text">
     <string>Save Contour</string>
+   </property>
+  </action>
+  <action name="actionObliqueView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/Project.qrc">
+     <normaloff>:/icons/aami10-90-512.png</normaloff>:/icons/aami10-90-512.png</iconset>
+   </property>
+   <property name="text">
+    <string>ObliqueView</string>
+   </property>
+   <property name="toolTip">
+    <string>Reconstruct axial view with a line</string>
    </property>
   </action>
  </widget>

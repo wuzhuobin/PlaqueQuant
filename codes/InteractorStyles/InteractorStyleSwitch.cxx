@@ -29,6 +29,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	PaintBrush = QInteractorStylePaintBrush::New();
 	ROI = QInteractorStyleROI::New();
 	Ruler = QInteractorStyleRuler::New();
+	ObliqueView = QInteractorStyleObliqueViewSeedsPlacer::New();
 
 	allStyles.push_back(InteractorStyleTesting);
 	allStyles.push_back(WindowLevel);
@@ -38,6 +39,7 @@ InteractorStyleSwitch::InteractorStyleSwitch()
 	allStyles.push_back(PaintBrush);
 	allStyles.push_back(ROI);
 	allStyles.push_back(Ruler);
+	allStyles.push_back(ObliqueView);
 
 	this->CurrentStyle = 0;
 }
@@ -66,7 +68,8 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->PolygonDraw->SetPolygonModeEnabled(false);
 	if (this->CurrentStyle != this->SeedsPlacer)
 		this->SeedsPlacer->SetSeedsPlacerEnable(false);
-
+	if (this->CurrentStyle != this->ObliqueView)
+		this->ObliqueView->SetSeedsPlacerEnable(false);
 	if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
 	if (this->CurrentStyle != this->Ruler)
@@ -83,7 +86,8 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->PolygonDraw->SetPolygonModeEnabled(true);
 	if (this->CurrentStyle == this->SeedsPlacer)
 		this->SeedsPlacer->SetSeedsPlacerEnable(true);
-
+	if (this->CurrentStyle == this->ObliqueView)
+		this->ObliqueView->SetSeedsPlacerEnable(true);
 	if (this->CurrentStyle == this->ROI)
 		this->ROI->SetROIWidgetEnabled(true);
 	if (this->CurrentStyle == this->PaintBrush)
