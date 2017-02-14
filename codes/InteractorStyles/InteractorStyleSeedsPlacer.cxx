@@ -68,8 +68,13 @@ void InteractorStyleSeedsPlacer::SetFocalSeed(int i)
 void InteractorStyleSeedsPlacer::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
 {
 	AbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleSeedsPlacer, GenerateWidgetFromSeeds());
-	MY_VIEWER_CONSTITERATOR(Render());
+	if (this->Interactor) // If 'this' is the active interactorstyle
+	{
+		this->GenerateWidgetFromSeeds();
+		this->Interactor->Render();
+	}
+	//STYLE_DOWN_CAST_CONSTITERATOR(InteractorStyleSeedsPlacer, GenerateWidgetFromSeeds());
+	//MY_VIEWER_CONSTITERATOR(Render());
 }
 
 InteractorStyleSeedsPlacer::InteractorStyleSeedsPlacer()
@@ -186,6 +191,8 @@ void InteractorStyleSeedsPlacer::GenerateWidgetFromSeeds()
 {
 	if (m_currentSeedsType == ObliqueViewSeeds || m_currentSeedsType == SegmentationSeeds)
 	{
+		cout << "Viewer no. " << this->GetSliceOrientation() << " with m_currentSeedType=" << m_currentSeedsType << endl;
+
 		ClearAllSeedWidget();
 
 		for (list<int*>::const_iterator cit = m_seeds[m_currentSeedsType].cbegin();

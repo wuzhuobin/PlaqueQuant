@@ -125,11 +125,11 @@ protected:
 
 	/* This property decide which type of seeds this placer is controlling */
 	SeedsType m_currentSeedsType;
+	vtkSmartPointer<SeedsPlacerWidget> m_seedWidget;
 
 private:
 	friend class SeedsPlacerWidget;
 	vtkSmartPointer<SeedsPlacerRepresentation> m_seedRep;
-	vtkSmartPointer<SeedsPlacerWidget> m_seedWidget;
 	/**
 	 * Invalide pick or any other error? CalculateIndex() will set m_world[3] = 
 	 * { 0 };

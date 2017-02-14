@@ -57,15 +57,13 @@ protected:
 	virtual void OnKeyPress();
 
 
-
-
 	static std::list<MyImageViewer*> m_synchronalViewers;
 	MyImageViewer* m_imageViewer;
 
-private:
-	void MoveSliceForward();
-	void MoveSliceBackward();
+	virtual void MoveSliceForward();
+	virtual void MoveSliceBackward();
 
+private:
 	void SetCurrentFocalPointWithImageCoordinateByViewer(int i, int j, int k);
 };
 
