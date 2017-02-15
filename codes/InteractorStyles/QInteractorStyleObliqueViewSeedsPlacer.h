@@ -53,6 +53,8 @@ protected:
 	virtual void MoveSliceForward();
 	virtual void MoveSliceBackward();
 
+	void SetObliqueSlice(int sliceIndex);
+
 
 private:
 	Ui::QInteractorStyleObliqueViewSeedsPlacer* ui = nullptr;
@@ -60,7 +62,7 @@ private:
 	int m_numberOfIteractions = 3;
 	double m_multiplier = 2.1;
 	int m_initialNeighborhoodRadius = 1;
-	bool m_inReconstructedView = false;
+	bool m_inObliqueView = false;
 
 	static QList<vtkSmartPointer<vtkImageData>> m_listOfVtkImages;
 	static QList<QString> m_listOfModalityNames;
@@ -69,6 +71,7 @@ private:
 	int m_currentObliqueSlice;
 	static QList<double*> m_normalList;
 	static QList<double*> m_originList;
+	static QList<int*>	m_coordList;
 	QList<vtkProp*> m_savedActors;
 	vtkSmartPointer<vtkImageResliceMapper> m_resliceMapper;
 	vtkSmartPointer<vtkImageSlice> m_reslicer;

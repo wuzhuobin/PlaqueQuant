@@ -22,6 +22,7 @@
 #include "vtkCamera.h"
 #include "vtkImageSlice.h"
 #include "vtkImageProperty.h"
+#include "InteractorStyleNavigation.h"
 
 
 vtkStandardNewMacro(QInteractorStyleObliqueViewSeedsPlacer);
@@ -60,7 +61,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 	if (this->GetSliceOrientation() == 2)
 	{
 		// Do only for Axial view
-		if (axialView && !m_inReconstructedView)
+		if (axialView && !m_inObliqueView)
 		{
 			// Remember all actors
 			this->Interactor->GetRenderWindow()->GetRenderers()->InitTraversal();
@@ -122,9 +123,10 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			this->m_reslicer->Update();
 
 			this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddViewProp(this->m_reslicer);
+			this->SetObliqueSlice(0);
 			this->Interactor->Render();
 
-			this->m_inReconstructedView = true;
+			this->m_inObliqueView = true;
 
 			// Disable UI and seed widget
 			this->ClearAllSeedWidget();
@@ -133,12 +135,18 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			this->ui->pushBtnDeleteSeed->setDisabled(true);
 			this->ui->dropSeedPushButton->setDisabled(true);
 			this->ui->deleteAllSeedsPushButton->setDisabled(true);
+
+			this->m_inObliqueView = true;
 		}
 		else {
 			// Remove & delete reslice actor
 			this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveViewProp(this->m_reslicer);
-			this->m_reslicer->Delete();
-			this->m_resliceMapper->Delete();
+			this->m_reslicer->SetMapper(NULL);
+			this->m_resliceMapper->RemoveAllClippingPlanes();
+			this->m_resliceMapper->RemoveAllInputs();
+
+			this->m_resliceMapper = NULL;
+			this->m_reslicer = NULL;
 
 			// Re-enable all actors
 			while (this->m_savedActors.size())
@@ -148,7 +156,16 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 				this->m_savedActors.pop_back();
 			}
 
-			this->m_inReconstructedView = false;
+			this->m_inObliqueView = false;
+
+			// Recalculate camera position
+			double newCamPos[3], refVect[3] = { 0, 0, 1 };
+			vtkCamera* cam = this->m_imageViewer->GetRenderer()->GetActiveCamera();
+			this->m_imageViewer->SetFocalPointWithWorldCoordinate(cam->GetFocalPoint()[0], cam->GetFocalPoint()[1], cam->GetFocalPoint()[2]);
+			cam->SetViewUp(0, -1, 0);
+			vtkMath::MultiplyScalar(refVect, cam->GetDistance());
+			vtkMath::Add(cam->GetFocalPoint(), refVect, newCamPos);
+			cam->SetPosition(newCamPos);
 
 			// Enable UI and seedwidget
 			this->SetSeedsPlacerEnable(true);
@@ -156,6 +173,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			this->ui->pushBtnDeleteSeed->setDisabled(false);
 			this->ui->dropSeedPushButton->setDisabled(false);
 			this->ui->deleteAllSeedsPushButton->setDisabled(false);
+			this->m_inObliqueView = false;
 		}
 	}
 }
@@ -187,7 +205,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::SlotClearAllSeeds()
 
 void QInteractorStyleObliqueViewSeedsPlacer::slotPushBtnAxialReconstruction()
 {
-	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, InitializeObliqueView())
+	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, InitializeObliqueView());
 }
 
 
@@ -208,9 +226,10 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		ui->labelReconstructionStatus->setText("");
 	}
 
-	if (m_inReconstructedView)
+	if (m_inObliqueView)
 	{
 		/// Stop reconstruction view
+		this->EnableObliqueView(false);
 	}
 	else {
 		/// Initiate reconstruction view
@@ -238,7 +257,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 
 		// Interpolate the polyline to form a uniformly seperated polyline 
 		/* First calculate the total length of the line */
-		double totalLength;
+		double totalLength = 0;
 		for (int i = 1; i < pts->GetNumberOfPoints();i++)
 		{
 			double segmentVect[3], prevPoint[3];
@@ -277,6 +296,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		{
 			double *normal = (double*)malloc(sizeof(double) * 3);
 			double *origin = (double*)malloc(sizeof(double) * 3);
+			int* ijk = (int*)malloc(sizeof(int) * 3);
 			double p1[3], p2[3];
 
 			/* last point */
@@ -293,12 +313,17 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 				memcpy(origin, p1, sizeof(double) * 3);
 			}
 			
+			/* calculate back the ijk*/
+			ijk[0] = (origin[0] - GetOrigin()[0]) / GetSpacing()[0];
+			ijk[1] = (origin[1] - GetOrigin()[1]) / GetSpacing()[1];
+			ijk[2] = (origin[2] - GetOrigin()[2]) / GetSpacing()[2];
 
 			vtkMath::Subtract(p2, p1, normal);
 			vtkMath::Normalize(normal);
 
 			this->m_normalList.append(normal);
 			this->m_originList.append(origin);
+			this->m_coordList.append(ijk);
 		}
 
 		// Initialize seed view
@@ -412,6 +437,13 @@ void QInteractorStyleObliqueViewSeedsPlacer::CleanAllLists()
 		delete element;
 	}
 
+	while (this->m_coordList.size())
+	{
+		int *element = this->m_coordList.last();
+		this->m_coordList.pop_back();
+		delete element;
+	}
+
 	this->m_savedActors.clear();
 }
 
@@ -463,32 +495,9 @@ void QInteractorStyleObliqueViewSeedsPlacer::OnKeyPress()
 
 void QInteractorStyleObliqueViewSeedsPlacer::MoveSliceForward()
 {
-	if (this->m_inReconstructedView && this->GetSliceOrientation() == 2)
+	if (this->m_inObliqueView && this->GetSliceOrientation() == 2)
 	{
-		if (this->m_currentObliqueSlice >= this->m_normalList.size() - 1)
-		{
-			return;
-		}
-		else {
-			cout << "Current slice :" << this->m_currentObliqueSlice << endl;
-			this->m_currentObliqueSlice += 1;
-			this->m_resliceMapper->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
-			this->m_resliceMapper->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
-			this->m_reslicer->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel());
-			this->m_reslicer->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow()*15);
-			this->m_reslicer->Update();
-
-			/* Change camera to view the slice*/
-			vtkCamera* cam = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
-			double camPos[3], refVect[3];
-			memcpy(refVect, this->m_normalList[this->m_currentObliqueSlice], sizeof(double) * 3);
-			vtkMath::MultiplyScalar(refVect, cam->GetDistance());
-			vtkMath::Add(this->m_originList[this->m_currentObliqueSlice], refVect, camPos);
-			cam->SetFocalPoint(this->m_originList[this->m_currentObliqueSlice]);
-			cam->SetPosition(camPos);
-
-			MY_VIEWER_CONSTITERATOR(Render());
-		}
+		SetObliqueSlice(this->m_currentObliqueSlice + 1);
 	}
 	else {
 		Superclass::MoveSliceForward();
@@ -497,34 +506,52 @@ void QInteractorStyleObliqueViewSeedsPlacer::MoveSliceForward()
 
 void QInteractorStyleObliqueViewSeedsPlacer::MoveSliceBackward()
 {
-	if (this->m_inReconstructedView && this->GetSliceOrientation() == 2)
+	if (this->m_inObliqueView && this->GetSliceOrientation() == 2)
 	{
-		if (this->m_currentObliqueSlice == 0)
-		{
-			return;
-		}
-		else {
-			this->m_currentObliqueSlice -= 1;
-			this->m_resliceMapper->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
-			this->m_resliceMapper->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
-			this->m_reslicer->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel());
-			this->m_reslicer->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow()*15);
-			this->m_reslicer->Update();
-
-			/* Change camera to view the slice*/
-			vtkCamera* cam = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
-			double camPos[3], refVect[3];
-			memcpy(refVect, this->m_normalList[this->m_currentObliqueSlice], sizeof(double) * 3);
-			vtkMath::MultiplyScalar(refVect, cam->GetDistance());
-			vtkMath::Add(this->m_originList[this->m_currentObliqueSlice], refVect, camPos);
-			cam->SetFocalPoint(this->m_originList[this->m_currentObliqueSlice]);
-			cam->SetPosition(camPos);
-			
-			MY_VIEWER_CONSTITERATOR(Render());
-		}
+		SetObliqueSlice(this->m_currentObliqueSlice - 1);
+		return;
 	}
 	else {
 		Superclass::MoveSliceBackward();
+	}
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::SetObliqueSlice(int sliceIndex)
+{
+	if (sliceIndex < 0)
+	{
+		sliceIndex = 0;
+		return;
+	}
+	else if (sliceIndex > this->m_normalList.size() - 1)
+	{
+		sliceIndex = this->m_normalList.size() - 1;
+		return;
+	}
+	else {
+		this->m_currentObliqueSlice = sliceIndex;
+		this->m_resliceMapper->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
+		this->m_resliceMapper->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
+		this->m_reslicer->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel()*10);
+		this->m_reslicer->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow() * 12);
+		this->m_reslicer->Update();
+
+		/* Change camera to view the slice*/
+		vtkCamera* cam = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
+		double camPos[3], refVect[3];
+		memcpy(refVect, this->m_normalList[this->m_currentObliqueSlice], sizeof(double) * 3);
+		vtkMath::MultiplyScalar(refVect, cam->GetDistance());
+		vtkMath::Add(this->m_originList[this->m_currentObliqueSlice], refVect, camPos);
+		cam->SetFocalPoint(this->m_originList[this->m_currentObliqueSlice]);
+		cam->SetViewUp(0, 0, 1);
+		cam->SetPosition(camPos);
+
+
+		int *curIndex = this->m_coordList[this->m_currentObliqueSlice];
+		QList<MyImageViewer*> viewers = QList<MyImageViewer*>::fromStdList(this->m_synchronalViewers);
+		viewers[0]->SetFocalPointWithImageCoordinate(curIndex[0], curIndex[1], curIndex[2]);
+		viewers[1]->SetFocalPointWithImageCoordinate(curIndex[0], curIndex[1], curIndex[2]);
+		MY_VIEWER_CONSTITERATOR(Render());
 	}
 }
 
@@ -532,3 +559,4 @@ QList<vtkSmartPointer<vtkImageData>> QInteractorStyleObliqueViewSeedsPlacer::m_l
 QList<QString> QInteractorStyleObliqueViewSeedsPlacer::m_listOfModalityNames;
 QList<double*> QInteractorStyleObliqueViewSeedsPlacer::m_normalList;
 QList<double*> QInteractorStyleObliqueViewSeedsPlacer::m_originList;
+QList<int*> QInteractorStyleObliqueViewSeedsPlacer::m_coordList;
