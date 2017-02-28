@@ -19,7 +19,7 @@
 
 namespace Ui { class QAbstractInteractorStyle; }
 
-#ifndef QSETUP_UI_HEAD(STYLE_NAME)
+//#ifndef QSETUP_UI_HEAD(STYLE_NAME)
 #define QSETUP_UI_HEAD(STYLE_NAME) \
 public:\
 Ui::##STYLE_NAME* getUi();\
@@ -29,9 +29,10 @@ void setupUi();\
 int uiType = NO_UI;\
 static int numOfMyself;\
 static bool initializationFlag;
-#endif // !QSETUP_UI_HEAD(STYLE_NAME)
+//#endif // !QSETUP_UI_HEAD(STYLE_NAME)
 
-#ifndef QSETUP_UI_SRC(STYLE_NAME)
+
+//#ifndef QSETUP_UI_SRC(STYLE_NAME)
 #define QSETUP_UI_SRC(STYLE_NAME) \
 int STYLE_NAME::numOfMyself = 0;\
 bool STYLE_NAME::initializationFlag = false;\
@@ -64,14 +65,15 @@ void STYLE_NAME::setupUi()\
 Ui::##STYLE_NAME* STYLE_NAME::getUi(){\
 	return ui;\
 }
-#endif // !QSETUP_UI_SRC(STYLE_NAME)
+//#endif // !QSETUP_UI_SRC(STYLE_NAME)
 
-#ifndef QNEW_UI()
+
+//#ifndef QNEW_UI()
 #define QNEW_UI()\
 this->uiType = uiType;this->setupUi();
-#endif // !QNEW_UI()
+//#endif // !QNEW_UI()
 
-#ifndef QDELETE_UI()
+//#ifndef QDELETE_UI()
 #define QDELETE_UI() \
 --numOfMyself;\
 switch (this->uiType)\
@@ -95,7 +97,7 @@ switch (this->uiType)\
 		}\
 		break;\
 }
-#endif // !QDELETE_UI()
+//#endif // !QDELETE_UI()
 
 /**
  * @class	QAbstractInteractorStyle 

@@ -26,13 +26,13 @@ Copyright (C) 2016
 
 
 
-#ifndef VIEWER_CONSTITERATOR(METHOD)
+//#ifndef VIEWER_CONSTITERATOR(METHOD)
 #define VIEWER_CONSTITERATOR(METHOD) \
 for(std::list<vtkImageViewer2*>::const_iterator cit = \
 	m_synchronalViewers.cbegin(); cit != m_synchronalViewers.cend(); ++cit){\
 	(*cit)->##METHOD; \
 }
-#endif // !VIEWER_CONSTITERATOR(METHOD)
+//#endif // !VIEWER_CONSTITERATOR(METHOD)
 
 class AbstractInteractorStyleImage : public vtkInteractorStyleImage, 
 	public AbstractInteractorStyle

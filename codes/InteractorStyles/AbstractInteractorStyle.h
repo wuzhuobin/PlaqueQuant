@@ -24,7 +24,7 @@ Copyright (C) 2016
  * Macro for iterate specified @param STYLE_NAME class to run its @param METHOD
  * saving human labor to type this iterate again!
  */
-#ifndef STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD)
+//#ifndef STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD)
 #define STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD) \
 for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
 	m_abstractInteractorStyles.cbegin(); cit != m_abstractInteractorStyles.cend(); ++cit){\
@@ -33,7 +33,7 @@ for(std::list<AbstractInteractorStyle*>::const_iterator cit = \
 		_style->##METHOD; \
 	} \
 }
-#endif // !STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD)
+//#endif // !STYLE_DOWN_CAST_CONSTITERATOR(STYLE_NAME, METHOD)
 
 class AbstractInteractorStyle
 {

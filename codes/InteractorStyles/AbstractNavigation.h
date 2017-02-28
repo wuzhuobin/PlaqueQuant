@@ -23,7 +23,7 @@ Copyright (C) 2016
 #include "MyImageViewer.h"
 
 
-#ifndef MY_VIEWER_CONSTITERATOR(METHOD)
+//#ifndef MY_VIEWER_CONSTITERATOR(METHOD)
 #define MY_VIEWER_CONSTITERATOR(METHOD) \
 for(std::list<vtkImageViewer2*>::const_iterator cit = \
 	AbstractInteractorStyleImage::m_synchronalViewers.cbegin(); \
@@ -32,7 +32,7 @@ for(std::list<vtkImageViewer2*>::const_iterator cit = \
 	if(_viewer != nullptr)\
 		_viewer->##METHOD; \
 }
-#endif // !MY_VIEWER_CONSTITERATOR(METHOD)
+//#endif // !MY_VIEWER_CONSTITERATOR(METHOD)
 
 class AbstractNavigation : public AbstractInteractorStyleImage
 {
