@@ -40,13 +40,13 @@ MainWindow::MainWindow()
 	
 	this->m_core->Initialization();
 
-	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,			SLOT(slotVisualizeImage()));
+	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,	SLOT(slotVisualizeImage()));
 	
 	// Open Image
-	connect(ui->actionOpenImage,	SIGNAL(triggered())					, m_core->GetIOManager(),	SLOT(slotOpenWithWizard()));
+	connect(ui->actionOpenImage,	SIGNAL(triggered()), m_core->GetIOManager(), SLOT(slotOpenWithWizard()));
 	
 	// Segmentation
-	connect(ui->actionSaveSegmentation,			SIGNAL(triggered())					, m_core->GetIOManager(),		SLOT(slotSaveSegmentaitonWithDiaglog()));
+	connect(ui->actionSaveSegmentation,	SIGNAL(triggered()), m_core->GetIOManager(), SLOT(slotSaveSegmentaitonWithDiaglog()));
 	connect(ui->actionOpenSegmentation, SIGNAL(triggered()),
 		m_core->GetIOManager(), SLOT(slotOpenSegmentationWithDiaglog()));
 	connect(ui->actionSaveContour, SIGNAL(triggered()),

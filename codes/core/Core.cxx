@@ -179,9 +179,6 @@ void Core::slotVisualizeAll2DViewers()
 	m_style[DEFAULT_IMAGE]->GetSeedsPlacer()->SetTargetImages(
 		m_imageManager->getListOfVtkImages(),
 		m_imageManager->getListOfModalityNames());
-	m_style[DEFAULT_IMAGE]->GetObliqueView()->SetTargetImages(
-		m_imageManager->getListOfVtkImages(),
-		m_imageManager->getListOfModalityNames());
 
 	emit signalVisualizeAllViewers();
 }

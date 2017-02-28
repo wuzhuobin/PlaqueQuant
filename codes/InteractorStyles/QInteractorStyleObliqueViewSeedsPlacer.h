@@ -20,18 +20,22 @@ public:
 	static QInteractorStyleObliqueViewSeedsPlacer* New();
 	void SetSeedsPlacerEnable(bool flag);
 	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
-	/**
-	 * temporary fix
-	 */
-	void SetTargetImages(
-		QList<vtkSmartPointer<vtkImageData>> listOfVtkImages, 
-		QList<QString> listOfModalityNames);
+	///**
+	// * temporary fix
+	// */
+	//void SetTargetImages(
+	//	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages, 
+	//	QList<QString> listOfModalityNames);
 	
 	void EnableObliqueView(bool);
+	
+	virtual void SetInteractor(vtkRenderWindowInteractor *interactor);
+
 
 public slots:
-	void SlotClearAllSeeds();
+	void slotClearAllSeeds();
 	void slotPushBtnAxialReconstruction();
+	void slotPushBtnCopySeedsFromSegmentation();
 
 	void SetFocalSeed(int i);
 	void DeleteFocalSeed();
@@ -46,8 +50,11 @@ protected:
 	//void uniqueInvoke(bool flag);
 	void CleanAllLists();
 	void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
-	void InitializeObliqueView();
 
+	void UpdateSeedTable();
+
+	void InitializeObliqueView();
+	void CopySegmentationSeeds();
 
 	virtual void OnKeyPress();
 	virtual void MoveSliceForward();
@@ -73,8 +80,8 @@ private:
 	static QList<double*> m_originList;
 	static QList<int*>	m_coordList;
 	QList<vtkProp*> m_savedActors;
-	vtkSmartPointer<vtkImageResliceMapper> m_resliceMapper;
-	vtkSmartPointer<vtkImageSlice> m_reslicer;
+	vtkSmartPointer<vtkImageResliceMapper> m_resliceMapper[2];
+	vtkSmartPointer<vtkImageSlice> m_reslicer[2];
 };
 
 

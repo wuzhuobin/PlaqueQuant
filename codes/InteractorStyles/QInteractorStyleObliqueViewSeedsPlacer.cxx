@@ -18,16 +18,43 @@
 #include "ui_QInteractorStyleObliqueViewSeedsPlacer.h"
 #include "ui_QAbstractNavigation.h"
 #include "vtkPlane.h"
-//#include "vtkXMLPolyDataWriter.h"
 #include "vtkCamera.h"
 #include "vtkImageSlice.h"
 #include "vtkImageProperty.h"
 #include "InteractorStyleNavigation.h"
 
+// DEBUG
+#include "vtkXMLPolyDataWriter.h"
+#include "vtkNIFTIImageWriter.h"
 
 vtkStandardNewMacro(QInteractorStyleObliqueViewSeedsPlacer);
 QSETUP_UI_SRC(QInteractorStyleObliqueViewSeedsPlacer);
 using namespace std;
+
+QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(int uiType, QWidget* parent)
+{
+	QNEW_UI();
+	if (numOfMyself == 1) {
+		connect(ui->pushBtnDeleteSeed, SIGNAL(clicked()),
+			this, SLOT(DeleteFocalSeed()));
+		connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
+			this, SLOT(SetFocalSeed(int)));
+		connect(ui->dropSeedPushButton, SIGNAL(clicked()),
+			this, SLOT(DropSeed()));
+		connect(ui->pushBtnAxialReconstruction, SIGNAL(clicked()),
+			this, SLOT(slotPushBtnAxialReconstruction()));
+		connect(ui->pushBtnCopyFromSegSeeds, SIGNAL(clicked()),
+			this, SLOT(slotPushBtnCopySeedsFromSegmentation()));
+
+	}
+	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
+		this, SLOT(slotClearAllSeeds()));
+}
+
+QInteractorStyleObliqueViewSeedsPlacer::~QInteractorStyleObliqueViewSeedsPlacer()
+{
+	QDELETE_UI();
+}
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetSeedsPlacerEnable(bool flag)
 {
@@ -41,20 +68,20 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetCurrentFocalPointWithImageCoordi
 	QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 }
 
-void QInteractorStyleObliqueViewSeedsPlacer::SetTargetImages(
-	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages,
-	QList<QString> listOfModalityNames)
-{
-	m_listOfModalityNames = listOfModalityNames;
-	m_listOfVtkImages = listOfVtkImages;
-
-	ui->comboBoxTargeImage->clear();
-	for (int i = 0; i < m_listOfModalityNames.size(); ++i) {
-		if (m_listOfVtkImages[i] != nullptr) {
-			ui->comboBoxTargeImage->addItem(m_listOfModalityNames[i]);
-		}
-	}
-}
+//void QInteractorStyleObliqueViewSeedsPlacer::SetTargetImages(
+//	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages,
+//	QList<QString> listOfModalityNames)
+//{
+//	m_listOfModalityNames = listOfModalityNames;
+//	m_listOfVtkImages = listOfVtkImages;
+//
+//	ui->comboBoxTargeImage->clear();
+//	for (int i = 0; i < m_listOfModalityNames.size(); ++i) {
+//		if (m_listOfVtkImages[i] != nullptr) {
+//			ui->comboBoxTargeImage->addItem(m_listOfModalityNames[i]);
+//		}
+//	}
+//}
 
 void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 {
@@ -94,43 +121,65 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 
 
 			// Setup reslicer
-			if (this->m_reslicer != NULL)
+			if (this->m_reslicer[0] != NULL)
 			{
-				this->m_reslicer->RemoveAllObservers();
-				this->m_reslicer->Delete();
+				this->m_reslicer[0]->RemoveAllObservers();
+				this->m_reslicer[0]->Delete();
 			}
-			if (this->m_resliceMapper != NULL)
-				this->m_resliceMapper->Delete();
+			if (this->m_resliceMapper[0] != NULL)
+				this->m_resliceMapper[0]->Delete();
 
-			this->m_resliceMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
-			this->m_reslicer = vtkSmartPointer<vtkImageSlice>::New();
-			int index = m_listOfModalityNames.indexOf(ui->comboBoxTargeImage->currentText());
-			vtkImageData* im = m_listOfVtkImages[index];
-			im->Print(cout);
-			this->m_resliceMapper->SetInputData(im);
-			this->m_resliceMapper->SetSlicePlane(vtkSmartPointer<vtkPlane>::New());
-			this->m_reslicer->SetMapper(this->m_resliceMapper);
-			this->m_reslicer->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel());
-			this->m_reslicer->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow());
-			this->m_reslicer->Update();
+			// Read currently viewing image
 			
+			vtkImageData* im = this->m_imageViewer->GetInput();
+			vtkImageData* overlay = this->m_imageViewer->GetInputLayer();
 
-			// set cut plane to first point
-			vtkPlane* plane = this->m_resliceMapper->GetSlicePlane();
-			this->m_currentObliqueSlice = 0;
-			plane->SetNormal(this->m_normalList[0]);
-			plane->SetOrigin(this->m_originList[0]);
-			this->m_reslicer->Update();
+			// Declare new mapper and reslicers
+			this->m_resliceMapper[0] = vtkSmartPointer<vtkImageResliceMapper>::New();
+			this->m_reslicer[0] = vtkSmartPointer<vtkImageSlice>::New();
 
-			this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddViewProp(this->m_reslicer);
+			//// DEBUG
+			//vtkSmartPointer<vtkNIFTIImageWriter> writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
+			//writer->SetInputData(overlay);
+			//writer->SetFileName("C:/Users/lwong/Downloads/output.nii.gz");
+			//writer->Update();
+			//writer->Write();
+
+			this->m_resliceMapper[0]->SetInputData(im);
+			this->m_resliceMapper[0]->SetSlicePlane(vtkSmartPointer<vtkPlane>::New());
+			this->m_reslicer[0]->SetMapper(this->m_resliceMapper[0]);
+			this->m_reslicer[0]->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel());
+			this->m_reslicer[0]->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow());
+			this->m_reslicer[0]->Update();			
+			this->CurrentRenderer->AddViewProp(this->m_reslicer[0]);
+			this->CurrentRenderer->SetBackground(0.3, 0.3, 0.3);
+			
+			// Handle overlay if exist
+			if (overlay)
+			{
+				this->m_imageViewer->GetOverlay()->GetLookupTable()->Print(cout);
+				this->m_resliceMapper[1] = vtkSmartPointer<vtkImageResliceMapper>::New();
+				this->m_reslicer[1] = vtkSmartPointer<vtkImageSlice>::New();
+				this->m_resliceMapper[1]->SetInputData(overlay);
+				this->m_resliceMapper[1]->SetSlicePlane(vtkSmartPointer<vtkPlane>::New());
+				this->m_reslicer[1]->SetMapper(this->m_resliceMapper[1]);
+				this->m_reslicer[1]->GetProperty()->SetLookupTable(this->m_imageViewer->GetOverlay()->GetLookupTable());
+				this->m_reslicer[1]->GetProperty()->SetColorWindow(this->m_imageViewer->GetOverlay()->GetLookupTable()->GetNumberOfColors());
+				this->m_reslicer[1]->GetProperty()->SetColorLevel(this->m_imageViewer->GetOverlay()->GetLookupTable()->GetNumberOfColors()/2.);
+				this->m_reslicer[1]->GetProperty()->SetInterpolationTypeToNearest();
+				this->m_reslicer[1]->Update();
+
+				this->CurrentRenderer->AddViewProp(this->m_reslicer[1]);
+			}
+
+
 			this->SetObliqueSlice(0);
 			this->Interactor->Render();
-
 			this->m_inObliqueView = true;
 
 			// Disable UI and seed widget
 			this->ClearAllSeedWidget();
-			this->SetSeedsPlacerEnable(false);
+			InteractorStyleSeedsPlacer::SetSeedsPlacerEnable(false); // This advoid invoking uniqueDisable()
 			this->ui->listWidgetSeedList->setDisabled(true);
 			this->ui->pushBtnDeleteSeed->setDisabled(true);
 			this->ui->dropSeedPushButton->setDisabled(true);
@@ -138,15 +187,28 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 
 			this->m_inObliqueView = true;
 		}
-		else {
+		else if (this->m_inObliqueView) {
 			// Remove & delete reslice actor
-			this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveViewProp(this->m_reslicer);
-			this->m_reslicer->SetMapper(NULL);
-			this->m_resliceMapper->RemoveAllClippingPlanes();
-			this->m_resliceMapper->RemoveAllInputs();
+			this->m_reslicer[0]->SetMapper(NULL);
+			this->CurrentRenderer->RemoveViewProp(this->m_reslicer[0]);
+			if (this->m_reslicer[1])
+			{
+				this->m_reslicer[1]->SetMapper(NULL);
+				this->CurrentRenderer->RemoveViewProp(this->m_reslicer[1]);
+			}
+			if (!this->Interactor)
+				this->CurrentRenderer = NULL;             
 
-			this->m_resliceMapper = NULL;
-			this->m_reslicer = NULL;
+			this->m_resliceMapper[0]->RemoveAllObservers();
+			if (this->m_resliceMapper[1])
+			{
+				this->m_resliceMapper[1]->RemoveAllObservers();
+			}
+
+			this->m_resliceMapper[0] = NULL;
+			this->m_resliceMapper[1] = NULL;
+			this->m_reslicer[0] = NULL;
+			this->m_reslicer[1] = NULL;
 
 			// Re-enable all actors
 			while (this->m_savedActors.size())
@@ -168,7 +230,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			cam->SetPosition(newCamPos);
 
 			// Enable UI and seedwidget
-			this->SetSeedsPlacerEnable(true);
+			InteractorStyleSeedsPlacer::SetSeedsPlacerEnable(true); // This advoid invoking uiqueEnable()
 			this->ui->listWidgetSeedList->setDisabled(false);
 			this->ui->pushBtnDeleteSeed->setDisabled(false);
 			this->ui->dropSeedPushButton->setDisabled(false);
@@ -178,9 +240,25 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 	}
 }
 
+void QInteractorStyleObliqueViewSeedsPlacer::SetInteractor(vtkRenderWindowInteractor *interactor)
+{
+	if (interactor)
+	{
+		this->CurrentRenderer = interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+	}
+
+	Superclass::SetInteractor(interactor);
+}
+
 void QInteractorStyleObliqueViewSeedsPlacer::UpdateWidgetToSeeds(int * oldImagePos, int* newImagePos)
 {
 	InteractorStyleSeedsPlacer::UpdateWidgetToSeeds(oldImagePos, newImagePos);
+	UpdateSeedTable();
+
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::UpdateSeedTable()
+{
 	ui->listWidgetSeedList->clear();
 	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
 	//for (QList<int*>::ConstIterator cit = _seeds.cbegin(); cit != _seeds.cend(); ++cit) {
@@ -195,7 +273,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::UpdateWidgetToSeeds(int * oldImageP
 	}
 }
 
-void QInteractorStyleObliqueViewSeedsPlacer::SlotClearAllSeeds()
+void QInteractorStyleObliqueViewSeedsPlacer::slotClearAllSeeds()
 {
 	ClearAllSeeds();
 	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, ClearAllSeedWidget());
@@ -208,6 +286,11 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotPushBtnAxialReconstruction()
 	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, InitializeObliqueView());
 }
 
+
+void QInteractorStyleObliqueViewSeedsPlacer::slotPushBtnCopySeedsFromSegmentation()
+{
+	this->CopySegmentationSeeds();
+}
 
 void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 {
@@ -288,6 +371,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		//writer->SetFileName("C:\\Users\\lwong\\Source\\datacenter\\interpPolyline.vtp");
 		//writer->Update();
 		//writer->Write();
+		
 
 		// Construct the normal list and the origin list for reslicer;
 		/* clean the list first */
@@ -332,6 +416,19 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 	}
 }
 
+void QInteractorStyleObliqueViewSeedsPlacer::CopySegmentationSeeds()
+{
+	this->ClearAllSeeds();
+
+	for each (int* seed in m_seeds[SegmentationSeeds])
+	{
+		int *copy = new int[3];
+		memcpy(copy, seed, sizeof(int) * 3);
+		m_seeds[ObliqueViewSeeds].push_back(copy);
+	}
+	this->GenerateWidgetFromSeeds();
+	this->UpdateSeedTable();
+}
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetFocalSeed(int i)
 {
@@ -376,18 +473,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::DeleteFocalSeed()
 void QInteractorStyleObliqueViewSeedsPlacer::SaveWidgetToSeeds()
 {
 	InteractorStyleSeedsPlacer::SaveWidgetToSeeds();
-	ui->listWidgetSeedList->clear();
-	QList<int*> _seeds = QList<int*>::fromStdList(m_seeds[m_currentSeedsType]);
-	//for (QList<int*>::ConstIterator cit = _seeds.cbegin(); cit != _seeds.cend(); ++cit) {
-	//	ui->listWidgetSeedList->insertItem()
-	//}
-	for (int i = 0; i < _seeds.size(); ++i) {
-		QString listItem = "Way Point " + QString::number(i) + ": [" +
-			QString::number(_seeds[i][0]) + "," +
-			QString::number(_seeds[i][1]) + "," +
-			QString::number(_seeds[i][2]) + "]";
-		ui->listWidgetSeedList->insertItem(i, listItem);
-	}
+	this->UpdateSeedTable();
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::DropSeed()
@@ -395,31 +481,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::DropSeed()
 	InteractorStyleSeedsPlacer::DropSeed();
 }
 
-QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(int uiType, QWidget* parent)
-{
-	QNEW_UI();
-	if (numOfMyself == 1) {
-		connect(ui->pushBtnDeleteSeed, SIGNAL(clicked()),
-			this, SLOT(DeleteFocalSeed()));
 
-		connect(ui->listWidgetSeedList, SIGNAL(currentRowChanged(int)),
-			this, SLOT(SetFocalSeed(int)));
-		
-		connect(ui->dropSeedPushButton, SIGNAL(clicked()),
-			this, SLOT(DropSeed()));
-		connect(ui->pushBtnAxialReconstruction, SIGNAL(clicked()),
-			this, SLOT(slotPushBtnAxialReconstruction()));
-
-	}
-	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
-		this, SLOT(SlotClearAllSeeds()));
-}
-
-QInteractorStyleObliqueViewSeedsPlacer::~QInteractorStyleObliqueViewSeedsPlacer()
-{
-	QDELETE_UI();
-
-}
 
 void QInteractorStyleObliqueViewSeedsPlacer::CleanAllLists()
 {
@@ -530,14 +592,22 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetObliqueSlice(int sliceIndex)
 	}
 	else {
 		this->m_currentObliqueSlice = sliceIndex;
-		this->m_resliceMapper->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
-		this->m_resliceMapper->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
-		this->m_reslicer->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel()*10);
-		this->m_reslicer->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow() * 12);
-		this->m_reslicer->Update();
+		this->m_resliceMapper[0]->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
+		this->m_resliceMapper[0]->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
+		this->m_reslicer[0]->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel()*10);
+		this->m_reslicer[0]->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow() * 12);
+		this->m_reslicer[0]->Update();
+
+		if (this->m_reslicer[1])
+		{
+			this->m_resliceMapper[1]->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
+			this->m_resliceMapper[1]->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
+			this->m_reslicer[1]->Update();
+		}
+
 
 		/* Change camera to view the slice*/
-		vtkCamera* cam = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
+		vtkCamera* cam = this->CurrentRenderer->GetActiveCamera();
 		double camPos[3], refVect[3];
 		memcpy(refVect, this->m_normalList[this->m_currentObliqueSlice], sizeof(double) * 3);
 		vtkMath::MultiplyScalar(refVect, cam->GetDistance());

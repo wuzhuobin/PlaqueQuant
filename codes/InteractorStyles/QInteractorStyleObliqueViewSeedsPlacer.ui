@@ -152,20 +152,6 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_62">
-          <property name="text">
-           <string>Targe Image (T1 recommanded): </string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxTargeImage"/>
-        </item>
-       </layout>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_33">
         <item>
          <spacer name="horizontalSpacer_2">
@@ -222,6 +208,13 @@
        </layout>
       </item>
       <item>
+       <widget class="QPushButton" name="pushBtnCopyFromSegSeeds">
+        <property name="text">
+         <string>Copy From Segmentation Seeds</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -254,10 +247,12 @@
        </widget>
       </item>
      </layout>
+     <zorder>pushBtnAxialReconstruction</zorder>
+     <zorder>labelReconstructionStatus</zorder>
      <zorder>line</zorder>
      <zorder>listWidgetSeedList</zorder>
      <zorder>label_60</zorder>
-     <zorder>pushBtnAxialReconstruction_2</zorder>
+     <zorder>pushBtnCopyFromSegSeeds</zorder>
     </widget>
    </item>
    <item>

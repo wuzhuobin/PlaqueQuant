@@ -68,8 +68,10 @@ void InteractorStyleSwitch::InternalUpdate()
 		this->PolygonDraw->SetPolygonModeEnabled(false);
 	if (this->CurrentStyle != this->SeedsPlacer)
 		this->SeedsPlacer->SetSeedsPlacerEnable(false);
-	if (this->CurrentStyle != this->ObliqueView)
+	if (this->CurrentStyle != this->ObliqueView) {
 		this->ObliqueView->SetSeedsPlacerEnable(false);
+		this->ObliqueView->EnableObliqueView(false);
+	}
 	if (this->CurrentStyle != this->PaintBrush)
 		this->PaintBrush->SetPaintBrushModeEnabled(false);
 	if (this->CurrentStyle != this->Ruler)

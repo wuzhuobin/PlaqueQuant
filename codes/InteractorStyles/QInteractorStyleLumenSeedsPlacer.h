@@ -26,6 +26,8 @@ public:
 		QList<QString> listOfModalityNames);
 
 public slots:
+	void SlotUpdateSpinBoxExtractRadius();
+	void SlotUpdateHSliderExtractRadius();
 	void SlotClearAllSeeds();
 	void SlotCentreLine();
 	void SetFocalSeed(int i);
@@ -55,13 +57,15 @@ protected:
 	void OnKeyPress();
 
 private:
+	void ConstructPolydataFromSeeds(vtkPolyData* outPD);
+	void ExtractSegment(vtkImageData* inImage, vtkImageData* outImage, vtkPolyData* inPolydata);
+
 
 	Ui::QInteractorStyleLumenSeedsPlacer* ui = nullptr;
 
 	int m_numberOfIteractions = 3;
 	double m_multiplier = 2.1;
 	int m_initialNeighborhoodRadius = 1;
-
 
 	QList<vtkSmartPointer<vtkImageData>> m_listOfVtkImages;
 	QList<QString> m_listOfModalityNames;

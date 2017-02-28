@@ -40,7 +40,7 @@ find_library(
     VIKEY_LIB
     NAMES ViKey
     PATHS
-    ${PROJECT_SOURCE_DIR}/"DLL(X64)"
+    ${PROJECT_SOURCE_DIR}/"DLL\(X64\)"
 )
 file(
     COPY

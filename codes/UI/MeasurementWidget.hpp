@@ -3,6 +3,7 @@
 #define MEASUREMENTWIDGET_HPP
 #include <QWidget>
 
+#include "vtkImageData.h"
 #include "ui_measurementwidget.h"
 
 
@@ -14,6 +15,8 @@ class MeasurementWidget : public QWidget {
 public:
 	MeasurementWidget(QWidget * parent = Q_NULLPTR);
 	~MeasurementWidget();
+
+	//void UpdateMeasurementsForObliqueSlice(vtkImageData*);
 
 public slots:
 	void slotUpdate3DMeasurements();

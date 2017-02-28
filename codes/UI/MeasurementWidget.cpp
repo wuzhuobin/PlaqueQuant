@@ -8,6 +8,8 @@
 #include <vtkImageResize.h>
 #include <vtkPNGWriter.h>
 
+#include "MeasurementFor2D.h"
+#include "MeasurementFor3D.h"
 #include "Overlay.h"
 #include "ReportGenerator.h"
 #include "MainWindow.h"
@@ -46,6 +48,19 @@ MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent)
 MeasurementWidget::~MeasurementWidget() {
 	
 }
+
+//void MeasurementWidget::UpdateMeasurementsForObliqueSlice(vtkImageData* img)
+//{
+//	// Must be single slice
+//	if (img->GetExtent()[4] != img->GetExtent()[5])
+//	{
+//		return;
+//	}
+//
+//	vtkSmartPointer<MeasurementFor2D> m = vtkSmartPointer<MeasurementFor2D>::New();
+//	m->SetSliceImage(img);
+//	m->Update();
+//}
 
 void MeasurementWidget::slotUpdate3DMeasurements()
 {

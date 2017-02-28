@@ -5,17 +5,17 @@
 
 //#undef _DEBUG
 
-
-// error output
-#ifdef _DEBUG
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
-extern const bool WARNING = false;
-extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
-#else
+//
+//// error output
+//#ifdef _DEBUG
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+//extern const bool WARNING = false;
+//extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
+//#else
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 extern const bool WARNING = true;
 extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = true;
-#endif // !_DEBUG
+//#endif // !_DEBUG
  
 
 extern const char* PLAQUEQUANT_VERSION = "2.0";

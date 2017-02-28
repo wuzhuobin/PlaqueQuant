@@ -177,7 +177,7 @@ bool MaximumWallThickness::ExtractSlice()
 	//MainWindow* mainwnd = MainWindow::GetMainWindow();
 	//mainwnd->GetOverlay()->GetDisplayExtent(m_extent); // Extent is obtained from distplayed extent of overlay
 
-													   // Set the extent to the slice being handled only
+	// Set the extent to the slice being handled only
 	this->m_extent[4] = this->m_sliceNumber;
 	this->m_extent[5] = this->m_sliceNumber;
 
