@@ -67,16 +67,6 @@ void QInteractorStyleLumenSeedsPlacer::UpdateWidgetToSeeds(int * oldImagePos, in
 	}
 }
 
-void QInteractorStyleLumenSeedsPlacer::SlotUpdateSpinBoxExtractRadius()
-{
-	this->ui->doubleSpinBoxExtractRadius->setValue(this->ui->hSliderExtractRadius->value() / 10.);
-}
-
-void QInteractorStyleLumenSeedsPlacer::SlotUpdateHSliderExtractRadius()
-{
-	this->ui->hSliderExtractRadius->setValue(this->ui->doubleSpinBoxExtractRadius->value() * 10);
-}
-
 void QInteractorStyleLumenSeedsPlacer::SlotClearAllSeeds()
 {
 	ClearAllSeeds();
@@ -203,24 +193,7 @@ void QInteractorStyleLumenSeedsPlacer::ExtractLumen()
 	lumenExtractionFilter->SetInputData(m_listOfVtkImages[index]);
 	lumenExtractionFilter->Update();
 
-	/* If the ExtractRadius check box is checked */
-	if (this->ui->checkBoxExtractWithRadius->isChecked()) 
-	{
-		/* Generate polyline from seeds */
-		vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
-		this->ConstructPolydataFromSeeds(pd);
-
-		/* Use mask to process the segmentation */
-		vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
-		this->ExtractSegment(lumenExtractionFilter->GetOutput(), im, pd);
-
-		m_imageViewer->GetOverlay()->vtkShallowCopyImage(
-			im);
-	}
-	else
-	{
-		m_imageViewer->GetOverlay()->vtkShallowCopyImage(lumenExtractionFilter->GetOutput());
-	}
+	m_imageViewer->GetOverlay()->vtkShallowCopyImage(lumenExtractionFilter->GetOutput());
 	MY_VIEWER_CONSTITERATOR(Render());
 
 	//ExtractLumenPolyData();
@@ -331,10 +304,7 @@ QInteractorStyleLumenSeedsPlacer::QInteractorStyleLumenSeedsPlacer(int uiType, Q
 			this, SLOT(SetNumberOfIteractions(int)));
 		connect(ui->initialNeighbodhoodSpinBox, SIGNAL(valueChanged(int)),
 			this, SLOT(SetInitialNeighborhoodRadius(int)));
-		connect(ui->doubleSpinBoxExtractRadius, SIGNAL(valueChanged(double)),
-			this, SLOT(SlotUpdateHSliderExtractRadius()));
-		connect(ui->hSliderExtractRadius, SIGNAL(valueChanged(int)),
-			this, SLOT(SlotUpdateSpinBoxExtractRadius()));
+
 
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
@@ -390,81 +360,4 @@ void QInteractorStyleLumenSeedsPlacer::OnKeyPress()
 	else {
 		InteractorStyleSeedsPlacer::OnKeyPress();
 	}
-}
-
-void QInteractorStyleLumenSeedsPlacer::ConstructPolydataFromSeeds(vtkPolyData* outPD)
-{
-	if (!outPD)
-	{
-		vtkErrorMacro("Input polydata pointer must be allocated before inputing to this function!");
-		return;
-	}
-
-	/// Initiate reconstruction view
-	// Construct a polyline from the way point 
-	vtkSmartPointer<vtkPolyData> polyline = vtkSmartPointer<vtkPolyData>::New();
-	vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-	cells->InsertNextCell(m_seeds[SegmentationSeeds].size());
-	int iteratorCursor = 0;
-	for (std::list<int*>::const_iterator iter = m_seeds[SegmentationSeeds].cbegin();
-	iter != m_seeds[SegmentationSeeds].cend(); iter++)
-	{
-		int* imagePos = *iter;
-		double worldPos[3];
-		for (int pos = 0; pos < 3; ++pos) {
-			worldPos[pos] = (imagePos[pos] * GetSpacing()[pos]) + GetOrigin()[pos];
-		}
-		pts->InsertNextPoint(worldPos);
-		cells->InsertCellPoint(iteratorCursor);
-		iteratorCursor += 1;
-	}
-	iteratorCursor = 0;
-	polyline->SetPoints(pts);
-	polyline->SetLines(cells);
-
-	// Interpolate the polyline to form a uniformly seperated polyline 
-	/* First calculate the total length of the line */
-	double totalLength = 0;
-	for (int i = 1; i < pts->GetNumberOfPoints(); i++)
-	{
-		double segmentVect[3], prevPoint[3];
-		memcpy(prevPoint, pts->GetPoint(i - 1), sizeof(double) * 3);
-		vtkMath::Subtract(pts->GetPoint(i), prevPoint, segmentVect);
-		totalLength += vtkMath::Norm(segmentVect);
-	}
-	/* Calculate subdivision value, default spacing will be 1mm */
-	double defaultSpacing_mm = 1;
-	int subdivision = int(ceil(totalLength / defaultSpacing_mm)) + 1;
-
-	/* Interpolate the polyline */
-	vtkSmartPointer<vtkCardinalSpline> spline = vtkSmartPointer<vtkCardinalSpline>::New();
-	spline->SetLeftConstraint(2);
-	spline->SetLeftValue(0.0);
-	spline->SetRightConstraint(2);
-	spline->SetRightValue(0.0);
-	vtkSmartPointer<vtkSplineFilter> splineFilter = vtkSmartPointer<vtkSplineFilter>::New();
-	splineFilter->SetInputData(polyline);
-	splineFilter->SetSpline(spline);
-	splineFilter->SetNumberOfSubdivisions(subdivision);
-	splineFilter->Update();
-	outPD->DeepCopy(splineFilter->GetOutput());
-}
-
-void QInteractorStyleLumenSeedsPlacer::ExtractSegment(vtkImageData* inImage, 
-	vtkImageData* outImage, vtkPolyData* inPolydata)
-{
-	vtkSmartPointer<vtkPolylineToTubularVolume> pd2vol 
-		= vtkSmartPointer<vtkPolylineToTubularVolume>::New();
-	pd2vol->SetInputData(inImage);
-	pd2vol->SetPolyline(inPolydata);
-	pd2vol->SetTubeRadius(this->ui->doubleSpinBoxExtractRadius->value()*10);
-	pd2vol->Update();
-
-	vtkSmartPointer<vtkImageMask> maskFilter = vtkSmartPointer<vtkImageMask>::New();
-	maskFilter->SetInput1Data(inImage);
-	maskFilter->SetMaskInputData(pd2vol->GetOutput());
-	maskFilter->Update();
-
-	outImage->DeepCopy(maskFilter->GetOutput());
 }

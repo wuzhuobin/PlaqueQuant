@@ -35,7 +35,9 @@ public:
 public slots:
 	void slotClearAllSeeds();
 	void slotPushBtnAxialReconstruction();
-	void slotPushBtnCopySeedsFromSegmentation();
+	void slotExtractSegmentFromOverlay();
+	void slotUpdateSpinBoxExtractRadius();
+	void slotUpdateHSliderExtractRadius();
 
 	void SetFocalSeed(int i);
 	void DeleteFocalSeed();
@@ -50,11 +52,14 @@ protected:
 	//void uniqueInvoke(bool flag);
 	void CleanAllLists();
 	void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
-
 	void UpdateSeedTable();
 
+	void ExtractSegment(vtkImageData* inImage,
+		vtkImageData* outImage, vtkPolyData* inPolydata);
+
 	void InitializeObliqueView();
-	void CopySegmentationSeeds();
+
+	void InterpolateWayPointsToPolyline(vtkPolyData* outPD);
 
 	virtual void OnKeyPress();
 	virtual void MoveSliceForward();
@@ -65,6 +70,8 @@ protected:
 
 private:
 	Ui::QInteractorStyleObliqueViewSeedsPlacer* ui = nullptr;
+
+	vtkPolyData* m_polyline;
 
 	int m_numberOfIteractions = 3;
 	double m_multiplier = 2.1;

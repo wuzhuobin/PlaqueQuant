@@ -26,6 +26,8 @@
 // DEBUG
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkNIFTIImageWriter.h"
+#include "vtkPolylineToTubularVolume.h"
+#include "vtkImageMask.h"
 
 vtkStandardNewMacro(QInteractorStyleObliqueViewSeedsPlacer);
 QSETUP_UI_SRC(QInteractorStyleObliqueViewSeedsPlacer);
@@ -43,8 +45,12 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 			this, SLOT(DropSeed()));
 		connect(ui->pushBtnAxialReconstruction, SIGNAL(clicked()),
 			this, SLOT(slotPushBtnAxialReconstruction()));
-		connect(ui->pushBtnCopyFromSegSeeds, SIGNAL(clicked()),
-			this, SLOT(slotPushBtnCopySeedsFromSegmentation()));
+		connect(ui->doubleSpinBoxExtractRadius, SIGNAL(valueChanged(double)),
+			this, SLOT(slotUpdateHSliderExtractRadius()));
+		connect(ui->hSliderExtractRadius, SIGNAL(valueChanged(int)),
+			this, SLOT(slotUpdateSpinBoxExtractRadius()));
+		connect(ui->pushBtnExtractSegmentation, SIGNAL(clicked()),
+			this, SLOT(slotExtractSegmentFromOverlay()));
 
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
@@ -54,6 +60,16 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 QInteractorStyleObliqueViewSeedsPlacer::~QInteractorStyleObliqueViewSeedsPlacer()
 {
 	QDELETE_UI();
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateSpinBoxExtractRadius()
+{
+	this->ui->doubleSpinBoxExtractRadius->setValue(this->ui->hSliderExtractRadius->value() / 10.);
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateHSliderExtractRadius()
+{
+	this->ui->hSliderExtractRadius->setValue(this->ui->doubleSpinBoxExtractRadius->value() * 10);
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetSeedsPlacerEnable(bool flag)
@@ -287,9 +303,22 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotPushBtnAxialReconstruction()
 }
 
 
-void QInteractorStyleObliqueViewSeedsPlacer::slotPushBtnCopySeedsFromSegmentation()
+void QInteractorStyleObliqueViewSeedsPlacer::slotExtractSegmentFromOverlay()
 {
-	this->CopySegmentationSeeds();
+	if (QList<int*>::fromStdList(m_seeds[this->m_currentSeedsType]).count() > 1)
+	{
+		/* Generate polyline from seeds */
+		vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
+		this->InterpolateWayPointsToPolyline(pd);
+
+		/* Use mask to process the segmentation */
+		vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
+		this->ExtractSegment(m_imageViewer->GetOverlay()->GetVTKOutput(), im, pd);
+
+		m_imageViewer->GetOverlay()->vtkShallowCopyImage(
+			im);
+		MY_VIEWER_CONSTITERATOR(Render());
+	}
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
@@ -317,53 +346,9 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 	else {
 		/// Initiate reconstruction view
 		// Construct a polyline from the way point 
-		vtkSmartPointer<vtkPolyData> polyline = vtkSmartPointer<vtkPolyData>::New();
-		vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
-		vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-		cells->InsertNextCell(m_seeds[ObliqueViewSeeds].size());
-		int iteratorCursor = 0;
-		for (std::list<int*>::const_iterator iter = m_seeds[ObliqueViewSeeds].cbegin();
-			iter != m_seeds[ObliqueViewSeeds].cend(); iter++)
-		{
-			int* imagePos = *iter;
-			double worldPos[3];
-			for (int pos = 0; pos < 3; ++pos) {
-				worldPos[pos] = (imagePos[pos] * GetSpacing()[pos]) + GetOrigin()[pos];
-			}
-			pts->InsertNextPoint(worldPos);
-			cells->InsertCellPoint(iteratorCursor);
-			iteratorCursor += 1;
-		}
-		iteratorCursor = 0;
-		polyline->SetPoints(pts);
-		polyline->SetLines(cells);
+		vtkSmartPointer<vtkPolyData> interpedPD = vtkSmartPointer<vtkPolyData>::New();
+		this->InterpolateWayPointsToPolyline(interpedPD);
 
-		// Interpolate the polyline to form a uniformly seperated polyline 
-		/* First calculate the total length of the line */
-		double totalLength = 0;
-		for (int i = 1; i < pts->GetNumberOfPoints();i++)
-		{
-			double segmentVect[3], prevPoint[3];
-			memcpy(prevPoint, pts->GetPoint(i - 1), sizeof(double) * 3);
-			vtkMath::Subtract(pts->GetPoint(i), prevPoint, segmentVect);
-			totalLength += vtkMath::Norm(segmentVect);
-		}
-		/* Calculate subdivision value, default spacing will be 1mm */
-		double defaultSpacing_mm = 1;
-		int subdivision = int(ceil(totalLength / defaultSpacing_mm)) + 1;
-
-		/* Interpolate the polyline */
-		vtkSmartPointer<vtkCardinalSpline> spline = vtkSmartPointer<vtkCardinalSpline>::New();
-		spline->SetLeftConstraint(2);
-		spline->SetLeftValue(0.0);
-		spline->SetRightConstraint(2);
-		spline->SetRightValue(0.0);
-		vtkSmartPointer<vtkSplineFilter> splineFilter = vtkSmartPointer<vtkSplineFilter>::New();
-		splineFilter->SetInputData(polyline);
-		splineFilter->SetSpline(spline);
-		splineFilter->SetNumberOfSubdivisions(subdivision);
-		splineFilter->Update();
-		vtkSmartPointer<vtkPolyData> interpolated = splineFilter->GetOutput();
 
 		//// Debug
 		//vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
@@ -376,7 +361,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		// Construct the normal list and the origin list for reslicer;
 		/* clean the list first */
 		this->CleanAllLists();
-		for (int i = 0; i < interpolated->GetNumberOfPoints(); i++)
+		for (int i = 0; i < interpedPD->GetNumberOfPoints(); i++)
 		{
 			double *normal = (double*)malloc(sizeof(double) * 3);
 			double *origin = (double*)malloc(sizeof(double) * 3);
@@ -384,16 +369,16 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 			double p1[3], p2[3];
 
 			/* last point */
-			if (i == interpolated->GetNumberOfPoints() - 1)
+			if (i == interpedPD->GetNumberOfPoints() - 1)
 			{
-				memcpy(p1, interpolated->GetPoint(i - 1), sizeof(double) * 3);
-				memcpy(p2, interpolated->GetPoint(i), sizeof(double) * 3);
+				memcpy(p1, interpedPD->GetPoint(i - 1), sizeof(double) * 3);
+				memcpy(p2, interpedPD->GetPoint(i), sizeof(double) * 3);
 				memcpy(origin, p2, sizeof(double) * 3);
 			}
 			else {
 
-				memcpy(p1, interpolated->GetPoint(i), sizeof(double) * 3);
-				memcpy(p2, interpolated->GetPoint(i + 1), sizeof(double) * 3);
+				memcpy(p1, interpedPD->GetPoint(i), sizeof(double) * 3);
+				memcpy(p2, interpedPD->GetPoint(i + 1), sizeof(double) * 3);
 				memcpy(origin, p1, sizeof(double) * 3);
 			}
 			
@@ -416,18 +401,56 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 	}
 }
 
-void QInteractorStyleObliqueViewSeedsPlacer::CopySegmentationSeeds()
+void QInteractorStyleObliqueViewSeedsPlacer::InterpolateWayPointsToPolyline(vtkPolyData* outPD)
 {
-	this->ClearAllSeeds();
-
-	for each (int* seed in m_seeds[SegmentationSeeds])
+	vtkSmartPointer<vtkPolyData> polyline = vtkSmartPointer<vtkPolyData>::New();
+	vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+	cells->InsertNextCell(m_seeds[ObliqueViewSeeds].size());
+	int iteratorCursor = 0;
+	for (std::list<int*>::const_iterator iter = m_seeds[ObliqueViewSeeds].cbegin();
+	iter != m_seeds[ObliqueViewSeeds].cend(); iter++)
 	{
-		int *copy = new int[3];
-		memcpy(copy, seed, sizeof(int) * 3);
-		m_seeds[ObliqueViewSeeds].push_back(copy);
+		int* imagePos = *iter;
+		double worldPos[3];
+		for (int pos = 0; pos < 3; ++pos) {
+			worldPos[pos] = (imagePos[pos] * GetSpacing()[pos]) + GetOrigin()[pos];
+		}
+		pts->InsertNextPoint(worldPos);
+		cells->InsertCellPoint(iteratorCursor);
+		iteratorCursor += 1;
 	}
-	this->GenerateWidgetFromSeeds();
-	this->UpdateSeedTable();
+	iteratorCursor = 0;
+	polyline->SetPoints(pts);
+	polyline->SetLines(cells);
+
+	// Interpolate the polyline to form a uniformly seperated polyline 
+	/* First calculate the total length of the line */
+	double totalLength = 0;
+	for (int i = 1; i < pts->GetNumberOfPoints(); i++)
+	{
+		double segmentVect[3], prevPoint[3];
+		memcpy(prevPoint, pts->GetPoint(i - 1), sizeof(double) * 3);
+		vtkMath::Subtract(pts->GetPoint(i), prevPoint, segmentVect);
+		totalLength += vtkMath::Norm(segmentVect);
+	}
+	/* Calculate subdivision value, default spacing will be 1mm */
+	double defaultSpacing_mm = 1;
+	int subdivision = int(ceil(totalLength / defaultSpacing_mm)) + 1;
+
+	/* Interpolate the polyline */
+	vtkSmartPointer<vtkCardinalSpline> spline = vtkSmartPointer<vtkCardinalSpline>::New();
+	spline->SetLeftConstraint(2);
+	spline->SetLeftValue(0.0);
+	spline->SetRightConstraint(2);
+	spline->SetRightValue(0.0);
+	vtkSmartPointer<vtkSplineFilter> splineFilter = vtkSmartPointer<vtkSplineFilter>::New();
+	splineFilter->SetInputData(polyline);
+	splineFilter->SetSpline(spline);
+	splineFilter->SetNumberOfSubdivisions(subdivision);
+	splineFilter->Update();
+
+	outPD->DeepCopy(splineFilter->GetOutput());
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetFocalSeed(int i)
@@ -624,6 +647,26 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetObliqueSlice(int sliceIndex)
 		MY_VIEWER_CONSTITERATOR(Render());
 	}
 }
+
+void QInteractorStyleObliqueViewSeedsPlacer::ExtractSegment(vtkImageData* inImage,
+	vtkImageData* outImage, vtkPolyData* inPolydata)
+{
+	vtkSmartPointer<vtkPolylineToTubularVolume> pd2vol
+		= vtkSmartPointer<vtkPolylineToTubularVolume>::New();
+	pd2vol->SetInputData(inImage);
+	pd2vol->SetPolyline(inPolydata);
+	pd2vol->SetTubeRadius(this->ui->doubleSpinBoxExtractRadius->value() * 10);
+	pd2vol->Update();
+
+	vtkSmartPointer<vtkImageMask> maskFilter = vtkSmartPointer<vtkImageMask>::New();
+	maskFilter->SetInput1Data(inImage);
+	maskFilter->SetMaskInputData(pd2vol->GetOutput());
+	maskFilter->Update();
+
+	outImage->DeepCopy(maskFilter->GetOutput());
+}
+
+
 
 QList<vtkSmartPointer<vtkImageData>> QInteractorStyleObliqueViewSeedsPlacer::m_listOfVtkImages;
 QList<QString> QInteractorStyleObliqueViewSeedsPlacer::m_listOfModalityNames;
