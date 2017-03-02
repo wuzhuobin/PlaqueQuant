@@ -46,31 +46,31 @@ endif()
 #Link all libraries
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
+
 SET(
 	QT_SRC
-	${PROJECT_SOURCE_DIR}/AbstractFilter.cxx
-	${PROJECT_SOURCE_DIR}/ExtractCenterline.cpp
-	# ${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
-	${PROJECT_SOURCE_DIR}/ReportGenerator.cxx
-	${PROJECT_SOURCE_DIR}/SurfaceCreator.cxx
-	${PROJECT_SOURCE_DIR}/VesselSegmentation.cpp
-	${PROJECT_SOURCE_DIR}/Core.cxx
-	${PROJECT_SOURCE_DIR}/MyImageViewer.cxx
-	${PROJECT_SOURCE_DIR}/vtkPolylineToTubularVolume.cpp
-	# ${PROJECT_SOURCE_DIR}/MyPlaneWidget.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/AbstractFilter.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/ExtractCenterline.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ReportGenerator.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/SurfaceCreator.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/VesselSegmentation.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Core.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/MyImageViewer.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/MyResliceMapper.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/vtkPolylineToTubularVolume.cpp
 )
 
 SET(
 	QT_INC
-	${PROJECT_SOURCE_DIR}/AbstractFilter.h
-	${PROJECT_SOURCE_DIR}/ExtractCenterline.h
-	# ${PROJECT_SOURCE_DIR}/ImageRegistration.h
-	${PROJECT_SOURCE_DIR}/ReportGenerator.h
-	${PROJECT_SOURCE_DIR}/VesselSegmentation.h
-	${PROJECT_SOURCE_DIR}/SurfaceCreator.h
-	${PROJECT_SOURCE_DIR}/Core.h
-	${PROJECT_SOURCE_DIR}/MyImageViewer.h
-	${PROJECT_SOURCE_DIR}/vtkPolylineToTubularVolume.h
+	${CMAKE_CURRENT_SOURCE_DIR}/AbstractFilter.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ExtractCenterline.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ReportGenerator.h
+	${CMAKE_CURRENT_SOURCE_DIR}/VesselSegmentation.h
+	${CMAKE_CURRENT_SOURCE_DIR}/SurfaceCreator.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Core.h
+	${CMAKE_CURRENT_SOURCE_DIR}/MyImageViewer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/vtkPolylineToTubularVolume.h
+	${CMAKE_CURRENT_SOURCE_DIR}/MyResliceMapper.h
 	# ${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
 )
 

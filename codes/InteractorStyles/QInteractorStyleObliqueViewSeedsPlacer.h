@@ -4,6 +4,7 @@
 #include <vtkImageResliceMapper.h>
 #include <vtkImageReslice.h>
 
+#include "MyResliceMapper.h"
 #include "InteractorStyleSeedsPlacer.h"
 #include "ui_QInteractorStyleObliqueViewSeedsPlacer.h"
 #include "QAbstractNavigation.h"
@@ -50,18 +51,20 @@ protected:
 	~QInteractorStyleObliqueViewSeedsPlacer();
 
 	//void uniqueInvoke(bool flag);
+	/// Internal functions
 	void CleanAllLists();
 	void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
 	void UpdateSeedTable();
-
+	void InterpolateWayPointsToPolyline(vtkPolyData* outPD);
 	void ExtractSegment(vtkImageData* inImage,
 		vtkImageData* outImage, vtkPolyData* inPolydata);
+	void UpdateMeasurementsArea();
 
 	void InitializeObliqueView();
 
-	void InterpolateWayPointsToPolyline(vtkPolyData* outPD);
 
 	virtual void OnKeyPress();
+
 	virtual void MoveSliceForward();
 	virtual void MoveSliceBackward();
 
@@ -87,7 +90,7 @@ private:
 	static QList<double*> m_originList;
 	static QList<int*>	m_coordList;
 	QList<vtkProp*> m_savedActors;
-	vtkSmartPointer<vtkImageResliceMapper> m_resliceMapper[2];
+	vtkSmartPointer<MyResliceMapper> m_resliceMapper[2];
 	vtkSmartPointer<vtkImageSlice> m_reslicer[2];
 };
 

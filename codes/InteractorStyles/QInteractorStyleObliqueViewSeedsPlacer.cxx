@@ -21,6 +21,7 @@
 #include "vtkCamera.h"
 #include "vtkImageSlice.h"
 #include "vtkImageProperty.h"
+#include "MeasurementFor2D.h"
 #include "InteractorStyleNavigation.h"
 
 // DEBUG
@@ -667,6 +668,22 @@ void QInteractorStyleObliqueViewSeedsPlacer::ExtractSegment(vtkImageData* inImag
 }
 
 
+
+void QInteractorStyleObliqueViewSeedsPlacer::UpdateMeasurementsArea()
+{
+	/* Do only in oblique mode */
+	if (this->m_inObliqueView)
+	{
+		// Extract slice from reslicer
+		if (!this->m_resliceMapper[1])
+			return;
+		vtkImageData* im = this->m_resliceMapper[1]->GetImageReslice()->GetOutput();
+
+		// Extract extent according to the ROI
+
+		// Calculate are of the label
+	}
+}
 
 QList<vtkSmartPointer<vtkImageData>> QInteractorStyleObliqueViewSeedsPlacer::m_listOfVtkImages;
 QList<QString> QInteractorStyleObliqueViewSeedsPlacer::m_listOfModalityNames;

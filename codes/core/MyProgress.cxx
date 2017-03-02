@@ -27,7 +27,7 @@ void DialogOpenImage::slotBrowse()
 	if(dir=="") 
 		return;
 
-	dir.replace("\\","/");
+	dir.replace("\\","/");	
 
 	ui->imageDirLineEdit->setText(dir);
 
