@@ -155,6 +155,11 @@ MainWindow* MainWindow::GetMainWindow()
 }
 
 
+MeasurementWidget* MainWindow::GetMeasurementWidget()
+{
+	return this->m_measurementWidget;
+}
+
 void MainWindow::openOneImage(QString img)
 {
 	IOManager* io = m_core->GetIOManager();

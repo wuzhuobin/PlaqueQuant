@@ -208,6 +208,20 @@
        </layout>
       </item>
       <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Preprocessing</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="label_5">
@@ -322,6 +336,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="checkBoxEnableRuler">
+        <property name="text">
+         <string>Enable Ruler</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="labelReconstructionStatus">
         <property name="styleSheet">
          <string notr="true">QWidget {
@@ -339,11 +360,10 @@
      <zorder>line</zorder>
      <zorder>listWidgetSeedList</zorder>
      <zorder>label_60</zorder>
-     <zorder>checkBoxExtractWithRadius</zorder>
-     <zorder>hSliderExtractRadius</zorder>
-     <zorder>doubleSpinBoxExtractRadius</zorder>
-     <zorder>label_5</zorder>
-     <zorder>horizontalSpacer_7</zorder>
+     <zorder>line_2</zorder>
+     <zorder>label_6</zorder>
+     <zorder>checkBoxEnableRuler</zorder>
+     <zorder>checkBoxEnableRuler</zorder>
     </widget>
    </item>
    <item>

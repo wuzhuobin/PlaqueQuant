@@ -4,6 +4,7 @@
 #include <vtkImageResliceMapper.h>
 #include <vtkImageReslice.h>
 
+#include "vtkDistanceWidget.h"
 #include "MyResliceMapper.h"
 #include "InteractorStyleSeedsPlacer.h"
 #include "ui_QInteractorStyleObliqueViewSeedsPlacer.h"
@@ -29,6 +30,7 @@ public:
 	//	QList<QString> listOfModalityNames);
 	
 	void EnableObliqueView(bool);
+	void EnableRulerWidget(bool);
 	
 	virtual void SetInteractor(vtkRenderWindowInteractor *interactor);
 
@@ -39,6 +41,7 @@ public slots:
 	void slotExtractSegmentFromOverlay();
 	void slotUpdateSpinBoxExtractRadius();
 	void slotUpdateHSliderExtractRadius();
+	void slotToggleRulerWidget(bool);
 
 	void SetFocalSeed(int i);
 	void DeleteFocalSeed();
@@ -58,7 +61,7 @@ protected:
 	void InterpolateWayPointsToPolyline(vtkPolyData* outPD);
 	void ExtractSegment(vtkImageData* inImage,
 		vtkImageData* outImage, vtkPolyData* inPolydata);
-	void UpdateMeasurementsArea();
+	void UpdateMeasurements();
 
 	void InitializeObliqueView();
 
@@ -90,6 +93,7 @@ private:
 	static QList<double*> m_originList;
 	static QList<int*>	m_coordList;
 	QList<vtkProp*> m_savedActors;
+	vtkSmartPointer<vtkDistanceWidget> m_distanceWidget;
 	vtkSmartPointer<MyResliceMapper> m_resliceMapper[2];
 	vtkSmartPointer<vtkImageSlice> m_reslicer[2];
 };

@@ -17,6 +17,7 @@ public:
 	~MeasurementWidget();
 
 	//void UpdateMeasurementsForObliqueSlice(vtkImageData*);
+	Ui::MeasurementWidget GetUI();
 
 public slots:
 	void slotUpdate3DMeasurements();

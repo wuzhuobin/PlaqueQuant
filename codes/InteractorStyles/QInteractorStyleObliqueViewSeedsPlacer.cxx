@@ -13,7 +13,6 @@
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 
-
 #include "LumenSegmentationFilter2.h"
 #include "ui_QInteractorStyleObliqueViewSeedsPlacer.h"
 #include "ui_QAbstractNavigation.h"
@@ -22,6 +21,7 @@
 #include "vtkImageSlice.h"
 #include "vtkImageProperty.h"
 #include "MeasurementFor2D.h"
+
 #include "InteractorStyleNavigation.h"
 
 // DEBUG
@@ -29,6 +29,8 @@
 #include "vtkNIFTIImageWriter.h"
 #include "vtkPolylineToTubularVolume.h"
 #include "vtkImageMask.h"
+#include "MainWindow.h"
+#include "MeasurementWidget.hpp"
 
 vtkStandardNewMacro(QInteractorStyleObliqueViewSeedsPlacer);
 QSETUP_UI_SRC(QInteractorStyleObliqueViewSeedsPlacer);
@@ -61,6 +63,20 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 QInteractorStyleObliqueViewSeedsPlacer::~QInteractorStyleObliqueViewSeedsPlacer()
 {
 	QDELETE_UI();
+
+	for (int i = 0; i < 2;i++)
+	{
+		if (this->m_resliceMapper[i])
+		{
+			if (this->CurrentRenderer)
+			{
+				this->CurrentRenderer->RemoveViewProp(this->m_reslicer[i]);
+			}
+			this->m_reslicer[i]->SetMapper(NULL);
+			this->m_reslicer[i]->RemoveAllObservers();
+			this->m_resliceMapper[i]->SetInputData(NULL);
+		}
+	}
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateSpinBoxExtractRadius()
@@ -71,6 +87,33 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateSpinBoxExtractRadius()
 void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateHSliderExtractRadius()
 {
 	this->ui->hSliderExtractRadius->setValue(this->ui->doubleSpinBoxExtractRadius->value() * 10);
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::slotToggleRulerWidget(bool checkBoxState)
+{
+	if (checkBoxState)
+	{
+		// Check interactor
+		if (!this->Interactor)
+			return;
+
+		// Creates the distance widget
+		if (!this->m_distanceWidget)
+		{
+			this->m_distanceWidget = vtkSmartPointer<vtkDistanceWidget>::New();
+			this->m_distanceWidget->SetInteractor(this->Interactor);
+		}
+
+		this->m_distanceWidget->SetEnabled(true);
+	}
+	else {
+		if (this->m_distanceWidget)
+		{
+			this->m_distanceWidget->SetEnabled(false);
+			this->m_distanceWidget->SetInteractor(NULL);
+		}
+	}
+
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetSeedsPlacerEnable(bool flag)
@@ -152,7 +195,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			vtkImageData* overlay = this->m_imageViewer->GetInputLayer();
 
 			// Declare new mapper and reslicers
-			this->m_resliceMapper[0] = vtkSmartPointer<vtkImageResliceMapper>::New();
+			this->m_resliceMapper[0] = vtkSmartPointer<MyResliceMapper>::New();
 			this->m_reslicer[0] = vtkSmartPointer<vtkImageSlice>::New();
 
 			//// DEBUG
@@ -175,7 +218,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			if (overlay)
 			{
 				this->m_imageViewer->GetOverlay()->GetLookupTable()->Print(cout);
-				this->m_resliceMapper[1] = vtkSmartPointer<vtkImageResliceMapper>::New();
+				this->m_resliceMapper[1] = vtkSmartPointer<MyResliceMapper>::New();
 				this->m_reslicer[1] = vtkSmartPointer<vtkImageSlice>::New();
 				this->m_resliceMapper[1]->SetInputData(overlay);
 				this->m_resliceMapper[1]->SetSlicePlane(vtkSmartPointer<vtkPlane>::New());
@@ -255,6 +298,11 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			this->m_inObliqueView = false;
 		}
 	}
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::EnableRulerWidget(bool state)
+{
+	this->ui->checkBoxEnableRuler->setChecked(state);
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetInteractor(vtkRenderWindowInteractor *interactor)
@@ -640,6 +688,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetObliqueSlice(int sliceIndex)
 		cam->SetViewUp(0, 0, 1);
 		cam->SetPosition(camPos);
 
+		this->UpdateMeasurements();
 
 		int *curIndex = this->m_coordList[this->m_currentObliqueSlice];
 		QList<MyImageViewer*> viewers = QList<MyImageViewer*>::fromStdList(this->m_synchronalViewers);
@@ -669,7 +718,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::ExtractSegment(vtkImageData* inImag
 
 
 
-void QInteractorStyleObliqueViewSeedsPlacer::UpdateMeasurementsArea()
+void QInteractorStyleObliqueViewSeedsPlacer::UpdateMeasurements()
 {
 	/* Do only in oblique mode */
 	if (this->m_inObliqueView)
@@ -679,9 +728,26 @@ void QInteractorStyleObliqueViewSeedsPlacer::UpdateMeasurementsArea()
 			return;
 		vtkImageData* im = this->m_resliceMapper[1]->GetImageReslice()->GetOutput();
 
-		// Extract extent according to the ROI
+		// Extract extent of proximity
+		double *currentOrigin = this->m_resliceMapper[1]->GetSlicePlane()->GetOrigin();
+		vtkMatrix4x4* resliceMatrix = this->m_resliceMapper[1]->GetImageReslice()->GetResliceAxes();
 
-		// Calculate are of the label
+		// Calculate area of the label
+		MeasurementFor2D* m = MeasurementFor2D::New();
+		m->SetSliceImage(im);
+		m->Update();
+
+		double lumenArea = m->GetOutput(0).LumenArea;
+		double vesselWallArea = m->GetOutput(0).VesselWallArea;
+		double NMI = m->GetOutput(0).NMI;
+
+		// Update table widget
+		MainWindow::GetMainWindow()->GetMeasurementWidget()->GetUI().measurement2DTableWidget->
+			setItem(0, 0, new QTableWidgetItem(QString::number(lumenArea, 'f', 2)));
+		MainWindow::GetMainWindow()->GetMeasurementWidget()->GetUI().measurement2DTableWidget->
+			setItem(1, 0, new QTableWidgetItem(QString::number(vesselWallArea, 'f', 2)));
+		MainWindow::GetMainWindow()->GetMeasurementWidget()->GetUI().measurement2DTableWidget->
+			setItem(3, 0, new QTableWidgetItem(QString::number(NMI, 'f', 2)));
 	}
 }
 

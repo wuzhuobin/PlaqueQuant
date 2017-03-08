@@ -49,6 +49,11 @@ MeasurementWidget::~MeasurementWidget() {
 	
 }
 
+Ui::MeasurementWidget MeasurementWidget::GetUI()
+{
+	return ui;
+}
+
 //void MeasurementWidget::UpdateMeasurementsForObliqueSlice(vtkImageData* img)
 //{
 //	// Must be single slice

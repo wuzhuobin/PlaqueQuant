@@ -28,6 +28,7 @@ public:
 	~MainWindow();
 	static MainWindow* GetMainWindow();
 
+	MeasurementWidget* GetMeasurementWidget();
 
 	void openOneImage(QString img);
 
