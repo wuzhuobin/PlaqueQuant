@@ -54,7 +54,8 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 			this, SLOT(slotUpdateSpinBoxExtractRadius()));
 		connect(ui->pushBtnExtractSegmentation, SIGNAL(clicked()),
 			this, SLOT(slotExtractSegmentFromOverlay()));
-
+		connect(ui->checkBoxEnableRuler, SIGNAL(clicked()),
+			this, SLOT(slotExtractSegmentFromOverlay()));
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
 		this, SLOT(slotClearAllSeeds()));
