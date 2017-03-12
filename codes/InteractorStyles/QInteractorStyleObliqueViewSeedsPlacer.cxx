@@ -111,10 +111,10 @@ void QInteractorStyleObliqueViewSeedsPlacer::ToggleRulerWidget(int state)
 		if (!this->m_distanceWidget)
 		{
 			this->m_distanceWidget = vtkSmartPointer<vtkDistanceWidget>::New();
-			this->m_distanceWidget->SetInteractor(this->Interactor);
-			this->m_distanceWidget->CreateDefaultRepresentation();
-			this->m_distanceWidget->GetDistanceRepresentation()->SetLabelFormat("%-#11.2f mm");
 		}
+		this->m_distanceWidget->SetInteractor(this->Interactor);
+		this->m_distanceWidget->CreateDefaultRepresentation();
+		this->m_distanceWidget->GetDistanceRepresentation()->SetLabelFormat("%-#11.2f mm");
 
 		this->m_seedWidget->SetEnabled(false);
 		this->m_distanceWidget->On();
@@ -158,12 +158,12 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetCurrentFocalPointWithImageCoordi
 //	}
 //}
 
-void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
+void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool oblique)
 {
 	if (this->GetSliceOrientation() == 2)
 	{
 		// Do only for Axial view
-		if (axialView && !m_inObliqueView)
+		if (oblique && !m_inObliqueView)
 		{
 			// Remember all actors
 			this->Interactor->GetRenderWindow()->GetRenderers()->InitTraversal();
@@ -300,7 +300,9 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			vtkMath::Add(cam->GetFocalPoint(), refVect, newCamPos);
 			cam->SetPosition(newCamPos);
 
-			this->m_seedWidget->SetEnabled(true);
+			if (this->Interactor)
+				this->m_seedWidget->SetEnabled(true);
+
 			this->ui->listWidgetSeedList->setDisabled(false);
 			this->ui->pushBtnDeleteSeed->setDisabled(false);
 			this->ui->dropSeedPushButton->setDisabled(false);
@@ -415,6 +417,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 	{
 		/// Stop reconstruction view
 		this->EnableObliqueView(false);
+		this->EnableRulerWidget(false);
 	}
 	else {
 		/// Initiate reconstruction view
