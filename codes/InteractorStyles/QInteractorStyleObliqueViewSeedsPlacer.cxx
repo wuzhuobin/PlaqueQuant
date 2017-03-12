@@ -54,8 +54,8 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 			this, SLOT(slotUpdateSpinBoxExtractRadius()));
 		connect(ui->pushBtnExtractSegmentation, SIGNAL(clicked()),
 			this, SLOT(slotExtractSegmentFromOverlay()));
-		connect(ui->checkBoxEnableRuler, SIGNAL(clicked()),
-			this, SLOT(slotExtractSegmentFromOverlay()));
+		connect(ui->checkBoxEnableRuler, SIGNAL(stateChanged(int)),
+			this, SLOT(slotCheckBoxRulerStateChange(int)));
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
 		this, SLOT(slotClearAllSeeds()));
@@ -90,9 +90,18 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateHSliderExtractRadius()
 	this->ui->hSliderExtractRadius->setValue(this->ui->doubleSpinBoxExtractRadius->value() * 10);
 }
 
-void QInteractorStyleObliqueViewSeedsPlacer::slotToggleRulerWidget(bool checkBoxState)
+void QInteractorStyleObliqueViewSeedsPlacer::slotCheckBoxRulerStateChange(int state)
 {
-	if (checkBoxState)
+	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, ToggleRulerWidget(state));
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::ToggleRulerWidget(int state)
+{
+	// Toggle only for axial view
+	if (this->GetSliceOrientation() != 2)
+		return;
+
+	if (state)
 	{
 		// Check interactor
 		if (!this->Interactor)
@@ -103,9 +112,13 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotToggleRulerWidget(bool checkBox
 		{
 			this->m_distanceWidget = vtkSmartPointer<vtkDistanceWidget>::New();
 			this->m_distanceWidget->SetInteractor(this->Interactor);
+			this->m_distanceWidget->CreateDefaultRepresentation();
+			this->m_distanceWidget->GetDistanceRepresentation()->SetLabelFormat("%-#11.2f mm");
 		}
 
-		this->m_distanceWidget->SetEnabled(true);
+		this->m_seedWidget->SetEnabled(false);
+		this->m_distanceWidget->On();
+		//this->m_distanceWidget->SetWidgetStateToStart();
 	}
 	else {
 		if (this->m_distanceWidget)
@@ -113,6 +126,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotToggleRulerWidget(bool checkBox
 			this->m_distanceWidget->SetEnabled(false);
 			this->m_distanceWidget->SetInteractor(NULL);
 		}
+		this->m_seedWidget->SetEnabled(true);
 	}
 
 }
@@ -236,16 +250,12 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 
 			this->SetObliqueSlice(0);
 			this->Interactor->Render();
-			this->m_inObliqueView = true;
 
-			// Disable UI and seed widget
-			this->ClearAllSeedWidget();
-			InteractorStyleSeedsPlacer::SetSeedsPlacerEnable(false); // This advoid invoking uniqueDisable()
+			this->m_seedWidget->SetEnabled(false);
 			this->ui->listWidgetSeedList->setDisabled(true);
 			this->ui->pushBtnDeleteSeed->setDisabled(true);
 			this->ui->dropSeedPushButton->setDisabled(true);
 			this->ui->deleteAllSeedsPushButton->setDisabled(true);
-
 			this->m_inObliqueView = true;
 		}
 		else if (this->m_inObliqueView) {
@@ -290,8 +300,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 			vtkMath::Add(cam->GetFocalPoint(), refVect, newCamPos);
 			cam->SetPosition(newCamPos);
 
-			// Enable UI and seedwidget
-			InteractorStyleSeedsPlacer::SetSeedsPlacerEnable(true); // This advoid invoking uiqueEnable()
+			this->m_seedWidget->SetEnabled(true);
 			this->ui->listWidgetSeedList->setDisabled(false);
 			this->ui->pushBtnDeleteSeed->setDisabled(false);
 			this->ui->dropSeedPushButton->setDisabled(false);
@@ -303,6 +312,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool axialView)
 
 void QInteractorStyleObliqueViewSeedsPlacer::EnableRulerWidget(bool state)
 {
+	// Public function for starting the ruler widget
 	this->ui->checkBoxEnableRuler->setChecked(state);
 }
 
@@ -376,7 +386,20 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 	/// Error check
 	// Trigger this function only in the AXIAL view
 	if (this->GetSliceOrientation() != 2)
+	{
+		if (this->m_inObliqueView)
+		{
+			this->m_seedWidget->On();
+			m_inObliqueView = false;
+		}
+		else
+		{
+			this->m_seedWidget->Off();
+			m_inObliqueView = true;
+		}
+
 		return;
+	}
 	// If the way point has less than two point
 	if (ui->listWidgetSeedList->count() < 2)
 	{
@@ -447,7 +470,6 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 
 		// Initialize seed view
 		this->EnableObliqueView(true);
-
 	}
 }
 

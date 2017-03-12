@@ -193,6 +193,9 @@ void InteractorStyleSeedsPlacer::GenerateWidgetFromSeeds()
 	{
 		cout << "Viewer no. " << this->GetSliceOrientation() << " with m_currentSeedType=" << m_currentSeedsType << endl;
 
+		if (!this->m_seedWidget->GetEnabled())
+			return;
+
 		ClearAllSeedWidget();
 
 		for (list<int*>::const_iterator cit = m_seeds[m_currentSeedsType].cbegin();

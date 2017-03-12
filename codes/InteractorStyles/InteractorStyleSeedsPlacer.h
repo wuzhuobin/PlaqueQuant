@@ -88,6 +88,7 @@ public:
 	void SetCurrentSeedsType(SeedsType);
 	SeedsType GetCurrentSeedsType();
 
+
 	void SetSeedsPlacerEnable(bool flag);
 	void SetFocalSeed(int i);
 	void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);

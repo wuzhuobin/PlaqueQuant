@@ -40,8 +40,8 @@ public slots:
 	void slotPushBtnAxialReconstruction();
 	void slotExtractSegmentFromOverlay();
 	void slotUpdateSpinBoxExtractRadius();
+	void slotCheckBoxRulerStateChange(int);
 	void slotUpdateHSliderExtractRadius();
-	void slotToggleRulerWidget(bool);
 
 	void SetFocalSeed(int i);
 	void DeleteFocalSeed();
@@ -62,6 +62,7 @@ protected:
 	void ExtractSegment(vtkImageData* inImage,
 		vtkImageData* outImage, vtkPolyData* inPolydata);
 	void UpdateMeasurements();
+	void ToggleRulerWidget(int state);
 
 	void InitializeObliqueView();
 
