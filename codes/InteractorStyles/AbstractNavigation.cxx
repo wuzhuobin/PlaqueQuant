@@ -216,9 +216,12 @@ void AbstractNavigation::MoveSliceForward()
 
 void AbstractNavigation::MoveSliceBackward()
 {
-	if (GetSlice() > GetMinSlice())
+	if (GetSlice() > 0)
 	{
+		cout << "GetSlice: " << GetSlice() << " SetSlice: " << GetSlice() - 1;
+
 		SetCurrentSlice(GetSlice() - 1);
+		cout << " New Slice: " << GetSlice() << endl;
 	}
 }
 
