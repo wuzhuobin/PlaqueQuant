@@ -69,7 +69,7 @@ Ui::MeasurementWidget MeasurementWidget::GetUI()
 
 void MeasurementWidget::slotUpdate3DMeasurements()
 {
-	if (this->isTopLevel())
+	if (true)
 	{
 		m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();
 		ui.measurement3DTableWidget->clearContents();
@@ -86,12 +86,12 @@ void MeasurementWidget::slotUpdate3DMeasurements()
 
 void MeasurementWidget::slotUpdate2DMeasurements()
 {
-	//slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
+	//slotUpdate2DMeasurements(m_mainWnd->ui->->value());
 }
 
 void MeasurementWidget::slotUpdate2DMeasurements(int slice)
 {
-	if (false)
+	if (true)
 	{
 		m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure2D(slice);
 		QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->

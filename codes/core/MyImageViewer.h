@@ -72,6 +72,7 @@ public:
 	 * Render method
 	 */
 	virtual void Render(void);
+	virtual void ResetCamera(void);
 
 	/**
 	 * Set/Get the input image to the viewer.

@@ -302,6 +302,12 @@ void Overlay::vtkShallowCopyImage(vtkImageData * image)
 	emit signalOverlayUpdated();
 }
 
+void Overlay::vtkDeepCopy(vtkImageData * image)
+{
+	m_vtkOverlay->DeepCopy(image);
+	emit signalOverlayUpdated();
+}
+
 void Overlay::Measure3D()
 {
 	m_measurementFor3D.SetInputData(m_vtkOverlay);

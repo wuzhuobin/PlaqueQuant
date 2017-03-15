@@ -8,10 +8,14 @@
 #include <vtkCleanPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkvmtkPolyDataCenterlines.h>
+#include <vtkvmtkCurvedMPRImageFilter.h>
+#include <vtkvmtkCenterlineAttributesFilter.h>
+#include <vtkvmtkCenterlineGeometry.h>
 #include <vtkIdList.h>
 #include <vtkMath.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include <vtkConnectivityFilter.h>
 
 #include "LumenSegmentationFilter2.h"
 #include "ui_QInteractorStyleObliqueViewSeedsPlacer.h"
@@ -21,16 +25,17 @@
 #include "vtkImageSlice.h"
 #include "vtkImageProperty.h"
 #include "MeasurementFor2D.h"
-
+#include "vtkPolylineToTubularVolume.h"
+#include "vtkImageMask.h"
+#include "SurfaceCreator.h"
 #include "InteractorStyleNavigation.h"
+#include "MeasurementWidget.hpp"
+#include "MainWindow.h"
 
 // DEBUG
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkNIFTIImageWriter.h"
-#include "vtkPolylineToTubularVolume.h"
-#include "vtkImageMask.h"
-#include "MainWindow.h"
-#include "MeasurementWidget.hpp"
+#include "vtkCell.h"
 
 vtkStandardNewMacro(QInteractorStyleObliqueViewSeedsPlacer);
 QSETUP_UI_SRC(QInteractorStyleObliqueViewSeedsPlacer);
@@ -143,172 +148,29 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetCurrentFocalPointWithImageCoordi
 	QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 }
 
-//void QInteractorStyleObliqueViewSeedsPlacer::SetTargetImages(
-//	QList<vtkSmartPointer<vtkImageData>> listOfVtkImages,
-//	QList<QString> listOfModalityNames)
-//{
-//	m_listOfModalityNames = listOfModalityNames;
-//	m_listOfVtkImages = listOfVtkImages;
-//
-//	ui->comboBoxTargeImage->clear();
-//	for (int i = 0; i < m_listOfModalityNames.size(); ++i) {
-//		if (m_listOfVtkImages[i] != nullptr) {
-//			ui->comboBoxTargeImage->addItem(m_listOfModalityNames[i]);
-//		}
-//	}
-//}
-
-void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool oblique)
+void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool state)
 {
-	if (this->GetSliceOrientation() == 2)
+	if (state && this->m_inObliqueView == false)
 	{
-		// Do only for Axial view
-		if (oblique && !m_inObliqueView)
-		{
-			// Remember all actors
-			this->Interactor->GetRenderWindow()->GetRenderers()->InitTraversal();
-			while (vtkRenderer* ren = this->Interactor->GetRenderWindow()->GetRenderers()->GetNextItem())
-			{
-				vtkPropCollection* actors = ren->GetViewProps();
-				actors->InitTraversal();
-				while (vtkProp* actor = actors->GetNextProp())
-				{
-					this->m_savedActors.append(actor);
-				}
-			}
-
-			// Hide original actors
-			for (QList<vtkProp*>::iterator iter = this->m_savedActors.begin();
-					 iter != this->m_savedActors.end(); iter++)
-			{
-				if ((*iter)->GetVisibility())
-				{
-					(*iter)->SetVisibility(false);
-				}
-				else
-				{
-					this->m_savedActors.erase(iter);
-					iter--;
-				}
-
-			}
-			MY_VIEWER_CONSTITERATOR(Render());
+		/// Replace image with curved MPR image
+		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, SetImageToViewer(s_curvedImage, s_curvedOverlay));
+		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, SetSeedsPlacerEnable(false));
 
 
-			// Setup reslicer
-			if (this->m_reslicer[0] != NULL)
-			{
-				this->m_reslicer[0]->RemoveAllObservers();
-				this->m_reslicer[0]->Delete();
-			}
-			if (this->m_resliceMapper[0] != NULL)
-				this->m_resliceMapper[0]->Delete();
+		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, CenterCursorPosition());
+		MY_VIEWER_CONSTITERATOR(Render());
+		MY_VIEWER_CONSTITERATOR(ResetCamera());
+		this->m_inObliqueView = true;
+	}
+	else if (this->m_inObliqueView) {
+		/// Replace image back
+		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, SetImageToViewer(s_vectImageStore.at(0), s_vectImageStore.at(1)));
+		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, SetSeedsPlacerEnable(true));
 
-			// Read currently viewing image
-			
-			vtkImageData* im = this->m_imageViewer->GetInput();
-			vtkImageData* overlay = this->m_imageViewer->GetInputLayer();
-
-			// Declare new mapper and reslicers
-			this->m_resliceMapper[0] = vtkSmartPointer<MyResliceMapper>::New();
-			this->m_reslicer[0] = vtkSmartPointer<vtkImageSlice>::New();
-
-			//// DEBUG
-			//vtkSmartPointer<vtkNIFTIImageWriter> writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
-			//writer->SetInputData(overlay);
-			//writer->SetFileName("C:/Users/lwong/Downloads/output.nii.gz");
-			//writer->Update();
-			//writer->Write();
-
-			this->m_resliceMapper[0]->SetInputData(im);
-			this->m_resliceMapper[0]->SetSlicePlane(vtkSmartPointer<vtkPlane>::New());
-			this->m_reslicer[0]->SetMapper(this->m_resliceMapper[0]);
-			this->m_reslicer[0]->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel());
-			this->m_reslicer[0]->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow());
-			this->m_reslicer[0]->Update();			
-			this->CurrentRenderer->AddViewProp(this->m_reslicer[0]);
-			this->CurrentRenderer->SetBackground(0.3, 0.3, 0.3);
-			
-			// Handle overlay if exist
-			if (overlay)
-			{
-				this->m_imageViewer->GetOverlay()->GetLookupTable()->Print(cout);
-				this->m_resliceMapper[1] = vtkSmartPointer<MyResliceMapper>::New();
-				this->m_reslicer[1] = vtkSmartPointer<vtkImageSlice>::New();
-				this->m_resliceMapper[1]->SetInputData(overlay);
-				this->m_resliceMapper[1]->SetSlicePlane(vtkSmartPointer<vtkPlane>::New());
-				this->m_reslicer[1]->SetMapper(this->m_resliceMapper[1]);
-				this->m_reslicer[1]->GetProperty()->SetLookupTable(this->m_imageViewer->GetOverlay()->GetLookupTable());
-				this->m_reslicer[1]->GetProperty()->SetColorWindow(this->m_imageViewer->GetOverlay()->GetLookupTable()->GetNumberOfColors());
-				this->m_reslicer[1]->GetProperty()->SetColorLevel(this->m_imageViewer->GetOverlay()->GetLookupTable()->GetNumberOfColors()/2.);
-				this->m_reslicer[1]->GetProperty()->SetInterpolationTypeToNearest();
-				this->m_reslicer[1]->Update();
-
-				this->CurrentRenderer->AddViewProp(this->m_reslicer[1]);
-			}
-
-
-			this->SetObliqueSlice(0);
-			this->Interactor->Render();
-
-			this->m_seedWidget->SetEnabled(false);
-			this->ui->listWidgetSeedList->setDisabled(true);
-			this->ui->pushBtnDeleteSeed->setDisabled(true);
-			this->ui->dropSeedPushButton->setDisabled(true);
-			this->ui->deleteAllSeedsPushButton->setDisabled(true);
-			this->m_inObliqueView = true;
-		}
-		else if (this->m_inObliqueView) {
-			// Remove & delete reslice actor
-			this->m_reslicer[0]->SetMapper(NULL);
-			this->CurrentRenderer->RemoveViewProp(this->m_reslicer[0]);
-			if (this->m_reslicer[1])
-			{
-				this->m_reslicer[1]->SetMapper(NULL);
-				this->CurrentRenderer->RemoveViewProp(this->m_reslicer[1]);
-			}
-			if (!this->Interactor)
-				this->CurrentRenderer = NULL;             
-
-			this->m_resliceMapper[0]->RemoveAllObservers();
-			if (this->m_resliceMapper[1])
-			{
-				this->m_resliceMapper[1]->RemoveAllObservers();
-			}
-
-			this->m_resliceMapper[0] = NULL;
-			this->m_resliceMapper[1] = NULL;
-			this->m_reslicer[0] = NULL;
-			this->m_reslicer[1] = NULL;
-
-			// Re-enable all actors
-			while (this->m_savedActors.size())
-			{
-				vtkProp* lastElement = this->m_savedActors.last();
-				lastElement->SetVisibility(true);
-				this->m_savedActors.pop_back();
-			}
-
-			this->m_inObliqueView = false;
-
-			// Recalculate camera position
-			double newCamPos[3], refVect[3] = { 0, 0, 1 };
-			vtkCamera* cam = this->m_imageViewer->GetRenderer()->GetActiveCamera();
-			this->m_imageViewer->SetFocalPointWithWorldCoordinate(cam->GetFocalPoint()[0], cam->GetFocalPoint()[1], cam->GetFocalPoint()[2]);
-			cam->SetViewUp(0, -1, 0);
-			vtkMath::MultiplyScalar(refVect, cam->GetDistance());
-			vtkMath::Add(cam->GetFocalPoint(), refVect, newCamPos);
-			cam->SetPosition(newCamPos);
-
-			if (this->Interactor)
-				this->m_seedWidget->SetEnabled(true);
-
-			this->ui->listWidgetSeedList->setDisabled(false);
-			this->ui->pushBtnDeleteSeed->setDisabled(false);
-			this->ui->dropSeedPushButton->setDisabled(false);
-			this->ui->deleteAllSeedsPushButton->setDisabled(false);
-			this->m_inObliqueView = false;
-		}
+		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, CenterCursorPosition());
+		MY_VIEWER_CONSTITERATOR(Render());
+		MY_VIEWER_CONSTITERATOR(ResetCamera());
+		this->m_inObliqueView = false;
 	}
 }
 
@@ -361,7 +223,8 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotClearAllSeeds()
 
 void QInteractorStyleObliqueViewSeedsPlacer::slotPushBtnAxialReconstruction()
 {
-	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, InitializeObliqueView());
+	this->InitializeObliqueView();
+	//STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, InitializeObliqueView());
 }
 
 
@@ -383,25 +246,10 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotExtractSegmentFromOverlay()
 	}
 }
 
+
 void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 {
 	/// Error check
-	// Trigger this function only in the AXIAL view
-	if (this->GetSliceOrientation() != 2)
-	{
-		if (this->m_inObliqueView)
-		{
-			this->m_seedWidget->On();
-			m_inObliqueView = false;
-		}
-		else
-		{
-			this->m_seedWidget->Off();
-			m_inObliqueView = true;
-		}
-
-		return;
-	}
 	// If the way point has less than two point
 	if (ui->listWidgetSeedList->count() < 2)
 	{
@@ -413,67 +261,207 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		ui->labelReconstructionStatus->setText("");
 	}
 
-	if (m_inObliqueView)
+	if (!this->m_inObliqueView)
 	{
-		/// Stop reconstruction view
-		this->EnableObliqueView(false);
-		this->EnableRulerWidget(false);
-	}
-	else {
-		/// Initiate reconstruction view
-		// Construct a polyline from the way point 
+		/// Spline path
+			// Construct a polyline from the way point 
 		vtkSmartPointer<vtkPolyData> interpedPD = vtkSmartPointer<vtkPolyData>::New();
 		this->InterpolateWayPointsToPolyline(interpedPD);
 
+		/// Extract lumen 
+		this->slotExtractSegmentFromOverlay();
 
-		//// Debug
+		/// Marching cube and obtain surface
+		SurfaceCreator* sfc = new SurfaceCreator();
+		sfc->SetInput(this->m_imageViewer->GetOverlay()->GetVTKOutput());
+		sfc->SetDiscrete(1);
+		sfc->SetValue(Core::LABEL_LUMEN); // #lumenLabel
+		sfc->SetSmoothIteration(10);
+		sfc->SetResamplingFactor(1);
+		sfc->SetLargestConnected(true);
+		sfc->Update();
+
+		vtkSmartPointer<vtkPolyData> bloodVesselPD = vtkSmartPointer<vtkPolyData>::New();
+		bloodVesselPD->DeepCopy(sfc->GetOutput());
+
+		delete sfc;
+
+		/// Find centerline
+		// push first and last point into the polydata
+		bloodVesselPD->GetPoints()->InsertNextPoint(interpedPD->GetPoint(0));
+		bloodVesselPD->GetPoints()->InsertNextPoint(interpedPD->GetPoint(interpedPD->GetNumberOfPoints() - 1));
+		vtkIdList *sourceID = vtkIdList::New();
+		vtkIdList *sinkID = vtkIdList::New();
+		sourceID->InsertNextId(bloodVesselPD->GetNumberOfPoints() - 2);
+		sinkID->InsertNextId(bloodVesselPD->GetNumberOfPoints() - 1);
+		// Use centerline filter to find centerline
+		vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlineFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
+		centerlineFilter->SetInputData(bloodVesselPD);
+		centerlineFilter->SetSourceSeedIds(sourceID);
+		centerlineFilter->SetTargetSeedIds(sinkID);
+		centerlineFilter->SetRadiusArrayName("Radius");
+		centerlineFilter->SetEdgeArrayName("Edge");
+		centerlineFilter->SetEdgePCoordArrayName("PCoord");
+		centerlineFilter->SetAppendEndPointsToCenterlines(true);
+		centerlineFilter->Update();
+		// Interpolate the centerline
+		vtkSmartPointer<vtkPolyData> centerline = vtkSmartPointer<vtkPolyData>::New();
+		centerline->DeepCopy(centerlineFilter->GetOutput());
+		this->InterpolatePolyline(centerline, centerline);
+
+		////DEBUG
 		//vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-		//writer->SetInputData(interpolated);
-		//writer->SetFileName("C:\\Users\\lwong\\Source\\datacenter\\interpPolyline.vtp");
+		//writer->SetFileName("C:/Users/lwong/Source/datacenter/Segment.vtp");
+		//writer->SetInputData(bloodVesselPD);
 		//writer->Update();
 		//writer->Write();
-		
+		//writer->SetFileName("C:/Users/lwong/Source/datacenter/centerline.vtp");
+		//writer->SetInputData(centerline);
+		//writer->Update();
+		//writer->Write();
 
-		// Construct the normal list and the origin list for reslicer;
-		/* clean the list first */
-		this->CleanAllLists();
-		for (int i = 0; i < interpedPD->GetNumberOfPoints(); i++)
+		/// Use centerline to obtain curved MPR
+		vtkSmartPointer<vtkvmtkCenterlineGeometry> centerlineGeometry =
+			vtkSmartPointer<vtkvmtkCenterlineGeometry>::New();
+		if (centerline->GetNumberOfPoints() > 10)
+			// Select centerline if centerline seems to be good
+			centerlineGeometry->SetInputData(centerline);
+		else
+			// otherwise, use the line interpolated from input seeds
+			centerlineGeometry->SetInputData(interpedPD);
+		centerlineGeometry->SetLengthArrayName("Length");
+		centerlineGeometry->SetCurvatureArrayName("Curvature");
+		centerlineGeometry->SetTorsionArrayName("Torsion");
+		centerlineGeometry->SetTortuosityArrayName("Tortuosity");
+		centerlineGeometry->SetFrenetTangentArrayName("FrenetTangent");
+		centerlineGeometry->SetFrenetNormalArrayName("FrenetNormal");
+		centerlineGeometry->SetFrenetBinormalArrayName("FrenetBinormal");
+		centerlineGeometry->LineSmoothingOff();
+		centerlineGeometry->Update();
+
+		vtkSmartPointer<vtkvmtkCenterlineAttributesFilter> centerlineAttributes =
+			vtkSmartPointer<vtkvmtkCenterlineAttributesFilter>::New();
+		centerlineAttributes->SetInputConnection(centerlineGeometry->GetOutputPort());
+		centerlineAttributes->SetAbscissasArrayName("Abscissas");
+		centerlineAttributes->SetParallelTransportNormalsArrayName("Normals");
+		centerlineAttributes->Update();
+
+		double *oriSpacing = this->m_imageViewer->GetOverlay()->GetVTKOutput()->GetSpacing();
+		double minSpacing = *std::min_element(oriSpacing, oriSpacing + 3);
+
+		// Prepare multi planar reconstruction for baseImage
+		double radius = this->ui->doubleSpinBoxExtractRadius->value() * 10; // mm
+		int size_XY = ceil(radius / minSpacing)*2.5;
+		vtkSmartPointer<vtkvmtkCurvedMPRImageFilter> curvedMPRImageFilter =
+			vtkSmartPointer<vtkvmtkCurvedMPRImageFilter>::New();
+		curvedMPRImageFilter->SetInputData(this->m_imageViewer->GetWindowLevel()->GetInput());
+		curvedMPRImageFilter->SetCenterline(centerlineAttributes->GetOutput());
+		curvedMPRImageFilter->SetParallelTransportNormalsArrayName("Normals");
+		curvedMPRImageFilter->SetFrenetTangentArrayName("FrenetTangent");
+		curvedMPRImageFilter->SetInplaneOutputSpacing(minSpacing, minSpacing);
+		curvedMPRImageFilter->SetInplaneOutputSize(size_XY, size_XY);
+		curvedMPRImageFilter->SetReslicingBackgroundLevel(0.0);
+		curvedMPRImageFilter->Update();
+		s_curvedImage = vtkSmartPointer<vtkImageData>::New();
+		s_curvedImage->DeepCopy(curvedMPRImageFilter->GetOutput());
+		// Prepare MPR for overlay 
+		curvedMPRImageFilter->SetInputData(this->m_imageViewer->GetOverlay()->GetVTKOutput());
+		curvedMPRImageFilter->SetCenterline(centerlineAttributes->GetOutput());
+		curvedMPRImageFilter->SetParallelTransportNormalsArrayName("Normals");
+		curvedMPRImageFilter->SetFrenetTangentArrayName("FrenetTangent");
+		curvedMPRImageFilter->SetInplaneOutputSpacing(minSpacing, minSpacing);
+		curvedMPRImageFilter->SetInplaneOutputSize(size_XY, size_XY);
+		curvedMPRImageFilter->SetReslicingBackgroundLevel(0.0);
+		curvedMPRImageFilter->Update();
+
+		s_curvedOverlay = vtkSmartPointer<vtkImageData>::New();
+		s_curvedOverlay->DeepCopy(curvedMPRImageFilter->GetOutput());
+
+		/// Extract center-area using the filter
+		//vtkSmartPointer<vtkPolyData> straightline = vtkSmartPointer<vtkPolyData>::New();
+		//vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+		//lines->InsertCellPoint(0);
+		//lines->InsertCellPoint(1);
+		//straightline->SetPoints(vtkSmartPointer<vtkPoints>::New());
+		//straightline->GetPoints()->InsertNextPoint(0, 0, 0);
+		//straightline->GetPoints()->InsertNextPoint(0, 0, s_curvedOverlay->GetSpacing()[2] * (s_curvedOverlay->GetExtent()[5] - 1));
+		//straightline->SetLines(lines);
+		//vtkSmartPointer<vtkPolylineToTubularVolume> pd2vol
+		//	= vtkSmartPointer<vtkPolylineToTubularVolume>::New();
+		//pd2vol->SetInputData(s_curvedOverlay);
+		//pd2vol->SetPolyline(straightline);
+		//pd2vol->SetTubeRadius(this->ui->doubleSpinBoxExtractRadius->value() * 10);
+		//pd2vol->Update();
+		//vtkSmartPointer<vtkImageMask> maskFilter = vtkSmartPointer<vtkImageMask>::New();
+		//maskFilter->SetInput1Data(s_curvedOverlay);
+		//maskFilter->SetMaskInputData(pd2vol->GetOutput());
+		//maskFilter->Update();
+		//s_curvedOverlay->DeepCopy(maskFilter->GetOutput());
+
+		// Store original data first 
+		while (s_vectImageStore.size())
 		{
-			double *normal = (double*)malloc(sizeof(double) * 3);
-			double *origin = (double*)malloc(sizeof(double) * 3);
-			int* ijk = (int*)malloc(sizeof(int) * 3);
-			double p1[3], p2[3];
-
-			/* last point */
-			if (i == interpedPD->GetNumberOfPoints() - 1)
-			{
-				memcpy(p1, interpedPD->GetPoint(i - 1), sizeof(double) * 3);
-				memcpy(p2, interpedPD->GetPoint(i), sizeof(double) * 3);
-				memcpy(origin, p2, sizeof(double) * 3);
-			}
-			else {
-
-				memcpy(p1, interpedPD->GetPoint(i), sizeof(double) * 3);
-				memcpy(p2, interpedPD->GetPoint(i + 1), sizeof(double) * 3);
-				memcpy(origin, p1, sizeof(double) * 3);
-			}
-			
-			/* calculate back the ijk*/
-			ijk[0] = (origin[0] - GetOrigin()[0]) / GetSpacing()[0];
-			ijk[1] = (origin[1] - GetOrigin()[1]) / GetSpacing()[1];
-			ijk[2] = (origin[2] - GetOrigin()[2]) / GetSpacing()[2];
-
-			vtkMath::Subtract(p2, p1, normal);
-			vtkMath::Normalize(normal);
-
-			this->m_normalList.append(normal);
-			this->m_originList.append(origin);
-			this->m_coordList.append(ijk);
+			vtkImageData* imag = s_vectImageStore.back();
+			imag->Delete();
+			s_vectImageStore.pop_back();
 		}
+		s_vectImageStore.push_back(vtkImageData::New());
+		s_vectImageStore.push_back(vtkImageData::New());
+		s_vectImageStore.at(0)->DeepCopy(this->m_imageViewer->GetInput());
+		s_vectImageStore.at(1)->DeepCopy(this->m_imageViewer->GetOverlay()->GetVTKOutput());
 
-		// Initialize seed view
 		this->EnableObliqueView(true);
 	}
+	else {
+		this->EnableObliqueView(false);
+	}
+}
+
+
+void QInteractorStyleObliqueViewSeedsPlacer::SetImageToViewer(vtkImageData* image, vtkImageData* overlay)
+{
+	int extent1[6], extent2[6];
+	memcpy(extent1, image->GetExtent(), sizeof(int) * 6);
+	memcpy(extent2, overlay->GetExtent(), sizeof(int) * 6);
+
+	this->m_imageViewer->SetInputData(image);
+	this->m_imageViewer->ResetImageVOI();
+	this->m_imageViewer->GetOverlay()->vtkDeepCopy(overlay);
+	this->m_imageViewer->GetOverlay()->GetOutput()->Modified();
+	this->m_imageViewer->GetOverlayActor()->Update();
+	this->m_imageViewer->GetOverlayWindowLevel()->SetUpdateExtent(extent2);
+	this->m_imageViewer->GetOverlayWindowLevel()->Update();
+	this->m_imageViewer->ResetOverlayVOI();
+	//this->m_imageViewer->SetOverlayVOI(extent2);
+	this->m_imageViewer->UpdateDisplayExtent();
+	
+	////DEBUG
+	//vtkSmartPointer<vtkNIFTIImageWriter> writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
+	//writer->SetInputData(overlay);
+	//writer->SetFileName("C:/Users/lwong/Source/datacenter/curvedMPROverlay.nii.gz");
+	//writer->Update();
+	//writer->Write();
+
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::CenterCursorPosition()
+{
+	int* extent = this->m_imageViewer->GetInput()->GetExtent();
+	int slice;
+	switch (this->GetSliceOrientation())
+	{
+	case 0:
+		slice = (extent[1] - extent[0]) / 2.;
+		break;
+	case 1:
+		slice = (extent[3] - extent[2]) / 2.;
+		break;
+	case 2:
+		slice = (extent[5] - extent[4]) / 2.;
+		break;
+	}
+
+	this->SetCurrentSlice(slice);
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::InterpolateWayPointsToPolyline(vtkPolyData* outPD)
@@ -499,8 +487,14 @@ void QInteractorStyleObliqueViewSeedsPlacer::InterpolateWayPointsToPolyline(vtkP
 	polyline->SetPoints(pts);
 	polyline->SetLines(cells);
 
+	InterpolatePolyline(polyline, outPD);
+}
+
+void QInteractorStyleObliqueViewSeedsPlacer::InterpolatePolyline(vtkPolyData* inPolyline, vtkPolyData* outPD)
+{
 	// Interpolate the polyline to form a uniformly seperated polyline 
 	/* First calculate the total length of the line */
+	vtkPoints* pts = inPolyline->GetPoints();
 	double totalLength = 0;
 	for (int i = 1; i < pts->GetNumberOfPoints(); i++)
 	{
@@ -520,7 +514,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::InterpolateWayPointsToPolyline(vtkP
 	spline->SetRightConstraint(2);
 	spline->SetRightValue(0.0);
 	vtkSmartPointer<vtkSplineFilter> splineFilter = vtkSmartPointer<vtkSplineFilter>::New();
-	splineFilter->SetInputData(polyline);
+	splineFilter->SetInputData(inPolyline);
 	splineFilter->SetSpline(spline);
 	splineFilter->SetNumberOfSubdivisions(subdivision);
 	splineFilter->Update();
@@ -655,73 +649,17 @@ void QInteractorStyleObliqueViewSeedsPlacer::OnKeyPress()
 
 void QInteractorStyleObliqueViewSeedsPlacer::MoveSliceForward()
 {
-	if (this->m_inObliqueView && this->GetSliceOrientation() == 2)
-	{
-		SetObliqueSlice(this->m_currentObliqueSlice + 1);
-	}
-	else {
-		Superclass::MoveSliceForward();
-	}
+	Superclass::MoveSliceForward();
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::MoveSliceBackward()
 {
-	if (this->m_inObliqueView && this->GetSliceOrientation() == 2)
-	{
-		SetObliqueSlice(this->m_currentObliqueSlice - 1);
-		return;
-	}
-	else {
-		Superclass::MoveSliceBackward();
-	}
+	Superclass::MoveSliceBackward();
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetObliqueSlice(int sliceIndex)
 {
-	if (sliceIndex < 0)
-	{
-		sliceIndex = 0;
-		return;
-	}
-	else if (sliceIndex > this->m_normalList.size() - 1)
-	{
-		sliceIndex = this->m_normalList.size() - 1;
-		return;
-	}
-	else {
-		this->m_currentObliqueSlice = sliceIndex;
-		this->m_resliceMapper[0]->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
-		this->m_resliceMapper[0]->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
-		this->m_reslicer[0]->GetProperty()->SetColorLevel(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorLevel()*10);
-		this->m_reslicer[0]->GetProperty()->SetColorWindow(this->m_imageViewer->GetImageActor()->GetProperty()->GetColorWindow() * 12);
-		this->m_reslicer[0]->Update();
-
-		if (this->m_reslicer[1])
-		{
-			this->m_resliceMapper[1]->GetSlicePlane()->SetNormal(this->m_normalList[this->m_currentObliqueSlice]);
-			this->m_resliceMapper[1]->GetSlicePlane()->SetOrigin(this->m_originList[this->m_currentObliqueSlice]);
-			this->m_reslicer[1]->Update();
-		}
-
-
-		/* Change camera to view the slice*/
-		vtkCamera* cam = this->CurrentRenderer->GetActiveCamera();
-		double camPos[3], refVect[3];
-		memcpy(refVect, this->m_normalList[this->m_currentObliqueSlice], sizeof(double) * 3);
-		vtkMath::MultiplyScalar(refVect, cam->GetDistance());
-		vtkMath::Add(this->m_originList[this->m_currentObliqueSlice], refVect, camPos);
-		cam->SetFocalPoint(this->m_originList[this->m_currentObliqueSlice]);
-		cam->SetViewUp(0, 0, 1);
-		cam->SetPosition(camPos);
-
-		this->UpdateMeasurements();
-
-		int *curIndex = this->m_coordList[this->m_currentObliqueSlice];
-		QList<MyImageViewer*> viewers = QList<MyImageViewer*>::fromStdList(this->m_synchronalViewers);
-		viewers[0]->SetFocalPointWithImageCoordinate(curIndex[0], curIndex[1], curIndex[2]);
-		viewers[1]->SetFocalPointWithImageCoordinate(curIndex[0], curIndex[1], curIndex[2]);
-		MY_VIEWER_CONSTITERATOR(Render());
-	}
+	// DEPREICATED
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::ExtractSegment(vtkImageData* inImage,
@@ -782,3 +720,6 @@ QList<QString> QInteractorStyleObliqueViewSeedsPlacer::m_listOfModalityNames;
 QList<double*> QInteractorStyleObliqueViewSeedsPlacer::m_normalList;
 QList<double*> QInteractorStyleObliqueViewSeedsPlacer::m_originList;
 QList<int*> QInteractorStyleObliqueViewSeedsPlacer::m_coordList;
+vtkSmartPointer<vtkImageData> QInteractorStyleObliqueViewSeedsPlacer::s_curvedImage;
+vtkSmartPointer<vtkImageData> QInteractorStyleObliqueViewSeedsPlacer::s_curvedOverlay;
+std::vector<vtkImageData*> QInteractorStyleObliqueViewSeedsPlacer::s_vectImageStore;

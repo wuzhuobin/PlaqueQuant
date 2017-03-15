@@ -110,6 +110,7 @@ public:
 	void ReplacePixels(int* extent, vtkImageData* image);
 
 	void vtkShallowCopyImage(vtkImageData* image);
+	void vtkDeepCopy(vtkImageData * image);
 
 
 	vtkImageData* GetOutput();

@@ -318,6 +318,12 @@ void MyImageViewer::Render()
 	// update orientation and header text
 	ResizeHeaderAndOrientationText();
 }
+
+void MyImageViewer::ResetCamera()
+{
+	this->Renderer->ResetCamera();
+}
+
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)
 {
@@ -576,7 +582,10 @@ void MyImageViewer::GetFocalPointWithImageCoordinate(int * coordinate)
 	const double* origin = GetInput()->GetOrigin();
 	const double* point = Cursor3D->GetFocalPoint();
 	for (int i = 0; i < 3; ++i) {
-		coordinate[i] = (point[i] - origin[i]) / spacing[i];
+		if (i == this->GetSliceOrientation())
+			coordinate[i] = this->GetSlice();
+		else
+			coordinate[i] = (point[i] - origin[i]) / spacing[i];
 	}
 }
 

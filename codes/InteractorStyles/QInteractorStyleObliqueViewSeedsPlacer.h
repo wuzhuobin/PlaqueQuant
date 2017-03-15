@@ -59,13 +59,14 @@ protected:
 	void UpdateWidgetToSeeds(int* oldImagePos, int* newImagePos);
 	void UpdateSeedTable();
 	void InterpolateWayPointsToPolyline(vtkPolyData* outPD);
+	void InterpolatePolyline(vtkPolyData* inPolyline, vtkPolyData* outPD);
 	void ExtractSegment(vtkImageData* inImage,
 		vtkImageData* outImage, vtkPolyData* inPolydata);
 	void UpdateMeasurements();
 	void ToggleRulerWidget(int state);
-
 	void InitializeObliqueView();
-
+	void SetImageToViewer(vtkImageData* image, vtkImageData* overlay);
+	void CenterCursorPosition();
 
 	virtual void OnKeyPress();
 
@@ -93,6 +94,11 @@ private:
 	static QList<double*> m_normalList;
 	static QList<double*> m_originList;
 	static QList<int*>	m_coordList;
+	static vtkSmartPointer<vtkImageData> s_curvedImage;
+	static vtkSmartPointer<vtkImageData> s_curvedOverlay;
+
+	static std::vector<vtkImageData*> s_vectImageStore;
+
 	QList<vtkProp*> m_savedActors;
 	vtkSmartPointer<vtkDistanceWidget> m_distanceWidget;
 	vtkSmartPointer<MyResliceMapper> m_resliceMapper[2];
