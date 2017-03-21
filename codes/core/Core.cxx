@@ -17,6 +17,11 @@
 #include <vtkImageThreshold.h>
 #include <QMessageBox>
 #include <QAction>
+#include "vtkXMLPolyDataWriter.h"
+#include "vtkConnectivityFilter.h"
+#include "vtkCleanPolyData.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
 Core::Core(QWidget* parent)
 	:Core(parent, parent)
 {
@@ -322,6 +327,8 @@ void Core::slotGenerateCenterlineBtn()
 	//voi->SetVOI(this->m_imageManager->getOverlay()->GetDisplayExtent());
 	//voi->Update();
 
+	double* origin = m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer()->GetOrigin();
+
 	// Threshold the iamge
 	vtkSmartPointer<vtkImageThreshold> thres = vtkSmartPointer<vtkImageThreshold>::New();
 	thres->SetInputData(m_2DimageViewer[DEFAULT_IMAGE]->GetInputLayer());
@@ -354,29 +361,56 @@ void Core::slotGenerateCenterlineBtn()
 	i2v->SetInput(dilationFilter->GetOutput());
 	i2v->Update();
 
-	// Generate surface for centerline calculation
-	SurfaceCreator* surfaceCreator = new SurfaceCreator();
-	surfaceCreator->SetInput(i2v->GetOutput());
-	surfaceCreator->SetValue(15);
-	surfaceCreator->SetSmoothIteration(5);
-	surfaceCreator->SetDiscrete(false);
-	surfaceCreator->SetResamplingFactor(1.0);
-	surfaceCreator->Update();
+	// There is a bug in marching cube which causes the output mesh to be sliced to seperate pieces at (0,0,0)
+	// So this work around move the image away from that point sufficiently far away.
+	vtkImageData* test = i2v->GetOutput();
+	test->SetOrigin(250, 250, 250);
+
+	vtkSmartPointer<vtkMarchingCubes> marchingcubeFilter
+		= vtkSmartPointer<vtkMarchingCubes>::New();
+	marchingcubeFilter->SetInputData(i2v->GetOutput());
+	marchingcubeFilter->SetValue(0, VTK_SHORT_MAX - 1);
+	marchingcubeFilter->ComputeScalarsOff();
+	marchingcubeFilter->ComputeGradientsOff();
+	marchingcubeFilter->ComputeNormalsOff();
+	marchingcubeFilter->Update();
+
+	vtkSmartPointer<vtkPolyDataConnectivityFilter> connFilter
+		= vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+	connFilter->SetInputConnection(marchingcubeFilter->GetOutputPort());
+	connFilter->SetExtractionModeToLargestRegion();
+	connFilter->Update();
+
+	// Transform the result back to original space
+	vtkSmartPointer<vtkTransformPolyDataFilter> trans 
+		= vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+	trans->SetInputConnection(connFilter->GetOutputPort());
+	trans->SetTransform(vtkSmartPointer<vtkTransform>::New());
+	vtkTransform::SafeDownCast(trans->GetTransform())->Translate(-250, -250, -250);
+	vtkTransform::SafeDownCast(trans->GetTransform())->Translate(origin);
+	trans->Update();
+
+
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetInputData(trans->GetOutput());
+	writer->SetFileName("C:/Users/lwong/Downloads/output.vtp");
+	writer->Update();
+	writer->Write();
 
 	// Clip at the end of the boundaries
 	vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
-	surface->DeepCopy(surfaceCreator->GetOutput());
+	surface->DeepCopy(trans->GetOutput());
 	vtkSmartPointer<vtkPlane> plane[2];
 	plane[0] = vtkSmartPointer<vtkPlane>::New();
 	plane[1] = vtkSmartPointer<vtkPlane>::New();
 	plane[0]->SetNormal(0, 0, -1);
 	plane[1]->SetNormal(0, 0, 1);
 	double zCoord1 = (this->m_imageManager->getOverlay()->GetDisplayExtent()[5] - 1) *
-		this->m_imageManager->getListOfVtkImages()[0]->GetSpacing()[2] +
-		this->m_imageManager->getListOfVtkImages()[0]->GetOrigin()[2];
+		this->m_imageManager->getOverlay()->GetVTKOutput()->GetSpacing()[2] +
+		this->m_imageManager->getOverlay()->GetVTKOutput()->GetOrigin()[2];
 	double zCoord2 = (this->m_imageManager->getOverlay()->GetDisplayExtent()[4] + 1) *
-		this->m_imageManager->getListOfVtkImages()[0]->GetSpacing()[2] +
-		this->m_imageManager->getListOfVtkImages()[0]->GetOrigin()[2];
+		this->m_imageManager->getOverlay()->GetVTKOutput()->GetSpacing()[2] +
+		this->m_imageManager->getOverlay()->GetVTKOutput()->GetOrigin()[2];
 	plane[0]->SetOrigin(0, 0, zCoord1);
 	plane[1]->SetOrigin(0, 0, zCoord2);
 	for (int i = 0; i < 2; i++)
@@ -387,6 +421,11 @@ void Core::slotGenerateCenterlineBtn()
 		clipper->Update();
 		surface->DeepCopy(clipper->GetOutput());
 	}
+
+	writer->SetInputData(surface);
+	writer->SetFileName("C:/Users/lwong/Downloads/output_clipped.vtp");
+	writer->Update();
+	writer->Write();
 
 
 	Centerline* cl = new Centerline;
