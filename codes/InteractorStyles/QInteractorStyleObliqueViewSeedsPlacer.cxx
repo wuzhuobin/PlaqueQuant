@@ -8,7 +8,7 @@
 #include <vtkCleanPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkvmtkPolyDataCenterlines.h>
-#include <vtkvmtkCurvedMPRImageFilter.h>
+#include <vtkvmtkCurvedMPRImageFilterNearestInterpolation.h>
 #include <vtkvmtkCenterlineAttributesFilter.h>
 #include <vtkvmtkCenterlineGeometry.h>
 #include <vtkIdList.h>
@@ -59,8 +59,6 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 			this, SLOT(slotUpdateSpinBoxExtractRadius()));
 		connect(ui->pushBtnExtractSegmentation, SIGNAL(clicked()),
 			this, SLOT(slotExtractSegmentFromOverlay()));
-		connect(ui->checkBoxEnableRuler, SIGNAL(stateChanged(int)),
-			this, SLOT(slotCheckBoxRulerStateChange(int)));
 	}
 	connect(ui->deleteAllSeedsPushButton, SIGNAL(clicked()),
 		this, SLOT(slotClearAllSeeds()));
@@ -68,21 +66,29 @@ QInteractorStyleObliqueViewSeedsPlacer::QInteractorStyleObliqueViewSeedsPlacer(i
 
 QInteractorStyleObliqueViewSeedsPlacer::~QInteractorStyleObliqueViewSeedsPlacer()
 {
-	QDELETE_UI();
-
-	for (int i = 0; i < 2;i++)
+	if (s_curvedImage)
 	{
-		if (this->m_resliceMapper[i])
-		{
-			if (this->CurrentRenderer)
-			{
-				this->CurrentRenderer->RemoveViewProp(this->m_reslicer[i]);
-			}
-			this->m_reslicer[i]->SetMapper(NULL);
-			this->m_reslicer[i]->RemoveAllObservers();
-			this->m_resliceMapper[i]->SetInputData(NULL);
-		}
+		s_curvedImage->Delete();
+		s_curvedImage = NULL;
 	}
+
+	if (s_curvedOverlay)
+	{
+		s_curvedOverlay->Delete();
+		s_curvedOverlay = NULL;
+	}
+
+	while (s_vectImageStore.size())
+	{
+		vtkImageData* img = s_vectImageStore.back();
+		s_vectImageStore.pop_back();
+		if (img != NULL)
+			img->Delete();
+	}
+
+	this->CurrentRenderer = NULL;
+
+	QDELETE_UI();
 }
 
 void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateSpinBoxExtractRadius()
@@ -95,46 +101,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::slotUpdateHSliderExtractRadius()
 	this->ui->hSliderExtractRadius->setValue(this->ui->doubleSpinBoxExtractRadius->value() * 10);
 }
 
-void QInteractorStyleObliqueViewSeedsPlacer::slotCheckBoxRulerStateChange(int state)
-{
-	STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, ToggleRulerWidget(state));
-}
 
-void QInteractorStyleObliqueViewSeedsPlacer::ToggleRulerWidget(int state)
-{
-	// Toggle only for axial view
-	if (this->GetSliceOrientation() != 2)
-		return;
-
-	if (state)
-	{
-		// Check interactor
-		if (!this->Interactor)
-			return;
-
-		// Creates the distance widget
-		if (!this->m_distanceWidget)
-		{
-			this->m_distanceWidget = vtkSmartPointer<vtkDistanceWidget>::New();
-		}
-		this->m_distanceWidget->SetInteractor(this->Interactor);
-		this->m_distanceWidget->CreateDefaultRepresentation();
-		this->m_distanceWidget->GetDistanceRepresentation()->SetLabelFormat("%-#11.2f mm");
-
-		this->m_seedWidget->SetEnabled(false);
-		this->m_distanceWidget->On();
-		//this->m_distanceWidget->SetWidgetStateToStart();
-	}
-	else {
-		if (this->m_distanceWidget)
-		{
-			this->m_distanceWidget->SetEnabled(false);
-			this->m_distanceWidget->SetInteractor(NULL);
-		}
-		this->m_seedWidget->SetEnabled(true);
-	}
-
-}
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetSeedsPlacerEnable(bool flag)
 {
@@ -160,6 +127,8 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool state)
 		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, CenterCursorPosition());
 		MY_VIEWER_CONSTITERATOR(Render());
 		MY_VIEWER_CONSTITERATOR(ResetCamera());
+
+		MainWindow::GetMainWindow()->EnableImageSelection(false);
 		this->m_inObliqueView = true;
 	}
 	else if (this->m_inObliqueView) {
@@ -170,15 +139,12 @@ void QInteractorStyleObliqueViewSeedsPlacer::EnableObliqueView(bool state)
 		STYLE_DOWN_CAST_CONSTITERATOR(QInteractorStyleObliqueViewSeedsPlacer, CenterCursorPosition());
 		MY_VIEWER_CONSTITERATOR(Render());
 		MY_VIEWER_CONSTITERATOR(ResetCamera());
+
+		MainWindow::GetMainWindow()->EnableImageSelection(true);
 		this->m_inObliqueView = false;
 	}
 }
 
-void QInteractorStyleObliqueViewSeedsPlacer::EnableRulerWidget(bool state)
-{
-	// Public function for starting the ruler widget
-	this->ui->checkBoxEnableRuler->setChecked(state);
-}
 
 void QInteractorStyleObliqueViewSeedsPlacer::SetInteractor(vtkRenderWindowInteractor *interactor)
 {
@@ -269,9 +235,11 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		this->InterpolateWayPointsToPolyline(interpedPD);
 
 		/// Extract lumen 
-		this->slotExtractSegmentFromOverlay();
+		//// User should extract lumen themself
+		//this->slotExtractSegmentFromOverlay();
 
 		/// Marching cube and obtain surface
+		// thresehold image first
 		SurfaceCreator* sfc = new SurfaceCreator();
 		sfc->SetInput(this->m_imageViewer->GetOverlay()->GetVTKOutput());
 		sfc->SetDiscrete(1);
@@ -280,34 +248,36 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		sfc->SetResamplingFactor(1);
 		sfc->SetLargestConnected(true);
 		sfc->Update();
-
 		vtkSmartPointer<vtkPolyData> bloodVesselPD = vtkSmartPointer<vtkPolyData>::New();
 		bloodVesselPD->DeepCopy(sfc->GetOutput());
-
 		delete sfc;
 
 		/// Find centerline
-		// push first and last point into the polydata
-		bloodVesselPD->GetPoints()->InsertNextPoint(interpedPD->GetPoint(0));
-		bloodVesselPD->GetPoints()->InsertNextPoint(interpedPD->GetPoint(interpedPD->GetNumberOfPoints() - 1));
-		vtkIdList *sourceID = vtkIdList::New();
-		vtkIdList *sinkID = vtkIdList::New();
-		sourceID->InsertNextId(bloodVesselPD->GetNumberOfPoints() - 2);
-		sinkID->InsertNextId(bloodVesselPD->GetNumberOfPoints() - 1);
-		// Use centerline filter to find centerline
-		vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlineFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
-		centerlineFilter->SetInputData(bloodVesselPD);
-		centerlineFilter->SetSourceSeedIds(sourceID);
-		centerlineFilter->SetTargetSeedIds(sinkID);
-		centerlineFilter->SetRadiusArrayName("Radius");
-		centerlineFilter->SetEdgeArrayName("Edge");
-		centerlineFilter->SetEdgePCoordArrayName("PCoord");
-		centerlineFilter->SetAppendEndPointsToCenterlines(true);
-		centerlineFilter->Update();
-		// Interpolate the centerline
+		// Check if there are actually a surface
 		vtkSmartPointer<vtkPolyData> centerline = vtkSmartPointer<vtkPolyData>::New();
-		centerline->DeepCopy(centerlineFilter->GetOutput());
-		this->InterpolatePolyline(centerline, centerline);
+		if (bloodVesselPD->GetNumberOfPoints() > 20)
+		{
+			// push first and last point into the polydata
+			bloodVesselPD->GetPoints()->InsertNextPoint(interpedPD->GetPoint(0));
+			bloodVesselPD->GetPoints()->InsertNextPoint(interpedPD->GetPoint(interpedPD->GetNumberOfPoints() - 1));
+			vtkIdList *sourceID = vtkIdList::New();
+			vtkIdList *sinkID = vtkIdList::New();
+			sourceID->InsertNextId(bloodVesselPD->GetNumberOfPoints() - 2);
+			sinkID->InsertNextId(bloodVesselPD->GetNumberOfPoints() - 1);
+			// Use centerline filter to find centerline
+			vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlineFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
+			centerlineFilter->SetInputData(bloodVesselPD);
+			centerlineFilter->SetSourceSeedIds(sourceID);
+			centerlineFilter->SetTargetSeedIds(sinkID);
+			centerlineFilter->SetRadiusArrayName("Radius");
+			centerlineFilter->SetEdgeArrayName("Edge");
+			centerlineFilter->SetEdgePCoordArrayName("PCoord");
+			centerlineFilter->SetAppendEndPointsToCenterlines(true);
+			centerlineFilter->Update();
+			// Interpolate the centerline
+			centerline->DeepCopy(centerlineFilter->GetOutput());
+			this->InterpolatePolyline(centerline, centerline);
+		}
 
 		////DEBUG
 		//vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
@@ -323,12 +293,18 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		/// Use centerline to obtain curved MPR
 		vtkSmartPointer<vtkvmtkCenterlineGeometry> centerlineGeometry =
 			vtkSmartPointer<vtkvmtkCenterlineGeometry>::New();
-		if (centerline->GetNumberOfPoints() > 10)
+		if (centerline->GetNumberOfPoints() > 25)
+		{
 			// Select centerline if centerline seems to be good
 			centerlineGeometry->SetInputData(centerline);
+			this->ui->labelReconstructionStatus->setText(QString(""));
+		}
 		else
+		{
 			// otherwise, use the line interpolated from input seeds
 			centerlineGeometry->SetInputData(interpedPD);
+			this->ui->labelReconstructionStatus->setText(QString("Centerline extraction failed, using users' waypoints as reference."));
+		}
 		centerlineGeometry->SetLengthArrayName("Length");
 		centerlineGeometry->SetCurvatureArrayName("Curvature");
 		centerlineGeometry->SetTorsionArrayName("Torsion");
@@ -362,20 +338,34 @@ void QInteractorStyleObliqueViewSeedsPlacer::InitializeObliqueView()
 		curvedMPRImageFilter->SetInplaneOutputSize(size_XY, size_XY);
 		curvedMPRImageFilter->SetReslicingBackgroundLevel(0.0);
 		curvedMPRImageFilter->Update();
-		s_curvedImage = vtkSmartPointer<vtkImageData>::New();
+		
+		if (s_curvedImage)
+		{
+			s_curvedImage->Delete();
+			s_curvedImage = NULL;
+		}
+		s_curvedImage = vtkImageData::New();
 		s_curvedImage->DeepCopy(curvedMPRImageFilter->GetOutput());
-		// Prepare MPR for overlay 
-		curvedMPRImageFilter->SetInputData(this->m_imageViewer->GetOverlay()->GetVTKOutput());
-		curvedMPRImageFilter->SetCenterline(centerlineAttributes->GetOutput());
-		curvedMPRImageFilter->SetParallelTransportNormalsArrayName("Normals");
-		curvedMPRImageFilter->SetFrenetTangentArrayName("FrenetTangent");
-		curvedMPRImageFilter->SetInplaneOutputSpacing(minSpacing, minSpacing);
-		curvedMPRImageFilter->SetInplaneOutputSize(size_XY, size_XY);
-		curvedMPRImageFilter->SetReslicingBackgroundLevel(0.0);
-		curvedMPRImageFilter->Update();
 
-		s_curvedOverlay = vtkSmartPointer<vtkImageData>::New();
-		s_curvedOverlay->DeepCopy(curvedMPRImageFilter->GetOutput());
+		// Prepare MPR for overlay 
+		vtkSmartPointer<vtkvmtkCurvedMPRImageFilterNearestInterpolation> curvedMPRImageFilter_overlay =
+			vtkSmartPointer<vtkvmtkCurvedMPRImageFilterNearestInterpolation>::New();
+		curvedMPRImageFilter_overlay->SetInputData(this->m_imageViewer->GetOverlay()->GetVTKOutput());
+		curvedMPRImageFilter_overlay->SetCenterline(centerlineAttributes->GetOutput());
+		curvedMPRImageFilter_overlay->SetParallelTransportNormalsArrayName("Normals");
+		curvedMPRImageFilter_overlay->SetFrenetTangentArrayName("FrenetTangent");
+		curvedMPRImageFilter_overlay->SetInplaneOutputSpacing(minSpacing, minSpacing);
+		curvedMPRImageFilter_overlay->SetInplaneOutputSize(size_XY, size_XY);
+		curvedMPRImageFilter_overlay->SetReslicingBackgroundLevel(0.0);
+		curvedMPRImageFilter_overlay->Update();
+
+		if (s_curvedOverlay)
+		{
+			s_curvedOverlay->Delete();
+			s_curvedOverlay = NULL;
+		}
+		s_curvedOverlay = vtkImageData::New();
+		s_curvedOverlay->DeepCopy(curvedMPRImageFilter_overlay->GetOutput());
 
 		/// Extract center-area using the filter
 		//vtkSmartPointer<vtkPolyData> straightline = vtkSmartPointer<vtkPolyData>::New();
@@ -424,14 +414,20 @@ void QInteractorStyleObliqueViewSeedsPlacer::SetImageToViewer(vtkImageData* imag
 	memcpy(extent1, image->GetExtent(), sizeof(int) * 6);
 	memcpy(extent2, overlay->GetExtent(), sizeof(int) * 6);
 
-	this->m_imageViewer->SetInputData(image);
+	//this->m_imageViewer->SetInputData(image);
+	if (!std::equal(extent1, extent1 + 6, this->m_imageViewer->GetOriginalInput()->GetExtent()))
+	{
+		// Deep copy once if the extent is different
+		this->m_imageViewer->GetOriginalInput()->DeepCopy(image);
+	}
+	this->m_imageViewer->SetInputData(this->m_imageViewer->GetOriginalInput());
 	this->m_imageViewer->ResetImageVOI();
 	this->m_imageViewer->GetOverlay()->vtkDeepCopy(overlay);
 	this->m_imageViewer->GetOverlay()->GetOutput()->Modified();
-	this->m_imageViewer->GetOverlayActor()->Update();
 	this->m_imageViewer->GetOverlayWindowLevel()->SetUpdateExtent(extent2);
 	this->m_imageViewer->GetOverlayWindowLevel()->Update();
 	this->m_imageViewer->ResetOverlayVOI();
+	this->m_imageViewer->GetOverlayActor()->Update();
 	//this->m_imageViewer->SetOverlayVOI(extent2);
 	this->m_imageViewer->UpdateDisplayExtent();
 	
@@ -577,20 +573,6 @@ void QInteractorStyleObliqueViewSeedsPlacer::DropSeed()
 
 void QInteractorStyleObliqueViewSeedsPlacer::CleanAllLists()
 {
-	while (this->m_originList.size())
-	{
-		double *element = this->m_originList.last();
-		this->m_originList.pop_back();
-		delete element;
-	}
-
-	while (this->m_normalList.size())
-	{
-		double *element = this->m_normalList.last();
-		this->m_normalList.pop_back();
-		delete element;
-	}
-
 	while (this->m_coordList.size())
 	{
 		int *element = this->m_coordList.last();
@@ -680,46 +662,7 @@ void QInteractorStyleObliqueViewSeedsPlacer::ExtractSegment(vtkImageData* inImag
 	outImage->DeepCopy(maskFilter->GetOutput());
 }
 
-
-
-void QInteractorStyleObliqueViewSeedsPlacer::UpdateMeasurements()
-{
-	/* Do only in oblique mode */
-	if (this->m_inObliqueView)
-	{
-		// Extract slice from reslicer
-		if (!this->m_resliceMapper[1])
-			return;
-		vtkImageData* im = this->m_resliceMapper[1]->GetImageReslice()->GetOutput();
-
-		// Extract extent of proximity
-		double *currentOrigin = this->m_resliceMapper[1]->GetSlicePlane()->GetOrigin();
-		vtkMatrix4x4* resliceMatrix = this->m_resliceMapper[1]->GetImageReslice()->GetResliceAxes();
-
-		// Calculate area of the label
-		MeasurementFor2D* m = MeasurementFor2D::New();
-		m->SetSliceImage(im);
-		m->Update();
-
-		double lumenArea = m->GetOutput(0).LumenArea;
-		double vesselWallArea = m->GetOutput(0).VesselWallArea;
-		double NMI = m->GetOutput(0).NMI;
-
-		// Update table widget
-		MainWindow::GetMainWindow()->GetMeasurementWidget()->GetUI().measurement2DTableWidget->
-			setItem(0, 0, new QTableWidgetItem(QString::number(lumenArea, 'f', 2)));
-		MainWindow::GetMainWindow()->GetMeasurementWidget()->GetUI().measurement2DTableWidget->
-			setItem(1, 0, new QTableWidgetItem(QString::number(vesselWallArea, 'f', 2)));
-		MainWindow::GetMainWindow()->GetMeasurementWidget()->GetUI().measurement2DTableWidget->
-			setItem(3, 0, new QTableWidgetItem(QString::number(NMI, 'f', 2)));
-	}
-}
-
-QList<vtkSmartPointer<vtkImageData>> QInteractorStyleObliqueViewSeedsPlacer::m_listOfVtkImages;
-QList<QString> QInteractorStyleObliqueViewSeedsPlacer::m_listOfModalityNames;
-QList<double*> QInteractorStyleObliqueViewSeedsPlacer::m_normalList;
-QList<double*> QInteractorStyleObliqueViewSeedsPlacer::m_originList;
 QList<int*> QInteractorStyleObliqueViewSeedsPlacer::m_coordList;
-vtkSmartPointer<vtkImageData> QInteractorStyleObliqueViewSeedsPlacer::s_curvedImage;
-vtkSmartPointer<vtkImageData> QInteractorStyleObliqueViewSeedsPlacer::s_curvedOverlay;
+vtkImageData* QInteractorStyleObliqueViewSeedsPlacer::s_curvedImage;
+vtkImageData* QInteractorStyleObliqueViewSeedsPlacer::s_curvedOverlay;
 std::vector<vtkImageData*> QInteractorStyleObliqueViewSeedsPlacer::s_vectImageStore;

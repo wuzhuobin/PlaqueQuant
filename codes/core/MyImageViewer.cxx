@@ -327,6 +327,7 @@ void MyImageViewer::ResetCamera()
 //----------------------------------------------------------------------------
 void MyImageViewer::SetInputData(vtkImageData *in)
 {
+	print_vector(cout, in->GetExtent(), 6); cout << endl;
 	ImageExtractVOI->SetInputData(in);
 	ImageExtractVOI->SetVOI(in->GetExtent());
 	ImageExtractVOI->Update();
@@ -417,20 +418,23 @@ void MyImageViewer::ResetImageVOI()
 {
 	int* originalExtent =
 		vtkImageData::SafeDownCast(ImageExtractVOI->GetInput())->GetExtent();
+	int extent[6];
 	SetImageVOI(originalExtent);
+
 	Render();
 }
 void MyImageViewer::SetOverlayVOI(int * extent)
 {
 	const int* originalExtent =
 		vtkImageData::SafeDownCast(OverlayExtractVOI->GetInput())->GetExtent();
-	extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
-	extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
-	extent[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
-	extent[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
-	extent[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
-	extent[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
-	OverlayExtractVOI->SetVOI(extent);
+	int temp[6];
+	temp[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
+	temp[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
+	temp[2] = extent[2] > originalExtent[2] ? extent[2] : originalExtent[2];
+	temp[3] = extent[3] < originalExtent[3] ? extent[3] : originalExtent[3];
+	temp[4] = extent[4] > originalExtent[4] ? extent[4] : originalExtent[4];
+	temp[5] = extent[5] < originalExtent[5] ? extent[5] : originalExtent[5];
+	OverlayExtractVOI->SetVOI(temp);
 	Render();
 }
 void MyImageViewer::ResetOverlayVOI()

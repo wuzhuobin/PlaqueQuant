@@ -58,6 +58,7 @@ SET(
 	${CMAKE_CURRENT_SOURCE_DIR}/MyImageViewer.cxx
 	${CMAKE_CURRENT_SOURCE_DIR}/MyResliceMapper.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/vtkPolylineToTubularVolume.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/vtkvmtkCurvedMPRImageFilterNearestInterpolation.cpp
 )
 
 SET(
@@ -71,6 +72,7 @@ SET(
 	${CMAKE_CURRENT_SOURCE_DIR}/MyImageViewer.h
 	${CMAKE_CURRENT_SOURCE_DIR}/vtkPolylineToTubularVolume.h
 	${CMAKE_CURRENT_SOURCE_DIR}/MyResliceMapper.h
+	${CMAKE_CURRENT_SOURCE_DIR}/vtkvmtkCurvedMPRImageFilterNearestInterpolation.h
 	# ${PROJECT_SOURCE_DIR}/MyPlaneWidget.h
 )
 

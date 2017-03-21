@@ -560,3 +560,10 @@ void MainWindow::UpdateStenosisValue(double val)
 {
 	this->m_measurementWidget->ui.stenosisSpinBox->setValue(val);
 }
+
+void MainWindow::EnableImageSelection(bool enable)
+{
+	this->ui->ULSelectImgBtn->setEnabled(enable);
+	this->ui->URSelectImgBtn->setEnabled(enable);
+	this->ui->LLSelectImgBtn->setEnabled(enable);
+}

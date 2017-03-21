@@ -82,6 +82,7 @@ InteractorStyleSeedsPlacer::InteractorStyleSeedsPlacer()
 {
 	m_seedWidget = vtkSmartPointer<SeedsPlacerWidget>::New();
 	m_seedWidget->seedsPlacer = this;
+	m_seedWidget->RemoveObserver(vtkCommand::RightButtonPressEvent);
 	m_seedRep = vtkSmartPointer<SeedsPlacerRepresentation>::New();
 	m_seedWidget->SetRepresentation(m_seedRep);
 }

@@ -30,7 +30,6 @@ public:
 	//	QList<QString> listOfModalityNames);
 	
 	void EnableObliqueView(bool);
-	void EnableRulerWidget(bool);
 	
 	virtual void SetInteractor(vtkRenderWindowInteractor *interactor);
 
@@ -40,7 +39,6 @@ public slots:
 	void slotPushBtnAxialReconstruction();
 	void slotExtractSegmentFromOverlay();
 	void slotUpdateSpinBoxExtractRadius();
-	void slotCheckBoxRulerStateChange(int);
 	void slotUpdateHSliderExtractRadius();
 
 	void SetFocalSeed(int i);
@@ -62,8 +60,6 @@ protected:
 	void InterpolatePolyline(vtkPolyData* inPolyline, vtkPolyData* outPD);
 	void ExtractSegment(vtkImageData* inImage,
 		vtkImageData* outImage, vtkPolyData* inPolydata);
-	void UpdateMeasurements();
-	void ToggleRulerWidget(int state);
 	void InitializeObliqueView();
 	void SetImageToViewer(vtkImageData* image, vtkImageData* overlay);
 	void CenterCursorPosition();
@@ -86,23 +82,15 @@ private:
 	int m_initialNeighborhoodRadius = 1;
 	bool m_inObliqueView = false;
 
-	static QList<vtkSmartPointer<vtkImageData>> m_listOfVtkImages;
-	static QList<QString> m_listOfModalityNames;
-
 	// For reslice view
 	int m_currentObliqueSlice;
-	static QList<double*> m_normalList;
-	static QList<double*> m_originList;
 	static QList<int*>	m_coordList;
-	static vtkSmartPointer<vtkImageData> s_curvedImage;
-	static vtkSmartPointer<vtkImageData> s_curvedOverlay;
+	static vtkImageData* s_curvedImage;
+	static vtkImageData* s_curvedOverlay;
 
 	static std::vector<vtkImageData*> s_vectImageStore;
 
 	QList<vtkProp*> m_savedActors;
-	vtkSmartPointer<vtkDistanceWidget> m_distanceWidget;
-	vtkSmartPointer<MyResliceMapper> m_resliceMapper[2];
-	vtkSmartPointer<vtkImageSlice> m_reslicer[2];
 };
 
 

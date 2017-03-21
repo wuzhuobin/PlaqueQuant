@@ -1,4 +1,5 @@
 #include "Centerline.h"
+#include "vtkXMLPolyDataWriter.h"
 
 Centerline::Centerline()
 {
@@ -68,7 +69,6 @@ void Centerline::SetTargetIds(vtkIdList* targetIds)
 
 void Centerline::CapSurface(vtkPolyData* inputSurface, vtkPolyData* cappedSurface, vtkIdList* CapCenterIds)
 {
-	// calculate centerlines of lumen and vessl outer wall
 		vtkSmartPointer<vtkvmtkCapPolyData> capper = vtkSmartPointer<vtkvmtkCapPolyData>::New();
 		capper->SetInputData(inputSurface);
 		capper->Update();
@@ -87,6 +87,12 @@ void Centerline::Update()
 
 void Centerline::CalculateCenterline()
 {
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetFileName("C:/Users/lwong/Downloads/output_capped.vtp");
+	writer->SetInputData(m_cappedSurface);
+	writer->Update();
+	writer->Write();
+
 	vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlinesFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
 	centerlinesFilter->SetInputData(m_cappedSurface);
 	centerlinesFilter->SetSourceSeedIds(m_sourceIds);

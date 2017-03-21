@@ -69,7 +69,6 @@ void InteractorStyleSwitch::InternalUpdate()
 	if (this->CurrentStyle != this->SeedsPlacer)
 		this->SeedsPlacer->SetSeedsPlacerEnable(false);
 	if (this->CurrentStyle != this->ObliqueView) {
-		this->ObliqueView->EnableRulerWidget(false);
 		this->ObliqueView->SetSeedsPlacerEnable(false);
 	}
 	if (this->CurrentStyle != this->PaintBrush)

@@ -336,13 +336,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBoxEnableRuler">
-        <property name="text">
-         <string>Enable Ruler</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="labelReconstructionStatus">
         <property name="styleSheet">
          <string notr="true">QWidget {
@@ -362,8 +355,6 @@
      <zorder>label_60</zorder>
      <zorder>line_2</zorder>
      <zorder>label_6</zorder>
-     <zorder>checkBoxEnableRuler</zorder>
-     <zorder>checkBoxEnableRuler</zorder>
     </widget>
    </item>
    <item>

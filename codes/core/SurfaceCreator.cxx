@@ -59,17 +59,24 @@ bool SurfaceCreator::Update()
 {	
 	if (m_input==NULL) return true;
 
-	m_resample = vtkImageResample::New();
-	m_resample->SetAxisMagnificationFactor(0,m_factor);
-	m_resample->SetAxisMagnificationFactor(1,m_factor);
-	m_resample->SetAxisMagnificationFactor(2,m_factor);
-	m_resample->SetInputData(m_input);
-	m_resample->Update();
+	double *range;
+	if (this->m_factor != 1)
+	{
+		m_resample = vtkImageResample::New();
+		m_resample->SetAxisMagnificationFactor(0, m_factor);
+		m_resample->SetAxisMagnificationFactor(1, m_factor);
+		m_resample->SetAxisMagnificationFactor(2, m_factor);
+		m_resample->SetInputData(m_input);
+		m_resample->Update();
+
+		range = m_resample->GetOutput()->GetScalarRange();
+	}
+	else {
+		range = m_input->GetScalarRange();
+	}
 
 	if (m_discrete)
 	{
-		double* range = m_resample->GetOutput()->GetScalarRange();
-		cout << range[0] << " range " << range[1] << endl;
 		int numValue = vtkMath::Round(range[1] - range[0]) +1;
 		
 		m_surface = vtkDiscreteMarchingCubes::New();
@@ -83,7 +90,11 @@ bool SurfaceCreator::Update()
 		m_surface = vtkMarchingCubes::New();
 		m_surface->SetValue(0, m_value);
 	}
-	m_surface->SetInputData(m_resample->GetOutput());
+
+	if (this->m_factor != 1)
+		m_surface->SetInputData(m_resample->GetOutput());
+	else
+		m_surface->SetInputData(m_input);
 	
 	//m_surface->SetInput(m_input);
 	m_surface->ComputeNormalsOff();
@@ -106,19 +117,22 @@ bool SurfaceCreator::Update()
 		tempPolyData = m_connectivityFilter->GetOutput();
 	}
 	
-	m_smoother = vtkWindowedSincPolyDataFilter::New();
-	m_smoother->SetInputData(tempPolyData);
-	m_smoother->SetNumberOfIterations(this->m_smoothFactor);
-	//m_smoother->SetNumberOfIterations(0);
-	m_smoother->BoundarySmoothingOff();
-	m_smoother->FeatureEdgeSmoothingOff();
-	m_smoother->SetFeatureAngle(120.0);
-	m_smoother->SetPassBand(.001);
-	//m_smoother->NonManifoldSmoothingOn();
-	//m_smoother->NormalizeCoordinatesOn();
-	m_smoother->Update();
+	if (this->m_smoothFactor > 0)
+	{
+		m_smoother = vtkWindowedSincPolyDataFilter::New();
+		m_smoother->SetInputData(tempPolyData);
+		m_smoother->SetNumberOfIterations(this->m_smoothFactor);
+		m_smoother->BoundarySmoothingOff();
+		m_smoother->FeatureEdgeSmoothingOff();
+		m_smoother->SetFeatureAngle(120.0);
+		m_smoother->SetPassBand(.001);
+		m_smoother->Update();
 
-    m_output = m_smoother->GetOutput();
+		m_output = m_smoother->GetOutput();
+	}
+	else {
+		m_output = m_surface->GetOutput();
+	}
 
 	if (m_output==NULL) return true;
 

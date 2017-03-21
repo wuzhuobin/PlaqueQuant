@@ -3,22 +3,21 @@
 #include "EncryptionAuthentication.h"
 
 
-//#undef _DEBUG
 
 //
-//// error output
-//#ifdef _DEBUG
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
-//extern const bool WARNING = false;
-//extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
-//#else
+// error output
+#ifndef _DEBUG
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+extern const bool WARNING = false;
+extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
+#else
 #pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 extern const bool WARNING = true;
 extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = true;
-//#endif // !_DEBUG
+#endif // !_DEBUG
  
 
-extern const char* PLAQUEQUANT_VERSION = "2.0";
+extern const char* PLAQUEQUANT_VERSION = "2.1";
 
 int main( int argc, char** argv )
 {
@@ -26,11 +25,10 @@ int main( int argc, char** argv )
 
   vtkObject::SetGlobalWarningDisplay(WARNING);
   MainWindow mainWnd;
-  mainWnd.SetVersion(PLAQUEQUANT_VERSION);
   mainWnd.setWindowTitle(QString("Plaque Quant v") + QString(PLAQUEQUANT_VERSION));
 
   EncryptionAuthentication ea(0, QString(), QString(),
-	  QDateTime(QDate(2017, 01, 10),
+	  QDateTime(QDate(2017, 06, 18),
 		  QTime(24, 0, 0)),
 	  "68686868");
 

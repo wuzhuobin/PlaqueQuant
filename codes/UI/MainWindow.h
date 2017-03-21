@@ -50,6 +50,8 @@ public:
 		SLICE_ORIENTATION_XY = 2
 	};
 
+	void EnableImageSelection(bool enable);
+
 public slots:
 	//GUI
 	virtual void resizeEvent(QResizeEvent * event);
