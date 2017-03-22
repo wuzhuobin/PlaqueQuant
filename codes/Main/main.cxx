@@ -17,7 +17,7 @@ extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = true;
 #endif // !_DEBUG
  
 
-extern const char* PLAQUEQUANT_VERSION = "2.1";
+extern const char* PLAQUEQUANT_VERSION = "2.2";
 
 int main( int argc, char** argv )
 {
@@ -28,7 +28,7 @@ int main( int argc, char** argv )
   mainWnd.setWindowTitle(QString("Plaque Quant v") + QString(PLAQUEQUANT_VERSION));
 
   EncryptionAuthentication ea(0, QString(), QString(),
-	  QDateTime(QDate(2017, 06, 18),
+	  QDateTime(QDate(2017, 06, 30),
 		  QTime(24, 0, 0)),
 	  "68686868");
 

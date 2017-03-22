@@ -87,13 +87,7 @@ void Centerline::Update()
 
 void Centerline::CalculateCenterline()
 {
-	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	writer->SetFileName("C:/Users/lwong/Downloads/output_capped.vtp");
-	writer->SetInputData(m_cappedSurface);
-	writer->Update();
-	writer->Write();
-
-	vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlinesFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();	vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlinesFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
 	centerlinesFilter->SetInputData(m_cappedSurface);
 	centerlinesFilter->SetSourceSeedIds(m_sourceIds);
 	centerlinesFilter->SetTargetSeedIds(m_targetIds);

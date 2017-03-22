@@ -390,13 +390,6 @@ void Core::slotGenerateCenterlineBtn()
 	vtkTransform::SafeDownCast(trans->GetTransform())->Translate(origin);
 	trans->Update();
 
-
-	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	writer->SetInputData(trans->GetOutput());
-	writer->SetFileName("C:/Users/lwong/Downloads/output.vtp");
-	writer->Update();
-	writer->Write();
-
 	// Clip at the end of the boundaries
 	vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
 	surface->DeepCopy(trans->GetOutput());
@@ -421,11 +414,6 @@ void Core::slotGenerateCenterlineBtn()
 		clipper->Update();
 		surface->DeepCopy(clipper->GetOutput());
 	}
-
-	writer->SetInputData(surface);
-	writer->SetFileName("C:/Users/lwong/Downloads/output_clipped.vtp");
-	writer->Update();
-	writer->Write();
 
 
 	Centerline* cl = new Centerline;
