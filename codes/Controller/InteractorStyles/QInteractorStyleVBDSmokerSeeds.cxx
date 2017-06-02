@@ -175,21 +175,16 @@ void QInteractorStyleVBDSmokerSeeds::slotUpdateBasilarArteryBifurcationLocation(
 	int value = ui->spinBoxBasilarArteryBifurcationLocation->value();
 	if (value <= class0) {
 		ui->lineEditElongation->setText("class0");
-		emit elongationChanged(0);
 	}
 	else if (class0 < value && value <= class1) {
 		ui->lineEditElongation->setText("class1");
-		emit elongationChanged(1);
 
 	}
 	else if (class1 < value && value <= class2) {
 		ui->lineEditElongation->setText("class2");
-		emit elongationChanged(2);
-
 	}
 	else {
 		ui->lineEditElongation->setText("class3");
-		emit elongationChanged(3);
 
 	}
 
@@ -243,21 +238,20 @@ void QInteractorStyleVBDSmokerSeeds::slotUpdatePonsCentralSectionLocation()
 	if ((class1R < centerX && centerX <= class0M) ||
 		(class0M < centerX && centerX <= class1L)) {
 		ui->lineEditDetour->setText("class0");
-		emit detourChanged(0);
+
 	}
 	else if((class2R < centerX && centerX <= class1R) ||
 		(class1L < centerX && centerX <= class2L)) {
 		ui->lineEditDetour->setText("class1");
-		emit detourChanged(1);
+
 	}
 	else if ((class3R < centerX && centerX <= class2R) ||
 		(class2L < centerX && centerX <= class3L)) {
 		ui->lineEditDetour->setText("class2");
-		emit detourChanged(2);
+
 	}
 	else {
 		ui->lineEditDetour->setText("class3");
-		emit detourChanged(3);
 
 	}
 

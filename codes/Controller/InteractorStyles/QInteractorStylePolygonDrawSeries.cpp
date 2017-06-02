@@ -26,9 +26,7 @@ QSETUP_UI_SRC(QInteractorStylePolygonDrawSeries);
 QInteractorStylePolygonDrawSeries::ContourMap QInteractorStylePolygonDrawSeries::m_normalXZ;
 QInteractorStylePolygonDrawSeries::ContourMap QInteractorStylePolygonDrawSeries::m_normalYZ;
 QInteractorStylePolygonDrawSeries::ContourMap QInteractorStylePolygonDrawSeries::m_normalXY;
-const char* QInteractorStylePolygonDrawSeries::COLOUR = "Colour";
-const char* QInteractorStylePolygonDrawSeries::SLICE_ORIENTATION = "Slice orientation";
-const char* QInteractorStylePolygonDrawSeries::INTERPOLATOR = "Interpolator";
+
 
 class QInteractorStylePolygonDrawSeriesCallback : public vtkCommand
 {

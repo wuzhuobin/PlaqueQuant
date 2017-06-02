@@ -9,12 +9,10 @@ include(${VTK_USE_FILE})
 SET(
 	MAXIMUMWALLTHICKNESS_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/MaximumWallThickness.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/MaximumWallThickness2.cpp
 	)
 SET(
 	MAXIMUMWALLTHICKNESS_INC
 	${CMAKE_CURRENT_SOURCE_DIR}/MaximumWallThickness.h
-	${CMAKE_CURRENT_SOURCE_DIR}/MaximumWallThickness2.h
 	)
 
 add_library(
@@ -33,16 +31,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}	
-)
-
-add_executable(
-	MaximumWallThickness_test
-	main.cpp
-)
-
-target_link_libraries(
-	MaximumWallThickness_test
-	MaximumWallThickness
 )
 
 source_group(

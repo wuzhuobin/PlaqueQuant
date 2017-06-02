@@ -61,6 +61,7 @@ link_directories(
 	${MAIN_LINK_DIRECTORIES}
 	)
 
+add_subdirectory(codes/EncryptionAuthentication)
 add_subdirectory(codes/Main)
 add_subdirectory(codes/View)
 add_subdirectory(codes/Core)
@@ -68,3 +69,6 @@ add_subdirectory(codes/Controller)
 add_subdirectory(codes/Model)
 add_subdirectory(codes/Widgets)
 add_subdirectory(codes/Algorithm)
+
+
+

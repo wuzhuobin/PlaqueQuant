@@ -25,7 +25,6 @@ set(
 
 add_library(
 	ReorderPointIdOfContourFilter 
-	SHARED
 	${REORDER_POINT_ID_OF_CONTOUR_FILTER_CXX}
 	${REORDER_POINT_ID_OF_CONTOUR_FILTER_H}
 	)
@@ -36,14 +35,6 @@ target_link_libraries(
 	${VTK_LIBRARIES}
 	)
 
-set_target_properties(
-    ReorderPointIdOfContourFilter
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-)
 target_include_directories(
 	ReorderPointIdOfContourFilter
 	PUBLIC

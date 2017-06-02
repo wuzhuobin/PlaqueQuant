@@ -16,7 +16,6 @@
 #include <QString>
 #include <QTableWidgetItem>
 #include <QFileInfo>
-#include <qthreadpool.h>
 #include <qheaderview.h>
 
 #include "itkGDCMSeriesFileNames.h"
@@ -29,9 +28,19 @@ RegistrationWizard::RegistrationWizard(
 	QString dir, int numOfImages, QWidget *parent)
 	: m_numOfImages(numOfImages), QWizard(parent)
 {
-	directoryPage	= new DirectoryPage(dir, this);
+	directoryPage	= new DirectoryPage(this);
 	imagePage		= new ImagePage(numOfImages, this);
 	conclusionPage	= new ConclusionPage(numOfImages, this);
+
+	for (int i = 0; i < numOfImages; ++i) {
+		m_selectedImages << -1;
+	}
+
+	imagePage->m_imagePaths = &m_imagePaths;
+	imagePage->m_selectedImages = &m_selectedImages;
+
+	conclusionPage->m_imagePaths = &m_imagePaths;
+	conclusionPage->m_selectedImages = &m_selectedImages;
 
     setPage(PAGE_DIRECTORY,  directoryPage);
     setPage(PAGE_IMAGE,		 imagePage );
@@ -47,6 +56,7 @@ RegistrationWizard::RegistrationWizard(
 
     connect(this, SIGNAL(helpRequested()), this, SLOT(showHelp()));
 
+	directoryPage->setDirectory(dir);
 }
 
 RegistrationWizard::RegistrationWizard(int numOfImages, QWidget * parent)
@@ -92,20 +102,20 @@ void RegistrationWizard::showHelp()
 
 }
 
-QString RegistrationWizard::getFileNames(unsigned int i)
+QSharedPointer<QStringList> RegistrationWizard::getFileNames(unsigned int i)
 {
-	if (i < 0 || i >= m_numOfImages) {
-		return QString();
-	}
-	else {
-		QString fieldImagePath = "image.path" + QString::number(i);
-		return field(fieldImagePath).toString();
-	}
+	if (i < 0 || i >= m_numOfImages)
+		return QSharedPointer<QStringList>::create();
+	// if the QLineEdit has not any input, return a null QSharedPointer
+	else if (m_selectedImages[i] == -1)
+		return QSharedPointer<QStringList>::create();
+	else
+		return m_imagePaths[m_selectedImages[i]];
 }
 
 void RegistrationWizard::setDirectory(QString directory)
 {
-	setField("directory.path", directory);
+	directoryPage->setDirectory(directory);
 }
 
 const QString RegistrationWizard::getDirectory()
@@ -117,15 +127,15 @@ int RegistrationWizard::getNumberOfImages()
 {
 	return m_numOfImages;
 }
-DirectoryPage::DirectoryPage(QString dir, QWidget *parent)
-	:QWizardPage(parent)
+
+DirectoryPage::DirectoryPage(QWidget *parent)
+	: QWizardPage(parent)
 {
 	setTitle(tr("Set Image Directory"));
 	setSubTitle(tr(""));
 
-	m_imageDirectoryLineEdit = new QLineEdit(dir);
-	registerField("directory.path", m_imageDirectoryLineEdit);
-	setField("directory.path", dir);
+	m_imageDirectoryLineEdit = new QLineEdit(this);
+	registerField("directory.path*", m_imageDirectoryLineEdit);
 
 	m_imageDirectoryLabel = new QLabel(tr("&Image Directory:"), this);
 	m_imageDirectoryLabel->setBuddy(m_imageDirectoryLineEdit);
@@ -140,11 +150,6 @@ DirectoryPage::DirectoryPage(QString dir, QWidget *parent)
 	setLayout(hBoxLayout);
 
 	connect(browseBtn, SIGNAL(clicked()), this, SLOT(browse()));
-}
-
-DirectoryPage::DirectoryPage(QWidget *parent)
-	: DirectoryPage(QString(), parent)
-{
 }
 
 void DirectoryPage::browse()
@@ -167,6 +172,11 @@ int DirectoryPage::nextId() const
     return RegistrationWizard::PAGE_IMAGE;
 }
 
+void DirectoryPage::setDirectory(QString dir)
+{
+	setField("directory.path", dir);
+}
+
 ImagePage::ImagePage(int numOfImages, QWidget *parent)
 	: QWizardPage(parent)
 {
@@ -179,12 +189,11 @@ ImagePage::ImagePage(int numOfImages, QWidget *parent)
 		"Slice" << "Date" << "Series UID" << "Format" << "Path";
 
 	treeWidget = new QTreeWidget(this);
-	treeWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	treeWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	treeWidget->setHeaderLabels(headerList);
 	treeWidget->setMinimumSize(1000, 200);
 
 	progressBar = new QProgressBar(this);
+	progressBar->setRange(0, 100);
 	progressBar->setTextVisible(true);
 	progressBar->setStyleSheet("QProgressBar {text-align: center;}");
 
@@ -199,9 +208,6 @@ ImagePage::ImagePage(int numOfImages, QWidget *parent)
 	for (int i = 0; i < numOfImages; ++i) {
 		m_imageLineEdits << new QLineEdit(this);
 		m_imageLineEdits[i]->setReadOnly(true);
-
-		m_imageLineEdits2 << new QLineEdit(this);
-		m_imageLineEdits2[i]->setVisible(false);
 
 		m_imageLabels << new QLabel(this);
 		m_imageLabels[i]->setBuddy(m_imageLineEdits[i]);
@@ -224,19 +230,25 @@ ImagePage::ImagePage(int numOfImages, QWidget *parent)
 		if (i == 0) {
 			//* mean compulsory , otherwise optional 
 			registerField("image.set" + QString::number(i) + "*", m_imageLineEdits[i]);
-			registerField("image.path" + QString::number(i) + "*", m_imageLineEdits2[i]);
 		}
 		else {
 			registerField("image.set" + QString::number(i), m_imageLineEdits[i]);
-			registerField("image.path" + QString::number(i), m_imageLineEdits2[i]);
 		}
 
 		connect(m_imageSetBtns[i], SIGNAL(clicked()), this, SLOT(setImages()), Qt::UniqueConnection);
 		connect(m_imageRemoveBtns[i], SIGNAL(clicked()), this, SLOT(removeImages()), Qt::UniqueConnection);
 
 	}
-	m_threadPool = new QThreadPool(this);
-	m_threadPool->setExpiryTimeout(0);
+
+	//Initialize 
+	thread = new FindImageThread(this);
+	thread->m_imagePage = (this);
+	lastDirectory = "";
+
+	
+
+
+	connect(thread, SIGNAL(updateProgressBar(int)), this->progressBar, SLOT(setValue(int)));
 
 }
 
@@ -248,7 +260,10 @@ ImagePage::ImagePage(QWidget *parent)
 
 ImagePage::~ImagePage()
 {
-	emit finishPrevious();
+	thread->m_stop = true;
+	QMutexLocker locker(&m_mutex);
+	//thread->forceStop();
+	//thread->deleteLater();
 }
 
 void ImagePage::setImageModalityNames(unsigned int i, QString imageModalityName)
@@ -275,35 +290,20 @@ bool ImagePage::validatePage()
 
 void ImagePage::initializePage()
 {
-	if (m_lastDirectory == field("directory.path").toString()) {
-		return;
-	}
-	m_lastDirectory = field("directory.path").toString();
 	//Find Images	
-	QStringList allDir;
-	allDir << (field("directory.path").toString());
-	QDirIterator it(field("directory.path").toString(),
-		QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-	while (it.hasNext())	
-		allDir << it.next();
-	// force finish all FindImageRunnable
-	emit finishPrevious();
-	// setup progress bar
-	progressBar->setRange(0, allDir.size());
-	progressBar->setValue(0);
-	// clean tree widget
-	treeWidget->clear();
-
-	for (int i = 0; i < allDir.size(); i++)
-	{
-		FindImageRunnable* findImage = new FindImageRunnable(allDir[i]);
-		m_threadPool->start(findImage);
-		connect(findImage, SIGNAL(finish()),
-			this, SLOT(updateProgressBar()));
-		connect(findImage, SIGNAL(addTreeWidgetItem(QString)),
-			this, SLOT(updateTreeWidget(QString)));
-		connect(this, SIGNAL(finishPrevious()),
-			findImage, SLOT(forceFinish()));
+	if (lastDirectory != field("directory.path").toString())
+	{		
+		while (thread->isRunning())
+		{
+			thread->m_stop = true;
+			//thread->forceStop();
+			//thread->wait(500);
+		}
+		lastDirectory = field("directory.path").toString();
+		treeWidget->clear();
+		progressBar->setValue(0);
+		//thread->setDirectory(field("directory.path").toString());
+		thread->start();
 	}
 }
 
@@ -312,9 +312,9 @@ int ImagePage::nextId() const
 	return RegistrationWizard::PAGE_CONCLUSION;
 }
 
-void ImagePage::updateProgressBar()
+void ImagePage::onUpdateProgressBar(int value)
 {	
-	progressBar->setValue(progressBar->value() + 1);
+	progressBar->setValue(value);
 }
 
 void ImagePage::setImages()
@@ -332,8 +332,7 @@ void ImagePage::setImages()
 			"NAME: " + treeWidgetItem->text(0) + 
 			"	DESCRIPTION: " + treeWidgetItem->text(2));
 		m_imageLineEdits[index]->setText(text);
-		m_imageLineEdits2[index]->setText(treeWidgetItem->text(7));
-		//(*m_selectedImages)[index] = treeWidget->indexOfTopLevelItem(treeWidgetItem);
+		(*m_selectedImages)[index] = treeWidget->indexOfTopLevelItem(treeWidgetItem);
 	}
 
 }
@@ -349,28 +348,10 @@ void ImagePage::removeImages()
 		return;
 	else {
 		m_imageLineEdits[index]->clear();
-		m_imageLineEdits2[index]->clear();
-		//(*m_selectedImages)[index] = -1;
+		(*m_selectedImages)[index] = -1;
 	}
 
 
-}
-
-void ImagePage::updateTreeWidget(QString item)
-{
-	QTreeWidgetItem* treeWidgetItem = new QTreeWidgetItem(treeWidget);
-	QStringList itemList = item.split('\t');
-	treeWidgetItem->setText(0, itemList[0]);
-	treeWidgetItem->setText(1, itemList[1]);
-	treeWidgetItem->setText(2, itemList[2]);
-	treeWidgetItem->setText(3, itemList[3]);
-	treeWidgetItem->setText(4, itemList[4]);
-	treeWidgetItem->setText(5, itemList[5]);
-	treeWidgetItem->setText(6, itemList[6]);
-	treeWidgetItem->setText(7, itemList[7]);
-
-
-	treeWidget->addTopLevelItem(treeWidgetItem);
 }
 
 ConclusionPage::ConclusionPage(int numOfImages, QWidget *parent)
@@ -422,175 +403,111 @@ void ConclusionPage::initializePage()
 
 	for (int i = 0; i < m_tableWidgets.size(); ++i) {
 
-		QString fieldStringImageSet;
-		fieldStringImageSet += "image.set";
-		fieldStringImageSet += QString::number(i);
+		QString fieldString;
+		fieldString += "image.set";
+		fieldString += QString::number(i);
 
-		QString imageSet = field(fieldStringImageSet).toString();
-
-		if (imageSet.isEmpty()) {
-			continue;
-		}
-
-		if (m_tableWidgets[i] == nullptr) {
-			m_tableWidgets[i] = new QTableWidget(this);
-		}
-		tabWidget->addTab(m_tableWidgets[i], imageSet);
-		//m_tableWidgets[i]->clear();
-		m_tableWidgets[i]->setEditTriggers(QTableWidget::NoEditTriggers);
-		m_tableWidgets[i]->setColumnCount(3);
-		m_tableWidgets[i]->setRowCount(0);
-		m_tableWidgets[i]->setHorizontalHeaderLabels(QStringList()
-			<< "Tag" << "Label" << "Description");
-		m_tableWidgets[i]->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-		m_tableWidgets[i]->verticalHeader()->setVisible(false);
-
-		try {
-			GDCMImageIO::Pointer dicomIO = GDCMImageIO::New();
-			ImageFileReader::Pointer reader = ImageFileReader::New();
-
-			QString fieldStringImagePath;
-			fieldStringImagePath += "image.path";
-			fieldStringImagePath += QString::number(i);
-
-			QStringList imagePaths = field(fieldStringImagePath).toString().split(';');
-			if (imagePaths[0].isEmpty()) {
-				continue;
+		if ((*m_selectedImages)[i] != -1) {
+			if (m_tableWidgets[i] == nullptr) {
+				m_tableWidgets[i] = new QTableWidget(this);
 			}
+			tabWidget->addTab(m_tableWidgets[i], 
+				field(fieldString).toString());
+			m_tableWidgets[i]->clear();
+			m_tableWidgets[i]->setEditTriggers(QTableWidget::NoEditTriggers);
+			m_tableWidgets[i]->setColumnCount(3);
+			m_tableWidgets[i]->setRowCount(0);
+			m_tableWidgets[i]->setHorizontalHeaderLabels(QStringList()
+				<< "Tag" << "Label" << "Description");
+			m_tableWidgets[i]->verticalHeader()->setVisible(false);
+			
+			try {
+				GDCMImageIO::Pointer dicomIO = GDCMImageIO::New();
+				ImageFileReader::Pointer reader = ImageFileReader::New();
+				reader->SetFileName((*(*m_imagePaths)[(*m_selectedImages)[i]])[0].toStdString());
+				qDebug() << (*(*m_imagePaths)[(*m_selectedImages)[i]])[0];
+				reader->SetImageIO(dicomIO);
+				reader->Update();
 
-			reader->SetFileName(imagePaths[0].toStdString());
-			qDebug() << imagePaths;
-			reader->SetImageIO(dicomIO);
-			reader->Update();
+				const MetaDataDictionary& dictionary = dicomIO->GetMetaDataDictionary();
+				for (MetaDataDictionary::ConstIterator cit = dictionary.Begin();
+					cit != dictionary.End(); ++cit) {
 
-			const MetaDataDictionary& dictionary = dicomIO->GetMetaDataDictionary();
-			for (MetaDataDictionary::ConstIterator cit = dictionary.Begin();
-				cit != dictionary.End(); ++cit) {
+					MetaDataObjectBase::Pointer entry = cit->second;
+					MetaDataString::Pointer entryValue = static_cast<MetaDataString*>(
+						entry.GetPointer());
 
-				MetaDataObjectBase::Pointer entry = cit->second;
-				MetaDataString::Pointer entryValue = static_cast<MetaDataString*>(
-					entry.GetPointer());
+					if (entryValue) {
+						m_tableWidgets[i]->insertRow(m_tableWidgets[i]->rowCount());
+						string tag = cit->first;
+						string label;
+						string value = entryValue->GetMetaDataObjectValue();
+						m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 2,
+							new QTableWidgetItem(QString::fromStdString(value)));
+						m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 0,
+							new QTableWidgetItem(QString::fromStdString(tag)));
+						if (GDCMImageIO::GetLabelFromTag(tag, label)) {
+							m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 1,
+								new QTableWidgetItem(QString::fromStdString(label)));
+						}
+						else {
+							m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 1,
+								new QTableWidgetItem(tr("Unknown")));
+						}
 
-				if (entryValue) {
-					m_tableWidgets[i]->insertRow(m_tableWidgets[i]->rowCount());
-					string tag = cit->first;
-					string label;
-					string value = entryValue->GetMetaDataObjectValue();
-					m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 2,
-						new QTableWidgetItem(QString::fromStdString(value)));
-					m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 0,
-						new QTableWidgetItem(QString::fromStdString(tag)));
-					if (GDCMImageIO::GetLabelFromTag(tag, label)) {
-						m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 1,
-							new QTableWidgetItem(QString::fromStdString(label)));
 					}
-					else {
-						m_tableWidgets[i]->setItem(m_tableWidgets[i]->rowCount() - 1, 1,
-							new QTableWidgetItem(tr("Unknown")));
-					}
-
 				}
 			}
-		}
-		catch (itk::ExceptionObject& e) {
-			qDebug() << "Inputs are not DICOM images.";
-			qDebug() << e.what();
-		}
-
-		//if (!(*m_DICOMHeaders)[i].isNull()) {
-		//	int tableRow = 0;
-		//	m_tableWidgets[i]->setRowCount((*m_DICOMHeaders).size());
-		//	m_tableWidgets[i]->setColumnCount(2);
-		//	for (QMap<QString, QString>::const_iterator cit = (*m_DICOMHeaders)[i]->constBegin();
-		//		cit != (*m_DICOMHeaders)[i]->constEnd(); ++cit) {
-
-		//		qDebug() << cit.key();
-		//		qDebug() << cit.value();
-		//		m_tableWidgets[i]->setItem(tableRow, 0, new QTableWidgetItem(cit.key()));
-		//		m_tableWidgets[i]->setItem(tableRow, 1, new QTableWidgetItem(cit.value()));
-		//		++tableRow;
-		//	}
-		//}
-
-	}
-
-}
-
-FindImageRunnable::FindImageRunnable(QString folderPath, QObject* parent)
-	:m_folderPath(folderPath), QObject(parent)
-{
-	setAutoDelete(true);
-}
-
-void FindImageRunnable::run()
-{
-	using std::vector;
-	using std::string;
-	using itk::GDCMSeriesFileNames;
-	if (m_forceFinish) {
-		emit finish();
-		return;
-	}
-	// Find Dicom files
-	{
-		// Generate a sequence of fileNames from a DICOM series
-		GDCMSeriesFileNames::Pointer nameGenerator = GDCMSeriesFileNames::New();
-		nameGenerator->SetUseSeriesDetails(true);
-		nameGenerator->SetDirectory(m_folderPath.toStdString().c_str());
-		//nameGenerator->AddSeriesRestriction("0008|0021");
-		nameGenerator->GetInputFileNames();
-
-		// basing on all seriesUIDs
-		// get file names form corresponding serires UID
-		try {
-			const vector<string>& seriesUID = nameGenerator->GetSeriesUIDs();
-
-			vector<string>::const_iterator seriesEnd = seriesUID.end();
-			for (vector<string>::const_iterator cit = seriesUID.cbegin();
-				cit != seriesUID.cend(); ++cit) {
-
-				GDCImageIORead(nameGenerator->GetFileNames(*cit));
-
+			catch (itk::ExceptionObject& e) {
+				qDebug() << "Inputs are not DICOM images.";
+				qDebug() << e.what();
 			}
+
+			//if (!(*m_DICOMHeaders)[i].isNull()) {
+			//	int tableRow = 0;
+			//	m_tableWidgets[i]->setRowCount((*m_DICOMHeaders).size());
+			//	m_tableWidgets[i]->setColumnCount(2);
+			//	for (QMap<QString, QString>::const_iterator cit = (*m_DICOMHeaders)[i]->constBegin();
+			//		cit != (*m_DICOMHeaders)[i]->constEnd(); ++cit) {
+
+			//		qDebug() << cit.key();
+			//		qDebug() << cit.value();
+			//		m_tableWidgets[i]->setItem(tableRow, 0, new QTableWidgetItem(cit.key()));
+			//		m_tableWidgets[i]->setItem(tableRow, 1, new QTableWidgetItem(cit.value()));
+			//		++tableRow;
+			//	}
+			//}
+
 		}
-		catch (itk::ExceptionObject& e) {
-			qDebug() << e.what();
-		}
+
 
 	}
 
-	//Find Nifti file
-	{
-		QStringList filterList;
-		filterList << "*.nii" << "*.nii.gz";
-		QDir dir(m_folderPath);
-		QFileInfoList niiFileList = dir.entryInfoList(filterList);
-
-		// basing on wildcard to find out all NIFTI files
-		for (QFileInfoList::const_iterator cit = niiFileList.cbegin();
-			cit != niiFileList.cend(); ++cit)
-		{
-			vector<string> fileNames(1, cit->absoluteFilePath().toStdString());
-			GDCImageIORead(fileNames);
-		}
-	}
-	emit finish();
 }
 
-void FindImageRunnable::forceFinish()
+FindImageThread::FindImageThread(ImagePage *parent) 
+	:QThread(parent)
 {
-	m_forceFinish = true;
-	disconnect(0, 0, 0);
+	m_imagePage = parent;
+	m_stop = false;
 }
 
-void FindImageRunnable::GDCImageIORead(const std::vector<std::string>& files)
+//void FindImageThread::setDirectory(QString dir)
+//{
+//	m_dir = dir;
+//}
+//
+//void FindImageThread::setImagePage(ImagePage * imagePage)
+//{
+//	m_imagePage = imagePage;
+//}
+
+void FindImageThread::updateTreeWidget(QStringList* imagePath)
 {
 	using std::string;
-	using std::vector;
 	using itk::GDCMImageIO;
 	typedef itk::ImageFileReader<itk::Image<unsigned short, 2>> ImageFileReader;
 
-	string _file = files[0];
 	string patientName = "/";
 	string modality = "/";
 	string seriesDescription = "/";
@@ -605,7 +522,7 @@ void FindImageRunnable::GDCImageIORead(const std::vector<std::string>& files)
 		ImageFileReader::Pointer imageFilerReader = ImageFileReader::New();
 		imageFilerReader->SetNumberOfThreads(4);
 		imageFilerReader->SetImageIO(dicomIO);
-		imageFilerReader->SetFileName(_file);
+		imageFilerReader->SetFileName((*imagePath)[0].toStdString());
 		imageFilerReader->Update();
 
 		if (!dicomIO->GetValueFromTag(("0010|0010"), patientName)) {
@@ -620,8 +537,8 @@ void FindImageRunnable::GDCImageIORead(const std::vector<std::string>& files)
 
 		if (!dicomIO->GetValueFromTag("0020|1002", slice)) {
 			//slice = "/";
-			slice = std::to_string(files.size());
 		}
+		slice = imagePath->size();
 		if (!dicomIO->GetValueFromTag("0008|0020", date)) {
 			//date = "/";
 		}
@@ -630,27 +547,123 @@ void FindImageRunnable::GDCImageIORead(const std::vector<std::string>& files)
 		}
 	}
 	catch (itk::ExceptionObject& e) {
-		patientName = QFileInfo(QString::fromStdString(_file)).baseName().toStdString();
+		patientName = QFileInfo((*imagePath)[0]).baseName().toStdString();
 		qDebug() << "Input are not DICOM images.";
 		qDebug() << "Input are assumed to be NIFTI.";
 		qDebug() << e.what();
 
 	}
-	
-	QString _emitString;
-	_emitString += QString::fromStdString(patientName) + '\t';
-	_emitString += QString::fromStdString(modality) + '\t';
-	_emitString += QString::fromStdString(seriesDescription) + '\t';
-	_emitString += QString::fromStdString(slice) + '\t';
-	_emitString += QString::fromStdString(date) + '\t';
-	_emitString += QString::fromStdString(seriesUID) + '\t';
-	_emitString += QString::fromStdString(format) + '\t';
-	for (vector<string>::const_iterator cit = files.cbegin();
-		cit != files.cend(); ++cit) {
-		_emitString += QString::fromStdString(*cit);
-		_emitString += ';';
-	}
-	_emitString += QString::fromStdString(_file);
 
-	emit addTreeWidgetItem(_emitString);
+	QTreeWidgetItem* treeWidgetItem = new QTreeWidgetItem(m_imagePage->treeWidget);
+	treeWidgetItem->setText(0, QString::fromStdString(patientName));
+	treeWidgetItem->setText(1, QString::fromStdString(modality));
+	treeWidgetItem->setText(2, QString::fromStdString(seriesDescription));
+	treeWidgetItem->setText(3, QString::number(imagePath->size()));
+	treeWidgetItem->setText(4, QString::fromStdString(date));
+	treeWidgetItem->setText(5, QString::fromStdString(seriesUID));
+	treeWidgetItem->setText(6, QString::fromStdString(format));
+	treeWidgetItem->setText(7, (*imagePath)[0]);
+
+
+	m_imagePage->treeWidget->addTopLevelItem(treeWidgetItem);
 }
+
+
+void FindImageThread::run()
+{
+	using std::vector;
+	using std::string;
+	using itk::GDCMSeriesFileNames;
+
+	//QMutex mutex;
+	//mutex.lock();
+
+
+	m_stop = false;
+
+	if(this->m_stop)
+		return;
+	QMutexLocker locker(&m_imagePage->m_mutex);
+
+	QStringList allDir;
+	allDir << (m_imagePage->field("directory.path").toString());
+	QDirIterator it(m_imagePage->field("directory.path").toString(),
+		QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+	while (it.hasNext())
+		allDir << it.next();
+	m_imagePage->m_imagePaths->clear();
+	for (int i=0;i<allDir.size();i++)
+	{
+		if(this->m_stop)
+			return;
+		// Find Dicom files
+		{		
+			// Generate a sequence of fileNames from a DICOM series
+			GDCMSeriesFileNames::Pointer nameGenerator = GDCMSeriesFileNames::New();
+			nameGenerator->SetUseSeriesDetails(true);
+			nameGenerator->SetDirectory(allDir.at(i).toStdString().c_str());
+			//nameGenerator->AddSeriesRestriction("0008|0021");
+			nameGenerator->GetInputFileNames();
+
+			qDebug() << "The directory: ";
+			qDebug() << allDir.at(i);
+			qDebug() << "Contains the following DICOM Series: ";
+			try {
+				const vector<string>& seriesUID = nameGenerator->GetSeriesUIDs();
+
+				vector<string>::const_iterator seriesEnd = seriesUID.end();
+				for (vector<string>::const_iterator cit = seriesUID.cbegin();
+					cit != seriesUID.cend(); ++cit) {
+					qDebug() << QString::fromStdString(*cit);
+					vector<string> fileNames = nameGenerator->GetFileNames(*cit);
+
+					QSharedPointer<QStringList> imagePath = QSharedPointer<QStringList>(
+						new QStringList());
+					*m_imagePage->m_imagePaths << imagePath;
+
+					// vector<string> push to QList<QStringList>
+					for (vector<string>::const_iterator cit1 = fileNames.cbegin();
+						cit1 != fileNames.cend(); ++cit1) {
+						*imagePath << QString::fromStdString(*cit1);
+					}
+					updateTreeWidget(imagePath.data());
+				}
+			}
+			catch (itk::ExceptionObject& e) {
+				qDebug() << e.what();
+			}
+
+		}
+		
+		//Find Nifti file
+		{
+			if (this->m_stop)
+				return;
+			QStringList filterList;
+			filterList << "*.nii" << "*.nii.gz";
+			QDir dir(allDir.at(i));
+			QFileInfoList niiFileList = dir.entryInfoList(filterList);
+
+
+			for (QFileInfoList::const_iterator cit = niiFileList.cbegin(); 
+				cit != niiFileList.cend(); ++cit)
+			{
+				QSharedPointer<QStringList> imagePath = QSharedPointer<QStringList>(
+					new QStringList());
+				*m_imagePage->m_imagePaths << imagePath;
+				*imagePath << cit->absoluteFilePath();
+
+				updateTreeWidget(imagePath.data());
+			}
+		}
+		emit updateProgressBar(double(i + 1) / double(allDir.size()) * 100);
+	}
+	//mutex.unlock();
+}
+
+//void FindImageThread::forceStop()
+//{
+//	m_stop = true;
+//}
+
+

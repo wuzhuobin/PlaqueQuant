@@ -62,7 +62,7 @@ void IADEOverlay::updatedOverlay()
 //	vtkSmartPointer<vtkImageAccumulate> imageAccumulate =
 //		vtkSmartPointer<vtkImageAccumulate>::New();
 //	imageAccumulate->SetInputData(m_data);
-//	imageAccumulate->SetExtent(0, NUMBER_OF_COLOR - 1, 0, 0, 0, 0); // #LookupTable
+//	imageAccumulate->SetComponentExtent(0, NUMBER_OF_COLOR - 1, 0, 0, 0, 0); // #LookupTable
 //	imageAccumulate->SetComponentOrigin(0, 0, 0);
 //	imageAccumulate->SetComponentSpacing(1, 0, 0);
 //	imageAccumulate->Update();
@@ -125,7 +125,7 @@ int IADEOverlay::getCurrentSlice()
 //		vtkSmartPointer<vtkImageAccumulate>::New();
 //	imageAccumulate->SetInputConnection(extractVOI->GetOutputPort());
 //	//imageAccumulate->SetInputData(m_data);
-//	imageAccumulate->SetExtent(0, 1, 0, 0, 0, 0); // #LookupTable
+//	imageAccumulate->SetComponentExtent(0, 1, 0, 0, 0, 0); // #LookupTable
 //	imageAccumulate->SetComponentOrigin(1, 0, 0);
 //	imageAccumulate->SetComponentSpacing(1, 0, 0);
 //	imageAccumulate->Update();

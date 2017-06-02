@@ -60,7 +60,6 @@ void vtkROIBorderWidget::SetCursor(int cState)
 		}
 	}
 }
-
 void vtkROIBorderWidget::UpdateROIWidget()
 {
 	// if orientation not set
@@ -293,7 +292,6 @@ void vtkROIBorderWidget::UpdateROIWidget()
 	parentRep->PlaceWidget(boxBounds);
 	parentRep->Modified();
 	parentRep->SetPlaceFactor(placefactor);
-	parent->InvokeEvent(vtkCommand::InteractionEvent);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -303,7 +301,19 @@ vtkStandardNewMacro(vtkROIWidget);
 vtkROIWidget::vtkROIWidget() : vtkBoxWidget2()
 {
 	//MainWindow* mainwnd = MainWindow::GetMainWindow();
-	this->NumberOfBorderWidgets = 0;
+
+	for (int i = 0; i < 3;i++)
+	{
+		this->m_planes[i] = NULL;
+		this->m_borderWidgets[i] = vtkSmartPointer<vtkROIBorderWidget>::New();
+		this->m_borderWidgets[i]->SetROIParent(this);
+		this->m_borderWidgets[i]->SetOrientation(i);
+		this->m_borderWidgets[i]->SelectableOff();
+		this->m_borderRep[i] = vtkSmartPointer<vtkBorderRepresentation>::New();
+		this->m_borderRep[i]->GetBorderProperty()->SetColor(0.8, 0.2, 0.1);
+		this->m_borderRep[i]->GetBorderProperty()->SetLineStipplePattern(0xFCFC); // ------..------..
+		this->m_borderRep[i]->GetBorderProperty()->SetLineWidth(2.);
+	}
 
 	/// Callback
 	this->m_callback = vtkSmartPointer<vtkROIUpdateAllBorderWidgetCallBack>::New();
@@ -315,11 +325,33 @@ vtkROIWidget::vtkROIWidget() : vtkBoxWidget2()
 	vtkSmartPointer<vtkROIUpdateAllBorderWidgetCallBack> callback = vtkSmartPointer<vtkROIUpdateAllBorderWidgetCallBack>::New();
 	callback->SetUpdateTarget(this);
 	this->AddObserver(vtkCommand::InteractionEvent, callback);
+	
+	/// Widgets update interaction observers
+	vtkSmartPointer<vtkROIBroderWidgetCallBack> bwCallback[3];
+	for (int i = 0; i < 3; i++)
+	{
+		bwCallback[i] = vtkSmartPointer<vtkROIBroderWidgetCallBack>::New();
+		this->m_borderWidgets[i]->AddObserver(vtkCommand::InteractionEvent, bwCallback[i]);
+	}
 }
 
 vtkROIWidget::~vtkROIWidget()
 {
-	this->ClearAllBorderWidgets();
+	for (int i = 0; i < 3;i++)
+	{
+		if (m_borderWidgets[i] == NULL)
+			continue;
+
+		/*if (this->m_borderWidgets[i]->GetInteractor()) {
+			this->m_borderWidgets[i]->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera()->RemoveAllObservers();
+		}*/
+
+		this->m_borderWidgets[i]->Off();
+		this->m_borderWidgets[i]->SetInteractor(NULL);
+		this->m_borderWidgets[i]->SetCurrentRenderer(NULL);
+		this->m_borderWidgets[i]->SetDefaultRenderer(NULL);
+		this->m_borderWidgets[i] = NULL;
+	}
 }
 
 void vtkROIWidget::SetBorderWidgetsInteractor(int index, vtkRenderWindowInteractor *iren)
@@ -342,80 +374,8 @@ void vtkROIWidget::SetBorderWidgetsInteractor(int index, vtkRenderWindowInteract
 }
 
 
-void vtkROIWidget::SetNumbeOfBorderWidgets(int num)
-{
-	while (this->NumberOfBorderWidgets != num && this->NumberOfBorderWidgets < num)
-	{
-		this->GenerateOneBorderWidget();
-	}
-}
-
-
-void vtkROIWidget::GenerateOneBorderWidget()
-{
-	// Legacy
-	this->m_planes.push_back(NULL);
-
-	// Generate new borderwidget and push into vector
-	vtkSmartPointer<vtkROIBorderWidget> bwWidget 
-		= vtkSmartPointer<vtkROIBorderWidget>::New();
-	bwWidget->SetROIParent(this);
-	bwWidget->SetOrientation(0);
-	bwWidget->SelectableOff();
-	bwWidget->SetReferenceCount(bwWidget->GetReferenceCount() + 1); // So that this border widget live with its parent object
-	this->m_borderWidgets.push_back(bwWidget);
-
-	// Generate new representation for border widget
-	vtkSmartPointer<vtkBorderRepresentation> bRep
-	 = vtkSmartPointer<vtkBorderRepresentation>::New();
-	bRep->GetBorderProperty()->SetColor(0.8, 0.2, 0.1);
-	bRep->GetBorderProperty()->SetLineStipplePattern(0xFCFC); // ------..------..
-	bRep->GetBorderProperty()->SetLineWidth(2.);
-	this->m_borderRep.push_back(bRep);
-
-	// Generate new call back function 
-	vtkSmartPointer<vtkROIBroderWidgetCallBack> bwCallback;
-	bwCallback = vtkSmartPointer<vtkROIBroderWidgetCallBack>::New();
-	bwWidget->AddObserver(vtkCommand::InteractionEvent, bwCallback);
-
-	this->NumberOfBorderWidgets += 1;
-}
-
-void vtkROIWidget::ClearAllBorderWidgets()
-{
-	typedef std::vector<vtkSmartPointer<vtkROIBorderWidget>>::iterator ROIIter;
-	if (this->NumberOfBorderWidgets > 0)
-	{
-		for (ROIIter iter = this->m_borderWidgets.begin();
-			iter != this->m_borderWidgets.end(); iter++)
-		{
-			if (*iter)
-			{
-				(*iter)->Off();
-				(*iter)->SetInteractor(NULL);
-				(*iter)->SetCurrentRenderer(NULL);
-				(*iter)->SetDefaultRenderer(NULL);
-				(*iter)->SetRepresentation(NULL);
-				(*iter)->RemoveAllObservers();
-				(*iter) = NULL;
-			}
-		}
-
-	}
-}
-
 void vtkROIWidget::SetBorderWidgetOrientation(int borderWidgetNumber, int orientation)
 {
-	// Return if there are not enough borderwidgets
-	if (borderWidgetNumber > this->NumberOfBorderWidgets - 1)
-	{
-		return;
-	}
-
-	// Clamp the input orientation to 0 - 2
-	orientation = orientation > vtkROIBorderWidget::ORIENTATION_XY ? 2 : orientation;
-	orientation = orientation < vtkROIBorderWidget::ORIENTATION_YZ ? 0 : orientation;
-
 	this->m_borderWidgets[borderWidgetNumber]->SetOrientation(orientation);
 }
 
@@ -443,9 +403,10 @@ void vtkROIWidget::UpdateBorderWidgets()
 
 	/// Emit bounds signal
 	double* bounds = this->WidgetRep->GetBounds();
+	emit signalROIBounds(bounds);
 
 	/// Update border Widgets accordingly
-	for (int i = 0; i < this->NumberOfBorderWidgets; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		// if interactor is not set
 		if (!this->m_borderWidgets[i]->GetInteractor()) {
@@ -519,7 +480,7 @@ void vtkROIWidget::SetEnabled(int b)
 
 	if (b) {
 
-		for (int i = 0; i < NumberOfBorderWidgets; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			if (!m_borderWidgets[i]) continue;
 			if (this->m_borderWidgets[i]->GetInteractor() != NULL) {
@@ -528,7 +489,7 @@ void vtkROIWidget::SetEnabled(int b)
 		}
 
 		this->UpdateBorderWidgets();
-		for (int i = 0; i < NumberOfBorderWidgets; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			if (!m_borderWidgets[i]) continue;
 			if (this->m_borderWidgets[i]->GetInteractor() != NULL)
@@ -536,7 +497,7 @@ void vtkROIWidget::SetEnabled(int b)
 		}
 	}
 	else {
-		for (int i = 0; i < NumberOfBorderWidgets;i++)
+		for (int i = 0; i < 3;i++)
 		{
 			if (!m_borderWidgets[i]) continue;
 			this->m_borderWidgets[i]->Off();

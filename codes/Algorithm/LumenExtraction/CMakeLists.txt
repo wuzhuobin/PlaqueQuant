@@ -28,7 +28,6 @@ set(
 
 add_library(
 	LumenExtraction 
-	SHARED
 	${LUMENEXTRATION_SRC}
 	${LUMENEXTRATION_INC}
 	)
@@ -45,15 +44,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}
-)
-
-set_target_properties(
-    LumenExtraction
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_SOURCE_DIR}/bin
 )
 
 add_executable(

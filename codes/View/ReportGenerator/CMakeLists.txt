@@ -30,7 +30,6 @@ qt5_wrap_cpp(
 
 add_library(
 	ReportGenerator
-	SHARED
 	${REPORT_GENERATOR_H}
 	${REPORT_GENERATOR_SRC}
 	${REPORT_GENERATOR_MOC}	
@@ -48,13 +47,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}
-)
-
-set_target_properties(
-    ReportGenerator
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
 )
 
 #Grouping in MSVC

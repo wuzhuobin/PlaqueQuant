@@ -74,41 +74,41 @@ void QInteractorStyleTubularVOI::ExtractVOI(QList<int*>& seed)
 	GetImageViewer()->Render();
 }
 
-//void QInteractorStyleTubularVOI::UpdateWidgetToSeeds(QList<int*>& seeds, int * newImagePos, int * oldImagePos)
-//{
-//	// if oldImagePos is nullptr or oldImagePos is not a valid number, 
-//	// replace the existed newImagePos or push the new newImagePos
-//	if (oldImagePos == nullptr ||
-//		oldImagePos[0] < 0 ||
-//		oldImagePos[1] < 0 ||
-//		oldImagePos[2] < 0) {
-//		oldImagePos = newImagePos;
-//	}
-//	QList<int*>::iterator it = std::find_if(seeds.begin(),
-//		seeds.end(), [oldImagePos](int* index)->bool {
-//		return
-//			oldImagePos[0] == index[0] &&
-//			oldImagePos[1] == index[1] &&
-//			oldImagePos[2] == index[2];
-//	});
-//	if (it != seeds.end()) {
-//		memcpy(*it, newImagePos, sizeof(int[3]));
-//		QString listItem = "way point: [" +
-//			QString::number(newImagePos[0]) + "," +
-//			QString::number(newImagePos[1]) + "," +
-//			QString::number(newImagePos[2]) + "]";
-//		GetListWidget()->item(seeds.indexOf(*it))->setText(listItem);
-//	}
-//	else {
-//		seeds.push_back(new int[3]);
-//		memcpy(seeds.back(), newImagePos, sizeof(int[3]));
-//		QString listItem = "way point: [" +
-//			QString::number(seeds.back()[0]) + "," +
-//			QString::number(seeds.back()[1]) + "," +
-//			QString::number(seeds.back()[2]) + "]";
-//		GetListWidget()->addItem(listItem);
-//	}
-//}
+void QInteractorStyleTubularVOI::UpdateWidgetToSeeds(QList<int*>& seeds, int * newImagePos, int * oldImagePos)
+{
+	// if oldImagePos is nullptr or oldImagePos is not a valid number, 
+	// replace the existed newImagePos or push the new newImagePos
+	if (oldImagePos == nullptr ||
+		oldImagePos[0] < 0 ||
+		oldImagePos[1] < 0 ||
+		oldImagePos[2] < 0) {
+		oldImagePos = newImagePos;
+	}
+	QList<int*>::iterator it = std::find_if(seeds.begin(),
+		seeds.end(), [oldImagePos](int* index)->bool {
+		return
+			oldImagePos[0] == index[0] &&
+			oldImagePos[1] == index[1] &&
+			oldImagePos[2] == index[2];
+	});
+	if (it != seeds.end()) {
+		memcpy(*it, newImagePos, sizeof(int[3]));
+		QString listItem = "way point: [" +
+			QString::number(newImagePos[0]) + "," +
+			QString::number(newImagePos[1]) + "," +
+			QString::number(newImagePos[2]) + "]";
+		GetListWidget()->item(seeds.indexOf(*it))->setText(listItem);
+	}
+	else {
+		seeds.push_back(new int[3]);
+		memcpy(seeds.back(), newImagePos, sizeof(int[3]));
+		QString listItem = "way point: [" +
+			QString::number(seeds.back()[0]) + "," +
+			QString::number(seeds.back()[1]) + "," +
+			QString::number(seeds.back()[2]) + "]";
+		GetListWidget()->addItem(listItem);
+	}
+}
 
 vtkPolyData* QInteractorStyleTubularVOI::UpdateSpline(QList<int*>& seed)
 {
@@ -196,7 +196,7 @@ void QInteractorStyleTubularVOI::DropSeed()
 
 void QInteractorStyleTubularVOI::UpdateWidgetToSeeds(int * newImagePos, int * oldImagePos)
 {
-	QInteractorStyleLumenSeedsPlacer::UpdateWidgetToSeeds(m_tubularSeeds, newImagePos, oldImagePos);
+	QInteractorStyleTubularVOI::UpdateWidgetToSeeds(m_tubularSeeds, newImagePos, oldImagePos);
 }
 
 void QInteractorStyleTubularVOI::SetExtractRadius(int radius)

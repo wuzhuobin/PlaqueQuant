@@ -20,21 +20,23 @@ endif()
 
 add_subdirectory(InteractorStyles)
 add_subdirectory(SurfaceViewer_test)
+# add_subdirectory(ReportGenerator)
 add_subdirectory(InteractorStylePolygonDraw2_test)
 
 SET(
 	CONTROLLER_SRC
+	# ${PROJECT_SOURCE_DIR}/MyImageManager.cpp
 	${PROJECT_SOURCE_DIR}/IOManager.cpp
 	${PROJECT_SOURCE_DIR}/IADEIOManager.cpp
 	${PROJECT_SOURCE_DIR}/PlaqueQuantIOManager.cpp
 	${PROJECT_SOURCE_DIR}/ImageRegistration.cxx
 	${PROJECT_SOURCE_DIR}/DataProcessor.cpp
-	${PROJECT_SOURCE_DIR}/Measurement.cpp
-	${PROJECT_SOURCE_DIR}/IADEMeasurement.cpp
-	${PROJECT_SOURCE_DIR}/PlaqueQuantMeasurement.cpp
+	# ${PROJECT_SOURCE_DIR}/Overlay.cxx
+	# ${PROJECT_SOURCE_DIR}/RegistrationWizard.cxx
 	)
 SET(
 	CONTROLLER_H
+	# ${PROJECT_SOURCE_DIR}/MyImageManager.h
 	${PROJECT_SOURCE_DIR}/IOManager.h
 	${PROJECT_SOURCE_DIR}/IADEIOManager.h
 	${PROJECT_SOURCE_DIR}/PlaqueQuantIOManager.h
@@ -42,9 +44,8 @@ SET(
 	${PROJECT_SOURCE_DIR}/StyleSwitch.h
 	${PROJECT_SOURCE_DIR}/StyleSwitch3D.h
 	${PROJECT_SOURCE_DIR}/DataProcessor.h
-	${PROJECT_SOURCE_DIR}/Measurement.h
-	${PROJECT_SOURCE_DIR}/PlaqueQuantMeasurement.h
-	${PROJECT_SOURCE_DIR}/IADEMeasurement.h
+	# ${PROJECT_SOURCE_DIR}/Overlay.h
+	# ${PROJECT_SOURCE_DIR}/RegistrationWizard.h
 	)
 
 qt5_wrap_cpp(
@@ -54,7 +55,6 @@ qt5_wrap_cpp(
 
 add_library(
 	Controller
-	SHARED
 	${CONTROLLER_SRC}
 	${CONTROLLER_H}
 	${CONTROLLER_MOC}
@@ -69,7 +69,6 @@ target_link_libraries(
 	Model
 	InteractorStyles
 	ReportGenerator
-	ImageSliceBySliceAccumulate
 )
 
 target_include_directories(
@@ -77,12 +76,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}
-)
-set_target_properties(
-    Controller
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
 )
 
 source_group(

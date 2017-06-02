@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>277</width>
-    <height>425</height>
+    <width>295</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,9 +32,75 @@
     </widget>
    </item>
    <item>
+    <widget class="QFrame" name="frame_10">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(226, 226, 226)</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_25">
+      <property name="spacing">
+       <number>7</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_26">
+        <property name="spacing">
+         <number>7</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_17">
+          <item>
+           <widget class="QLabel" name="label_40">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+             </font>
+            </property>
+            <property name="text">
+             <string>Step 1/5</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>To be continued</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
-      <string>Seeds placer</string>
+      <string>Lumen Extraction</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -88,6 +154,19 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_33">
         <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="QPushButton" name="dropSeedPushButton">
           <property name="text">
            <string>Drop Seed</string>
@@ -140,7 +219,7 @@
         <item>
          <widget class="QLabel" name="label_62">
           <property name="text">
-           <string>Targe Image:</string>
+           <string>Targe Image (T1 recommanded): </string>
           </property>
          </widget>
         </item>
@@ -157,6 +236,19 @@
            <string>Multiplier</string>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="doubleSpinBoxMultiplier">
@@ -228,7 +320,6 @@
      <zorder>line</zorder>
      <zorder>listWidgetSeedList</zorder>
      <zorder>label_60</zorder>
-     <zorder></zorder>
     </widget>
    </item>
    <item>
@@ -250,6 +341,20 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Holes filling iterations: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Initial neighborhood radius:</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
        <widget class="QSpinBox" name="initialNeighbodhoodSpinBox">
         <property name="minimum">
@@ -258,7 +363,7 @@
         <property name="maximum">
          <number>10</number>
         </property>
-        <property name="displayIntegerBase">
+        <property name="displayIntegerBase" stdset="0">
          <number>10</number>
         </property>
        </widget>
@@ -268,7 +373,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Number Of Iterations:</string>
+           <string>Number Of Iterations</string>
           </property>
          </widget>
         </item>
@@ -318,20 +423,6 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>neighborhood radius:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Holes filling iterations: </string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -353,18 +444,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>checkBox</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>frame</receiver>
-   <slot>setEnabled(bool)</slot>
+   <sender>numberOfIterationsSliderInit</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>numberOfIterationsSpinBox</receiver>
+   <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>292</y>
+     <x>218</x>
+     <y>437</y>
     </hint>
     <hint type="destinationlabel">
-     <x>246</x>
-     <y>409</y>
+     <x>274</x>
+     <y>436</y>
     </hint>
    </hints>
   </connection>
@@ -375,28 +466,28 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>345</y>
+     <x>274</x>
+     <y>436</y>
     </hint>
     <hint type="destinationlabel">
-     <x>200</x>
-     <y>346</y>
+     <x>218</x>
+     <y>437</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>numberOfIterationsSliderInit</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>numberOfIterationsSpinBox</receiver>
-   <slot>setValue(int)</slot>
+   <sender>checkBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>frame</receiver>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>200</x>
-     <y>346</y>
+     <x>274</x>
+     <y>383</y>
     </hint>
     <hint type="destinationlabel">
-     <x>256</x>
-     <y>345</y>
+     <x>237</x>
+     <y>426</y>
     </hint>
    </hints>
   </connection>

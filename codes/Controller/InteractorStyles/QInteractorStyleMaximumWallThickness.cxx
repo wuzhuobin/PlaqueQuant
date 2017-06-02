@@ -179,8 +179,8 @@ void QInteractorStyleMaximumWallThickness::UpdateMaximumWallThicknessLabel()
 			// Update UI
 			char distanceString[25];
 			sprintf_s(distanceString, "%.3f mm", l_lp.Distance);
-			labels->InsertNextValue(distanceString);
-			labels->InsertNextValue(" ");
+			labels->InsertNextValue(vtkStdString(distanceString));
+			labels->InsertNextValue(vtkStdString());
 
 			sizes->InsertNextValue(3);
 			sizes->InsertNextValue(3);

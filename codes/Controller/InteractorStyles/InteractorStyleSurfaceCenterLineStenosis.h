@@ -15,8 +15,7 @@ class InteractorStyleSurfaceCenterLineStenosis :
 {
 public:
 
-	static const unsigned int NUM_OF_HANDLES = 2;
-	static const char* STENOSIS;
+	const static unsigned int NUM_OF_HANDLES = 2;
 
 	vtkTypeMacro(InteractorStyleSurfaceCenterLineStenosis,
 		InteractorStyleSurfaceCenterLineSimpleClipping);
@@ -48,7 +47,7 @@ protected:
 
 
 	vtkSmartPointer<vtkKdTreePointLocator> m_pointLocator = nullptr;
-	vtkSmartPointer<vtkHandleWidget> m_handleWidgets[NUM_OF_HANDLES] = {nullptr};
+	vtkSmartPointer<vtkHandleWidget> m_handleWidgets[NUM_OF_HANDLES];
 	vtkSmartPointer<vtkPolyData> m_triangulatedCenterLine = nullptr;
 	vtkSmartPointer<vtkTextActor> m_measurementText = nullptr;
 
@@ -57,4 +56,7 @@ protected:
 private:
 
 };
+
+
+
 #endif // !__INTERACTOR_STYLE_SURFACE_CENTER_LINE_STENOSIS_H__

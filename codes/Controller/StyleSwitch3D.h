@@ -1,4 +1,3 @@
-
 #ifndef __STYLE_SWITCH3D_H__
 #define __STYLE_SWITCH3D_H__
 
@@ -8,10 +7,7 @@
 #include "InteractorStyleSurfaceCenterLinePerpendicularMeasurement.h"
 #include "InteractorStyleSurfaceCenterLineCurvedNavigation.h"
 #include "InteractorStyleSurfaceCenterlineWaypoint.h"
-#include "QInteractorStyleSurfaceCenterLineStenosis.h"
-#include "QInteractorStyleSurfaceCenterLineICDAStandard.h"
-#include "QInteractorStyleSurfaceCenterLineVBDSmokerBADiameter.h"
-#include "QInteractorStyleSurfaceCenterLineVBDUboguStandard.h"
+#include "InteractorStyleSurfaceCenterLineStenosis.h"
 
 class StyleSwitch3D: public InteractorStyleSwitch3D
 {
@@ -39,21 +35,11 @@ public:
 	SetInteractorStyle3DMacro(Waypoint);
 	CurrentStyle3DMacro(Waypoint);
 
-	vtkGetMacro(Stenosis, QInteractorStyleSurfaceCenterLineStenosis*);
+	vtkGetMacro(Stenosis, InteractorStyleSurfaceCenterLineStenosis*);
 	SetInteractorStyle3DMacro(Stenosis);
 	CurrentStyle3DMacro(Stenosis);
 
-	vtkGetMacro(ICDADiameter, QInteractorStyleSurfaceCenterLineICDAStandard*);
-	SetInteractorStyle3DMacro(ICDADiameter);
-	CurrentStyle3DMacro(ICDADiameter);
-
-	vtkGetMacro(SmokerBADiameter, QInteractorStyleSurfaceCenterLineVBDSmokerBADiameter*);
-	SetInteractorStyle3DMacro(SmokerBADiameter);
-	CurrentStyle3DMacro(SmokerBADiameter);
-
-	vtkGetMacro(UboguMeasure, QInteractorStyleSurfaceCenterLineVBDUboguStandard*);
-	SetInteractorStyle3DMacro(UboguMeasure);
-	CurrentStyle3DMacro(UboguMeasure);
+	//virtual void SetCenterLine(vtkPolyData* centerline);
 
 protected:
 	StyleSwitch3D() {
@@ -73,17 +59,8 @@ protected:
 		this->Waypoint = InteractorStyleSurfaceCenterlineWaypoint::New();
 		allStyles.push_back(this->Waypoint);
 
-		this->Stenosis = QInteractorStyleSurfaceCenterLineStenosis::New();
+		this->Stenosis = InteractorStyleSurfaceCenterLineStenosis::New();
 		allStyles.push_back(this->Stenosis);
-
-		this->ICDADiameter = QInteractorStyleSurfaceCenterLineICDAStandard::New();
-		allStyles.push_back(this->ICDADiameter);
-
-		this->SmokerBADiameter = QInteractorStyleSurfaceCenterLineVBDSmokerBADiameter::New();
-		allStyles.push_back(this->SmokerBADiameter);
-
-		this->UboguMeasure = QInteractorStyleSurfaceCenterLineVBDUboguStandard::New();
-		allStyles.push_back(this->UboguMeasure);
 	}
 
 	InteractorStyleSurfaceCenterLineSimpleClipping* CenterLine;
@@ -91,10 +68,7 @@ protected:
 	InteractorStyleSurfaceCenterLinePerpendicularMeasurement* PerpendicularMeasurement;
 	InteractorStyleSurfaceCenterLineCurvedNavigation* CurvedNavigation;
 	InteractorStyleSurfaceCenterlineWaypoint* Waypoint;
-	QInteractorStyleSurfaceCenterLineStenosis* Stenosis;
-	QInteractorStyleSurfaceCenterLineICDAStandard* ICDADiameter;
-	QInteractorStyleSurfaceCenterLineVBDSmokerBADiameter* SmokerBADiameter;
-	QInteractorStyleSurfaceCenterLineVBDUboguStandard* UboguMeasure;
+	InteractorStyleSurfaceCenterLineStenosis* Stenosis;
 
 private:
 

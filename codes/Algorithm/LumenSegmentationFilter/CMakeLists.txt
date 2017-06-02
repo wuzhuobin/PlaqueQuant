@@ -27,7 +27,6 @@ set(
 
 add_library(
 	LumenSegmentationFilter 
-	SHARED
 	${LUMEN_SEGMENTATION_FILTER_CXX}
 	${LUMEN_SEGMENTATION_FILTER_H}
 	)
@@ -44,16 +43,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}
-)
-
-
-set_target_properties(
-    LumenSegmentationFilter
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 
 #Grouping in MSVC

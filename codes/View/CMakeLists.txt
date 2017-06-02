@@ -13,16 +13,13 @@ find_package(Qt5OpenGL)
 
 add_subdirectory(RegistrationWizard)
 add_subdirectory(ReportGenerator)
-add_subdirectory(qtcsv)
 set(
 	VIEW_H
 	MainWindow.h
 	LabelWidget.h
-	Switch2DWidget.h
-	Switch3DWidget.h
+	ModuleWidget.h
 	ViewerWidget.h
 	MeasurementWidget.h
-	IADEMeasurementWidget.h
 )
 
 
@@ -30,22 +27,18 @@ set(
 	VIEW_SRC
 	MainWindow.cpp
 	LabelWidget.cpp
-	Switch2DWidget.cpp
-	Switch3DWidget.cpp
+	ModuleWidget.cpp
 	ViewerWidget.cpp
 	MeasurementWidget.cpp
-	IADEMeasurementWidget.cpp
 )
 
 set(
 	VIEW_UI
 	MainWindow.ui
 	LabelWidget.ui
-	Switch2DWidget.ui
-	Switch3DWidget.ui
+	ModuleWidget.ui
 	ViewerWidget.ui
 	MeasurementWidget.ui
-	IADEMeasurementWidget.ui
 )
 #Generate moc and ui file
 qt5_wrap_cpp(
@@ -60,24 +53,19 @@ qt5_wrap_ui(
 
 add_library(
 	View
-	SHARED
 	${VIEW_H}
 	${VIEW_SRC}
 	${VIEW_UI}
 	${VIEW_MOC}
 	${VIEW_UI_H}
 )
-# qt5_use_modules(View Core Widgets OpenGL PrintSupport)
+qt5_use_modules(View Core Widgets OpenGL PrintSupport)
 
 #link libraries
 target_link_libraries(
 	View
-	Qt5::Core
-	Qt5::Widgets
-	Qt5::OpenGL
 	RegistrationWizard
 	ReportGenerator
-	qtcsv
 	)
 
 target_include_directories(
@@ -85,13 +73,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}
-)
-
-set_target_properties(
-    View
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
 )
 
 #Grouping in MSVC

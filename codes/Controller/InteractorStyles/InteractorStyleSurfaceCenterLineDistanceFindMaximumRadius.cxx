@@ -231,9 +231,6 @@ void InteractorStyleSurfaceCenterLineDistanceFindMaximumRadius::FindMaximumRadiu
 	sprintf_s(buff, "Maximum radius: %.2f mm\n Minimum radius: %.2f mm\n Centerline length: %.2f mm", maxRadius, minRadius, GeodesicPathDistance);
 	m_measurementText->SetInput(buff);
 	m_measurementText->SetDisplayPosition(displayCoordinate[0], displayCoordinate[1]);
-	m_maxRadius = maxRadius;
-	m_minRadius = minRadius;
-	m_distance = GeodesicPathDistance;
 	//this->GetSurfaceViewer()->Render();
 }
 

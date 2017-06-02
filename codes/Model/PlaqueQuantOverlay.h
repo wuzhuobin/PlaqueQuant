@@ -30,8 +30,24 @@ public:
 
 	virtual vtkPolyData* getCenterLine();
 
+	virtual void updatedOverlay() override;
+
+
+	// total plaque, vessel wall, lumen, calcification, hemorrhage, lrnc, lm,
+	double Measurements3D[7] = { 0 };
+	// vessel wall, lumen, NMI
+	//double Measurements2D[3] = { 0 };
+	QMap<int, QSharedPointer<double>> Measurements2D;
+
+	virtual int getCurrentSlice();
+public slots:
+	virtual void updateMeasurement3D();
+	virtual void setCurrentSlice(int slice);
+	virtual void updateMeasurement2D(int slice);
+
 protected:
 	vtkSmartPointer<vtkPolyData> m_centerline = nullptr;
+	int currentSlice = 0;
 
 };
 

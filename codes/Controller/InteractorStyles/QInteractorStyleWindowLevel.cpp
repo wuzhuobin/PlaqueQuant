@@ -41,22 +41,19 @@ void QInteractorStyleWindowLevel::SetLevelByViewer(double level)
 void QInteractorStyleWindowLevel::initialization()
 {
 	m_label = new QLabel(this);
-	QLabel* width = new QLabel("Width", this);
-	QLabel* level = new QLabel("Level", this);
 	m_spinBoxWindowLevel = new QSpinBox(this);
 	m_spinBoxWindowWidth = new QSpinBox(this);
 	m_sliderWindowLevel = new QSlider(Qt::Horizontal, this);
 	m_sliderWindowWidth = new QSlider(Qt::Horizontal, this);
 	m_pushButtonReset = new QPushButton("Reset", this);
 
-	ui->gridLayout->addWidget(m_label, numOfMyself * 3, 0);
-	ui->gridLayout->addWidget(m_pushButtonReset, numOfMyself * 3, 2);
-	ui->gridLayout->addWidget(width, numOfMyself * 3 + 1, 0);
-	ui->gridLayout->addWidget(m_spinBoxWindowWidth, numOfMyself * 3 + 1, 1);
-	ui->gridLayout->addWidget(m_sliderWindowWidth, numOfMyself * 3 + 1, 2);
-	ui->gridLayout->addWidget(level, numOfMyself * 3 + 2, 0);
-	ui->gridLayout->addWidget(m_spinBoxWindowLevel, numOfMyself * 3 + 2, 1);
-	ui->gridLayout->addWidget(m_sliderWindowLevel, numOfMyself * 3 + 2, 2);
+
+	ui->gridLayout->addWidget(m_label, numOfMyself, 0);
+	ui->gridLayout->addWidget(m_spinBoxWindowWidth, numOfMyself, 1);
+	ui->gridLayout->addWidget(m_sliderWindowWidth, numOfMyself, 2);
+	ui->gridLayout->addWidget(m_spinBoxWindowLevel, numOfMyself, 3);
+	ui->gridLayout->addWidget(m_sliderWindowLevel, numOfMyself, 4);
+	ui->gridLayout->addWidget(m_pushButtonReset, numOfMyself, 5);
 
 
 	connect(m_pushButtonReset, SIGNAL(clicked()),

@@ -18,12 +18,14 @@ vtkSmartPointer<vtkROIWidget> QInteractorStyleVOI::m_roi = nullptr;
 vtkSmartPointer<vtkRenderWindow> QInteractorStyleVOI::m_renderWindow = nullptr;
 
 
-
+//vtkROIWidget* QInteractorStyleVOI::GetROIWidget()
+//{
+//	return m_roi;
+//}
 
 void QInteractorStyleVOI::SetCustomEnabled(bool flag)
 {
 	QInteractorStyleNavigation::SetCustomEnabled(flag);
-	uniqueInvoke(flag);
 	if (flag) {
 		// Change orientation of border widgets too
 		m_roi->SetBorderWidgetOrientation(m_uniqueROIId, GetSliceOrientation());
@@ -40,6 +42,7 @@ void QInteractorStyleVOI::SetCustomEnabled(bool flag)
 	GetImageViewer()->Render();
 	// suppose it should able to disappear by the following
 	//m_roi->Render();
+	uniqueInvoke(flag);
 }
 void QInteractorStyleVOI::slotUpdateVOISpinBoxes(double * values)
 {
@@ -81,23 +84,16 @@ void QInteractorStyleVOI::slotUpdateVOISpinBoxes(double * values)
 
 void QInteractorStyleVOI::ExtractVOI()
 {
+	int extent[6];
 	const double* bounds = m_roi->GetRepresentation()->GetBounds();
 	for (int i = 0; i < 3; ++i) {
-		m_voi[i*2] = (bounds[i*2] - GetOrigin()[i]) / GetSpacing()[i];
-		m_voi[i*2 + 1] = (bounds[i*2 + 1] - GetOrigin()[i]) / GetSpacing()[i];
+		extent[i*2] = (bounds[i*2] - GetOrigin()[i]) / GetSpacing()[i];
+		extent[i*2 + 1] = (bounds[i*2 + 1] - GetOrigin()[i]) / GetSpacing()[i];
 		// not voi clamping, the extraction can be more flexible
 		//extent[i*2] = extent[i*2] > GetExtent()[i*2] ? extent[i*2] : GetExtent()[i*2];
 		//extent[i*2 + 1] = extent[i*2 + 1] < GetExtent()[i*2 + 1] ? extent[i*2 + 1] : GetExtent()[i*2 +1];
 	}
-	RestoreVOI();
-	//GetImageViewer()->SetDisplayExtent(m_voi);
-	//SetExtentRange(GetImageViewer()->GetDisplayExtent());
-	//GetImageViewer()->Render();
-}
-
-void QInteractorStyleVOI::RestoreVOI()
-{
-	GetImageViewer()->SetDisplayExtent(m_voi);
+	GetImageViewer()->SetDisplayExtent(extent);
 	SetExtentRange(GetImageViewer()->GetDisplayExtent());
 	GetImageViewer()->Render();
 }
@@ -136,30 +132,16 @@ void QInteractorStyleVOI::uniqueInitialization()
 		m_roi->GetRepresentation()->SetPlaceFactor(1);
 	}
 	/// ROI
-	vtkSmartPointer<vtkCallbackCommand> callback =
-		vtkSmartPointer<vtkCallbackCommand>::New();
-	callback->SetClientData(this);
-	callback->SetCallback([](vtkObject *caller, unsigned long eid,
-		void *clientdata, void *calldata) {
-		QInteractorStyleVOI* self = reinterpret_cast<QInteractorStyleVOI*>(clientdata);
-		vtkROIWidget* roiWidget = reinterpret_cast<vtkROIWidget*>(caller);
-		vtkBoxRepresentation* roiWidgetRep = reinterpret_cast<vtkBoxRepresentation*>(roiWidget->GetRepresentation());
-		self->slotUpdateVOISpinBoxes(roiWidgetRep->GetBounds());
-	});
-	m_roi->AddObserver(vtkCommand::InteractionEvent, callback);
-	
-	//connect(m_roi, SIGNAL(signalROIBounds(double*)),
-	//	this, SLOT(slotUpdateVOISpinBoxes(double*)));
+	connect(m_roi, SIGNAL(signalROIBounds(double*)),
+		this, SLOT(slotUpdateVOISpinBoxes(double*)));
 }
 
 void QInteractorStyleVOI::initialization()
 {
 	m_uniqueROIId = numOfMyself - 1;
-	m_roi->SetNumbeOfBorderWidgets(numOfMyself);
+
 	connect(ui->pushButtonResetVOI, SIGNAL(clicked()),
 		this, SLOT(ResetVOI()));
-	connect(ui->pushButtonRestoreVOI, SIGNAL(clicked()),
-		this, SLOT(RestoreVOI()));
 	connect(ui->pushButtonExtractVOI, SIGNAL(clicked()),
 		this, SLOT(ExtractVOI()));
 }

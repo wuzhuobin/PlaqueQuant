@@ -20,14 +20,16 @@
 
 #include <QtWidgets/QMainWindow>
 
+//#include "ModuleWidget.h"
+//#include "ViewerWidget.h"
+
 
 
 namespace Ui { class MainWindow; }
 class vtkRenderWindow;
 class QMenu;
 class QSettings;
-class Switch2DWidget;
-class Switch3DWidget;
+class ModuleWidget;
 class ViewerWidget;
 class MeasurementWidget;
 class LabelWidget;
@@ -55,20 +57,16 @@ public:
 
 	// get ui things for connection 
 	Ui::MainWindow* getUi();
-	Switch2DWidget* getSwitch2DWidget();
-	Switch3DWidget* getSwitch3DWidget();
+	//QMainWindow* getCentralWidget();
+	ModuleWidget* getModuleWidget();
 	ViewerWidget* getViewerWidget(unsigned int num);
 	MeasurementWidget* getMeasurementWidget();
 	LabelWidget* getLabelWidget();
 	QMenu* getSelectImgMenu(unsigned int i);
 
-protected:
-	virtual void dragEnterEvent(QDragEnterEvent* event);
-	virtual void dropEvent(QDropEvent* event);
-
 signals:
 
-	void signalImageImportLoad(QStringList);
+	void signalImageImportLoad(QList<QStringList>*);
 	void signalOverlayImportLoad(QString);
 	void signalOverlayExportSave(QString);
 	void signalReportExport(QString);
@@ -77,23 +75,25 @@ signals:
 private slots:
 	
 	void slotOpenRecentImage();
-	void slotOpenNewImage(QString path = QString());
-	void slotOpen(QString path = QString());
-	void slotOpenOverlay(QString path = QString());
-	void slotSaveOverlay(QString path = QString());
+	void slotOpenNewImage();
 
-	void slotExportReport(QString path = QString());
-	void slotExportCSV(QString path = QString());
+	void slotOpenOverlay();
+	void slotSaveOverlay();
+
+	void slotExportReport();
 	/**
 	* four viewers and maximum
 	*/
 	void slotImage(bool flag);
 
+	void slotAbout();
 
 private:
 	Ui::MainWindow* ui;
 
-	void imageImport(QString path = QString());
+	void imageImport(QString path);
+
+	void setEnabled(bool flag);
 
 	//Recent File
 	const static int MAX_RECENT_IMAGE = 10;
@@ -104,9 +104,7 @@ private:
 	
 	ViewerWidget* viewerWidgets[NUM_OF_VIEWERS] = { nullptr };
 
-	Switch2DWidget* switch2DWidget = nullptr;
-
-	Switch3DWidget* switch3DWidget = nullptr;
+	ModuleWidget* moduleWiget = nullptr;
 
 	MeasurementWidget* measurementWidget = nullptr;
 

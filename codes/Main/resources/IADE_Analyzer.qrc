@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="/">
-    <file>icons/plant-a-tree.png</file>
     <file>icons/curved-arrow.png</file>
     <file>icons/business-down-bars-graphic.png</file>
     <file>icons/transparentbox.png</file>

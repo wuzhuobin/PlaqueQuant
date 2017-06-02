@@ -23,7 +23,6 @@ set(
 
 add_library(
 	PolylineToTubularVolume 
-	SHARED
 	${POLYLINE_TO_TUBULAR_VOLUME_SRC}
 	${POLYLINE_TO_TUBULAR_VOLUME_INC}
 	)
@@ -40,15 +39,6 @@ target_include_directories(
 	PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_BINARY_DIR}
-)
-
-set_target_properties(
-    PolylineToTubularVolume
-    PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS 
-    true
-    # RUNTIME_OUTPUT_DIRECTORY
-	# ${CMAKE_SOURCE_DIR}/bin
 )
 
 # add_executable(

@@ -1,17 +1,20 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
+//#define PLAQUEQUANT_VER
+//#define IADE_VER
+#define DEBUG_VER
+#ifdef DEBUG_VER
 #define PLAQUEQUANT_VER
+#endif // DEBUG_VER
 
 #ifdef PLAQUEQUANT_VER
 #include "PlaqueQuantIOManager.h"
 #include "PlaqueQuantImageManager.h"
 #include "PlaqueQuantOverlay.h"
-#include "PlaqueQuantMeasurement.h"
 #define IO_MANAGER PlaqueQuantIOManager
 #define IMAGE_MANAGER PlaqueQuantImageManager
 #define OVERLAY PlaqueQuantOverlay
-#define MEASUREMENT PlaqueQuantMeasurement
 #endif // PLAQUEQUANT_VER
 
 
@@ -20,11 +23,9 @@
 #include "IADEIOManager.h"
 #include "IADEImageManager.h"
 #include "IADEOverlay.h"
-#include "IADEMeasurement.h"
-#define IO_MANAGER IADEIOManager
+#define IO_MANAGER IADEIOManagerIO
 #define IMAGE_MANAGER IADEImageManager 
 #define OVERLAY IADEOverlay
-#define MEASUREMENT IADEMeasurement
 #endif // IADE_VER
 
 #include <qobject.h>
@@ -45,7 +46,7 @@ class Core: public QObject
 	Q_OBJECT
 public:
 
-	const static unsigned short NUM_OF_IMAGES = 4;
+	const static unsigned short NUM_OF_IMAGES = 5;
 	const static unsigned short DEFAULT_IMAGE = 0;
 
 	Core(QObject* parent = nullptr);
@@ -56,6 +57,7 @@ private slots:
 
 	void slotIOManagerToImageManager();
 	void slotOverlayToImageManager();
+	void slotUpdateMeasurements();
 	// Image interactorstyle
 	void slotNavigation();
 	void slotWindowLevel();
@@ -71,29 +73,21 @@ private slots:
 	void slotPolygonDraw();
 	void slotPolygonDrawSeries();
 	void slotVesselSegmentation();
-	void slotVBDSmokerSeed();
-
-
 
 	// Surface interactorStyle
 	void slotTrackballCamera();
 	void slotCenterLine();
 	void slotFindMaximumRadius();
-	void slotICDADiameter();
-	void slotVBDBADiameter();
 	void slotPerpendicularMeasurement();
 	void slotCurvedNavigation();
 	void slotWaypoint();
 	void slotStenosis();
-	void slotVBDUboguMeasure();
 
-	////Diagnosis
-	//void slotSmokerStandard();
-	//void slotUboguStandard();
-	//void slotICDAStandard();
+	// IADE specified
+	void slotVBDSmoker();
 
 	// Curved image update
-	bool slotInitializeCurvedImage();
+	void slotInitializeCurvedImage();
 
 	void slotChangeImage(QAction* action);
 	void slotChangeImage(int viewer, int image);
@@ -105,14 +99,7 @@ private slots:
 	void slotUpdateImageViewersToCurrent(int viewer);
 	void slotCurvedView(bool flag);
 
-	// Surface viewers
 	void slotUpdateSurfaceView();
-	void slotChangeOrientationToYZ(int viewer);
-	void slotChangeOrientationToXZ(int viewer);
-	void slotChangeOrientationToXY(int viewer);
-	void slotUpdateSurfaceViewersToCurrent(int viewer);
-
-
 
 	void slotRenderALlViewers();
 
@@ -121,7 +108,6 @@ private:
 	MainWindow mainWindow;
 	IO_MANAGER ioManager;
 	IMAGE_MANAGER imageManager;
-	MEASUREMENT measurement;
 	DataProcessor dataProcessor;
 
 
@@ -135,11 +121,11 @@ private:
 	ImageViewer* imageViewers[MainWindow::NUM_OF_2D_VIEWERS];
 	StyleSwitch* imageInteractorStyle[MainWindow::NUM_OF_2D_VIEWERS];
 
-	int currentOrientation[MainWindow::NUM_OF_3D_VIEWERS] = {
-		ImageViewer::SLICE_ORIENTATION_XY };
-	CenterlineSurfaceViewer* surfaceViewer[MainWindow::NUM_OF_3D_VIEWERS];
-	StyleSwitch3D* surfaceInteractorStyle[MainWindow::NUM_OF_3D_VIEWERS];
+	CenterlineSurfaceViewer* surfaceViewer;
+	StyleSwitch3D* surfaceInteractorStyle;
 
+
+	unsigned int m_viewMode = -1;
 };
 
 

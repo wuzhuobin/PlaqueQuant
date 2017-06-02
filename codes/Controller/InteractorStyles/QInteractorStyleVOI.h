@@ -19,12 +19,13 @@ public:
 	vtkTypeMacro(QInteractorStyleVOI, QInteractorStyleNavigation);
 	static QInteractorStyleVOI* New();
 
+	//static vtkROIWidget* GetROIWidget();
+
 public slots:
 	virtual void SetCustomEnabled(bool flag);
 
 	virtual void slotUpdateVOISpinBoxes(double* values);
 	virtual void ExtractVOI();
-	virtual void RestoreVOI();
 	virtual void ResetVOI();
 
 protected:
@@ -40,8 +41,6 @@ protected:
 	static vtkSmartPointer<vtkRenderWindow> m_renderWindow;
 	// for differentiate itself 
 	int m_uniqueROIId = 0;
-
-	int m_voi[6] = { 0 };
 private:
 	Ui::QInteractorStyleVOI* ui = nullptr;
 };

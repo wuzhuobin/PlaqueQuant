@@ -49,12 +49,6 @@ public slots:
 	virtual void UpdateWidgetToSeeds(
 		int* newImagePos,
 		int* oldImagePos = nullptr) override;
-
-signals:
-
-	void elongationChanged(int i);
-	void detourChanged(int i);
-
 protected:
 	QInteractorStyleVBDSmokerSeeds(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
 	~QInteractorStyleVBDSmokerSeeds();

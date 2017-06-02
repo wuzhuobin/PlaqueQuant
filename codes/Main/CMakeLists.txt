@@ -55,14 +55,19 @@ add_executable(
 	${VIEW_QRC_CPP}
 	${VIEW_RC}
 )
+# include_directories(
+# 	${CMAKE_SOURCE_DIR}/include
+# )
 
 target_link_libraries(
 	Main
 	Core
+	EncryptionAuthentication
 	# ${ITK_LIBRARIES}
 	# ${VTK_LIBRARIES}
 	# Qt5::Core
 	# Qt5::Widgets
+	EncryptionAuthentication
 )
 target_include_directories(
 	Main

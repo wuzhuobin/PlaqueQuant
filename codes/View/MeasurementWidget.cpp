@@ -4,10 +4,7 @@
 
 #include <qfileinfo.h>
 #include <QDesktopServices>
-
 #include "ReportGenerator.h"
-#include "qtcsv/writer.h"
-#include "qtcsv/variantdata.h"
 
 #include <vtkWindowToImageFilter.h>
 #include <vtkRenderWindow.h>
@@ -16,18 +13,39 @@
 #include <vtkSmartPointer.h>
 
 #include <itkGDCMImageIO.h>
-
+//#include "MeasurementFor2D.h"
+//#include "MeasurementFor3D.h"
+//#include "Overlay.h"
+//#include "MainWindow.h"
+//#include "ui_MainWindow.h"
+//#include "ui_QAbstractNavigation.h"
 
 MeasurementWidget::MeasurementWidget(QWidget * parent) : QWidget(parent) 
 {
 	ui = new Ui::MeasurementWidget;
 	ui->setupUi(this);
-
+	//m_mainWnd = MainWindow::GetMainWindow();
+	//Core* core = m_mainWnd->GetCore();
+	// Set table widget properties
+	ui->measurement3DTableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	ui->measurement3DTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui->measurement2DTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	ui->measurement2DTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui->measurement2DTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	ui->measurement3DTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	ui->tableWidgetReport->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	ui->tableWidgetDicom->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui->measurement2DTableWidget->setColumnHidden(1, true);
 
+	// measurement
+	//Overlay* overlay = core->GetMyImageManager()->getOverlay();
+	//connect(overlay, SIGNAL(signalOverlayUpdated()),
+	//	this, SLOT(slotUpdate3DMeasurements()));
+	//connect(overlay, SIGNAL(signalOverlayUpdated()),
+	//	this, SLOT(slotUpdate2DMeasurements()));
+	//connect(core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetNavigation()->
+	//	QAbstractNavigation::getUi()->sliceHorizontalSliderZ, SIGNAL(valueChanged(int)),
+	//	this, SLOT(slotUpdate2DMeasurements(int)));
+
+	// generate report
+	//connect(ui->generateReportPushButton, SIGNAL(clicked()), this, SLOT(slotReportGetInput()));
 }
 
 MeasurementWidget::~MeasurementWidget() {
@@ -39,8 +57,22 @@ Ui::MeasurementWidget* MeasurementWidget::getUi()
 	return ui;
 }
 
-void MeasurementWidget::slotUpdate3DMeasurements(double Measurements3D[7])
+//void MeasurementWidget::UpdateMeasurementsForObliqueSlice(vtkImageData* img)
+//{
+//	// Must be single slice
+//	if (img->GetExtent()[4] != img->GetExtent()[5])
+//	{
+//		return;
+//	}
+//
+//	vtkSmartPointer<MeasurementFor2D> m = vtkSmartPointer<MeasurementFor2D>::New();
+//	m->SetSliceImage(img);
+//	m->Update();
+//}
+
+void MeasurementWidget::slotUpdate3DMeasurements(double* Measurements3D)
 {
+	//m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();
 	ui->measurement3DTableWidget->clearContents();
 	for (int i = 0; i < 7; ++i) {
 		ui->measurement3DTableWidget->setItem(i, 0,
@@ -48,12 +80,29 @@ void MeasurementWidget::slotUpdate3DMeasurements(double Measurements3D[7])
 	}
 }
 
-void MeasurementWidget::slotUpdate2DMeasurements(double Measurements2D[4])
+void MeasurementWidget::slotUpdate2DMeasurements(double* Measurements2D)
 {
+	//slotUpdate2DMeasurements(m_mainWnd->ui->zSpinBox->value());
+	//m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure3D();
 	ui->measurement2DTableWidget->clearContents();
 	for (int i = 0; i < 4; ++i) {
 		ui->measurement2DTableWidget->setItem(i, 0,
 			new QTableWidgetItem(QString::number(Measurements2D[i])));
+	}
+}
+
+void MeasurementWidget::slotUpdate2DMeasurements(int slice)
+{
+	if (false)
+	{
+		//m_mainWnd->m_core->GetMyImageManager()->getOverlay()->Measure2D(slice);
+		//QStringList _2DMeasurements = m_mainWnd->GetCore()->GetMyImageManager()->getOverlay()->
+		//	Get2DMeasurementsStrings(slice);
+		//for (int i = 0; i < 4; ++i) {
+		//	ui->measurement2DTableWidget->setItem(i, 0, new QTableWidgetItem((_2DMeasurements)[i]));
+		//}
+
+		//ui->MWTTextBrowser->setText((_2DMeasurements)[4]);
 	}
 }
 
@@ -62,7 +111,7 @@ void MeasurementWidget::slotUpdateStenosis(double stenosis)
 	ui->stenosisSpinBox->setValue(stenosis);
 }
 
-void MeasurementWidget::slotUpdateInformation()
+void MeasurementWidget::slotUpdateImformation()
 {
 
 	if (info.IsNull()) {
@@ -79,19 +128,19 @@ void MeasurementWidget::slotUpdateInformation()
 	info->GetValueFromTag("0010|0040", patientGender);
 	info->GetValueFromTag("0008|0020", scanDate);
 	if (!patientName.empty()) {
-		ui->tableWidgetDicom->setItem(0, 0, new QTableWidgetItem(QString::fromStdString(patientName)));
+		ui->patientTableWidget->setItem(0, 0, new QTableWidgetItem(QString::fromStdString(patientName)));
 	}
 	if (!patientID.empty()) {
-		ui->tableWidgetDicom->setItem(1, 0, new QTableWidgetItem(QString::fromStdString(patientID)));
+		ui->patientTableWidget->setItem(1, 0, new QTableWidgetItem(QString::fromStdString(patientID)));
 	}
 	if (!patientDOB.empty()) {
-		ui->tableWidgetDicom->setItem(2, 0, new QTableWidgetItem(QString::fromStdString(patientDOB)));
+		ui->patientTableWidget->setItem(2, 0, new QTableWidgetItem(QString::fromStdString(patientDOB)));
 	}
 	if (!patientGender.empty()) {
-		ui->tableWidgetDicom->setItem(3, 0, new QTableWidgetItem(QString::fromStdString(patientGender)));
+		ui->patientTableWidget->setItem(3, 0, new QTableWidgetItem(QString::fromStdString(patientGender)));
 	}
 	if (!scanDate.empty()) {
-		ui->tableWidgetDicom->setItem(4, 0, new QTableWidgetItem(QString::fromStdString(scanDate)));
+		ui->MRITableWidget->setItem(0, 0, new QTableWidgetItem(QString::fromStdString(scanDate)));
 	}
 
 }
@@ -103,36 +152,36 @@ void MeasurementWidget::GenerateReport(QString	path)
 	//Basic Information to fill
 	QFileInfo fileInfo(path);
 	QString ReportName = "Plaque Quantification Report";
-	QString PatientName = ui->tableWidgetDicom->item(0,0)->text();
-	QString PatientID = ui->tableWidgetDicom->item(1, 0)->text();
-	QString PatientDOB = ui->tableWidgetDicom->item(2, 0)->text();
-	QString PatientGender = ui->tableWidgetDicom->item(3, 0)->text();
-	QString ScanDate = ui->tableWidgetDicom->item(4, 0)->text();
-	QString ReportDate = ui->tableWidgetReport->item(0, 0)->text();
-	QString MRISide = ui->tableWidgetReport->item(1, 0)->text();
-	QString DoctorName = ui->tableWidgetReport->item(2, 0)->text();
+	QString PatientName = ui->patientTableWidget->item(0,0)->text();
+	QString PatientID = ui->patientTableWidget->item(1, 0)->text();
+	QString PatientDOB = ui->patientTableWidget->item(2, 0)->text();
+	QString PatientGender = ui->patientTableWidget->item(3, 0)->text();
+	QString ScanDate = ui->MRITableWidget->item(0, 0)->text();
+	QString ReportDate = ui->MRITableWidget->item(1, 0)->text();
+	QString MRISide = ui->MRITableWidget->item(2, 0)->text();
+	QString DoctorName = ui->MRITableWidget->item(3, 0)->text();
 	//Stenosis Measurement
 	QString StenosisPercent = ui->stenosisSpinBox->text();
 	//2D Measurement
 	QString VesselWallArea = ui->measurement2DTableWidget->item(0, 0)->text();
 	QString LumenArea = ui->measurement2DTableWidget->item(1, 0)->text();
-	QString NWI = ui->measurement2DTableWidget->item(2, 0)->text();
-	QString WallThickness = ui->measurement2DTableWidget->item(3, 0)->text();
+	QString WallThickness = ui->measurement2DTableWidget->item(2, 0)->text();
+	QString NWI = ui->measurement2DTableWidget->item(3, 0)->text();
 	//3D Measurement
+	QString LumenVolume = ui->measurement3DTableWidget->item(1, 0)->text();
+	QString WallVolume = ui->measurement3DTableWidget->item(2, 0)->text();
 	QString PlaqueVolume = ui->measurement3DTableWidget->item(0, 0)->text();
-	QString VesselWallVolume = ui->measurement3DTableWidget->item(1, 0)->text();
-	QString LumenVolume = ui->measurement3DTableWidget->item(2, 0)->text();
 	//Plaque Composition
 	double plaqueVolumeNum = ui->measurement3DTableWidget->item(0, 0)->data(Qt::DisplayRole).toDouble();
 	double calcificationNum = ui->measurement3DTableWidget->item(3, 0)->data(Qt::DisplayRole).toDouble();
 	double hemorrhageNum = ui->measurement3DTableWidget->item(4, 0)->data(Qt::DisplayRole).toDouble();
 	double LRNCNum = ui->measurement3DTableWidget->item(5, 0)->data(Qt::DisplayRole).toDouble();
 	QString Calcification = ui->measurement3DTableWidget->item(3, 0)->text();
-	QString CalcificationPercent = QString::number(calcificationNum / plaqueVolumeNum * 100) + "%";
+	QString CalcificationPercent = QString::number(calcificationNum / plaqueVolumeNum) + "%";
 	QString Hemorrhage = ui->measurement3DTableWidget->item(4, 0)->text();
-	QString HemorrhagePercent = QString::number(hemorrhageNum / plaqueVolumeNum * 100) + "%";
+	QString HemorrhagePercent = QString::number(hemorrhageNum / plaqueVolumeNum) + "%";
 	QString LRNC = ui->measurement3DTableWidget->item(5, 0)->text();
-	QString LRNCPercent = QString::number(LRNCNum / plaqueVolumeNum * 100) + "%";
+	QString LRNCPercent = QString::number(LRNCNum / plaqueVolumeNum) + "%";
 	// Screen Shot
 	QString _2dResult = "./2dResult.png";
 	QString _3dResult = "./3dResult.png";
@@ -222,7 +271,7 @@ void MeasurementWidget::GenerateReport(QString	path)
 	reportGenerator->SetTableItemRowSpan(2, 1, 1, 2);
 	reportGenerator->SetTableItem(2, 3, 1, VesselWallArea);
 	reportGenerator->SetTableItemRowSpan(2, 2, 1, 2);
-	reportGenerator->SetTableItem(2, 1, 2, "Maximum Wall Thickness\n(mm)");
+	reportGenerator->SetTableItem(2, 1, 2, "Wall Thickness\n(mm)");
 	reportGenerator->SetTableItemRowSpan(2, 1, 2, 2);
 	reportGenerator->SetTableItem(2, 3, 2, WallThickness);
 	reportGenerator->SetTableItemRowSpan(2, 2, 2, 2);
@@ -241,9 +290,9 @@ void MeasurementWidget::GenerateReport(QString	path)
 	reportGenerator->SetTableItem(3, 1, 1, "Lumen(mm^3)");
 	reportGenerator->SetTableItem(3, 2, 1, LumenVolume);
 
-	reportGenerator->SetTableItem(3, 1, 2, "Vessel Wall(mm^3)");
-	reportGenerator->SetTableItem(3, 2, 2, VesselWallVolume);
-	reportGenerator->SetTableItem(3, 1, 3, "Total Plaque(mm^3)");
+	reportGenerator->SetTableItem(3, 1, 2, "Wall(mm^3)");
+	reportGenerator->SetTableItem(3, 2, 2, WallVolume);
+	reportGenerator->SetTableItem(3, 1, 3, "Plaque(mm^3)");
 	reportGenerator->SetTableItem(3, 2, 3, PlaqueVolume);
 
 	reportGenerator->AddTable(4, "Plaque Composition", QStringList(), QStringList(), 4, 4);
@@ -289,69 +338,4 @@ void MeasurementWidget::GenerateReport(QString	path)
 
 	delete reportGenerator;
 
-}
-
-#define VARIANT_DATA_ADD_ROW(PARAM1, PARAM2) \
-PARAM1.addRow(QStringList() << #PARAM2 << ##PARAM2);
-void MeasurementWidget::GenerateCSV(QString path)
-{
-	QString PatientName = ui->tableWidgetDicom->item(0, 0)->text();
-	QString PatientID = ui->tableWidgetDicom->item(1, 0)->text();
-	QString PatientDOB = ui->tableWidgetDicom->item(2, 0)->text();
-	QString PatientGender = ui->tableWidgetDicom->item(3, 0)->text();
-	QString ScanDate = ui->tableWidgetDicom->item(4, 0)->text();
-	QString ReportDate = ui->tableWidgetReport->item(0, 0)->text();
-	QString MRISide = ui->tableWidgetReport->item(1, 0)->text();
-	QString DoctorName = ui->tableWidgetReport->item(2, 0)->text();
-	//Stenosis Measurement
-	QString StenosisPercent = ui->stenosisSpinBox->text();
-	//2D Measurement
-	QString VesselWallArea = ui->measurement2DTableWidget->item(0, 0)->text();
-	QString LumenArea = ui->measurement2DTableWidget->item(1, 0)->text();
-	QString WallThickness = ui->measurement2DTableWidget->item(2, 0)->text();
-	QString NWI = ui->measurement2DTableWidget->item(3, 0)->text();
-	//3D Measurement
-	QString PlaqueVolume = ui->measurement3DTableWidget->item(0, 0)->text();
-	QString VesselWallVolume = ui->measurement3DTableWidget->item(1, 0)->text();
-	QString LumenVolume = ui->measurement3DTableWidget->item(2, 0)->text();
-	QString CalcificationVolume = ui->measurement3DTableWidget->item(3, 0)->text();
-	QString HemorrhageVolume = ui->measurement3DTableWidget->item(4, 0)->text();
-	QString LRNCVolume = ui->measurement3DTableWidget->item(5, 0)->text();
-	QString LMVolume = ui->measurement3DTableWidget->item(6, 0)->text();
-
-
-
-	QtCSV::VariantData varData;
-	varData.addRow(QStringList() << "PatientName" << PatientName);
-	varData.addRow(QStringList() << "PatientID" << PatientID);
-	varData.addRow(QStringList() << "PatientDOB" << PatientDOB);
-	varData.addRow(QStringList() << "PatientGender" << PatientGender);
-	//varData.addRow(QStringList() << "ScanData" << ScanDate);
-	VARIANT_DATA_ADD_ROW(varData, ScanDate);
-	varData.addEmptyRow();
-
-	varData.addRow(QStringList() << "ReportData" << ReportDate);
-	varData.addRow(QStringList() << "MRISide" << MRISide);
-	varData.addRow(QStringList() << "DoctorName" << DoctorName);
-	varData.addEmptyRow();
-
-	varData.addRow(QStringList() << "VesselWallArea" << VesselWallArea);
-	varData.addRow(QStringList() << "LumenArea" << LumenArea);
-	varData.addRow(QStringList() << "WallThickness" << WallThickness);
-	varData.addRow(QStringList() << "NWI" << NWI);
-	varData.addEmptyRow();
-
-	varData.addRow(QStringList() << "PlaqueVolume" << PlaqueVolume);
-	varData.addRow(QStringList() << "VesselWallVolume" << VesselWallVolume);
-	varData.addRow(QStringList() << "CalcificationVolume" << CalcificationVolume);
-	varData.addRow(QStringList() << "HemorrhageVolume" << HemorrhageVolume);
-	varData.addRow(QStringList() << "LRNCVolume" << LRNCVolume);
-	varData.addRow(QStringList() << "LMVolume" << LMVolume);
-
-	QFileInfo fileInfo(path);
-	// wirte
-	if (true == QtCSV::Writer::write(fileInfo.absoluteFilePath(), varData))
-	{
-		QDesktopServices::openUrl(fileInfo.absoluteFilePath());
-	}
 }

@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>800</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,14 +26,14 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>PlaqueQuant</string>
   </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::ForceTabbedDocks|QMainWindow::VerticalTabs</set>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="sizePolicy">
     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -50,7 +50,7 @@
       <item>
        <widget class="QPushButton" name="updateBtn">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="minimumSize">
          <size>
@@ -66,7 +66,7 @@
       <item>
        <widget class="QScrollArea" name="sliceScrollArea">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -86,9 +86,6 @@
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustToContents</enum>
-        </property>
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
@@ -97,8 +94,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>835</width>
-           <height>69</height>
+           <width>619</width>
+           <height>495</height>
           </rect>
          </property>
         </widget>
@@ -116,7 +113,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1024</width>
      <height>23</height>
     </rect>
    </property>
@@ -129,14 +126,12 @@
       <string>Recent Image</string>
      </property>
     </widget>
-    <addaction name="actionImport"/>
     <addaction name="actionImport_images"/>
     <addaction name="menuRecentImage"/>
     <addaction name="actionNew_segmentation"/>
     <addaction name="actionImport_segmentation"/>
     <addaction name="actionExport_segmentation"/>
     <addaction name="actionExport_Report"/>
-    <addaction name="actionExport_CSV"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -166,6 +161,9 @@
      <addaction name="actionFourViews"/>
     </widget>
     <widget class="QMenu" name="menuOrientation">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>View Mode</string>
      </property>
@@ -178,7 +176,7 @@
    </widget>
    <widget class="QMenu" name="menuSegmentation">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>Process</string>
@@ -187,7 +185,7 @@
    </widget>
    <widget class="QMenu" name="menuImage">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>Image</string>
@@ -196,6 +194,7 @@
     <addaction name="actionNavigation"/>
     <addaction name="actionWindow_level"/>
     <addaction name="actionWindow_level_threshold"/>
+    <addaction name="actionMaximum_wall_thickness"/>
     <addaction name="actionThreshold"/>
     <addaction name="acitonVOI_selection"/>
     <addaction name="actionTubular_VOI"/>
@@ -203,29 +202,13 @@
     <addaction name="actionPolygon_draw"/>
     <addaction name="actionPolygon_draw_series"/>
     <addaction name="actionVessel_segmentation"/>
-    <addaction name="actionMaximum_wall_thickness"/>
     <addaction name="actionDistance_measure"/>
     <addaction name="actionSeeds_placer"/>
-    <addaction name="actionVBD_Smoker_seed"/>
-   </widget>
-   <widget class="QMenu" name="menuDiagnosis">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string>Diagnosis</string>
-    </property>
-    <widget class="QMenu" name="menuVBD_diagnosis">
-     <property name="title">
-      <string>VBD diagnosis</string>
-     </property>
-     <addaction name="actionSmoker_standard"/>
-     <addaction name="actionUbogu_standard"/>
-    </widget>
-    <addaction name="actionICDA_standard"/>
-    <addaction name="menuVBD_diagnosis"/>
    </widget>
    <widget class="QMenu" name="menuSurface">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Surface</string>
     </property>
@@ -233,9 +216,6 @@
     <addaction name="actionCenter_line"/>
     <addaction name="actionWay_point_centerline"/>
     <addaction name="actionFind_maximum_radius"/>
-    <addaction name="actionICDA_diameter"/>
-    <addaction name="actionVBD_Smoker_BA_diameter"/>
-    <addaction name="actionVBD_ubogu_measure"/>
     <addaction name="actionPerpendicular_measurement"/>
     <addaction name="actionStenosis"/>
     <addaction name="actionCurved_navigation"/>
@@ -244,14 +224,13 @@
    <addaction name="menuImage"/>
    <addaction name="menuSurface"/>
    <addaction name="menuSegmentation"/>
-   <addaction name="menuDiagnosis"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="ActionToolBar">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="windowTitle">
     <string>toolBar</string>
@@ -268,7 +247,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionImport"/>
+   <addaction name="actionOpenImage"/>
    <addaction name="actionExport_segmentation"/>
    <addaction name="separator"/>
    <addaction name="actionNavigation"/>
@@ -276,31 +255,31 @@
    <addaction name="actionDistance_measure"/>
    <addaction name="separator"/>
    <addaction name="acitonVOI_selection"/>
+   <addaction name="actionVessel_segmentation"/>
    <addaction name="actionTubular_VOI"/>
    <addaction name="actionSeeds_placer"/>
-   <addaction name="actionPolygon_draw"/>
    <addaction name="actionPaint_brush"/>
    <addaction name="separator"/>
    <addaction name="actionMulti_planar_view"/>
    <addaction name="actionAll_axial_view"/>
    <addaction name="actionCurved_view"/>
   </widget>
-  <widget class="QDockWidget" name="dockWidget2D">
+  <widget class="QDockWidget" name="moduleWidgetDockWidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>60</width>
-     <height>40</height>
+     <width>300</width>
+     <height>86</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>524287</width>
+     <width>400</width>
      <height>524287</height>
     </size>
    </property>
@@ -308,7 +287,7 @@
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>dockWidget2D</string>
+    <string>ModuleWidget</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -317,22 +296,22 @@
     <layout class="QVBoxLayout" name="verticalLayout_4"/>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetMeasurement">
+  <widget class="QDockWidget" name="measurementDockWidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>60</width>
-     <height>40</height>
+     <width>300</width>
+     <height>46</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>524287</width>
+     <width>400</width>
      <height>524287</height>
     </size>
    </property>
@@ -349,28 +328,16 @@
     <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget3D">
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
-   <property name="windowTitle">
-    <string>dockWidget3D</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3"/>
-  </widget>
-  <action name="actionImport">
+  <action name="actionOpenImage">
    <property name="icon">
     <iconset resource="../Main/resources/IADE_Analyzer.qrc">
      <normaloff>:/icons/OpenImage.png</normaloff>:/icons/OpenImage.png</iconset>
    </property>
    <property name="text">
-    <string>Import</string>
+    <string>&amp;Open Image</string>
    </property>
    <property name="toolTip">
-    <string>Import</string>
+    <string>Open Image</string>
    </property>
   </action>
   <action name="actionExit">
@@ -380,7 +347,7 @@
   </action>
   <action name="actionExport_segmentation">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="../Main/resources/IADE_Analyzer.qrc">
@@ -715,6 +682,9 @@
    </property>
   </action>
   <action name="actionImport_segmentation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Import segmentation</string>
    </property>
@@ -733,7 +703,7 @@
    </property>
    <property name="icon">
     <iconset resource="../Main/resources/IADE_Analyzer.qrc">
-     <normaloff>:/icons/plant-a-tree.png</normaloff>:/icons/plant-a-tree.png</iconset>
+     <normaloff>:/icons/1476453573_Wand.ico</normaloff>:/icons/1476453573_Wand.ico</iconset>
    </property>
    <property name="text">
     <string>Seeds placer</string>
@@ -781,19 +751,29 @@
    </property>
   </action>
   <action name="actionExport_Report">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Export Report</string>
    </property>
   </action>
-  <action name="actionICDA_standard">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="actionICDA_diagnosis">
    <property name="text">
-    <string>ICDA standard</string>
+    <string>ICDA diagnosis</string>
    </property>
   </action>
   <action name="actionSmoker_standard">
+   <property name="text">
+    <string>Smoker standard</string>
+   </property>
+  </action>
+  <action name="actionUbogo_standard">
+   <property name="text">
+    <string>Ubogo standard</string>
+   </property>
+  </action>
+  <action name="actionVBD_Smoker">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -802,21 +782,16 @@
      <normaloff>:/icons/cigarette-with-smoke.png</normaloff>:/icons/cigarette-with-smoke.png</iconset>
    </property>
    <property name="text">
-    <string>Smoker standard</string>
-   </property>
-  </action>
-  <action name="actionVBD_Smoker_seed">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>VBD Smoker seed</string>
+    <string>VBD Smoker</string>
    </property>
    <property name="toolTip">
-    <string>VBD Smoker seed</string>
+    <string>VBD Smoker</string>
    </property>
   </action>
   <action name="actionNew_segmentation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>New segmentation</string>
    </property>
@@ -851,6 +826,9 @@
   </action>
   <action name="actionTesting">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="text">
@@ -946,6 +924,9 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Main/resources/IADE_Analyzer.qrc">
      <normaloff>:/icons/Ruler.png</normaloff>:/icons/Ruler.png</iconset>
@@ -1026,58 +1007,6 @@
    </property>
    <property name="toolTip">
     <string>Stenosis</string>
-   </property>
-  </action>
-  <action name="actionUbogu_standard">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Ubogu standard</string>
-   </property>
-   <property name="toolTip">
-    <string>Ubogu standard</string>
-   </property>
-  </action>
-  <action name="actionICDA_diameter">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>ICDA diameter</string>
-   </property>
-   <property name="toolTip">
-    <string>ICDA diameter</string>
-   </property>
-  </action>
-  <action name="actionVBD_Smoker_BA_diameter">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>VBD Smoker BA diameter</string>
-   </property>
-   <property name="toolTip">
-    <string>VBD Smoker BA diameter</string>
-   </property>
-  </action>
-  <action name="actionVBD_ubogu_measure">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>VBD ubogu measure</string>
-   </property>
-   <property name="toolTip">
-    <string>VBD ubogu measure</string>
-   </property>
-  </action>
-  <action name="actionExport_CSV">
-   <property name="text">
-    <string>Export CSV</string>
-   </property>
-   <property name="toolTip">
-    <string>Export CSV</string>
    </property>
   </action>
  </widget>

@@ -2,10 +2,8 @@
 
 #include "ui_MainWindow.h"
 #include "ui_ViewerWidget.h"
-#include "ui_Switch2DWidget.h"
-#include "Switch2DWidget.h"
-#include "ui_Switch3DWidget.h"
-#include "Switch3DWidget.h"
+#include "ui_ModuleWidget.h"
+#include "ModuleWidget.h"
 #include "ViewerWidget.h"
 #include "MeasurementWidget.h"
 #include "LabelWidget.h"
@@ -15,8 +13,7 @@
 #include <qfiledialog.h>
 #include <QVTKInteractor.h>
 #include <qmessagebox.h>
-#include <qevent.h>
-#include <qmimedata.h>
+
 
 #include <vtkRenderWindow.h>
 #include <vtkGenericOpenGLRenderWindow.h>
@@ -29,20 +26,16 @@ MainWindow::MainWindow(QWidget *parent)
 	ui = new Ui::MainWindow;
 	ui->setupUi(this);
 
-	this->switch2DWidget = new Switch2DWidget(this);
-	ui->dockWidget2D->setWidget(this->switch2DWidget);
-
-	this->switch3DWidget = new Switch3DWidget(this);
-	ui->dockWidget3D->setWidget(this->switch3DWidget);
+	this->moduleWiget = new ModuleWidget(this);
+	ui->moduleWidgetDockWidget->setWidget(this->moduleWiget);
 
 	this->labelWidget = new LabelWidget(this);
-	this->switch2DWidget->getUi()->verticalLayoutModule->addWidget(this->labelWidget);
+	this->moduleWiget->getUi()->verticalLayoutModule->addWidget(this->labelWidget);
 
 	this->measurementWidget = new MeasurementWidget(this);
-	ui->dockWidgetMeasurement->setWidget(measurementWidget);
+	ui->measurementDockWidget->setWidget(measurementWidget);
 
-	this->tabifyDockWidget(ui->dockWidgetMeasurement, ui->dockWidget3D);
-	this->tabifyDockWidget(ui->dockWidgetMeasurement, ui->dockWidget2D);
+	this->tabifyDockWidget(ui->measurementDockWidget, ui->moduleWidgetDockWidget);
 
 	QMainWindow* centralWidget = new QMainWindow(this);
 	centralWidget->setDockNestingEnabled(true);
@@ -89,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
 	QActionGroup* actionGroupView = new QActionGroup(this);
 	actionGroupView->addAction(ui->actionAll_axial_view);
 	actionGroupView->addAction(ui->actionMulti_planar_view);
+	//actionGroupView->addAction(ui->actionCurved_view);
 	actionGroupView->setExclusive(true);
 
 
@@ -100,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 	actionGroupImage->addAction(ui->acitonVOI_selection);
 	actionGroupImage->addAction(ui->actionPaint_brush);
 	actionGroupImage->addAction(ui->actionSeeds_placer);
-	actionGroupImage->addAction(ui->actionVBD_Smoker_seed);
+	actionGroupImage->addAction(ui->actionVBD_Smoker);
 	actionGroupImage->addAction(ui->actionTubular_VOI);
 	actionGroupImage->addAction(ui->actionDistance_measure);
 	actionGroupImage->addAction(ui->actionMaximum_wall_thickness);
@@ -115,40 +109,16 @@ MainWindow::MainWindow(QWidget *parent)
 	actionGroupSurface->addAction(ui->actionTraceball_camera);
 	actionGroupSurface->addAction(ui->actionCenter_line);
 	actionGroupSurface->addAction(ui->actionFind_maximum_radius);
-	actionGroupSurface->addAction(ui->actionVBD_Smoker_BA_diameter);
-	actionGroupSurface->addAction(ui->actionICDA_diameter);
 	actionGroupSurface->addAction(ui->actionCurved_navigation);
 	actionGroupSurface->addAction(ui->actionPerpendicular_measurement);
 	actionGroupSurface->addAction(ui->actionWay_point_centerline);
 	actionGroupSurface->addAction(ui->actionStenosis);
+	
 	actionGroupSurface->setExclusive(true);
-
-	connect(ui->actionICDA_standard, SIGNAL(triggered()),
-		ui->actionNavigation, SIGNAL(triggered()));
-	connect(ui->actionICDA_standard, SIGNAL(triggered()),
-		ui->actionICDA_diameter, SIGNAL(triggered()));
-	connect(ui->actionSmoker_standard, SIGNAL(triggered()),
-		ui->actionVBD_Smoker_seed, SIGNAL(triggered()));
-	connect(ui->actionSmoker_standard, SIGNAL(triggered()),
-		ui->actionVBD_Smoker_BA_diameter, SIGNAL(triggered()));
-	connect(ui->actionUbogu_standard, SIGNAL(triggered()),
-		ui->actionNavigation, SIGNAL(triggered()));
-	connect(ui->actionUbogu_standard, SIGNAL(triggered()),
-		ui->actionVBD_ubogu_measure, SIGNAL(triggered()));
-
-
-	QActionGroup* actionGroupDiagnosis = new QActionGroup(this);
-	actionGroupDiagnosis->addAction(ui->actionICDA_standard);
-	actionGroupDiagnosis->addAction(ui->actionSmoker_standard);
-	actionGroupDiagnosis->addAction(ui->actionUbogu_standard);
-	actionGroupDiagnosis->setExclusive(true);
-
 
 
 	// Connection
 	connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
-	connect(ui->actionImport, SIGNAL(triggered()),
-		this, SLOT(slotOpen()));
 	connect(ui->actionImport_images, SIGNAL(triggered()), this, SLOT(slotOpenNewImage()));
 	connect(ui->actionImport_segmentation, SIGNAL(triggered()),
 		this, SLOT(slotOpenOverlay()));
@@ -156,8 +126,8 @@ MainWindow::MainWindow(QWidget *parent)
 		this, SLOT(slotSaveOverlay()));
 	connect(ui->actionExport_Report, SIGNAL(triggered()),
 		this, SLOT(slotExportReport()));
-	connect(ui->actionExport_CSV, SIGNAL(triggered()),
-		this, SLOT(slotExportCSV()));
+	connect(ui->actionAbout, SIGNAL(triggered()),
+		this, SLOT(slotAbout()));
 	createRecentImageActions();
 
 }
@@ -178,87 +148,41 @@ void MainWindow::slotOpenRecentImage()
 	}
 }
 
-void MainWindow::slotOpenNewImage(QString path)
+void MainWindow::slotOpenNewImage()
 {
-	imageImport(path);
+	imageImport("");
 }
 
-void MainWindow::slotOpen(QString path)
+void MainWindow::slotOpenOverlay()
 {
-	QMessageBox openMessageBox;
-	openMessageBox.setIcon(QMessageBox::Question);
-	openMessageBox.setText("Import.");
-	openMessageBox.setInformativeText("Import images or segmentation?");
-	openMessageBox.setStandardButtons(QMessageBox::Cancel);
-	openMessageBox.setDefaultButton(QMessageBox::Cancel);
-	QPushButton* imagesButton = openMessageBox.addButton(tr("Images"), QMessageBox::ActionRole);
-	QPushButton* segmentationButton = openMessageBox.addButton(tr("Segmentation"), QMessageBox::ActionRole);
-	openMessageBox.exec();
-	if (openMessageBox.clickedButton() == imagesButton)
-	{
-		slotOpenNewImage(path);
-	}
-	else if (openMessageBox.clickedButton() == segmentationButton)
-	{
-		if (QFileInfo(path).completeSuffix() == "nii" || 
-			QFileInfo(path).completeSuffix() == "nii.gz")
-		{
-			slotOpenOverlay(path);
-		}
-		else {
-			QMessageBox::critical(this, tr("Nifti is needed."), tr("Segmentation file is in Nifti format.\n"
-				"Please import \"*.nii\" or \"*.nii.gz\". "), QMessageBox::Ok);
-		}
-	}
+		QString path = QFileDialog::getOpenFileName((this), 
+			QString(tr("Import Segmentation")), ".", tr("NIFTI Images (*.nii)"));
+		if (path.isEmpty())	return;
+		emit signalOverlayImportLoad(path);
 }
 
-void MainWindow::slotOpenOverlay(QString path)
+void MainWindow::slotSaveOverlay()
 {
-	if (path.isEmpty()) {
-		path = QFileDialog::getOpenFileName((this),
-			QString(tr("Import Segmentation")), path, tr("NIFTI Images (*.nii *.nii.gz)"));
-	}
-	if (path.isEmpty())	return;
-	emit signalOverlayImportLoad(path);
-}
-
-void MainWindow::slotSaveOverlay(QString path)
-{
-	if (path.isEmpty()) {
-		path = QFileDialog::getSaveFileName((this),
-			QString(tr("Export Segmentation")), path, tr("NIFTI Images (*.nii *.nii.gz)"));
-	}
+	QString path = QFileDialog::getSaveFileName((this),
+		QString(tr("Export Segmentation")), ".", tr("NIFTI Images (*.nii)"));
 	if (path.isEmpty())	return;
 	emit signalOverlayExportSave(path);
 }
 
-void MainWindow::slotExportReport(QString path)
+void MainWindow::slotExportReport()
 {
-	if (path.isEmpty()) {
-		path = QFileDialog::getSaveFileName((this),
-			QString(tr("Export Report")), path, tr("Report (*.pdf)"));
-	}
+	QString path = QFileDialog::getSaveFileName((this),
+		QString(tr("Export Report")), ".", tr("Report (*.pdf)"));
 	if (path.isEmpty())	return;
 	emit signalReportExport(path);
 
 	measurementWidget->GenerateReport(path);
 }
 
-void MainWindow::slotExportCSV(QString path)
-{
-		if (path.isEmpty()) {
-		path = QFileDialog::getSaveFileName((this),
-			QString(tr("Export CSV")), path, tr("Comma-Seperated Values (*.csv)"));
-	}
-	if (path.isEmpty())	return;
-	emit signalReportExport(path);
-
-	measurementWidget->GenerateCSV(path);
-}
-
 void MainWindow::slotImage(bool flag)
 {
 	QAction *action = qobject_cast<QAction *>(sender());
+	//qDebug() << actionGroupActionImage->checkedAction();
 	if (!flag) {
 		if (ui->actionImage1->isChecked() ||
 			ui->actionImage2->isChecked() ||
@@ -305,24 +229,34 @@ void MainWindow::slotImage(bool flag)
 	//m_core->RenderAllViewer();
 }
 
+void MainWindow::slotAbout()
+{
+	QMessageBox msgBox;
+	msgBox.setIconPixmap(QPixmap(":/icons/plaqueQuant.png"));
+	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", "3.0") +
+		QString("<br>This software is a analytical tool designed to diagnose the condition of plaque and blood vessels."));
+	msgBox.setWindowTitle("About");
+	msgBox.exec();
+}
+
 void MainWindow::imageImport(QString path)
 {
 	RegistrationWizard rw(path, modalityNames.size(), this);
 	for (int i = 0; i < modalityNames.size(); ++i) {
 		rw.setImageModalityNames(i, modalityNames[i]);
 	}
-	QStringList _listOfFileNames;
+	QList<QStringList> _listOfFileNames;
 
 	if (QWizard::Accepted == rw.exec()) {
 
 		for (int i = 0; i < modalityNames.size(); ++i) {
-			//if (!rw.getFileNames(i).isEmpty()) {
-				qDebug() << rw.getFileNames(i);
-				_listOfFileNames << rw.getFileNames(i);
-			//}
+			if (rw.getFileNames(i)) {
+				qDebug() << *rw.getFileNames(i);
+				_listOfFileNames << *rw.getFileNames(i);
+			}
 		}
 
-		emit signalImageImportLoad(_listOfFileNames);
+		emit signalImageImportLoad(&_listOfFileNames);
 
 		qDebug() << rw.getDirectory();
 
@@ -339,10 +273,24 @@ void MainWindow::initialization()
 
 	ui->ActionToolBar->setEnabled(true);
 
+	ui->menuImage->setEnabled(true);
+
+
+	ui->actionImport_segmentation->setEnabled(true);
+
+	ui->actionNew_segmentation->setEnabled(true);
+
+	ui->actionExport_Report->setEnabled(true);
+
+	ui->actionExport_segmentation->setEnabled(true);
+
+	ui->updateBtn->setEnabled(true);
+
+	ui->menuOrientation->setEnabled(true);
+
 	ui->actionMulti_planar_view->trigger();
 	ui->actionNavigation->trigger();
 
-	measurementWidget->slotUpdateInformation();
 }
 
 void MainWindow::enableInteractor(bool flag)
@@ -379,14 +327,14 @@ Ui::MainWindow * MainWindow::getUi()
 	return this->ui;
 }
 
-Switch2DWidget * MainWindow::getSwitch2DWidget()
-{
-	return this->switch2DWidget;
-}
+//QMainWindow * MainWindow::getCentralWidget()
+//{
+//	return &this->centralWidget;
+//}
 
-Switch3DWidget * MainWindow::getSwitch3DWidget()
+ModuleWidget * MainWindow::getModuleWidget()
 {
-	return this->switch3DWidget;
+	return this->moduleWiget;
 }
 
 ViewerWidget * MainWindow::getViewerWidget(unsigned int num)
@@ -409,23 +357,9 @@ QMenu * MainWindow::getSelectImgMenu(unsigned int i)
 	return selectImgMenus[i];
 }
 
-void MainWindow::dragEnterEvent(QDragEnterEvent * event)
+void MainWindow::setEnabled(bool flag)
 {
-	if (event->mimeData()->hasUrls()) {
-		// default only count the first one
-		QUrl url = event->mimeData()->urls().first();
-		// only accept local file or local directory
-		if (url.isLocalFile()) {
-			event->acceptProposedAction();
-		}
-	}
-}
-
-void MainWindow::dropEvent(QDropEvent * event)
-{
-	QUrl url = event->mimeData()->urls().first();
-	QFileInfo fileInfo(url.toLocalFile());
-	slotOpen(fileInfo.absoluteFilePath());
+	ui->actionAbout->setEnabled(true);
 
 }
 

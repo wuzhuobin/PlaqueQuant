@@ -1,6 +1,7 @@
 #ifndef VTK_ROI_WIDGET_H
 #define VTK_ROI_WIDGET_H
 
+#include <QObject>
 #include <vtkSetGet.h>
 #include <vtkCallbackCommand.h>
 #include <vtkSmartPointer.h>
@@ -18,7 +19,6 @@ class vtkROIUpdateAllBorderWidgetCallBack;
 /// ROI border widget for 2D
 class vtkROIBorderWidget : public vtkBorderWidget
 {
-	friend vtkROIWidget;
 private:
 	typedef vtkROIWidget ParentType;
 
@@ -56,19 +56,13 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 /// ROI box widget for 3D
-class vtkROIWidget : public vtkBoxWidget2
+class vtkROIWidget : public QObject, public vtkBoxWidget2
 {
-	friend vtkROIBorderWidget;
+	Q_OBJECT
 public:
 	static vtkROIWidget *New();
 
 	vtkTypeMacro(vtkROIWidget, vtkBoxWidget2);
-
-	vtkGetMacro(NumberOfBorderWidgets, int);
-	virtual void SetNumbeOfBorderWidgets(int);
-
-	virtual void GenerateOneBorderWidget();
-	virtual void ClearAllBorderWidgets();
 
 	virtual void SetPositionPointer(double* pos);
 
@@ -82,19 +76,24 @@ public:
 
 	virtual void SetSlicePlane(int, vtkPlane*);
 
+public slots:
+
+signals:
+	void signalROIBounds(double*);
+
 protected:
 	vtkROIWidget();
 	~vtkROIWidget();
 
-	std::vector<vtkSmartPointer<vtkPlane>>					m_planes;
-	std::vector<vtkSmartPointer<vtkROIBorderWidget>>		m_borderWidgets;
-	std::vector<vtkSmartPointer<vtkBorderRepresentation>>	m_borderRep;
+	vtkSmartPointer<vtkPlane>					m_planes[3];
+	vtkSmartPointer<vtkROIBorderWidget>			m_borderWidgets[3];
+	vtkSmartPointer<vtkBorderRepresentation>	m_borderRep[3];
 	vtkSmartPointer<vtkROIUpdateAllBorderWidgetCallBack> m_callback;
 
 	double* m_cursorPos;
 
 private:
-	int NumberOfBorderWidgets;
+
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -18,9 +18,7 @@
 #include <vtkCommand.h>
 #include <vtkCoordinate.h>
 #include <vtkImageData.h>
-#include <vtkDoubleArray.h>
 
-const char* InteractorStyleSurfaceCenterLineStenosis::STENOSIS = "Stenosis";
 
 
 class InteractorStyleSurfaceCenterLineStenosisCallback : public vtkCommand {
@@ -161,13 +159,7 @@ void InteractorStyleSurfaceCenterLineStenosis::CalculateStenosis()
 	sprintf_s(buff, "Stenosis: %.4f%%", StenosisValue);
 	m_measurementText->SetInput(buff);
 	m_measurementText->SetDisplayPosition(displayCoordinate[0], displayCoordinate[1]);
-	
-	vtkSmartPointer<vtkDoubleArray> stenosis =
-		vtkSmartPointer<vtkDoubleArray>::New();
-	//stenosis->SetNumberOfComponents(1);
-	stenosis->InsertNextTuple1(StenosisValue);
-	stenosis->SetName(STENOSIS);
-	GetCenterlineSurfaceViewer()->GetCenterline()->GetFieldData()->AddArray(stenosis);
+	//this->GetSurfaceViewer()->Render();
 }
 
 void InteractorStyleSurfaceCenterLineStenosis::OnKeyPress()

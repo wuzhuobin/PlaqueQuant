@@ -64,8 +64,6 @@ void QInteractorStyleWindowLevelThreshold::UpdateTargetViewer()
 void QInteractorStyleWindowLevelThreshold::initialization()
 {
 	m_label = new QLabel(this);
-	QLabel* lower = new QLabel("Lower", this);
-	QLabel* upper = new QLabel("Upper", this); 
 	m_spinBoxUpperThreshold = new QSpinBox(this);
 	m_spinBoxLowerThreshold = new QSpinBox(this);
 	m_sliderUpperThreshold = new QSlider(Qt::Horizontal, this);
@@ -73,14 +71,12 @@ void QInteractorStyleWindowLevelThreshold::initialization()
 	m_pushButtonReset = new QPushButton("Reset", this);
 
 
-	ui->gridLayout->addWidget(m_label, numOfMyself * 3, 0);
-	ui->gridLayout->addWidget(m_pushButtonReset, numOfMyself * 3, 2);
-	ui->gridLayout->addWidget(lower, numOfMyself * 3 + 1, 0);
-	ui->gridLayout->addWidget(m_spinBoxLowerThreshold, numOfMyself * 3 + 1, 1);
-	ui->gridLayout->addWidget(m_sliderLowerThreshold, numOfMyself * 3 + 1, 2);
-	ui->gridLayout->addWidget(upper, numOfMyself * 3 + 2, 0);
-	ui->gridLayout->addWidget(m_spinBoxUpperThreshold, numOfMyself * 3 + 2, 1);
-	ui->gridLayout->addWidget(m_sliderUpperThreshold, numOfMyself * 3 + 2, 2);
+	ui->gridLayout->addWidget(m_label, numOfMyself, 0);
+	ui->gridLayout->addWidget(m_spinBoxLowerThreshold, numOfMyself, 1);
+	ui->gridLayout->addWidget(m_sliderLowerThreshold, numOfMyself, 2);
+	ui->gridLayout->addWidget(m_spinBoxUpperThreshold, numOfMyself, 3);
+	ui->gridLayout->addWidget(m_sliderUpperThreshold, numOfMyself, 4);
+	ui->gridLayout->addWidget(m_pushButtonReset, numOfMyself, 5);
 
 	connect(m_pushButtonReset, SIGNAL(clicked()),
 		this, SLOT(ResetWindowLevel()), Qt::UniqueConnection);
