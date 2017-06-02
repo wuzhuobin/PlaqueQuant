@@ -56,6 +56,7 @@ private slots:
 
 	void slotIOManagerToImageManager();
 	void slotOverlayToImageManager();
+	void slotSaveCurvedImage(QString fileName);
 	// Image interactorstyle
 	void slotNavigation();
 	void slotWindowLevel();

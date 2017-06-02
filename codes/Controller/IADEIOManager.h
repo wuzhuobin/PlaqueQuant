@@ -11,7 +11,7 @@ public:
 	IADEIOManager(QObject* parent = nullptr);
 
 	public slots:
-	virtual void slotOpenSegmentation(QString fileName) override;
+	virtual void slotOpenOverlay(QString fileName) override;
 	
 	virtual void slotInitializeOverlay() override;
 	

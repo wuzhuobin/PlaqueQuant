@@ -12,16 +12,15 @@ public:
 
 
 	public slots:
-	virtual void slotOpenSegmentation(QString fileName) override;
+	virtual void slotOpenOverlay(QString fileName) override;
 	
 	virtual void slotInitializeOverlay() override;
 	
 	virtual	void slotInitializeOverlay(IVtkImageData::itkImageType::Pointer image) override;
 
-	virtual void slotGenerateReport(QString path) override {};
+	void slotSaveCurvedImages(QString fileName, IVtkImageData* image);
 
-
-
+	void slotSaveCurvedOverlay(QString fileName, OverlayImageData* image);
 };
 
 

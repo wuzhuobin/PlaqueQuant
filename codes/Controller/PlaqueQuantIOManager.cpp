@@ -5,6 +5,7 @@
 
 #include <itkImageFileReader.h>
 #include <itkOrientImageFilter.h>
+#include <itkImageFileWriter.h>
 
 
 using itk::OrientImageFilter;
@@ -40,8 +41,32 @@ void PlaqueQuantIOManager::slotInitializeOverlay(IVtkImageData::itkImageType::Po
 	emit signalFinishOpenOverlay();
 }
 
+void PlaqueQuantIOManager::slotSaveCurvedImages(QString fileName, IVtkImageData * image)
+{
+	if (image) {
+		typedef itk::ImageFileWriter<IVtkImageData::itkImageType> ImageFileWriter;
+		ImageFileWriter::Pointer writer =
+			ImageFileWriter::New();
+		writer->SetInput(image->GetItkImage());
+		writer->SetFileName(fileName.toStdString().c_str());
+		writer->Write();
+	}
+}
 
-void PlaqueQuantIOManager::slotOpenSegmentation(QString fileName) 
+void PlaqueQuantIOManager::slotSaveCurvedOverlay(QString fileName, OverlayImageData * image)
+{
+	if (image) {
+		typedef itk::ImageFileWriter<OverlayImageData::itkImageType> ImageFileWriter;
+		ImageFileWriter::Pointer writer =
+			ImageFileWriter::New();
+		writer->SetInput(image->GetItkImage());
+		writer->SetFileName(fileName.toStdString().c_str());
+		writer->Write();
+	}
+}
+
+
+void PlaqueQuantIOManager::slotOpenOverlay(QString fileName) 
 {
 	ImageFileReader<OverlayImageData::itkImageType>::Pointer reader =
 		ImageFileReader<OverlayImageData::itkImageType>::New();

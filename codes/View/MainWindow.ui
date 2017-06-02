@@ -135,6 +135,7 @@
     <addaction name="actionNew_segmentation"/>
     <addaction name="actionImport_segmentation"/>
     <addaction name="actionExport_segmentation"/>
+    <addaction name="actionExport_curved_images"/>
     <addaction name="actionExport_Report"/>
     <addaction name="actionExport_CSV"/>
     <addaction name="actionExit"/>
@@ -1078,6 +1079,14 @@
    </property>
    <property name="toolTip">
     <string>Export CSV</string>
+   </property>
+  </action>
+  <action name="actionExport_curved_images">
+   <property name="text">
+    <string>Export curved images</string>
+   </property>
+   <property name="toolTip">
+    <string>Export curved images</string>
    </property>
   </action>
  </widget>

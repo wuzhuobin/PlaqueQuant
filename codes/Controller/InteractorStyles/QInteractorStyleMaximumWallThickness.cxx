@@ -24,38 +24,7 @@
 vtkStandardNewMacro(QInteractorStyleMaximumWallThickness);
 QSETUP_UI_SRC(QInteractorStyleMaximumWallThickness);
 
-//void QInteractorStyleMaximumWallThickness::uniqueInvoke(bool flag)
-//{
-//	QAbstractNavigation::uniqueInvoke(flag);
-//	if (flag && flag != initializationFlag) {
-//		// turn on codes
-//
-//		connect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-//			this, SLOT(slotChangeSlice()),
-//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-//		connect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-//			this, SLOT(slotChangeSlice()),
-//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-//		connect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-//			this, SLOT(slotChangeSlice()),
-//			static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection));
-//	}
-//	// turn off
-//	if (!flag && flag != initializationFlag) {
-//		// turn off codes
-//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxX, SIGNAL(valueChanged(int)),
-//			this, SLOT(slotChangeSlice()));
-//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxY, SIGNAL(valueChanged(int)),
-//			this, SLOT(slotChangeSlice()));
-//		disconnect(QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
-//			this, SLOT(slotChangeSlice()));
-//
-//	}
-//	if (flag != initializationFlag) {
-//
-//	}
-//	initializationFlag = flag;
-//}
+
 
 void QInteractorStyleMaximumWallThickness::SetCustomEnabled(bool flag)
 {
@@ -83,19 +52,6 @@ void QInteractorStyleMaximumWallThickness::SetCustomEnabled(bool flag)
 		}
 	}
 	GetImageViewer()->Render();
-}
-
-void QInteractorStyleMaximumWallThickness::SetCurrentFocalPointWithImageCoordinate(int i, int j, int k)
-{
-	QInteractorStyleRuler::SetCurrentFocalPointWithImageCoordinate(i, j, k);
-	if (m_MaximumWallThickneesLabelFlag &&
-		GetSliceOrientation() == vtkImageViewer2::SLICE_ORIENTATION_XY) {
-		UpdateMaximumWallThicknessLabel();
-	}
-	else {
-		this->m_lineActor->VisibilityOff();
-		this->m_labelActor->VisibilityOff();
-	}
 }
 
 void QInteractorStyleMaximumWallThickness::EnableMaximumWallThickneesLabel(bool flag) {
@@ -270,6 +226,19 @@ QInteractorStyleMaximumWallThickness::QInteractorStyleMaximumWallThickness(int u
 QInteractorStyleMaximumWallThickness::~QInteractorStyleMaximumWallThickness()
 {
 	QDELETE_UI();
+}
+
+void QInteractorStyleMaximumWallThickness::SetCurrentFocalPointWithImageCoordinateByViewer(int i, int j, int k)
+{
+	QInteractorStyleRuler::SetCurrentFocalPointWithImageCoordinateByViewer(i, j, k);
+	if (m_MaximumWallThickneesLabelFlag &&
+		GetSliceOrientation() == vtkImageViewer2::SLICE_ORIENTATION_XY) {
+		UpdateMaximumWallThicknessLabel();
+	}
+	else {
+		this->m_lineActor->VisibilityOff();
+		this->m_labelActor->VisibilityOff();
+	}
 }
 
 void QInteractorStyleMaximumWallThickness::initialization()

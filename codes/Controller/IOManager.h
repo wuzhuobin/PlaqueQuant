@@ -62,13 +62,11 @@ public slots:
 
 	virtual void slotInitializeOverlay(IVtkImageData::itkImageType::Pointer image);
 
-	virtual void slotOpenSegmentation(QString fileName);
+	virtual void slotOpenOverlay(QString fileName);
 
-	virtual void slotSaveSegmentation(QString path);
+	virtual void slotSaveOverlay(QString path);
 
-	void slotSaveSegmentation(OverlayImageData::itkImageType::Pointer input, QString path);
-
-	virtual void slotGenerateReport(QString path);
+	virtual void slotSaveOverlay(OverlayImageData::itkImageType::Pointer input, QString path);
 
 signals:
 	void signalFinishOpenMultiImages();

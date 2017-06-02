@@ -246,7 +246,7 @@ void IOManager::slotInitializeOverlay(IVtkImageData::itkImageType::Pointer image
 	emit signalFinishOpenOverlay();
 }
 
-void IOManager::slotOpenSegmentation(QString fileName)
+void IOManager::slotOpenOverlay(QString fileName)
 {
 	//typedef itk::OrientImageFilter<OverlayImageData::itkImageType, OverlayImageData::itkImageType> OrientImageFilter;
 
@@ -271,11 +271,11 @@ void IOManager::slotOpenSegmentation(QString fileName)
 	emit signalFinishOpenOverlay();
 
 }
-void IOManager::slotSaveSegmentation(QString path)
+void IOManager::slotSaveOverlay(QString path)
 {
-	slotSaveSegmentation(overlay->getData()->GetItkImage(), path);
+	slotSaveOverlay(overlay->getData()->GetItkImage(), path);
 }
-void IOManager::slotSaveSegmentation(OverlayImageData::itkImageType::Pointer input, QString path)
+void IOManager::slotSaveOverlay(OverlayImageData::itkImageType::Pointer input, QString path)
 {
 	typedef itk::ImageFileWriter<OverlayImageData::itkImageType> ImageFileWriter;
 		ImageFileWriter::Pointer writer =
@@ -283,9 +283,5 @@ void IOManager::slotSaveSegmentation(OverlayImageData::itkImageType::Pointer inp
 		writer->SetInput(input);
 		writer->SetFileName(path.toStdString().c_str());
 		writer->Write();
-}
-
-void IOManager::slotGenerateReport(QString path)
-{
 }
 

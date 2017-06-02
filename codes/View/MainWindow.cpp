@@ -149,7 +149,10 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui->actionImport, SIGNAL(triggered()),
 		this, SLOT(slotOpen()));
-	connect(ui->actionImport_images, SIGNAL(triggered()), this, SLOT(slotOpenNewImage()));
+	connect(ui->actionImport_images, SIGNAL(triggered()), 
+		this, SLOT(slotOpenNewImage()));
+	connect(ui->actionExport_curved_images, SIGNAL(triggered()),
+		this, SLOT(slotSaveCurvedImage()));
 	connect(ui->actionImport_segmentation, SIGNAL(triggered()),
 		this, SLOT(slotOpenOverlay()));
 	connect(ui->actionExport_segmentation, SIGNAL(triggered()), 
@@ -210,6 +213,16 @@ void MainWindow::slotOpen(QString path)
 				"Please import \"*.nii\" or \"*.nii.gz\". "), QMessageBox::Ok);
 		}
 	}
+}
+
+void MainWindow::slotSaveCurvedImage(QString path)
+{
+	if (path.isEmpty()) {
+		path = QFileDialog::getSaveFileName((this),
+			QString(tr("Export Curved Images")), path, tr("NIFTI Images (*.nii *.nii.gz)"));
+	}
+	if (path.isEmpty())	return;
+	emit signalCurvedImageExport(path);
 }
 
 void MainWindow::slotOpenOverlay(QString path)

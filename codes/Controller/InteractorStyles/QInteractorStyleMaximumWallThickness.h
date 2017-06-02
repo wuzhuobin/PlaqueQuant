@@ -17,7 +17,6 @@ public:
 	static QInteractorStyleMaximumWallThickness* New();
 public slots:
 	virtual void SetCustomEnabled(bool flag);
-	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k);
 
 	virtual void EnableMaximumWallThickneesLabel(bool flag);
 
@@ -27,11 +26,13 @@ protected:
 	QInteractorStyleMaximumWallThickness(int uiType = UNIQUE_UI, QWidget* parent = Q_NULLPTR);
 	~QInteractorStyleMaximumWallThickness ();
 
+	virtual void SetCurrentFocalPointWithImageCoordinateByViewer(int i, int j, int k) override;
+
 	void initialization();
 
 	vtkSmartPointer<vtkActor> m_lineActor = nullptr;
 	vtkSmartPointer<vtkActor2D> m_labelActor = nullptr;
-	//vtkSmartPointer<vtkRenderer>
+
 	bool m_MaximumWallThickneesLabelFlag = false;
 
 private:

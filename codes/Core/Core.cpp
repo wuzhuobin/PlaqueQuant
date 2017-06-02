@@ -16,6 +16,7 @@
 #include <qdebug.h>
 #include <QVTKInteractor.h>
 #include <qsignalmapper.h>
+#include <qstringlist.h>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
@@ -76,15 +77,17 @@ Core::Core(QObject * parent)
 		&ioManager, SLOT(slotAddToListOfFileNamesAndOpen(QStringList)));
 	connect(&ioManager, SIGNAL(signalFinishOpenMultiImages()),
 		this, SLOT(slotIOManagerToImageManager()));
+	connect(&mainWindow, SIGNAL(signalCurvedImageExport(QString)),
+		this, SLOT(slotSaveCurvedImage(QString)));
 	connect(&ioManager, SIGNAL(signalFinishOpenOverlay()),
 		this, SLOT(slotOverlayToImageManager()));
 
 
 	// import and export overlay
 	connect(&mainWindow, SIGNAL(signalOverlayImportLoad(QString)),
-		&ioManager, SLOT(slotOpenSegmentation(QString)));
+		&ioManager, SLOT(slotOpenOverlay(QString)));
 	connect(&mainWindow, SIGNAL(signalOverlayExportSave(QString)),
-		&ioManager, SLOT(slotSaveSegmentation(QString)));
+		&ioManager, SLOT(slotSaveOverlay(QString)));
 
 	// new overlay
 	connect(mainWindow.getUi()->actionNew_segmentation, SIGNAL(triggered()),
@@ -376,6 +379,20 @@ void Core::slotOverlayToImageManager()
 	// clear the memory later, sometimes it will clear too early
 	// make no different, if it has not been clear
 	//ioManager.clearOverlay();
+}
+
+void Core::slotSaveCurvedImage(QString fileName)
+{
+	ioManager.slotSaveCurvedOverlay(fileName, imageManager.getCurvedPlaqueQuantOverlay()->getData());
+
+	for (int i = 0; i < NUM_OF_IMAGES; ++i) {
+
+		QStringList _f = fileName.split('.');
+		_f[0] += '_' + imageManager.getModalityName(i);
+		QString _newFileName = _f.join('.');
+
+		ioManager.slotSaveCurvedImages(_newFileName, imageManager.getCurvedImage(i));
+	}
 }
 
 void Core::slotNavigation()

@@ -69,6 +69,7 @@ protected:
 signals:
 
 	void signalImageImportLoad(QStringList);
+	void signalCurvedImageExport(QString);
 	void signalOverlayImportLoad(QString);
 	void signalOverlayExportSave(QString);
 	void signalReportExport(QString);
@@ -79,6 +80,7 @@ private slots:
 	void slotOpenRecentImage();
 	void slotOpenNewImage(QString path = QString());
 	void slotOpen(QString path = QString());
+	void slotSaveCurvedImage(QString path = QString());
 	void slotOpenOverlay(QString path = QString());
 	void slotSaveOverlay(QString path = QString());
 

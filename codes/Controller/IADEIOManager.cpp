@@ -40,7 +40,7 @@ void IADEIOManager::slotInitializeOverlay(IVtkImageData::itkImageType::Pointer i
 }
 
 
-void IADEIOManager::slotOpenSegmentation(QString fileName) 
+void IADEIOManager::slotOpenOverlay(QString fileName) 
 {
 	ImageFileReader<OverlayImageData::itkImageType>::Pointer reader =
 		ImageFileReader<OverlayImageData::itkImageType>::New();
