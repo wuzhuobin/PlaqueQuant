@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QInteractorStyleThreshold</class>
+ <widget class="QWidget" name="QInteractorStyleThreshold">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>278</width>
+    <height>162</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QInteractorStyleThreshold</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Threshold</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QGridLayout" name="gridLayout"/>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_4">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(226, 226, 226)</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="activeLabelLabel">
+             <property name="font">
+              <font>
+               <family>Arial</family>
+              </font>
+             </property>
+             <property name="text">
+              <string>Threshold Label:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <family>Arial</family>
+              </font>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>13</width>
+               <height>13</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>No label</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/transparentbox.png</normaloff>:/icons/transparentbox.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Vessel Wall</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/bluebox.png</normaloff>:/icons/bluebox.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Lumen</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/redbox.png</normaloff>:/icons/redbox.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Calcification</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/greenbox.png</normaloff>:/icons/greenbox.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hemorrhage</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/yellowbox.png</normaloff>:/icons/yellowbox.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>LRNC</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/lightbluebox.png</normaloff>:/icons/lightbluebox.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>LM</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+                <normaloff>:/icons/purplebox.png</normaloff>:/icons/purplebox.png</iconset>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="1">
+            <widget class="QComboBox" name="comboBoxTargeImage"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_62">
+             <property name="text">
+              <string>Targe Image:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBoxPreview">
+             <property name="text">
+              <string>Preview</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QPushButton" name="pushButtonThreshold">
+             <property name="text">
+              <string>Threshold</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>7</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../../Main/resources/IADE_Analyzer.qrc"/>
+ </resources>
+ <connections/>
+</ui>

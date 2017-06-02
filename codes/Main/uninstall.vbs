@@ -1,0 +1,1 @@
+createobject("wscript.shell").run "uninstall.bat",0

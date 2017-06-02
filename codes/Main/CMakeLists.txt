@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(Main)
-include_directories(
-	${MAIN_INCLUDE_DIRS}
-	)
-
- # message("${PROJECT_BINARY_DIR}")
 IF(COMMAND CMAKE_POLICY)
 	   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
+
+project(Main)
+
+#Link all libraries
+link_directories(
+   	${MAIN_LINK_DIRECTORIES}
+)
 
 #ITK
 find_package(ITK REQUIRED)
@@ -24,55 +25,55 @@ if (NOT VTK_FOUND)
 endif()
 include(${VTK_USE_FILE})
 
-#VMTK
-find_package(VMTK REQUIRED)
-if (NOT VMTK_FOUND)
-	message(FATAL_ERROR "error: VMTK is not found")
-endif()
-include(${VMTK_USE_FILE})
+#QT5
+find_package(Qt5Core)
+find_package(Qt5Widgets)
 
-#QT
-if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
-  # Instruct CMake to run moc automatically when needed.
-  # set(CMAKE_AUTOMOC ON)
-  find_package(Qt5PrintSupport REQUIRED)
-  find_package(Qt5Widgets REQUIRED QUIET)
-  # add_definitions(-DQT5_IS_LOADED)
-else()
-  find_package(Qt4 REQUIRED)
-  include(${QT_USE_FILE})
-endif()
-Set(
-	QT_RSRS 
-	${CMAKE_SOURCE_DIR}/resources/Project.qrc
+set(
+    MAIN_SRC
+    main.cpp
 )
 
-Set(
-	RC_FILE
-	${CMAKE_SOURCE_DIR}/resources/Project.rc
+set(
+	VIEW_RC
+	${PROJECT_SOURCE_DIR}/resources/IADE_Analyzer.rc
 )
-QT5_ADD_RESOURCES(RCC_RSRS ${QT_RSRS})
+
+set(
+	VIEW_QRC
+	${PROJECT_SOURCE_DIR}/resources/IADE_Analyzer.qrc
+)
+qt5_add_resources(
+	VIEW_QRC_CPP
+	${VIEW_QRC}
+)
+
 add_executable(
 	Main
-	main.cxx
-	${RC_FILE}
-	${QT_RSRS}
-	${RCC_RSRS}
+    ${MAIN_SRC}
+	${VIEW_QRC}
+	${VIEW_QRC_CPP}
+	${VIEW_RC}
 )
-
-#Link all libraries
-link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 target_link_libraries(
 	Main
-	${LINK_LIBRARIE}
+	Core
+	# ${ITK_LIBRARIES}
+	# ${VTK_LIBRARIES}
+	# Qt5::Core
+	# Qt5::Widgets
+)
+target_include_directories(
+	Main
+	PUBLIC
+	${PROJECT_SOURCE_DIR}
+	${PROJECT_BINARY_DIR}
 )
 
-
 #Grouping in MSVC
-
 SOURCE_GROUP(
 	"Source Files" 
 	FILES 
-	main.cxx
+	main.cpp
 )
