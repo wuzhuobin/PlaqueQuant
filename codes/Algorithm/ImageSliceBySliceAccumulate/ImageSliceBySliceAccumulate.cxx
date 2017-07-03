@@ -35,9 +35,12 @@ public:
 		vtkImageData *image, vtkImageStencilData *stencil, int extent[6],
 		vtkAlgorithm *algorithm = 0, int threadId = 0)
 		:vtkImageStencilIterator(image, stencil, extent, algorithm, threadId){}
-	int GetSpanIndexX() { return this->SpanIndexX; }
-	int GetSpanIndexY() { return this->SpanIndexY; }
-	int GetSpanIndexZ() { return this->SpanIndexZ; }
+	//int GetSpanIndexX() { return this->SpanIndexX; }
+	//int GetSpanIndexY() { return this->SpanIndexY; }
+	//int GetSpanIndexZ() { return this->SpanIndexZ; }
+	 int GetSpanIndexX() { return this->GetIndex()[0]; }
+	 int GetSpanIndexY() { return this->GetIndex()[1]; }
+	 int GetSpanIndexZ() { return this->GetIndex()[2]; }
 };
 
 template class MyImageStencilIterator<signed char>;
