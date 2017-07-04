@@ -163,7 +163,7 @@ protected:
 	int Orientation = ORIENTATION_XY;
 	bool FirstRender = true;
 	// MaxNoOfPeels maximum number of depth peels(multi - pass rendering)
-	int MaxNoOfPeels = 0;
+	int MaxNoOfPeels = 9999;
 	// OcclusionRatio the occlusion ration(0.0 means a perfect image,
 	// >0.0 means a non - perfect image which in general results in faster rendering)
 	double OcclusionRatio = 0.0;
