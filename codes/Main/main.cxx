@@ -4,7 +4,7 @@
 
 
 //#undef _DEBUG
-
+#define _DEBUG
 
 // error output
 #ifndef _DEBUG
@@ -16,7 +16,7 @@ extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = false;
 extern const bool WARNING = true;
 extern const bool ENCRYPTION_AUTHENTICATION_DISABLED = true;
 #endif // !_DEBUG
- 
+
 
 extern const char* PLAQUEQUANT_VERSION = "2.0";
 
@@ -41,11 +41,12 @@ int main( int argc, char** argv )
 
 	  mainWnd.show();
 	  // For debug only
-	  QString img = "C:/Users/jieji/Desktop/work/PlaqueQuant/JackyData/nifti_corrected/CUBE T1 corrected.nii";
-	  //QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
-		  //"nifti_corrected/CUBE_T1_corrected.nii";
-	  img.replace('\\', '/');
-	  mainWnd.openOneImage(img);
+	  //QString img = "E:/Source/datacenter/CUBE_T1_corrected.nii";
+	  //QString img = "E:/DIIR_SHARE/Share/datacenter/PlaqueQuant/Fujian_UnionHosp_22Feb17_patient/s44400";
+	  ////QString img = "E:/Andy/blood_vessel_v_1.0.0/Data/JackyData/"
+		 // //"nifti_corrected/CUBE_T1_corrected.nii";
+	  //img = img.replace('\\', '/');
+	  //mainWnd.open(img);
 	  return app.exec();
   }
   else if (!ENCRYPTION_AUTHENTICATION_DISABLED &&

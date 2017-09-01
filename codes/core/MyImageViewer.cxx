@@ -50,7 +50,7 @@ MyImageViewer::MyImageViewer(QObject* parent)
 	this->SetAnnotationRenderer(ren);
 	ren->Delete();
 
-	// OrientationTextActor 
+	// OrientationTextActor
 	this->IntTextActor = vtkTextActor::New();
 	this->HeaderActor = vtkTextActor::New();
 	for (int i = 0; i < 4; i++)
@@ -208,10 +208,10 @@ void MyImageViewer::InstallPipeline()
 	vtkImageViewer2::InstallPipeline();
 	// add the renderer to render window if it hasn't been added
 	if (this->RenderWindow && this->AnnotationRenderer ) {
-		this->RenderWindow->AddRenderer(this->AnnotationRenderer); 
+		this->RenderWindow->AddRenderer(this->AnnotationRenderer);
 	}
 	// add label view prop to renderer
-	if (this->AnnotationRenderer && this->OverlayActor) 
+	if (this->AnnotationRenderer && this->OverlayActor)
 	{
 		this->AnnotationRenderer->AddViewProp(this->OverlayActor);
 	}
@@ -222,12 +222,12 @@ void MyImageViewer::InstallPipeline()
 		this->OverlayActor->GetMapper()->SetInputConnection(
 			this->OverlayWindowLevel->GetOutputPort());
 	}
-	// add cursor 
+	// add cursor
 	if (this->Renderer && this->CursorActor)
 	{
 		this->Renderer->AddActor(this->CursorActor);
 	}
-	// Text 
+	// Text
 	if (this->HeaderActor && this->Renderer) {
 		this->Renderer->AddActor(this->HeaderActor);
 	}
@@ -260,7 +260,7 @@ void MyImageViewer::UnInstallPipeline()
 		this->Renderer->RemoveActor(this->CursorActor);
 	}
 
-	// Text 
+	// Text
 	if (this->HeaderActor && this->Renderer) {
 		this->Renderer->RemoveActor(this->HeaderActor);
 	}
@@ -377,7 +377,7 @@ void MyImageViewer::SetOverlay(Overlay * overlay)
 	this->SegmentationOverlay = overlay;
 	SetLookupTable(SegmentationOverlay->GetLookupTable());
 	SetInputDataLayer(SegmentationOverlay->GetOutput());
-	
+
 }
 
 Overlay * MyImageViewer::GetOverlay()
@@ -386,7 +386,7 @@ Overlay * MyImageViewer::GetOverlay()
 }
 void MyImageViewer::SetImageVOI(int * extent)
 {
-	const int* originalExtent = 
+	const int* originalExtent =
 		vtkImageData::SafeDownCast(ImageExtractVOI->GetInput())->GetExtent();
 	extent[0] = extent[0] > originalExtent[0] ? extent[0] : originalExtent[0];
 	extent[1] = extent[1] < originalExtent[1] ? extent[1] : originalExtent[1];
@@ -541,15 +541,15 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 	const double* spacing = GetInput()->GetSpacing();
 	const double* origin = GetInput()->GetOrigin();
 	const int* extent = GetInput()->GetExtent();
-	if (i < extent[0] || i > extent[1] || 
-		j < extent[2] || j > extent[3] || 
+	if (i < extent[0] || i > extent[1] ||
+		j < extent[2] || j > extent[3] ||
 		k < extent[4] || k > extent[5]
 		) {
 		return;
 	}
-	double point[3] = { 
+	double point[3] = {
 		i*spacing[0] + origin[0],
-		j*spacing[1] + origin[1], 
+		j*spacing[1] + origin[1],
 		k*spacing[2] + origin[2] };
 
 	const double* pointOld = Cursor3D->GetFocalPoint();
@@ -557,7 +557,6 @@ void MyImageViewer::SetFocalPointWithImageCoordinate(int i, int j, int k)
 	if (pointOld[0] == point[0] && pointOld[1] == point[1] && pointOld[2] == point[2]) {
 		return;
 	}
-	
 
 	Cursor3D->SetFocalPoint(point);
 	Cursor3D->Update();

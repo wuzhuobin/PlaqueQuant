@@ -15,7 +15,7 @@
 
 
 
-MainWindow::MainWindow() 
+MainWindow::MainWindow()
 	:widgetGroup(this), viewerGroup(this), viewGroup(this), m_InfoDialog(this)
 {
 	this->ui = new Ui::MainWindow;
@@ -37,14 +37,14 @@ MainWindow::MainWindow()
 	ui->image2View->SetRenderWindow(m_core->GetRenderWindow(1));
 	ui->image3View->SetRenderWindow(m_core->GetRenderWindow(2));
 	ui->image4View->SetRenderWindow(m_core->GetRenderWindow(3));
-	
+
 	this->m_core->Initialization();
 
 	connect(this->m_core,			SIGNAL(signalVisualizeAllViewers()) , this,			SLOT(slotVisualizeImage()));
-	
+
 	// Open Image
 	connect(ui->actionOpenImage,	SIGNAL(triggered())					, m_core->GetIOManager(),	SLOT(slotOpenWithWizard()));
-	
+
 	// Segmentation
 	connect(ui->actionSaveSegmentation,			SIGNAL(triggered())					, m_core->GetIOManager(),		SLOT(slotSaveSegmentaitonWithDiaglog()));
 	connect(ui->actionOpenSegmentation, SIGNAL(triggered()),
@@ -80,7 +80,7 @@ MainWindow::MainWindow()
 	connect(this->m_core, SIGNAL(signalMultiPlanarView()), ui->actionMultiPlanarView, SLOT(trigger()));
 	connect(this->m_core, SIGNAL(signalSegmentationView()), ui->actionAllAxialView, SLOT(trigger()));
 
-	// slice 
+	// slice
 	ui->sliceScrollArea->setWidget(
 		m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetNavigation());
 
@@ -88,7 +88,7 @@ MainWindow::MainWindow()
 	connect(ui->actionExit,		SIGNAL(triggered()), this, SLOT(slotExit()));
 	connect(ui->actionAbout,	SIGNAL(triggered()), this, SLOT(slotAbout()));
 	connect(ui->actionHelp,		SIGNAL(triggered()), this, SLOT(slotHelp()));
-	
+
 	// change modality
 	connect(ui->ULSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUL()));
 	connect(ui->URSelectImgBtn, SIGNAL(clicked()), this, SLOT(slotChangeBaseImageUR()));
@@ -125,9 +125,9 @@ MainWindow::MainWindow()
 
 
 	//3D view
-	connect(ui->updateBtn, SIGNAL(clicked()), 
+	connect(ui->updateBtn, SIGNAL(clicked()),
 		m_core, SLOT(slotUpdate3DLabelBtn()));
-	connect(ui->generateCLBtn, SIGNAL(clicked()), 
+	connect(ui->generateCLBtn, SIGNAL(clicked()),
 		m_core, SLOT(slotGenerateCenterlineBtn()));
 
 	//UI Setting
@@ -155,15 +155,21 @@ MainWindow* MainWindow::GetMainWindow()
 
 void MainWindow::openOneImage(QString img)
 {
-	IOManager* io = m_core->GetIOManager();
-	QStringList imgs(img);
-	io->cleanListsOfFileNames();
-	io->addToListOfFileNames(imgs);
-	io->addToListOfFileNames(QStringList());
-	io->addToListOfFileNames(QStringList());
-	io->addToListOfFileNames(QStringList());
-	io->addToListOfFileNames(QStringList());
-	io->slotOpenMultiImages();
+	try {
+		IOManager* io = m_core->GetIOManager();
+		QStringList imgs(img);
+		io->cleanListsOfFileNames();
+		io->addToListOfFileNames(imgs);
+		io->addToListOfFileNames(QStringList());
+		io->addToListOfFileNames(QStringList());
+		io->addToListOfFileNames(QStringList());
+		io->addToListOfFileNames(QStringList());
+		io->slotOpenMultiImages();
+	}
+	catch (itk::ExceptionObject &e)
+	{
+		qDebug() << e.what();
+	}
 }
 
 Core* MainWindow::GetCore()
@@ -188,7 +194,7 @@ void MainWindow::DisplayErrorMessage(std::string str)
 }
 
 void MainWindow::setActionsEnable( bool b )
-{	
+{
 	//switch after open the image
 	//ui->actionOpenImage->setEnabled(!b);
 	//ui->menuRecentImage->setEnabled(!b);
@@ -225,10 +231,10 @@ void MainWindow::setActionsEnable( bool b )
 	ui->URSelectImgBtn->setEnabled(b);
 	ui->LLSelectImgBtn->setEnabled(b);
 
-	
+
 }
 
-void MainWindow::slotExit() 
+void MainWindow::slotExit()
 {
 	qApp->exit();
 }
@@ -263,9 +269,9 @@ void MainWindow::createRecentImageActions()
 
 /* Visualization and initialize Module widget UI */
 bool MainWindow::slotVisualizeImage()
-{	
+{
 	adjustForCurrentFile(m_core->GetIOManager()->getFilePath());
-	//Enable Actions 
+	//Enable Actions
 	setActionsEnable(true);
 
 	m_moduleWidget->addWidget(m_core->Get2DInteractorStyle(Core::DEFAULT_IMAGE)->GetPaintBrush());
@@ -279,7 +285,7 @@ bool MainWindow::slotVisualizeImage()
 	// update DICOM header imformation
 	m_measurementWidget->slotUpdateImformation();
 
-	// initialize image select function 
+	// initialize image select function
 	ChangeBaseImageULMenu.clear();
 	ChangeBaseImageURMenu.clear();
 	ChangeBaseImageLLMenu.clear();
@@ -296,7 +302,7 @@ bool MainWindow::slotVisualizeImage()
 
 	}
 	ui->ULSelectImgBtn->setMenu(&ChangeBaseImageULMenu);
-	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)), 
+	connect(&ChangeBaseImageULMenu, SIGNAL(triggered(QAction*)),
 		this->m_core, SLOT(slotChangeModality(QAction*)));
 
 	ui->URSelectImgBtn->setMenu(&ChangeBaseImageURMenu);
@@ -345,7 +351,7 @@ void MainWindow::adjustForCurrentFile(const QString &filePath)
 {
 	QSettings settings("DIIR","PlaqueQuant");
 	QStringList recentFilePaths = settings.value("recentFiles").toStringList();
-	
+
 	recentFilePaths.removeAll(filePath);
 	recentFilePaths.prepend(filePath);
 	while (recentFilePaths.size() > MAX_RECENT_IMAGE)
@@ -367,8 +373,8 @@ void MainWindow::updateRecentActionList()
 		itEnd = recentFilePaths.size();
 	else
 		itEnd = MAX_RECENT_IMAGE;
-    
-	for (int i = 0; i < itEnd; i++) 
+
+	for (int i = 0; i < itEnd; i++)
 	{
 		recentFileActionList.at(i)->setText(recentFilePaths.at(i));
 		recentFileActionList.at(i)->setData(recentFilePaths.at(i));
@@ -483,7 +489,7 @@ void MainWindow::dropEvent( QDropEvent *ev )
 	{
 		QString folder = url.toLocalFile();
 		folder.replace("\\","/");
-		
+
 		m_core->GetIOManager()->slotOpenWithWizard(folder);
 
 	}
