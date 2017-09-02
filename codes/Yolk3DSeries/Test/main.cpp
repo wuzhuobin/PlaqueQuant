@@ -12,10 +12,10 @@
 
 int main(int argc, char** argv)
 {
-	if (argc < 2)
+	if (argc < 3)
 	{
 		std::cout << "Usage: \n";
-		std::cout << "\t Yolk3DSeries.exe directory \n";
+		std::cout << "\t Yolk3DSeries.exe [image] [directory]\n";
 		return 1;
 	}
 

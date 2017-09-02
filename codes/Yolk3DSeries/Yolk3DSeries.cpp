@@ -1,3 +1,20 @@
+/*!
+ * \file Yolk3DSeries.cpp
+ * \date 2017/09/01 16:28
+ *
+ * \author 		Wong, Matthew Lun
+ * Occupation	Chinese University of Hong Kong,
+ * 				Department of Imaging and Interventional Radiology,
+ * 				M.Phil Student
+ * Contact: 	fromosia@gmail.com
+ *
+ * \brief
+ *
+ *   This class loads a 3D Projection DICOM series and yolk the series with the
+ *   specified viewer.
+ *
+ * \note
+*/
 #include "Yolk3DSeries.h"
 
 #include <QGridLayout>
@@ -47,20 +64,21 @@ Yolk3DSeries::Yolk3DSeries(QObject* parent /*= nullptr*/)
 	this->m_ren->SetLayer(0);
 	this->m_frontRen->SetLayer(1);
 	this->m_frontRen->SetActiveCamera(this->m_ren->GetActiveCamera());
-	this->m_frontRen->SetBackground(0.5, 0.5, 0.5);
-	this->m_ren->SetBackground(0.5, 0.5, 0.5);
+	//this->m_frontRen->SetBackground(0.5, 0.5, 0.5);
+	//this->m_ren->SetBackground(0.5, 0.5, 0.5);
+	this->m_renwin->AddRenderer(this->m_frontRen);
 	this->m_renwin->AddRenderer(this->m_ren);
 	this->m_renwin->GetInteractor()->SetInteractorStyle(vtkInteractorStyleImage::New());
-	this->m_renwin->AddRenderer(this->m_frontRen);
+	this->m_renwin->GetInteractor()->GetInteractorStyle()->SetCurrentRenderer(this->m_ren);
 	this->m_imageActor = vtkImageActor::New();
 
-	/* Create reference */
-	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
-	axes->SetUserMatrix(vtkMatrix4x4::New());
-	axes->GetUserMatrix()->SetElement(0, 0, 100);
-	axes->GetUserMatrix()->SetElement(1, 1, 100);
-	axes->GetUserMatrix()->SetElement(2, 2, 100);
-	this->m_ren->AddActor(axes);
+	///* Create reference for debuging */
+	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+	//axes->SetUserMatrix(vtkMatrix4x4::New());
+	//axes->GetUserMatrix()->SetElement(0, 0, 100);
+	//axes->GetUserMatrix()->SetElement(1, 1, 100);
+	//axes->GetUserMatrix()->SetElement(2, 2, 100);
+	//this->m_ren->AddActor(axes);
 
 	/* Create line actors */
 	this->m_cutter		= vtkCutter::New();
@@ -101,14 +119,14 @@ Yolk3DSeries::~Yolk3DSeries()
 	this->m_imageActor->Delete();
 }
 
-void Yolk3DSeries::connectViewer(MyImageViewer*)
+void Yolk3DSeries::connectViewer(MyImageViewer* viewer)
 {
-
+	connect(viewer, SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)), this, SLOT(slotUpdate()), Qt::UniqueConnection);
 }
 
-void Yolk3DSeries::disconnectViewer(MyImageViewer*)
+void Yolk3DSeries::disconnectViewer(MyImageViewer* viewer)
 {
-
+	disconnect(viewer, SIGNAL(FocalPointWithImageCoordinateChanged(int, int, in)), this, SLOT(slotUpdate()));
 }
 
 void Yolk3DSeries::set3DSeries(QStringList filenames)
@@ -223,7 +241,11 @@ void Yolk3DSeries::setSlice(int sliceNum)
 
 void Yolk3DSeries::slotUpdate()
 {
-
+	MyImageViewer *viewer = dynamic_cast<MyImageViewer *>(this->sender());
+	if (NULL != viewer)
+	{
+		this->updateByViewer();
+	}
 }
 
 void Yolk3DSeries::slotSetSlice(int s)
@@ -233,7 +255,28 @@ void Yolk3DSeries::slotSetSlice(int s)
 
 void Yolk3DSeries::updateByViewer()
 {
+	MyImageViewer* viewer = static_cast<MyImageViewer*>(this->sender());
+	double* coord = viewer->GetFocalPointWithWorldCoordinate();
+	if (this->m_cutter->GetCutFunction())
+	{
+		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetOrigin(coord);
+	}
 
+	switch (viewer->GetSliceOrientation())
+	{
+	case 0:
+		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetNormal(1, 0, 0);
+		break;
+	case 1:
+		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetNormal(0, 1, 0);
+		break;
+	case 2:
+		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetNormal(0, 0, 1);
+		break;
+	default:
+		qCritical() << "Sender object viewer has wrong slice orientation!";
+		return;
+	};
 }
 
 void Yolk3DSeries::updateBy3DSeries()
