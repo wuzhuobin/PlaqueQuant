@@ -72,21 +72,27 @@ Yolk3DSeries::Yolk3DSeries(QObject* parent /*= nullptr*/)
 	this->m_renwin->GetInteractor()->GetInteractorStyle()->SetCurrentRenderer(this->m_ren);
 	this->m_imageActor = vtkImageActor::New();
 
-	///* Create reference for debuging */
-	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
-	//axes->SetUserMatrix(vtkMatrix4x4::New());
-	//axes->GetUserMatrix()->SetElement(0, 0, 100);
-	//axes->GetUserMatrix()->SetElement(1, 1, 100);
-	//axes->GetUserMatrix()->SetElement(2, 2, 100);
-	//this->m_ren->AddActor(axes);
+	/* Create reference for debuging */
+	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+	axes->SetUserMatrix(vtkMatrix4x4::New());
+	axes->GetUserMatrix()->SetElement(0, 0, 100);
+	axes->GetUserMatrix()->SetElement(1, 1, 100);
+	axes->GetUserMatrix()->SetElement(2, 2, 100);
+	this->m_ren->AddActor(axes);
 
 	/* Create line actors */
+	this->m_mapper		= vtkPolyDataMapper::New();
 	this->m_cutter		= vtkCutter::New();
 	this->m_lineActor	= vtkActor::New();
 	this->m_planeSource = vtkPlaneSource::New();
+	this->m_cutfunction = vtkPlane::New();
 	this->m_transfilter = vtkTransformPolyDataFilter::New();
+	this->m_mapper->SetInputConnection(this->m_cutter->GetOutputPort());
+	this->m_cutter->SetInputConnection(m_transfilter->GetOutputPort());
+	this->m_cutter->SetCutFunction(this->m_cutfunction);
+	this->m_transfilter->SetInputConnection(this->m_planeSource->GetOutputPort());
 
-	this->m_mapper		= vtkPolyDataMapper::New();
+
 	this->m_lineActor->SetMapper(this->m_mapper);
 	this->m_lineActor->GetProperty()->SetColor(1, 1, 0);
 	this->m_lineActor->GetProperty()->ShadingOff();
@@ -121,12 +127,12 @@ Yolk3DSeries::~Yolk3DSeries()
 
 void Yolk3DSeries::connectViewer(MyImageViewer* viewer)
 {
-	connect(viewer, SIGNAL(FocalPointWithImageCoordinateChanged(int, int, int)), this, SLOT(slotUpdate()), Qt::UniqueConnection);
+	connect(viewer, SIGNAL(SliceChanged(int)), this, SLOT(slotUpdate()), Qt::UniqueConnection);
 }
 
 void Yolk3DSeries::disconnectViewer(MyImageViewer* viewer)
 {
-	disconnect(viewer, SIGNAL(FocalPointWithImageCoordinateChanged(int, int, in)), this, SLOT(slotUpdate()));
+	disconnect(viewer, SIGNAL(SliceChanged(int)), this, SLOT(slotUpdate()));
 }
 
 void Yolk3DSeries::set3DSeries(QStringList filenames)
@@ -205,6 +211,7 @@ void Yolk3DSeries::setSlice(int sliceNum)
 
 	vtkSmartPointer<vtkMatrix4x4> mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	mat->DeepCopy(this->m_matrixList[s]);
+	mat->Print(cout);
 
 	memcpy(this->m_normalByExtent,mat->MultiplyDoublePoint(this->m_normalByExtent), sizeof(double) * 4);
 	memcpy(this->m_viewUpByExtent, mat->MultiplyDoublePoint(this->m_viewUpByExtent), sizeof(double) * 4);
@@ -221,7 +228,10 @@ void Yolk3DSeries::setSlice(int sliceNum)
 
 	///* Align cutter's plane source transform */
 	if (this->m_transfilter)
+	{
 		this->m_transfilter->SetTransform(this->m_imageActor->GetUserTransform());
+	}
+
 	//	this->m_cutter->GetCutFunction()->SetTransform(this->m_imageActor->GetUserTransform());
 
 	/* Handle camera */
@@ -246,6 +256,8 @@ void Yolk3DSeries::slotUpdate()
 	{
 		this->updateByViewer();
 	}
+
+	this->m_renwin->Render();
 }
 
 void Yolk3DSeries::slotSetSlice(int s)
@@ -257,26 +269,33 @@ void Yolk3DSeries::updateByViewer()
 {
 	MyImageViewer* viewer = static_cast<MyImageViewer*>(this->sender());
 	double* coord = viewer->GetFocalPointWithWorldCoordinate();
+	print_vector(cout, coord, 3);
+	cout << endl;
 	if (this->m_cutter->GetCutFunction())
 	{
-		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetOrigin(coord);
+		this->m_cutfunction->SetOrigin(coord);
 	}
 
 	switch (viewer->GetSliceOrientation())
 	{
 	case 0:
-		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetNormal(1, 0, 0);
+		this->m_cutfunction->SetNormal(1, 0, 0);
 		break;
 	case 1:
-		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetNormal(0, 1, 0);
+		this->m_cutfunction->SetNormal(0, 1, 0);
 		break;
 	case 2:
-		vtkPlane::SafeDownCast(this->m_cutter->GetCutFunction())->SetNormal(0, 0, 1);
+		this->m_cutfunction->SetNormal(0, 0, 1);
 		break;
 	default:
 		qCritical() << "Sender object viewer has wrong slice orientation!";
 		return;
 	};
+
+	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
+	{
+		drawLineByPlane(this->m_cutfunction->GetNormal(), coord);
+	}
 }
 
 void Yolk3DSeries::updateBy3DSeries()
@@ -334,6 +353,14 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		sscanf(tempstr.c_str(), "%lf\\%lf\\%lf\\%lf\\%lf\\%lf", matrix, matrix + 4, matrix + 8,
 			matrix + 1, matrix + 5, matrix + 9);
 #endif
+
+		int nrow;
+		itk::ExposeMetaData<std::string>(dict, "0028|0010", tempstr); // number of rows
+#ifdef _MSC_VER
+		sscanf_s(tempstr.c_str(), "%d", &nrow);
+#else
+		sscanf(tempstr.c_str(), "%d", nrow);
+#endif
 		itk::Vector<double, 3> dx;
 		itk::Vector<double, 3> dy;
 		itk::Vector<double, 3> dz;
@@ -352,38 +379,39 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		matrix[14] = 0;
 		matrix[15] = 1;
 
+		/* Adjust for ITK axes flip. */
+		/* >>> IMPORTANT <<< :
+		 *	This assume positive-z along axial of original 3D projection series, so that the difference
+		 *  is only a z-flip at the center of the image!
+		 */
+		matrix[1] = -matrix[1];
+		matrix[5] = -matrix[5];
+		matrix[9] = -matrix[9];
+		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
+
+		//matrix[8] = -matrix[8];
+
 		/// Push to matrix list
 		this->m_matrixList[s - 1] = matrix;
 	}
 }
 
-void Yolk3DSeries::drawLineByPlane(vtkPlane* plane)
+
+void Yolk3DSeries::drawLineByPlane(const double* normal, const double* pos)
 {
 	/* Create a plane */
 	double* bounds = this->m_imageActor->GetBounds();
 
-	this->m_transfilter->SetInputConnection(this->m_planeSource->GetOutputPort());
 	this->m_transfilter->SetTransform(this->m_imageActor->GetUserTransform());
 	this->m_transfilter->Update();
 
-	this->m_cutter->SetInputConnection(m_transfilter->GetOutputPort());
-	this->m_cutter->SetCutFunction(plane);
+	this->m_cutter->SetCutFunction(this->m_cutfunction);
 	this->m_cutter->Update();
 
-	this->m_mapper->SetInputConnection(this->m_cutter->GetOutputPort());
 	this->m_mapper->Update();
 
 	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
 	{
 		this->m_frontRen->AddActor(this->m_lineActor);
 	}
-}
-
-void Yolk3DSeries::drawLineByPlane(const double* normal, const double* pos)
-{
-	vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-	plane->SetNormal(normal[0], normal[1], normal[2]);
-	plane->SetOrigin(pos[0], pos[1], pos[2]);
-
-	this->drawLineByPlane(plane);
 }

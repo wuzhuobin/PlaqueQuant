@@ -19,6 +19,7 @@ class vtkPlaneSource;
 class vtkPolyDataMapper;
 class vtkCutter;
 class vtkTransformPolyDataFilter;
+class vtkPlane;
 
 class Yolk3DSeries : public QWidget
 {
@@ -45,7 +46,6 @@ protected:
 	void updateBy3DSeries();
 
 	void readSeries(QStringList filenames);
-	void drawLineByPlane(vtkPlane*);
 
 
 	/* Line actors */
@@ -53,6 +53,7 @@ protected:
 	vtkActor*			m_lineActor;
 	vtkCutter*			m_cutter;
 	vtkPlaneSource*		m_planeSource;
+	vtkPlane*			m_cutfunction;
 	vtkTransformPolyDataFilter* m_transfilter;
 
 
