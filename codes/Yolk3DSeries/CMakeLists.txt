@@ -3,8 +3,8 @@ cmake_policy(SET CMP0043 NEW)
 cmake_policy(SET CMP0028 NEW)
 
 get_filename_component(
-	SCB_PROJECT_NAME 
-	${CMAKE_CURRENT_SOURCE_DIR} 
+	SCB_PROJECT_NAME
+	${CMAKE_CURRENT_SOURCE_DIR}
 	NAME
 )
 
@@ -15,7 +15,7 @@ find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
 #VTK
-find_package(VTK REQUIRED) 
+find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
 # Allow the developer to select if Dynamic or Static libraries are built
@@ -42,6 +42,11 @@ qt5_wrap_cpp(
     ${PROJECT_INC}
 )
 
+qt5_add_resources(
+	RCC_RSRS
+	${CMAKE_SOURCE_DIR}/resources/Project.qrc
+)
+
 add_library(
     ${PROJECT_NAME}
     ${PROJECT_SRC}
@@ -54,17 +59,20 @@ add_library(
 add_executable(
 	${PROJECT_NAME}_Test
 	${CMAKE_CURRENT_SOURCE_DIR}/Test/main.cpp
+	${CMAKE_SOURCE_DIR}/resources/Project.qrc
+	${RCC_RSRS}
 )
 
 target_link_libraries(
     ${PROJECT_NAME}
-	${VTK_LIBRARIES} 
+	${VTK_LIBRARIES}
 	${ITK_LIBRARIES}
 )
 
 target_link_libraries(
 	${PROJECT_NAME}_Test
 	${PROJECT_NAME}
+	UI
 )
 
 target_include_directories(
@@ -94,13 +102,13 @@ source_group(
 	${PROJECT_UI}
 )
 source_group(
-	"Header Files" 
-	FILES 
+	"Header Files"
+	FILES
 	${PROJECT_INC}
 )
 source_group(
-	"Source Files" 
-	FILES 
+	"Source Files"
+	FILES
 	${PROJECT_SRC}
 )
 
