@@ -32,7 +32,7 @@ public:
 
 	void RenderAllViewer();
 	void DisplayErrorMessage(std::string str);
-	
+
 	enum INTERACTION_MODE
 	{
 		NAVIGATION_MODE = 0,
@@ -50,7 +50,7 @@ public:
 		MULTIPLANAR_VIEW = 0,
 		SEGMENTATION_VIEW = 1
 	};
-	
+
 	enum LABEL_MAPPING {
 		LABEL_NULL = 0,
 		LABEL_LUMEN = 1,
@@ -76,7 +76,7 @@ public:
 	// Modality
 	virtual void slotChangeModality(QAction* action);
 	virtual void slotChangeModality(QString modalityName, int viewerNum);
-	
+
 	// View Modes
 	virtual void slotSegmentationView();
 	virtual void slotMultiPlanarView();
@@ -99,6 +99,10 @@ public:
 	virtual void slotValidatePatientInformation();
 	virtual void slotChangeOpacity(int layer, int opacity);
 
+	MyImageViewer* Get2DViewer(int index) {
+		assert(index >= 0 && index < NUMBER_OF_2DVIEWERS, "Wrong viewer ID!");
+		return this->m_2DimageViewer[index];
+	};
 
 signals:
 	void signalVisualizeAllViewers();
