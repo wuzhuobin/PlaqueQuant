@@ -8,18 +8,22 @@
 #include <QObject>
 #include <QDebug>
 
+#include "MainWindow.h"
+
 #include <itkGDCMSeriesFileNames.h>
 
 int main(int argc, char** argv)
 {
-	if (argc < 3)
+	if (argc < 2)
 	{
 		std::cout << "Usage: \n";
-		std::cout << "\t Yolk3DSeries.exe [image] [directory]\n";
+		std::cout << "\t Yolk3DSeries.exe [directory]\n";
 		return 1;
 	}
 
 	QApplication app(argc, argv);
+
+	MainWindow* mainwnd = new MainWindow;
 
 	typedef itk::GDCMSeriesFileNames	InputNamesGeneratorType;
 	InputNamesGeneratorType::Pointer inputnamesGenerator = InputNamesGeneratorType::New();
@@ -49,7 +53,12 @@ int main(int argc, char** argv)
 	double normal[3] = { 1, 1, 1 };
 	double origin[3] = { 0, 0, 10 };
 	y->set3DSeries(qfilenames);
-	y->drawLineByPlane(normal, origin);
+
+	y->connectViewer(mainwnd->GetCore()->Get2DViewer(0));
+	y->connectViewer(mainwnd->GetCore()->Get2DViewer(1));
+	y->connectViewer(mainwnd->GetCore()->Get2DViewer(2));
+
+	mainwnd->show();
 
 	QObject::connect(spinbox, SIGNAL(valueChanged(int)), y, SLOT(slotSetSlice(int)));
 	return app.exec();
