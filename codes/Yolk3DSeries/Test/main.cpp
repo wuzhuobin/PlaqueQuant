@@ -39,19 +39,20 @@ int main(int argc, char** argv)
 	qfilenames.sort();
 
 
-	QWidget* tempwidget = new QWidget;
-	QGridLayout* layout = new QGridLayout(tempwidget);
-	QSpinBox* spinbox = new QSpinBox(tempwidget);
+	//QWidget* tempwidget = new QWidget;
+	//QGridLayout* layout = new QGridLayout(tempwidget);
+	//layout->addWidget(spinbox);
+	Yolk3DSeries* y = new Yolk3DSeries();
+	QSpinBox* spinbox = new QSpinBox(y);
+	y->layout()->addWidget(spinbox);
+
 	spinbox->setMinimum(0);
 	spinbox->setMaximum(qfilenames.length() - 1);
-	layout->addWidget(spinbox);
-
-	Yolk3DSeries* y = new Yolk3DSeries();
-	y->show();
-	tempwidget->show();
 
 	double normal[3] = { 1, 1, 1 };
 	double origin[3] = { 0, 0, 10 };
+
+	y->show();
 	y->set3DSeries(qfilenames);
 
 	y->connectViewer(mainwnd->GetCore()->Get2DViewer(0));

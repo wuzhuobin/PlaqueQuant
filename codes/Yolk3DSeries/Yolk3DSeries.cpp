@@ -72,13 +72,13 @@ Yolk3DSeries::Yolk3DSeries(QObject* parent /*= nullptr*/)
 	this->m_renwin->GetInteractor()->GetInteractorStyle()->SetCurrentRenderer(this->m_ren);
 	this->m_imageActor = vtkImageActor::New();
 
-	/* Create reference for debuging */
-	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
-	axes->SetUserMatrix(vtkMatrix4x4::New());
-	axes->GetUserMatrix()->SetElement(0, 0, 100);
-	axes->GetUserMatrix()->SetElement(1, 1, 100);
-	axes->GetUserMatrix()->SetElement(2, 2, 100);
-	this->m_ren->AddActor(axes);
+	///* Create reference for debuging */
+	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+	//axes->SetUserMatrix(vtkMatrix4x4::New());
+	//axes->GetUserMatrix()->SetElement(0, 0, 100);
+	//axes->GetUserMatrix()->SetElement(1, 1, 100);
+	//axes->GetUserMatrix()->SetElement(2, 2, 100);
+	//this->m_ren->AddActor(axes);
 
 	/* Create line actors */
 	this->m_mapper		= vtkPolyDataMapper::New();
@@ -211,7 +211,6 @@ void Yolk3DSeries::setSlice(int sliceNum)
 
 	vtkSmartPointer<vtkMatrix4x4> mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	mat->DeepCopy(this->m_matrixList[s]);
-	mat->Print(cout);
 
 	memcpy(this->m_normalByExtent,mat->MultiplyDoublePoint(this->m_normalByExtent), sizeof(double) * 4);
 	memcpy(this->m_viewUpByExtent, mat->MultiplyDoublePoint(this->m_viewUpByExtent), sizeof(double) * 4);
