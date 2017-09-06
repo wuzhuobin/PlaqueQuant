@@ -13,6 +13,7 @@ find_package(Qt5OpenGL)
 
 add_subdirectory(RegistrationWizard)
 add_subdirectory(ReportGenerator)
+add_subdirectory(Yolk3DSeries)
 add_subdirectory(qtcsv)
 set(
 	VIEW_H
