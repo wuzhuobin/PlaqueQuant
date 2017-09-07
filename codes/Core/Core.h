@@ -38,6 +38,7 @@
 #include "CenterlineSurfaceViewer.h"
 #include "ImageViewer.h"
 #include "DataProcessor.h"
+#include "Yolk3DSeries.h"
 
 
 class Core: public QObject
@@ -57,6 +58,7 @@ private slots:
 	void slotIOManagerToImageManager();
 	void slotOverlayToImageManager();
 	void slotSaveCurvedImage(QString fileName);
+	void slotMIP(bool flag);
 	// Image interactorstyle
 	void slotNavigation();
 	void slotWindowLevel();
@@ -124,7 +126,8 @@ private:
 	IMAGE_MANAGER imageManager;
 	MEASUREMENT measurement;
 	DataProcessor dataProcessor;
-
+	Yolk3DSeries mipViewer;
+	
 
 	int currentImage[MainWindow::NUM_OF_2D_VIEWERS] = {DEFAULT_IMAGE};
 	bool currentCurved[MainWindow::NUM_OF_2D_VIEWERS] = { false };

@@ -123,11 +123,11 @@ Yolk3DSeries::~Yolk3DSeries()
 	}
 
 	/* Clean current list */
-	while (this->m_3dimageList.size())
-	{
-		this->m_3dimageList.last()->Delete();
-		this->m_3dimageList.erase(this->m_3dimageList.end());
-	}
+	//while (this->m_3dimageList.size())
+	//{
+	//	this->m_3dimageList.last()->Delete();
+	//	this->m_3dimageList.erase(this->m_3dimageList.end());
+	//}
 
 	this->m_imageActor->Delete();
 
@@ -292,38 +292,38 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int s)
 	this->setSlice(s);
 }
 
-//void Yolk3DSeries::updateByViewer()
-//{
-//	MyImageViewer* viewer = static_cast<MyImageViewer*>(this->sender());
-//	double* coord = viewer->GetFocalPointWithWorldCoordinate();
-//	print_vector(cout, coord, 3);
-//	cout << endl;
-//	if (this->m_cutter->GetCutFunction())
-//	{
-//		this->m_cutfunction->SetOrigin(coord);
-//	}
-//
-//	switch (viewer->GetSliceOrientation())
-//	{
-//	case 0:
-//		this->m_cutfunction->SetNormal(1, 0, 0);
-//		break;
-//	case 1:
-//		this->m_cutfunction->SetNormal(0, 1, 0);
-//		break;
-//	case 2:
-//		this->m_cutfunction->SetNormal(0, 0, 1);
-//		break;
-//	default:
-//		qCritical() << "Sender object viewer has wrong slice orientation!";
-//		return;
-//	};
-//
-//	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
-//	{
-//		drawLineByPlane(this->m_cutfunction->GetNormal(), coord);
-//	}
-//}
+void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)
+{
+	double coord[3] = { x, y, z };
+	print_vector(cout, coord, 3);
+	cout << endl;
+	if (this->m_cutter->GetCutFunction())
+	{
+		this->m_cutfunction->SetOrigin(coord);
+	}
+
+	switch (i)
+	{
+	case 0:
+		this->m_cutfunction->SetNormal(1, 0, 0);
+		break;
+	case 1:
+		this->m_cutfunction->SetNormal(0, 1, 0);
+		break;
+	case 2:
+		this->m_cutfunction->SetNormal(0, 0, 1);
+		break;
+	default:
+		qCritical() << "sender object viewer has wrong slice orientation!";
+		return;
+	};
+
+	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
+	{
+		drawLineByPlane(this->m_cutfunction->GetNormal(), coord);
+	}
+	this->m_renwin->Render();
+}
 
 void Yolk3DSeries::updateBy3DSeries()
 {
@@ -411,10 +411,10 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		 *	This assume positive-z along axial of original 3D projection series, so that the difference
 		 *  is only a z-flip at the center of the image!
 		 */
-		matrix[1] = -matrix[1];
-		matrix[5] = -matrix[5];
-		matrix[9] = -matrix[9];
-		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
+		//matrix[1] = -matrix[1];
+		//matrix[5] = -matrix[5];
+		//matrix[9] = -matrix[9];
+		//matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
 
 		//matrix[8] = -matrix[8];
 

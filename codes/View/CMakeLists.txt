@@ -79,6 +79,7 @@ target_link_libraries(
 	RegistrationWizard
 	ReportGenerator
 	qtcsv
+	Yolk3DSeries
 	)
 
 target_include_directories(

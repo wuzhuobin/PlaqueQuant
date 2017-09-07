@@ -117,7 +117,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -285,6 +285,7 @@
    <addaction name="actionMulti_planar_view"/>
    <addaction name="actionAll_axial_view"/>
    <addaction name="actionCurved_view"/>
+   <addaction name="actionMIP"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget2D">
    <property name="sizePolicy">
@@ -1087,6 +1088,17 @@
    </property>
    <property name="toolTip">
     <string>Export curved images</string>
+   </property>
+  </action>
+  <action name="actionMIP">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>MIP</string>
+   </property>
+   <property name="toolTip">
+    <string>MIP</string>
    </property>
   </action>
  </widget>

@@ -22,6 +22,16 @@ void QInteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(int i, 
 {
 	InteractorStyleNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
 	QAbstractNavigation::SetCurrentFocalPointWithImageCoordinate(i, j, k);
+	double* worldPos = this->GetImageViewer()->GetFocalPointWithWorldCoordinate();
+	unsigned int orientation = this->GetImageViewer()->GetSliceOrientation();
+}
+
+void QInteractorStyleNavigation::SetCurrentSlice(int slice)
+{
+	AbstractNavigation::SetCurrentSlice(slice);
+	double* worldPos = this->GetImageViewer()->GetFocalPointWithWorldCoordinate();
+	unsigned int orientation = this->GetImageViewer()->GetSliceOrientation();
+	signalWorldPos(worldPos[0], worldPos[1], worldPos[2], orientation);
 }
 
 QInteractorStyleNavigation::QInteractorStyleNavigation(int uiType, QWidget * parent)

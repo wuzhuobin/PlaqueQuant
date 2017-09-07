@@ -43,6 +43,9 @@ public slots:
 	*/
 	virtual void SetCurrentFocalPointWithImageCoordinate(int i, int j, int k) override;
 
+	virtual void SetCurrentSlice(int slice);
+signals:
+	void signalWorldPos(double x, double y, double z, unsigned int i);
 
 protected:
 	/**

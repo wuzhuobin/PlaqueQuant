@@ -42,11 +42,12 @@ public slots:
 
 
 	void on_pushButtonLoad_clicked();
+	void SetWorldCoordinate(double x, double y, double z, unsigned int i);
 	//void slotUpdate();
 	void on_spinBoxSlice_valueChanged(int);
 
 protected:
-	void updateByViewer();
+	//void updateByViewer();
 	void updateBy3DSeries();
 
 	void readSeries(QStringList filenames);

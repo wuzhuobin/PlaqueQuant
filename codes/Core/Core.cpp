@@ -103,6 +103,13 @@ Core::Core(QObject * parent)
 	connect(imageInteractorStyle[DEFAULT_IMAGE]->GetNavigation()->QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
 		&measurement, SLOT(updateMaximumWallThickness(int)));
 
+	connect(imageInteractorStyle[0]->GetNavigation(), SIGNAL(signalWorldPos(double, double, double, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+	connect(imageInteractorStyle[1]->GetNavigation(), SIGNAL(signalWorldPos(double, double, double, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+	connect(imageInteractorStyle[2]->GetNavigation(), SIGNAL(signalWorldPos(double, double, double, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+
 	connect(&measurement, SIGNAL(signalMeasurement2D(double*)),
 		mainWindow.getMeasurementWidget(), SLOT(slotUpdate2DMeasurements(double*)));
 	connect(&measurement, SIGNAL(signalMeasurement3D(double*)),
@@ -171,6 +178,8 @@ Core::Core(QObject * parent)
 	// change view mode
 	connect(mainWindow.getUi()->actionCurved_view, SIGNAL(toggled(bool)),
 		this, SLOT(slotCurvedView(bool)));
+	connect(mainWindow.getUi()->actionMIP, SIGNAL(toggled(bool)),
+		this, SLOT(slotMIP(bool)));
 	for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
 		QPushButton* buttons[3] = {
 			mainWindow.getViewerWidget(i)->getUi()->pushButtonSigitalView,
@@ -393,6 +402,18 @@ void Core::slotSaveCurvedImage(QString fileName)
 
 		ioManager.slotSaveCurvedImages(_newFileName, imageManager.getCurvedImage(i));
 	}
+}
+
+void Core::slotMIP(bool flag)
+{
+
+	if (flag) {
+		this->mipViewer.show();
+	}
+	else {
+		this->mipViewer.hide();
+	}
+	
 }
 
 void Core::slotNavigation()
