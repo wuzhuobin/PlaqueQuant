@@ -411,12 +411,12 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		 *	This assume positive-z along axial of original 3D projection series, so that the difference
 		 *  is only a z-flip at the center of the image!
 		 */
-		//matrix[1] = -matrix[1];
-		//matrix[5] = -matrix[5];
-		//matrix[9] = -matrix[9];
-		//matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
+		matrix[1] = -matrix[1];
+		matrix[5] = -matrix[5];
+		matrix[9] = -matrix[9];
+		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
 
-		//matrix[8] = -matrix[8];
+		matrix[8] = -matrix[8];
 
 		/// Push to matrix list
 		this->m_matrixList[s - 1] = matrix;
