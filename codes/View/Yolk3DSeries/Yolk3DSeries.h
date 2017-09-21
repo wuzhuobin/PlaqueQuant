@@ -19,6 +19,7 @@ class vtkCutter;
 class vtkTransformPolyDataFilter;
 class vtkPlane;
 class vtkActor;
+class vtkMatrix4x4;
 namespace Ui { class Yolk3DSeries; }
 
 class Yolk3DSeries : public QWidget
@@ -36,6 +37,7 @@ public:
 
 	void set3DSeries(QStringList);
 	void setSlice(int sliceNum);
+	void setImageDirection(vtkMatrix4x4* direction);
 	void drawLineByPlane(const double* normal, const double* pos);
 
 public slots:
@@ -65,6 +67,7 @@ protected:
 	/* Image set */
 	QMap<int, vtkImageData*> m_3dimageList;
 	QMap<int, double*> m_matrixList;
+	vtkMatrix4x4* m_imageDirection;
 
 	/* vtk actors */
 	double m_normalByExtent[4];

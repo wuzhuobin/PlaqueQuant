@@ -22,6 +22,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLookupTable.h>
+#include <vtkMatrix4x4.h>
 #include "vtkROIWidget.h"
 
 Core::Core(QObject * parent)
@@ -354,6 +355,29 @@ void Core::slotIOManagerToImageManager()
 		(extent[3] - extent[2])*0.5,
 		(extent[5] - extent[4])*0.5
 	);
+	IVtkImageData::itkImageType::PointType origin = 
+		this->imageManager.getImage(0)->GetItkImage()->GetOrigin();
+
+	IVtkImageData::itkImageType::DirectionType direction =
+		this->imageManager.getImage(0)->GetItkImage()->GetDirection();
+
+	vtkSmartPointer<vtkMatrix4x4> directionMatrix =
+		vtkSmartPointer<vtkMatrix4x4>::New();
+	//directionMatrix->Identity();
+	for (int row = 0; row < 3; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			if (col < 3) {
+				directionMatrix->SetElement(row, col, direction[row][col]);
+			}
+			else {
+				//directionMatrix->SetElement(row, 3, origin[row]);
+
+			}
+
+		}
+	}
+	this->mipViewer.setImageDirection(directionMatrix);
+
 
 	// clear the memory later, sometimes it will clear too early
 	// make no different, if it has not been clear

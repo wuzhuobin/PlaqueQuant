@@ -53,6 +53,7 @@
 #include <vtkImageActor.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
 
 Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	:QWidget(parent)
@@ -104,6 +105,9 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->m_lineActor->GetProperty()->SetColor(1, 1, 0);
 	this->m_lineActor->GetProperty()->ShadingOff();
 	this->m_lineActor->GetProperty()->SetLineWidth(2);
+
+	this->m_imageDirection = vtkMatrix4x4::New();
+	this->m_imageDirection->Identity();
 }
 
 Yolk3DSeries::~Yolk3DSeries()
@@ -130,6 +134,8 @@ Yolk3DSeries::~Yolk3DSeries()
 	//}
 
 	this->m_imageActor->Delete();
+
+	this->m_imageDirection->Delete();
 
 	delete this->ui;
 }
@@ -262,10 +268,15 @@ void Yolk3DSeries::setSlice(int sliceNum)
 	this->m_renwin->Render();
 }
 
+void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
+{
+	this->m_imageDirection->DeepCopy(direction);
+}
+
 //void Yolk3DSeries::slotUpdate()
 //{
 //	MyImageViewer *viewer = dynamic_cast<MyImageViewer *>(this->sender());
-//	if (NULL != viewer)
+//	if (NULL != viewer)f
 //	{
 //		this->updateByViewer();
 //	}
@@ -294,9 +305,16 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int s)
 
 void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)
 {
-	double coord[3] = { x, y, z };
-	print_vector(cout, coord, 3);
-	cout << endl;
+	double coord[4] = {
+		x/* - this->m_imageDirection->GetElement(0, 3)*/, 
+		y/* - this->m_imageDirection->GetElement(1, 3)*/, 
+		z/* - this->m_imageDirection->GetElement(2, 3)*/, 
+		1 };
+	cout << "Before" << endl;
+	print_vector(cout, coord, 4);
+	this->m_imageDirection->MultiplyPoint(coord, coord);
+	cout << "After" << endl;
+	print_vector(cout, coord, 4);
 	if (this->m_cutter->GetCutFunction())
 	{
 		this->m_cutfunction->SetOrigin(coord);
@@ -416,7 +434,7 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		matrix[9] = -matrix[9];
 		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
 
-		matrix[8] = -matrix[8];
+		//matrix[8] = -matrix[8];
 
 		/// Push to matrix list
 		this->m_matrixList[s - 1] = matrix;
