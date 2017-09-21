@@ -73,14 +73,15 @@ Yolk3DSeries::Yolk3DSeries(QObject* parent /*= nullptr*/)
 	this->m_imageActor = vtkImageActor::New();
 
 	///* Create reference for debuging */
-	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
-	//axes->SetUserMatrix(vtkMatrix4x4::New());
-	//axes->GetUserMatrix()->SetElement(0, 0, 100);
-	//axes->GetUserMatrix()->SetElement(1, 1, 100);
-	//axes->GetUserMatrix()->SetElement(2, 2, 100);
-	//this->m_ren->AddActor(axes);
+	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+	axes->SetUserMatrix(vtkMatrix4x4::New());
+	axes->GetUserMatrix()->SetElement(0, 0, 100);
+	axes->GetUserMatrix()->SetElement(1, 1, 100);
+	axes->GetUserMatrix()->SetElement(2, 2, 100);
+	this->m_ren->AddActor(axes);
 
 	/* Create line actors */
+	this->m_imageDirection = vtkMatrix4x4::New();
 	this->m_mapper		= vtkPolyDataMapper::New();
 	this->m_cutter		= vtkCutter::New();
 	this->m_lineActor	= vtkActor::New();
@@ -123,6 +124,8 @@ Yolk3DSeries::~Yolk3DSeries()
 	}
 
 	this->m_imageActor->Delete();
+
+	this->m_imageDirection->Delete();
 }
 
 void Yolk3DSeries::connectViewer(MyImageViewer* viewer)
@@ -248,6 +251,16 @@ void Yolk3DSeries::setSlice(int sliceNum)
 	this->m_renwin->Render();
 }
 
+void Yolk3DSeries::setImageDirection(vtkMatrix4x4* mat)
+{
+	this->m_imageDirection->DeepCopy(mat);
+
+	/* Remove translation component */
+	this->m_imageDirection->SetElement(0, 3, 0);
+	this->m_imageDirection->SetElement(1, 3, 0);
+	this->m_imageDirection->SetElement(2, 3, 0);
+}
+
 void Yolk3DSeries::slotUpdate()
 {
 	MyImageViewer *viewer = dynamic_cast<MyImageViewer *>(this->sender());
@@ -267,12 +280,19 @@ void Yolk3DSeries::slotSetSlice(int s)
 void Yolk3DSeries::updateByViewer()
 {
 	MyImageViewer* viewer = static_cast<MyImageViewer*>(this->sender());
-	double* coord = viewer->GetFocalPointWithWorldCoordinate();
-	print_vector(cout, coord, 3);
-	cout << endl;
+	int coord[3];
+	viewer->GetFocalPointWithImageCoordinate(coord);
+	double* worldCoord = new double[4];
+	worldCoord[0] = coord[0];
+	worldCoord[1] = coord[1];
+	worldCoord[2] = coord[2];
+	worldCoord[3] = 0;
+	double* worldcoord = this->m_imageDirection->MultiplyDoublePoint(worldCoord);
+	double* imageorigin = viewer->GetImageActor()->GetInput()->GetOrigin();
+	vtkMath::Add(worldCoord, imageorigin, worldCoord);
 	if (this->m_cutter->GetCutFunction())
 	{
-		this->m_cutfunction->SetOrigin(coord);
+		this->m_cutfunction->SetOrigin(worldCoord);
 	}
 
 	switch (viewer->GetSliceOrientation())
@@ -293,7 +313,7 @@ void Yolk3DSeries::updateByViewer()
 
 	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
 	{
-		drawLineByPlane(this->m_cutfunction->GetNormal(), coord);
+		drawLineByPlane(this->m_cutfunction->GetNormal(), worldCoord);
 	}
 }
 

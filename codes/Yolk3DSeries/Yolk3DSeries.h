@@ -17,6 +17,7 @@ class vtkImageData;
 class vtkImageActor;
 class vtkPlaneSource;
 class vtkPolyDataMapper;
+class vtkMatrix4x4;
 class vtkCutter;
 class vtkTransformPolyDataFilter;
 class vtkPlane;
@@ -35,6 +36,7 @@ public:
 
 	void set3DSeries(QStringList);
 	void setSlice(int sliceNum);
+	void setImageDirection(vtkMatrix4x4*);
 	void drawLineByPlane(const double* normal, const double* pos);
 
 public slots:
@@ -59,7 +61,8 @@ protected:
 
 	/* Image set */
 	QMap<int, vtkImageData*> m_3dimageList;
-	QMap<int, double*> m_matrixList;
+	QMap<int, double*>  m_matrixList;
+	vtkMatrix4x4*		m_imageDirection;
 
 	/* vtk actors */
 	double m_normalByExtent[4];
