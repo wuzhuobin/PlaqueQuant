@@ -65,6 +65,7 @@ target_link_libraries(
 	RegistrationWizard
 	${VTK_LIBRARIES}
 	${ITK_LIBRARIES}
+	Model
 	Qt5::Widgets
 	Qt5::OpenGL
 	Qt5::Core
