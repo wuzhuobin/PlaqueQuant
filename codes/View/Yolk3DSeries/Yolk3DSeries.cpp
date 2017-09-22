@@ -15,24 +15,32 @@
  *
  * \note
 */
+
+
+// me
+#include "IVtkImageData.h"
+
 #include "Yolk3DSeries.h"
 #include "ui_Yolk3DSeries.h"
 #include "RegistrationWizard.h"
 
-#include <QGridLayout>
-#include <QStringList>
-#include <QStringListIterator>
 #include <QVTKWidget2.h>
 #include <QDebug>
 #include <QList>
 
 #include <itkVector.h>
 #include <itkImageFileReader.h>
+#include <itkOrientImageFilter.h>
+
+typedef itk::ImageFileReader<IVtkImageData::itkImageType> ImageFileReader;
+typedef itk::OrientImageFilter<IVtkImageData::itkImageType, IVtkImageData::itkImageType> OrientImageFilter;
+
 #include <itkGDCMImageIO.h>
 #include <itkMetaDataDictionary.h>
 #include <itkMetaDataObject.h>
 
 #include "vtkInteractorStyleImage.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkLinearTransform.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindowInteractor.h"
@@ -54,7 +62,9 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
-#include "vtkSphereSource.h"
+#include <vtkImageViewer2.h>
+#include <vtkSmartPointer.h>
+#include <QVTKInteractor.h>
 
 Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	:QWidget(parent)
@@ -64,23 +74,30 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	/* Create UI */
 	this->setMinimumSize(800, 600);
 
+	this->imageViewer = vtkSmartPointer<vtkImageViewer2>::New();
+	this->imageViewer->SetRenderWindow(this->ui->widgetViewer->GetRenderWindow());
+	this->imageViewer->SetupInteractor(this->ui->widgetViewer->GetInteractor());
+
+	vtkInteractorStyleTrackballCamera* style = vtkInteractorStyleTrackballCamera::New();
+	style->Delete();
+	this->imageViewer->GetImageActor()->VisibilityOff();
+
 
 	/* Create renderers */
-	this->m_renwin	= this->ui->widgetViewer->GetRenderWindow();
-	this->m_renwin->SetNumberOfLayers(2);
-	this->m_ren = vtkRenderer::New();
-	this->m_frontRen = vtkRenderer::New();
-	this->m_ren->SetLayer(0);
-	this->m_frontRen->SetLayer(1);
-	this->m_frontRen->SetActiveCamera(this->m_ren->GetActiveCamera());
-	//this->m_frontRen->SetBackground(0.5, 0.5, 0.5);
-	//this->m_ren->SetBackground(0.5, 0.5, 0.5);
-	this->m_renwin->AddRenderer(this->m_frontRen);
-	this->m_renwin->AddRenderer(this->m_ren);
-	//this->m_renwin->GetInteractor()->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
-	this->m_renwin->GetInteractor()->SetInteractorStyle(vtkInteractorStyleImage::New());
-	this->m_renwin->GetInteractor()->GetInteractorStyle()->SetCurrentRenderer(this->m_ren);
-	this->m_imageActor = vtkImageActor::New();
+	//this->m_renwin	= this->ui->widgetViewer->GetRenderWindow();
+	//this->m_renwin->SetNumberOfLayers(2);
+	//this->m_ren = vtkRenderer::New();
+	//this->m_frontRen = vtkRenderer::New();
+	//this->m_ren->SetLayer(0);
+	//this->m_frontRen->SetLayer(1);
+	//this->m_frontRen->SetActiveCamera(this->m_ren->GetActiveCamera());
+	////this->m_frontRen->SetBackground(0.5, 0.5, 0.5);
+	////this->m_ren->SetBackground(0.5, 0.5, 0.5);
+	//this->m_renwin->AddRenderer(this->m_frontRen);
+	//this->m_renwin->AddRenderer(this->m_ren);
+	//this->m_renwin->GetInteractor()->SetInteractorStyle(vtkInteractorStyleImage::New());
+	//this->m_renwin->GetInteractor()->GetInteractorStyle()->SetCurrentRenderer(this->m_ren);
+	//this->m_imageActor = vtkImageActor::New();
 
 	///* Create reference for debuging */
 	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
@@ -91,7 +108,7 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	//this->m_ren->AddActor(axes);
 
 	/* Create line actors */
-	this->m_mapper		= vtkPolyDataMapper::New();
+/*	this->m_mapper		= vtkPolyDataMapper::New();
 	this->m_cutter		= vtkCutter::New();
 	this->m_lineActor	= vtkActor::New();
 	this->m_planeSource = vtkPlaneSource::New();
@@ -109,35 +126,35 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->m_lineActor->GetProperty()->SetLineWidth(2);
 
 	this->m_imageDirection = vtkMatrix4x4::New();
-	this->m_imageDirection->Identity();
+	this->m_imageDirection->Identity()*/;
 }
 
 Yolk3DSeries::~Yolk3DSeries()
 {
-	/* Clean line actor */
-	if (this->m_frontRen->HasViewProp(this->m_lineActor))
-	{
-		this->m_frontRen->RemoveActor(this->m_lineActor);
-	}
-	this->m_lineActor->Delete();
-	this->m_mapper->Delete();
-
-	/* Clean dependence to actor */
-	if (this->m_imageActor->GetInput())
-	{
-		this->m_imageActor->SetInputData(NULL);
-	}
-
-	/* Clean current list */
-	//while (this->m_3dimageList.size())
+	///* Clean line actor */
+	//if (this->m_frontRen->HasViewProp(this->m_lineActor))
 	//{
-	//	this->m_3dimageList.last()->Delete();
-	//	this->m_3dimageList.erase(this->m_3dimageList.end());
+	//	this->m_frontRen->RemoveActor(this->m_lineActor);
+	//}
+	//this->m_lineActor->Delete();
+	//this->m_mapper->Delete();
+
+	///* Clean dependence to actor */
+	//if (this->m_imageActor->GetInput())
+	//{
+	//	this->m_imageActor->SetInputData(NULL);
 	//}
 
-	this->m_imageActor->Delete();
+	///* Clean current list */
+	////while (this->m_3dimageList.size())
+	////{
+	////	this->m_3dimageList.last()->Delete();
+	////	this->m_3dimageList.erase(this->m_3dimageList.end());
+	////}
 
-	this->m_imageDirection->Delete();
+	//this->m_imageActor->Delete();
+
+	//this->m_imageDirection->Delete();
 
 	delete this->ui;
 }
@@ -172,102 +189,109 @@ void Yolk3DSeries::set3DSeries(QStringList filenames)
 	this->setSlice(0);
 }
 
-void Yolk3DSeries::setSlice(int sliceNum)
+void Yolk3DSeries::setSlice(int slice)
 {
+	if (!this->ImageSlice.contains(slice)) {
+		return;
+	}
+
+
+	this->imageViewer->SetInputData(this->ImageSlice[slice]);
+	this->imageViewer->Render();
 	//assert(this->m_3dimageList.keys().contains(sliceNum), "Slice dose not exist!");
 
-	if (!this->m_3dimageList.contains(sliceNum))
-	{
-		qDebug() << "Slice does not exist.";
-		return;
-	}
-	int s = sliceNum;
+	//if (!this->m_3dimageList.contains(sliceNum))
+	//{
+	//	qDebug() << "Slice does not exist.";
+	//	return;
+	//}
+	//int s = sliceNum;
 
-	int* extent = this->m_3dimageList[s]->GetExtent();
-	double* bounds = this->m_3dimageList[s]->GetBounds();
-	int lengths[3];
-	lengths[0] = extent[1] - extent[0];
-	lengths[1] = extent[3] - extent[2];
-	lengths[2] = extent[5] - extent[4];
+	//int* extent = this->m_3dimageList[s]->GetExtent();
+	//double* bounds = this->m_3dimageList[s]->GetBounds();
+	//int lengths[3];
+	//lengths[0] = extent[1] - extent[0];
+	//lengths[1] = extent[3] - extent[2];
+	//lengths[2] = extent[5] - extent[4];
 
-	int minDirection = std::min_element(lengths, lengths + 3) - lengths;
+	//int minDirection = std::min_element(lengths, lengths + 3) - lengths;
 
-	/* Defines initial actor and plane source position and direction */
-	this->m_normalByExtent[0] = 0;
-	this->m_normalByExtent[1] = 0;
-	this->m_normalByExtent[2] = 0;
-	this->m_normalByExtent[3] = 0;
-	this->m_viewUpByExtent[0] = 0;
-	this->m_viewUpByExtent[1] = 0;
-	this->m_viewUpByExtent[2] = 0;
-	this->m_viewUpByExtent[3] = 0;
-	switch (minDirection)
-	{
-	case 0:
-		this->m_normalByExtent[0] = 1;
-		this->m_viewUpByExtent[2] = 1;
+	///* Defines initial actor and plane source position and direction */
+	//this->m_normalByExtent[0] = 0;
+	//this->m_normalByExtent[1] = 0;
+	//this->m_normalByExtent[2] = 0;
+	//this->m_normalByExtent[3] = 0;
+	//this->m_viewUpByExtent[0] = 0;
+	//this->m_viewUpByExtent[1] = 0;
+	//this->m_viewUpByExtent[2] = 0;
+	//this->m_viewUpByExtent[3] = 0;
+	//switch (minDirection)
+	//{
+	//case 0:
+	//	this->m_normalByExtent[0] = 1;
+	//	this->m_viewUpByExtent[2] = 1;
 
-		this->m_planeSource->SetPoint1(0, bounds[3] - bounds[2], 0);
-		this->m_planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
-		break;
-	case 1:
-		this->m_normalByExtent[1] = 1;
-		this->m_viewUpByExtent[2] = 1;
+	//	this->m_planeSource->SetPoint1(0, bounds[3] - bounds[2], 0);
+	//	this->m_planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
+	//	break;
+	//case 1:
+	//	this->m_normalByExtent[1] = 1;
+	//	this->m_viewUpByExtent[2] = 1;
 
-		this->m_planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
-		this->m_planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
-		break;
-	case 2:
-		this->m_normalByExtent[2] = 1;
-		this->m_viewUpByExtent[1] = 1;
+	//	this->m_planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
+	//	this->m_planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
+	//	break;
+	//case 2:
+	//	this->m_normalByExtent[2] = 1;
+	//	this->m_viewUpByExtent[1] = 1;
 
-		this->m_planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
-		this->m_planeSource->SetPoint2(0 ,bounds[3] - bounds[2], 0);
-		break;
-	default:
-		return;
-		break;
-	}
-	this->m_planeSource->Update();
+	//	this->m_planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
+	//	this->m_planeSource->SetPoint2(0 ,bounds[3] - bounds[2], 0);
+	//	break;
+	//default:
+	//	return;
+	//	break;
+	//}
+	//this->m_planeSource->Update();
 
 
-	vtkSmartPointer<vtkMatrix4x4> mat = vtkSmartPointer<vtkMatrix4x4>::New();
-	mat->DeepCopy(this->m_matrixList[s]);
+	//vtkSmartPointer<vtkMatrix4x4> mat = vtkSmartPointer<vtkMatrix4x4>::New();
+	//mat->DeepCopy(this->m_matrixList[s]);
 
-	memcpy(this->m_normalByExtent,mat->MultiplyDoublePoint(this->m_normalByExtent), sizeof(double) * 4);
-	memcpy(this->m_viewUpByExtent, mat->MultiplyDoublePoint(this->m_viewUpByExtent), sizeof(double) * 4);
-	vtkMath::Normalize(this->m_normalByExtent);
+	//memcpy(this->m_normalByExtent,mat->MultiplyDoublePoint(this->m_normalByExtent), sizeof(double) * 4);
+	//memcpy(this->m_viewUpByExtent, mat->MultiplyDoublePoint(this->m_viewUpByExtent), sizeof(double) * 4);
+	//vtkMath::Normalize(this->m_normalByExtent);
 
-	this->m_imageActor->SetInputData(this->m_3dimageList[s]);
-	this->m_imageActor->SetDisplayExtent(this->m_3dimageList[s]->GetExtent());
-	this->m_imageActor->Update();
-	this->m_imageActor->SetUserMatrix(mat);
-	if (!this->m_ren->HasViewProp(this->m_imageActor))
-	{
-		this->m_ren->AddActor(this->m_imageActor);
-	}
+	//this->m_imageActor->SetInputData(this->m_3dimageList[s]);
+	//this->m_imageActor->SetDisplayExtent(this->m_3dimageList[s]->GetExtent());
+	//this->m_imageActor->Update();
+	//this->m_imageActor->SetUserMatrix(mat);
+	//if (!this->m_ren->HasViewProp(this->m_imageActor))
+	//{
+	//	this->m_ren->AddActor(this->m_imageActor);
+	//}
 
-	///* Align cutter's plane source transform */
-	if (this->m_transfilter)
-	{
-		this->m_transfilter->SetTransform(this->m_imageActor->GetUserTransform());
-	}
+	/////* Align cutter's plane source transform */
+	//if (this->m_transfilter)
+	//{
+	//	this->m_transfilter->SetTransform(this->m_imageActor->GetUserTransform());
+	//}
 
-	//	this->m_cutter->GetCutFunction()->SetTransform(this->m_imageActor->GetUserTransform());
+	////	this->m_cutter->GetCutFunction()->SetTransform(this->m_imageActor->GetUserTransform());
 
-	/* Handle camera */
-	double dist = double(lengths[0] > lengths[1] ? lengths[0] : (lengths[1] > lengths [2] ? lengths[1] : lengths[2]) );
-	double *center = this->m_imageActor->GetCenter();
-	double cameraOffset[3];
-	memcpy(cameraOffset, this->m_normalByExtent, sizeof(double) * 3);
-	vtkMath::MultiplyScalar(cameraOffset, dist * 0.8);
-	vtkMath::Add(center, cameraOffset, cameraOffset);
-	this->m_ren->GetActiveCamera()->SetPosition(cameraOffset);
-	this->m_ren->GetActiveCamera()->SetFocalPoint(center);
-	this->m_ren->GetActiveCamera()->SetViewUp(this->m_viewUpByExtent);
+	///* Handle camera */
+	//double dist = double(lengths[0] > lengths[1] ? lengths[0] : (lengths[1] > lengths [2] ? lengths[1] : lengths[2]) );
+	//double *center = this->m_imageActor->GetCenter();
+	//double cameraOffset[3];
+	//memcpy(cameraOffset, this->m_normalByExtent, sizeof(double) * 3);
+	//vtkMath::MultiplyScalar(cameraOffset, dist * 0.8);
+	//vtkMath::Add(center, cameraOffset, cameraOffset);
+	//this->m_ren->GetActiveCamera()->SetPosition(cameraOffset);
+	//this->m_ren->GetActiveCamera()->SetFocalPoint(center);
+	//this->m_ren->GetActiveCamera()->SetViewUp(this->m_viewUpByExtent);
 
-	this->m_ren->ResetCameraClippingRange();
-	this->m_renwin->Render();
+	//this->m_ren->ResetCameraClippingRange();
+	//this->m_renwin->Render();
 }
 
 void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
@@ -302,15 +326,62 @@ void Yolk3DSeries::on_pushButtonLoad_clicked()
 		QStringList fileName = rw.getFileNames(0).split(";");
 		fileName.pop_back();
 
-		set3DSeries(fileName);
+		this->fileNames = fileName;
+		//set3DSeries(fileName);
 
 	}
 
+	if (this->fileNames.isEmpty()) {
+		qCritical() << "File names is empty.";
+		return;
+	}
+	qDebug() << fileNames.length();
+	this->ImageSlice.clear();
+	for (int i = 0; i < fileNames.length(); ++i) {
+
+		ImageFileReader::Pointer imageFileReader = ImageFileReader::New();
+		imageFileReader->SetFileName(fileNames[i].toStdString());
+		imageFileReader->Update();
+
+		OrientImageFilter::Pointer orientImageFilter = OrientImageFilter::New();
+		orientImageFilter->SetInput(imageFileReader->GetOutput());
+		orientImageFilter->UseImageDirectionOn();
+		orientImageFilter->SetDesiredCoordinateOrientation(
+			itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
+		orientImageFilter->Update();
+
+		vtkSmartPointer<IVtkImageData> image =
+			vtkSmartPointer<IVtkImageData>::New();
+		image->Graft(orientImageFilter->GetOutput());
+
+		this->ImageSlice.insert(i, image);
+	}
+
+	this->imageViewer->SetInputData(this->ImageSlice[0]);
+	this->imageViewer->GetImageActor()->VisibilityOn();
+	this->imageViewer->GetRenderer()->ResetCamera();
+	this->imageViewer->GetRenderer()->ResetCameraClippingRange();
+	this->imageViewer->GetRenderer()->Render();
+
 }
 
-void Yolk3DSeries::on_spinBoxSlice_valueChanged(int s)
+void Yolk3DSeries::on_spinBoxSlice_valueChanged(int slice)
 {
-	this->setSlice(s);
+	if (!this->ImageSlice.contains(slice)) {
+		return;
+	}
+	for (int i = 0; i < 3; ++i) {
+		if (this->ImageSlice[slice]->GetDimensions()[i] == 1)
+		{
+			this->imageViewer->SetSliceOrientation(i);
+			break;
+		}
+		
+	}
+	this->ImageSlice[slice]->Print(cout);
+
+	this->imageViewer->SetInputData(this->ImageSlice[slice]);
+	this->imageViewer->Render();
 }
 
 void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)

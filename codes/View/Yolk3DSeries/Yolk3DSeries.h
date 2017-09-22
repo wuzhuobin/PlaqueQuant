@@ -7,8 +7,13 @@
 #include <itkImage.h>
 #include <itkGDCMImageIO.h>
 
-//#include "MyImageViewer.h"
+// vtk
+#include <vtkSmartPointer.h>
 
+
+class IVtkImageData;
+
+class vtkImageViewer2;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkImageData;
@@ -47,9 +52,16 @@ public slots:
 	void on_pushButtonLoad_clicked();
 	void SetWorldCoordinate(double x, double y, double z, unsigned int i);
 	//void slotUpdate();
-	void on_spinBoxSlice_valueChanged(int);
+	void on_spinBoxSlice_valueChanged(int value);
 
 protected:
+
+	vtkSmartPointer<vtkImageViewer2> imageViewer;
+	QHash<int, vtkSmartPointer<IVtkImageData>> ImageSlice;
+
+	QStringList fileNames;
+
+
 	//void updateByViewer();
 	void updateBy3DSeries();
 
