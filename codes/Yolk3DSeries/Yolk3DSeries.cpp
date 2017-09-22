@@ -254,11 +254,6 @@ void Yolk3DSeries::setSlice(int sliceNum)
 void Yolk3DSeries::setImageDirection(vtkMatrix4x4* mat)
 {
 	this->m_imageDirection->DeepCopy(mat);
-
-	/* Remove translation component */
-	this->m_imageDirection->SetElement(0, 3, 0);
-	this->m_imageDirection->SetElement(1, 3, 0);
-	this->m_imageDirection->SetElement(2, 3, 0);
 }
 
 void Yolk3DSeries::slotUpdate()
@@ -288,8 +283,6 @@ void Yolk3DSeries::updateByViewer()
 	worldCoord[2] = coord[2];
 	worldCoord[3] = 0;
 	double* worldcoord = this->m_imageDirection->MultiplyDoublePoint(worldCoord);
-	double* imageorigin = viewer->GetImageActor()->GetInput()->GetOrigin();
-	vtkMath::Add(worldCoord, imageorigin, worldCoord);
 	if (this->m_cutter->GetCutFunction())
 	{
 		this->m_cutfunction->SetOrigin(worldCoord);
