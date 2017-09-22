@@ -104,12 +104,12 @@ Core::Core(QObject * parent)
 	connect(imageInteractorStyle[DEFAULT_IMAGE]->GetNavigation()->QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
 		&measurement, SLOT(updateMaximumWallThickness(int)));
 
-	connect(imageInteractorStyle[0]->GetNavigation(), SIGNAL(signalWorldPos(double, double, double, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
-	connect(imageInteractorStyle[1]->GetNavigation(), SIGNAL(signalWorldPos(double, double, double, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
-	connect(imageInteractorStyle[2]->GetNavigation(), SIGNAL(signalWorldPos(double, double, double, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+	connect(imageInteractorStyle[0]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(int, int, int, unsigned int)));
+	connect(imageInteractorStyle[1]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(int, int, int, unsigned int)));
+	connect(imageInteractorStyle[2]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(int, int, int, unsigned int)));
 
 	connect(&measurement, SIGNAL(signalMeasurement2D(double*)),
 		mainWindow.getMeasurementWidget(), SLOT(slotUpdate2DMeasurements(double*)));
