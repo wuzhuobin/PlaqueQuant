@@ -68,6 +68,7 @@ protected:
 	QMap<int, vtkImageData*> m_3dimageList;
 	QMap<int, double*> m_matrixList;
 	vtkMatrix4x4* m_imageDirection;
+	double m_imageOrigin[3];
 
 	/* vtk actors */
 	double m_normalByExtent[4];

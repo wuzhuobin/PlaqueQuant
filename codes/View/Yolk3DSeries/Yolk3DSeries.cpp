@@ -81,12 +81,12 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->m_imageActor = vtkImageActor::New();
 
 	///* Create reference for debuging */
-	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
-	//axes->SetUserMatrix(vtkMatrix4x4::New());
-	//axes->GetUserMatrix()->SetElement(0, 0, 100);
-	//axes->GetUserMatrix()->SetElement(1, 1, 100);
-	//axes->GetUserMatrix()->SetElement(2, 2, 100);
-	//this->m_ren->AddActor(axes);
+	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+	axes->SetUserMatrix(vtkMatrix4x4::New());
+	axes->GetUserMatrix()->SetElement(0, 0, 100);
+	axes->GetUserMatrix()->SetElement(1, 1, 100);
+	axes->GetUserMatrix()->SetElement(2, 2, 100);
+	this->m_ren->AddActor(axes);
 
 	/* Create line actors */
 	this->m_mapper		= vtkPolyDataMapper::New();
@@ -271,6 +271,14 @@ void Yolk3DSeries::setSlice(int sliceNum)
 void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 {
 	this->m_imageDirection->DeepCopy(direction);
+
+	this->m_imageOrigin[0] = this->m_imageDirection->GetElement(0, 3);
+	this->m_imageOrigin[1] = this->m_imageDirection->GetElement(1, 3);
+	this->m_imageOrigin[2] = this->m_imageDirection->GetElement(2, 3);
+
+	this->m_imageDirection->SetElement(0, 3, 0);
+	this->m_imageDirection->SetElement(1, 3, 0);
+	this->m_imageDirection->SetElement(2, 3, 0);
 }
 
 //void Yolk3DSeries::slotUpdate()
@@ -305,16 +313,15 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int s)
 
 void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)
 {
-	double coord[4] = {
-		x/* - this->m_imageDirection->GetElement(0, 3)*/, 
-		y/* - this->m_imageDirection->GetElement(1, 3)*/, 
-		z/* - this->m_imageDirection->GetElement(2, 3)*/, 
-		1 };
-	cout << "Before" << endl;
-	print_vector(cout, coord, 4);
-	this->m_imageDirection->MultiplyPoint(coord, coord);
-	cout << "After" << endl;
-	print_vector(cout, coord, 4);
+	/* Assume this is changed to index */
+	double index[4] = { x, y, z, 1 };
+	double *coord = new double[4];
+	memcpy(coord, this->m_imageDirection->MultiplyDoublePoint(index), sizeof(double)*3);
+	coord[0] += this->m_imageOrigin[0];
+	coord[1] += this->m_imageOrigin[1];
+	coord[2] += this->m_imageOrigin[2];
+	coord[3] = 1;
+
 	if (this->m_cutter->GetCutFunction())
 	{
 		this->m_cutfunction->SetOrigin(coord);
@@ -335,6 +342,7 @@ void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int
 		qCritical() << "sender object viewer has wrong slice orientation!";
 		return;
 	};
+	this->m_cutfunction->SetNormal(this->m_imageDirection->MultiplyDoublePoint(this->m_cutfunction->GetNormal()));
 
 	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
 	{
@@ -429,11 +437,11 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		 *	This assume positive-z along axial of original 3D projection series, so that the difference
 		 *  is only a z-flip at the center of the image!
 		 */
-		matrix[1] = -matrix[1];
+		/*matrix[1] = -matrix[1];
 		matrix[5] = -matrix[5];
 		matrix[9] = -matrix[9];
 		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
-
+*/
 		//matrix[8] = -matrix[8];
 
 		/// Push to matrix list
