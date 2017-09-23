@@ -76,6 +76,7 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	//this->m_ren->SetBackground(0.5, 0.5, 0.5);
 	this->m_renwin->AddRenderer(this->m_frontRen);
 	this->m_renwin->AddRenderer(this->m_ren);
+	//this->m_renwin->GetInteractor()->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
 	this->m_renwin->GetInteractor()->SetInteractorStyle(vtkInteractorStyleImage::New());
 	this->m_renwin->GetInteractor()->GetInteractorStyle()->SetCurrentRenderer(this->m_ren);
 	this->m_imageActor = vtkImageActor::New();
@@ -439,10 +440,13 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		 *	This assume positive-z along axial of original 3D projection series, so that the difference
 		 *  is only a z-flip at the center of the image!
 		 */
-		matrix[1] = -matrix[1];
-		matrix[5] = -matrix[5];
+		//matrix[1] = -matrix[1];
+		//matrix[5] = -matrix[5];
+		//matrix[9] = -matrix[9];
+		//matrix[8] = -matrix[8];
 		matrix[9] = -matrix[9];
-		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
+		//matrix[10] = -matrix[10];
+		//matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
 
 		//matrix[8] = -matrix[8];
 

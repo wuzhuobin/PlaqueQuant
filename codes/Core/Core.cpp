@@ -47,7 +47,7 @@ Core::Core(QObject * parent)
 
 
 	for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
-		
+
 		imageViewers[i] = ImageViewer::New();
 		imageViewers[i]->SetRenderWindow(mainWindow.getViewerWidget(i)->getUi()->qvtkWidget2->GetRenderWindow());
 		imageViewers[i]->SetupInteractor(mainWindow.getViewerWidget(i)->getUi()->qvtkWidget2->GetInteractor());
@@ -57,7 +57,7 @@ Core::Core(QObject * parent)
 		imageInteractorStyle[i] = StyleSwitch::New();
 		imageInteractorStyle[i]->SetImageViewer(imageViewers[i]);
 		mainWindow.getViewerWidget(i)->getUi()->qvtkWidget2->GetInteractor()->SetInteractorStyle(imageInteractorStyle[i]);
-		
+
 	}
 	for (int i = 0; i < MainWindow::NUM_OF_3D_VIEWERS; ++i) {
 		surfaceViewer[i] = CenterlineSurfaceViewer::New();
@@ -69,7 +69,7 @@ Core::Core(QObject * parent)
 		//surfaceInteractorStyle[i]->SetInteractor(imageInteractor[i]);
 		surfaceInteractorStyle[i] = StyleSwitch3D::New();
 		surfaceInteractorStyle[i]->SetSurfaceViewer(surfaceViewer[i]);
-		
+
 		mainWindow.getViewerWidget(MainWindow::NUM_OF_2D_VIEWERS + i)->getUi()->qvtkWidget2->GetInteractor()->SetInteractorStyle(surfaceInteractorStyle[i]);
 	}
 
@@ -99,17 +99,17 @@ Core::Core(QObject * parent)
 #ifdef PLAQUEQUANT_VER
 
 	// Measurement
-	connect(surfaceInteractorStyle[0]->GetStenosis(), SIGNAL(calculatedStenosis(double)), 
+	connect(surfaceInteractorStyle[0]->GetStenosis(), SIGNAL(calculatedStenosis(double)),
 		&measurement, SLOT(updateStenosis(double)));
 	connect(imageInteractorStyle[DEFAULT_IMAGE]->GetNavigation()->QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
 		&measurement, SLOT(updateMaximumWallThickness(int)));
 
-	connect(imageInteractorStyle[0]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(int, int, int, unsigned int)));
-	connect(imageInteractorStyle[1]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(int, int, int, unsigned int)));
-	connect(imageInteractorStyle[2]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(int, int, int, unsigned int)));
+	connect(imageInteractorStyle[0]->GetNavigation(), SIGNAL(signalImageCoord(double, double, double, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+	connect(imageInteractorStyle[1]->GetNavigation(), SIGNAL(signalImageCoord(double, double, double, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+	connect(imageInteractorStyle[2]->GetNavigation(), SIGNAL(signalImageCoord(double, double, double, unsigned int)),
+		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
 
 	connect(&measurement, SIGNAL(signalMeasurement2D(double*)),
 		mainWindow.getMeasurementWidget(), SLOT(slotUpdate2DMeasurements(double*)));
@@ -126,7 +126,7 @@ Core::Core(QObject * parent)
 	dataProcessor.imageManager = &imageManager;
 #endif // PLAQUEQUANT_VER
 
-	
+
 	// ImageViewer
 	// connect changing mode
 	mainWindow.getUi()->sliceScrollArea->setWidget(imageInteractorStyle[DEFAULT_IMAGE]->GetNavigation());
@@ -294,15 +294,15 @@ Core::~Core()
 {
 
 	for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
-		
+
 		imageInteractorStyle[i]->Delete();
 		imageInteractorStyle[i] = nullptr;
 
-		
+
 		mainWindow.getViewerWidget(i)->getUi()->qvtkWidget2->GetInteractor()->SetInteractorStyle(nullptr);
 		//imageInteractor[i]->Delete();
 		//imageInteractor[i] = nullptr;
-		
+
 		imageViewers[i]->Delete();
 		imageViewers[i] = nullptr;
 
@@ -337,7 +337,7 @@ void Core::slotIOManagerToImageManager()
 	ioManager.slotInitializeOverlay();
 
 
-	// update selectImgMenus 
+	// update selectImgMenus
 	for (int i = 0; i < NUM_OF_IMAGES; ++i) {
 		mainWindow.setSelectImgMenuVisible(i, imageManager.getImage(i));
 	}
@@ -355,7 +355,7 @@ void Core::slotIOManagerToImageManager()
 		(extent[3] - extent[2])*0.5,
 		(extent[5] - extent[4])*0.5
 	);
-	IVtkImageData::itkImageType::PointType origin = 
+	IVtkImageData::itkImageType::PointType origin =
 		this->imageManager.getImage(0)->GetItkImage()->GetOrigin();
 
 	IVtkImageData::itkImageType::DirectionType direction =
@@ -401,7 +401,7 @@ void Core::slotOverlayToImageManager()
 		this, SLOT(slotRenderALlViewers()));
 
 
-	
+
 	for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
 		slotUpdateImageViewersToCurrent(i);
 	}
@@ -437,7 +437,7 @@ void Core::slotMIP(bool flag)
 	else {
 		this->mipViewer.hide();
 	}
-	
+
 }
 
 void Core::slotNavigation()
@@ -742,7 +742,7 @@ void Core::slotUpdateImageViewersToCurrent(int viewer)
 #ifdef PLAQUEQUANT_VER
 		imageViewers[viewer]->SetOverlay(imageManager.getCurvedPlaqueQuantOverlay()->getData());
 		imageViewers[viewer]->SetInputData(imageManager.getCurvedImage(currentImage[viewer]));
-		// Measurement 
+		// Measurement
 		measurement.setOverlay(imageManager.getCurvedPlaqueQuantOverlay()->getData());
 #endif // PLAQUEQUANT_VER
 	}
@@ -751,9 +751,9 @@ void Core::slotUpdateImageViewersToCurrent(int viewer)
 		imageViewers[viewer]->SetOverlay(imageManager.getOverlay()->getData());
 		imageViewers[viewer]->SetInputData(imageManager.getImage(currentImage[viewer]));
 #ifdef PLAQUEQUANT_VER
-		// Measurement 
+		// Measurement
 		measurement.setOverlay(imageManager.getOverlay()->getData());
-#endif // PLAQUEQUANT_VER		
+#endif // PLAQUEQUANT_VER
 	}
 	imageViewers[viewer]->SetSliceOrientation(currentSliceOrientation[viewer]);
 	imageViewers[viewer]->Render();
