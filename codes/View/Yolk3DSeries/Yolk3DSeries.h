@@ -4,8 +4,7 @@
 #include <QWidget>
 #include <QMap>
 
-#include <itkImage.h>
-#include <itkGDCMImageIO.h>
+//#include <itkImage.h>
 
 // vtk
 #include <vtkSmartPointer.h>
@@ -34,7 +33,7 @@ public:
 	explicit Yolk3DSeries(QWidget* parent = nullptr);
 	~Yolk3DSeries();
 
-	typedef itk::Image<float, 3> ImageType;
+	//typedef itk::Image<float, 3> ImageType;
 
 	//void connectViewer(MyImageViewer*);
 	//void disconnectViewer(MyImageViewer*);
@@ -56,10 +55,15 @@ public slots:
 protected:
 
 	vtkSmartPointer<vtkImageViewer2> imageViewer;
-	QHash<int, vtkSmartPointer<IVtkImageData>> ImageSlice;
+	QHash<int, vtkSmartPointer<IVtkImageData>> imageSlice;
+	QHash<int, vtkSmartPointer<vtkMatrix4x4>> imageMatrixes;
 
 	QStringList fileNames;
 
+	/* Line actors */
+	vtkSmartPointer<vtkPlaneSource> planeSource;
+	vtkSmartPointer<vtkActor> planeActor;
+	vtkSmartPointer<vtkTransformPolyDataFilter> planeTransform;
 
 	//void updateByViewer();
 	void updateBy3DSeries();
@@ -67,13 +71,10 @@ protected:
 	void readSeries(QStringList filenames);
 
 
-	/* Line actors */
 	vtkPolyDataMapper*	m_mapper;
 	vtkActor*			m_lineActor;
 	vtkCutter*			m_cutter;
-	vtkPlaneSource*		m_planeSource;
 	vtkPlane*			m_cutfunction;
-	vtkTransformPolyDataFilter* m_transfilter;
 
 
 	/* Image set */
@@ -88,7 +89,7 @@ protected:
 
 
 	/* UI */
-	itk::GDCMImageIO::Pointer m_gdcmio;
+	//itk::GDCMImageIO::Pointer m_gdcmio;
 	vtkRenderer* m_ren;
 	vtkRenderer* m_frontRen;
 	vtkRenderWindow* m_renwin;
