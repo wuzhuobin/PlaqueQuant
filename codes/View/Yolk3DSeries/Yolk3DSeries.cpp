@@ -314,14 +314,16 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int s)
 void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)
 {
 	/* Assume this is changed to index */
-	double index[4] = { x, y, z, 1 };
-	double *coord = new double[4];
-	memcpy(coord, this->m_imageDirection->MultiplyDoublePoint(index), sizeof(double)*3);
-	coord[0] += this->m_imageOrigin[0];
+	double coord[4] = { x, y, z, 1 };
+	coord[0] -= this->m_imageOrigin[0];
+	coord[1] -= this->m_imageOrigin[1];
+	coord[2] -= this->m_imageOrigin[2];
+	coord[3] = 1;
+	memcpy(coord, this->m_imageDirection->MultiplyDoublePoint(coord), sizeof(double)*3);
+	/*coord[0] += this->m_imageOrigin[0];
 	coord[1] += this->m_imageOrigin[1];
 	coord[2] += this->m_imageOrigin[2];
-	coord[3] = 1;
-
+*/
 	if (this->m_cutter->GetCutFunction())
 	{
 		this->m_cutfunction->SetOrigin(coord);
@@ -437,11 +439,11 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		 *	This assume positive-z along axial of original 3D projection series, so that the difference
 		 *  is only a z-flip at the center of the image!
 		 */
-		/*matrix[1] = -matrix[1];
+		matrix[1] = -matrix[1];
 		matrix[5] = -matrix[5];
 		matrix[9] = -matrix[9];
 		matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
-*/
+
 		//matrix[8] = -matrix[8];
 
 		/// Push to matrix list
