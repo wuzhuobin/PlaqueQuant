@@ -30,14 +30,21 @@
 
 #include <itkVector.h>
 #include <itkImageFileReader.h>
+typedef itk::ImageFileReader<IVtkImageData::itkImageType>
+ImageFileReader;
 #include <itkOrientImageFilter.h>
-
-typedef itk::ImageFileReader<IVtkImageData::itkImageType> ImageFileReader;
-typedef itk::OrientImageFilter<IVtkImageData::itkImageType, IVtkImageData::itkImageType> OrientImageFilter;
-
+typedef itk::OrientImageFilter<IVtkImageData::itkImageType, IVtkImageData::itkImageType>
+OrientImageFilter;
+#include <itkChangeInformationImageFilter.h>
+typedef itk::ChangeInformationImageFilter<IVtkImageData::itkImageType>
+ChangeInformationImageFilter;
 #include <itkGDCMImageIO.h>
+using itk::GDCMImageIO;
+using itk::MetaDataDictionary;
 #include <itkMetaDataDictionary.h>
-#include <itkMetaDataObject.h>
+//#include <itkMetaDataObject.h>
+
+
 
 #include "vtkInteractorStyleImage.h"
 #include "vtkInteractorStyleTrackballCamera.h"
@@ -66,6 +73,44 @@ typedef itk::OrientImageFilter<IVtkImageData::itkImageType, IVtkImageData::itkIm
 #include <vtkSmartPointer.h>
 #include <QVTKInteractor.h>
 
+
+class Yolk3DSeriesViewer : public vtkImageViewer2
+{
+public:
+	vtkTypeMacro(Yolk3DSeriesViewer, vtkImageViewer2);
+	static Yolk3DSeriesViewer* New() { return new Yolk3DSeriesViewer; }
+protected:
+	virtual void UpdateOrientation() VTK_OVERRIDE {
+		// Set the camera position
+
+		vtkCamera *cam = this->Renderer ? this->Renderer->GetActiveCamera() : NULL;
+		if (cam)
+		{
+			switch (this->SliceOrientation)
+			{
+			case vtkImageViewer2::SLICE_ORIENTATION_XY:
+				cam->SetFocalPoint(0, 0, 0);
+				cam->SetPosition(0, 0, -1); // -1 if medical ?
+				cam->SetViewUp(0, -1, 0);
+				break;
+
+			case vtkImageViewer2::SLICE_ORIENTATION_XZ:
+				cam->SetFocalPoint(0, 0, 0);
+				cam->SetPosition(0, -1, 0); // 1 if medical ?
+				cam->SetViewUp(0, 0, 1);
+				break;
+
+			case vtkImageViewer2::SLICE_ORIENTATION_YZ:
+				cam->SetFocalPoint(0, 0, 0);
+				cam->SetPosition(1, 0, 0); // -1 if medical ?
+				cam->SetViewUp(0, 0, 1);
+				break;
+			}
+		}
+	}
+
+};
+
 Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	:QWidget(parent)
 {
@@ -74,13 +119,34 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	/* Create UI */
 	this->setMinimumSize(800, 600);
 
-	this->imageViewer = vtkSmartPointer<vtkImageViewer2>::New();
+	this->imageViewer = vtkSmartPointer<Yolk3DSeriesViewer>::New();
 	this->imageViewer->SetRenderWindow(this->ui->widgetViewer->GetRenderWindow());
 	this->imageViewer->SetupInteractor(this->ui->widgetViewer->GetInteractor());
 
-	vtkInteractorStyleTrackballCamera* style = vtkInteractorStyleTrackballCamera::New();
-	style->Delete();
+	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = 
+		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+	this->ui->widgetViewer->GetInteractor()->SetInteractorStyle(style);
 	this->imageViewer->GetImageActor()->VisibilityOff();
+
+	this->planeSource = vtkSmartPointer<vtkPlaneSource>::New();
+	this->planeSource->SetOrigin(0, 0, 0);
+
+	this->planeTransform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+	this->planeTransform->SetInputConnection(this->planeSource->GetOutputPort());
+	//this->planeSource->SetCenter(0, 0, 0);
+	//this->planeSource->SetNormal(0, 0, 1);
+
+	vtkSmartPointer<vtkPolyDataMapper> planeMapper =
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	planeMapper->SetInputConnection(this->planeTransform->GetOutputPort());
+	planeMapper->ScalarVisibilityOff();
+
+	this->planeActor = vtkSmartPointer<vtkActor>::New();
+	this->planeActor->SetMapper(planeMapper);
+	this->planeActor->VisibilityOff();
+	this->planeActor->GetProperty()->SetColor(1, 1, 0);
+
+	this->imageViewer->GetRenderer()->AddActor(planeActor);
 
 
 	/* Create renderers */
@@ -111,13 +177,12 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 /*	this->m_mapper		= vtkPolyDataMapper::New();
 	this->m_cutter		= vtkCutter::New();
 	this->m_lineActor	= vtkActor::New();
-	this->m_planeSource = vtkPlaneSource::New();
 	this->m_cutfunction = vtkPlane::New();
 	this->m_transfilter = vtkTransformPolyDataFilter::New();
 	this->m_mapper->SetInputConnection(this->m_cutter->GetOutputPort());
 	this->m_cutter->SetInputConnection(m_transfilter->GetOutputPort());
 	this->m_cutter->SetCutFunction(this->m_cutfunction);
-	this->m_transfilter->SetInputConnection(this->m_planeSource->GetOutputPort());
+	this->m_transfilter->SetInputConnection(this->planeSource->GetOutputPort());
 
 
 	this->m_lineActor->SetMapper(this->m_mapper);
@@ -191,12 +256,12 @@ void Yolk3DSeries::set3DSeries(QStringList filenames)
 
 void Yolk3DSeries::setSlice(int slice)
 {
-	if (!this->ImageSlice.contains(slice)) {
+	if (!this->imageSlice.contains(slice)) {
 		return;
 	}
 
-
-	this->imageViewer->SetInputData(this->ImageSlice[slice]);
+	this->imageSlice[slice]->Print(cout);
+	this->imageViewer->SetInputData(this->imageSlice[slice]);
 	this->imageViewer->Render();
 	//assert(this->m_3dimageList.keys().contains(sliceNum), "Slice dose not exist!");
 
@@ -231,28 +296,28 @@ void Yolk3DSeries::setSlice(int slice)
 	//	this->m_normalByExtent[0] = 1;
 	//	this->m_viewUpByExtent[2] = 1;
 
-	//	this->m_planeSource->SetPoint1(0, bounds[3] - bounds[2], 0);
-	//	this->m_planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
+	//	this->planeSource->SetPoint1(0, bounds[3] - bounds[2], 0);
+	//	this->planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
 	//	break;
 	//case 1:
 	//	this->m_normalByExtent[1] = 1;
 	//	this->m_viewUpByExtent[2] = 1;
 
-	//	this->m_planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
-	//	this->m_planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
+	//	this->planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
+	//	this->planeSource->SetPoint2(0, 0, bounds[5] - bounds[4]);
 	//	break;
 	//case 2:
 	//	this->m_normalByExtent[2] = 1;
 	//	this->m_viewUpByExtent[1] = 1;
 
-	//	this->m_planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
-	//	this->m_planeSource->SetPoint2(0 ,bounds[3] - bounds[2], 0);
+	//	this->planeSource->SetPoint1(bounds[1] - bounds[0], 0, 0);
+	//	this->planeSource->SetPoint2(0 ,bounds[3] - bounds[2], 0);
 	//	break;
 	//default:
 	//	return;
 	//	break;
 	//}
-	//this->m_planeSource->Update();
+	//this->planeSource->Update();
 
 
 	//vtkSmartPointer<vtkMatrix4x4> mat = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -320,7 +385,7 @@ void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 
 void Yolk3DSeries::on_pushButtonLoad_clicked()
 {
-	RegistrationWizard rw(1);
+	RegistrationWizard rw("D:\\work\\IADE\\T2propeller&MRA\\MIP", 1);
 	rw.setImageModalityNames(0, "MIP Image");
 	if (rw.exec() == QWizard::Accepted) {
 		QStringList fileName = rw.getFileNames(0).split(";");
@@ -336,12 +401,23 @@ void Yolk3DSeries::on_pushButtonLoad_clicked()
 		return;
 	}
 	qDebug() << fileNames.length();
-	this->ImageSlice.clear();
+	this->imageSlice.clear();
 	for (int i = 0; i < fileNames.length(); ++i) {
+
+		GDCMImageIO::Pointer gdcmIO = GDCMImageIO::New();
 
 		ImageFileReader::Pointer imageFileReader = ImageFileReader::New();
 		imageFileReader->SetFileName(fileNames[i].toStdString());
-		imageFileReader->Update();
+		imageFileReader->SetImageIO(gdcmIO);
+		try
+		{
+			imageFileReader->Update();
+		}
+		catch (const itk::ExceptionObject& e)
+		{
+			qWarning() << e.what(); 
+			continue;
+		}
 
 		OrientImageFilter::Pointer orientImageFilter = OrientImageFilter::New();
 		orientImageFilter->SetInput(imageFileReader->GetOutput());
@@ -349,16 +425,64 @@ void Yolk3DSeries::on_pushButtonLoad_clicked()
 		orientImageFilter->SetDesiredCoordinateOrientation(
 			itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI);
 		orientImageFilter->Update();
+		
+		IVtkImageData::itkImageType::PointType zeroOrigin;
+		zeroOrigin.Fill(0);
+
+		ChangeInformationImageFilter::Pointer changeInformationImageFilter =
+			ChangeInformationImageFilter::New();
+		changeInformationImageFilter->SetInput(imageFileReader->GetOutput());
+		changeInformationImageFilter->ChangeOriginOn();
+		changeInformationImageFilter->SetOutputOrigin(zeroOrigin);
+		changeInformationImageFilter->Update();
 
 		vtkSmartPointer<IVtkImageData> image =
 			vtkSmartPointer<IVtkImageData>::New();
-		image->Graft(orientImageFilter->GetOutput());
+		image->Graft(changeInformationImageFilter->GetOutput());
 
-		this->ImageSlice.insert(i, image);
+		const IVtkImageData::itkImageType::PointType& origin =
+			imageFileReader->GetOutput()->GetOrigin();
+		const IVtkImageData::itkImageType::DirectionType& direction =
+			imageFileReader->GetOutput()->GetDirection();
+
+		//const IVtkImageData::itkImageType::PointType& origin =
+		//	orientImageFilter->GetOutput()->GetOrigin();
+		//const IVtkImageData::itkImageType::DirectionType& direction =
+		//	orientImageFilter->GetOutput()->GetDirection();
+
+		vtkSmartPointer<vtkMatrix4x4> matrix =
+			vtkSmartPointer<vtkMatrix4x4>::New();
+
+		for (vtkIdType i = 0; i < 3; i++)
+		{
+			for (vtkIdType j = 0; j < 3; j++)
+			{
+				matrix->SetElement(i, j, direction[i][j]);
+			}
+		}
+		for (vtkIdType i = 0; i < 3; i++)
+		{
+			matrix->SetElement(i, 3, origin[i]);
+		}
+
+		MetaDataDictionary dict = gdcmIO->GetMetaDataDictionary();
+		std::string slice;
+
+
+
+		if (!itk::ExposeMetaData(dict, "0020|0013", slice)) {
+			qWarning() << "a slice is skipped. ";
+			continue;
+		}
+		this->imageSlice.insert(std::stoi(slice), image);
+		this->imageMatrixes.insert(std::stoi(slice), matrix);
 	}
 
-	this->imageViewer->SetInputData(this->ImageSlice[0]);
+	on_spinBoxSlice_valueChanged(1);
+	this->imageViewer->SetSliceOrientationToXZ();
+	this->imageViewer->SetSliceOrientationToXY();
 	this->imageViewer->GetImageActor()->VisibilityOn();
+	this->planeActor->VisibilityOn();
 	this->imageViewer->GetRenderer()->ResetCamera();
 	this->imageViewer->GetRenderer()->ResetCameraClippingRange();
 	this->imageViewer->GetRenderer()->Render();
@@ -367,20 +491,53 @@ void Yolk3DSeries::on_pushButtonLoad_clicked()
 
 void Yolk3DSeries::on_spinBoxSlice_valueChanged(int slice)
 {
-	if (!this->ImageSlice.contains(slice)) {
+	if (!this->imageSlice.contains(slice)) {
 		return;
 	}
-	for (int i = 0; i < 3; ++i) {
-		if (this->ImageSlice[slice]->GetDimensions()[i] == 1)
-		{
-			this->imageViewer->SetSliceOrientation(i);
-			break;
-		}
-		
+	if (!this->imageMatrixes.contains(slice)) {
+		return;
 	}
-	this->ImageSlice[slice]->Print(cout);
 
-	this->imageViewer->SetInputData(this->ImageSlice[slice]);
+	double normal[3];
+	double center[3];
+
+
+	vtkTransform* tranform = vtkTransform::New();
+	tranform->SetMatrix(this->imageMatrixes[slice]);
+	tranform->GetOrientation(normal);
+	tranform->GetPosition(center);
+
+	double bounds[6];
+	this->imageSlice[slice]->GetBounds(bounds);
+	if (this->imageSlice[slice]->GetDimensions()[0] == 1)
+	{
+		this->planeSource->SetPoint1(0, bounds[3], 0);
+		this->planeSource->SetPoint2(0, 0, bounds[5]);
+
+	}
+	else if (this->imageSlice[slice]->GetDimensions()[1] == 1)
+	{
+		this->planeSource->SetPoint1(0, 0, bounds[5]);
+		this->planeSource->SetPoint2(0, bounds[3], 0);
+	}
+	else
+	{
+		this->planeSource->SetPoint1(bounds[1], 0, 0);
+		this->planeSource->SetPoint2(0, bounds[3], 0);
+	}
+	this->planeSource->SetOrigin(0, 0, 0);
+	this->planeTransform->SetTransform(tranform);
+	//this->planeSource->SetNormal(normal);
+	//this->planeSource->SetCenter(center);
+
+	//tranform->Inverse();
+	//this->planeActor->SetUserTransform(tranform);
+	tranform->Delete();
+
+
+	this->imageViewer->SetInputData(this->imageSlice[slice]);
+	//this->imageViewer->GetImageActor()->SetPosition(center);
+	//this->imageViewer->GetImageActor()->SetOrientation(normal);
 	this->imageViewer->Render();
 }
 
@@ -538,8 +695,8 @@ void Yolk3DSeries::drawLineByPlane(const double* normal, const double* pos)
 	/* Create a plane */
 	double* bounds = this->m_imageActor->GetBounds();
 
-	this->m_transfilter->SetTransform(this->m_imageActor->GetUserTransform());
-	this->m_transfilter->Update();
+	//this->m_transfilter->SetTransform(this->m_imageActor->GetUserTransform());
+	//this->m_transfilter->Update();
 
 	this->m_cutter->SetCutFunction(this->m_cutfunction);
 	this->m_cutter->Update();
