@@ -20,6 +20,7 @@ class vtkTransformPolyDataFilter;
 class vtkPlane;
 class vtkActor;
 class vtkMatrix4x4;
+class vtkSphereSource;
 namespace Ui { class Yolk3DSeries; }
 
 class Yolk3DSeries : public QWidget
@@ -62,6 +63,10 @@ protected:
 	vtkPlaneSource*		m_planeSource;
 	vtkPlane*			m_cutfunction;
 	vtkTransformPolyDataFilter* m_transfilter;
+
+	/* DEBUG */
+	//vtkSphereSource*	m_debugSphereSource;
+	//vtkActor*			m_debugSphereActor;
 
 
 	/* Image set */

@@ -54,6 +54,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
+#include "vtkSphereSource.h"
 
 Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	:QWidget(parent)
@@ -82,12 +83,12 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->m_imageActor = vtkImageActor::New();
 
 	///* Create reference for debuging */
-	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
-	axes->SetUserMatrix(vtkMatrix4x4::New());
-	axes->GetUserMatrix()->SetElement(0, 0, 100);
-	axes->GetUserMatrix()->SetElement(1, 1, 100);
-	axes->GetUserMatrix()->SetElement(2, 2, 100);
-	this->m_ren->AddActor(axes);
+	//vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+	//axes->SetUserMatrix(vtkMatrix4x4::New());
+	//axes->GetUserMatrix()->SetElement(0, 0, 100);
+	//axes->GetUserMatrix()->SetElement(1, 1, 100);
+	//axes->GetUserMatrix()->SetElement(2, 2, 100);
+	//this->m_ren->AddActor(axes);
 
 	/* Create line actors */
 	this->m_mapper		= vtkPolyDataMapper::New();
@@ -314,17 +315,17 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int s)
 
 void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)
 {
-	/* Assume this is changed to index */
+	/* Rotate the input directionless point with image direction matrix  */
 	double coord[4] = { x, y, z, 1 };
 	coord[0] -= this->m_imageOrigin[0];
 	coord[1] -= this->m_imageOrigin[1];
 	coord[2] -= this->m_imageOrigin[2];
 	coord[3] = 1;
 	memcpy(coord, this->m_imageDirection->MultiplyDoublePoint(coord), sizeof(double)*3);
-	/*coord[0] += this->m_imageOrigin[0];
+	coord[0] += this->m_imageOrigin[0];
 	coord[1] += this->m_imageOrigin[1];
 	coord[2] += this->m_imageOrigin[2];
-*/
+
 	if (this->m_cutter->GetCutFunction())
 	{
 		this->m_cutfunction->SetOrigin(coord);
@@ -347,10 +348,18 @@ void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int
 	};
 	this->m_cutfunction->SetNormal(this->m_imageDirection->MultiplyDoublePoint(this->m_cutfunction->GetNormal()));
 
+
 	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
 	{
 		drawLineByPlane(this->m_cutfunction->GetNormal(), coord);
 	}
+
+	///* Debug */
+	//if (this->m_debugSphereSource != nullptr)
+	//{
+	//	this->m_debugSphereSource->SetCenter(coord[0], coord[1], coord[2]);
+	//	this->m_debugSphereSource->Update();
+	//}
 	this->m_renwin->Render();
 }
 
@@ -436,19 +445,16 @@ void Yolk3DSeries::readSeries(QStringList filenames)
 		matrix[15] = 1;
 
 		/* Adjust for ITK axes flip. */
-		/* >>> IMPORTANT <<< :
-		 *	This assume positive-z along axial of original 3D projection series, so that the difference
-		 *  is only a z-flip at the center of the image!
-		 */
-		//matrix[1] = -matrix[1];
-		//matrix[5] = -matrix[5];
-		//matrix[9] = -matrix[9];
-		//matrix[8] = -matrix[8];
+		matrix[1] = -matrix[1];
+		matrix[5] = -matrix[5];
 		matrix[9] = -matrix[9];
-		//matrix[10] = -matrix[10];
-		//matrix[11] = -matrix[11] - nrow * l_im->GetSpacing()[1] / 2.;
 
-		//matrix[8] = -matrix[8];
+		/* Adjust for DICOM y directional offset due to upper axis flip */
+		dy.Normalize();
+		dy *= nrow * l_im->GetSpacing()[1];
+		matrix[3] += dy[0];
+		matrix[7] += dy[1];
+		matrix[11] += dy[2];
 
 		/// Push to matrix list
 		this->m_matrixList[s - 1] = matrix;
@@ -468,6 +474,20 @@ void Yolk3DSeries::drawLineByPlane(const double* normal, const double* pos)
 	this->m_cutter->Update();
 
 	this->m_mapper->Update();
+
+	///* DEBUG */
+	//if (!this->m_debugSphereActor)
+	//{
+	//	this->m_debugSphereActor = vtkActor::New();
+	//	this->m_debugSphereSource = vtkSphereSource::New();
+	//	this->m_debugSphereSource->SetRadius(25);
+	//	vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
+	//	mapper->SetInputConnection(this->m_debugSphereSource->GetOutputPort());
+	//	this->m_debugSphereActor->SetMapper(mapper);
+	//	this->m_frontRen->AddActor(this->m_debugSphereActor);
+	//}
+
+
 
 	if (!this->m_frontRen->HasViewProp(this->m_lineActor))
 	{
