@@ -370,7 +370,7 @@ void Core::slotIOManagerToImageManager()
 				directionMatrix->SetElement(row, col, direction[row][col]);
 			}
 			else {
-				//directionMatrix->SetElement(row, 3, origin[row]);
+				directionMatrix->SetElement(row, 3, origin[row]);
 
 			}
 

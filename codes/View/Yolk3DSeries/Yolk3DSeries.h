@@ -65,6 +65,17 @@ protected:
 	vtkSmartPointer<vtkActor> planeActor;
 	vtkSmartPointer<vtkTransformPolyDataFilter> planeTransform;
 
+	vtkSmartPointer<vtkPlaneSource> planeSource2;
+	vtkSmartPointer<vtkActor> planeActor2;
+	vtkSmartPointer<vtkTransformPolyDataFilter> planeTransform2;
+
+	vtkSmartPointer<vtkPlane> plane;
+	vtkSmartPointer<vtkCutter> cutter;
+	vtkSmartPointer<vtkActor> lineActor;
+
+
+
+	vtkSmartPointer<vtkMatrix4x4> imageDirection;
 	//void updateByViewer();
 	void updateBy3DSeries();
 
@@ -72,15 +83,12 @@ protected:
 
 
 	vtkPolyDataMapper*	m_mapper;
-	vtkActor*			m_lineActor;
-	vtkCutter*			m_cutter;
 	vtkPlane*			m_cutfunction;
 
 
 	/* Image set */
 	QMap<int, vtkImageData*> m_3dimageList;
 	QMap<int, double*> m_matrixList;
-	vtkMatrix4x4* m_imageDirection;
 
 	/* vtk actors */
 	double m_normalByExtent[4];
