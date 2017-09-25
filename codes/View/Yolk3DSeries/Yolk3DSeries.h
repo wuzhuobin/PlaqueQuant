@@ -32,7 +32,6 @@ public:
 	explicit Yolk3DSeries(QWidget* parent = nullptr);
 	~Yolk3DSeries();
 
-
 	void setImageDirection(vtkMatrix4x4* direction);
 
 public slots:
@@ -48,8 +47,6 @@ protected:
 	vtkSmartPointer<vtkImageViewer2> imageViewer;
 	QHash<int, vtkSmartPointer<IVtkImageData>> imageSlice;
 	QHash<int, vtkSmartPointer<vtkMatrix4x4>> imageMatrixes;
-
-	QStringList fileNames;
 
 	/* Line actors */
 	vtkSmartPointer<vtkPlaneSource> planeSource;

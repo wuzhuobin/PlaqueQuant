@@ -218,17 +218,18 @@ void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 void Yolk3DSeries::on_pushButtonLoad_clicked()
 {
 	RegistrationWizard rw(1);
+	QStringList fileNames;
 	rw.setImageModalityNames(0, "MIP Image");
 	if (rw.exec() == QWizard::Accepted) {
 		QStringList fileName = rw.getFileNames(0).split(";");
 		fileName.pop_back();
 
-		this->fileNames = fileName;
+		fileNames = fileName;
 		//set3DSeries(fileName);
 
 	}
 
-	if (this->fileNames.isEmpty()) {
+	if (fileNames.isEmpty()) {
 		qCritical() << "File names is empty.";
 		return;
 	}
@@ -309,8 +310,11 @@ void Yolk3DSeries::on_pushButtonLoad_clicked()
 		this->imageMatrixes.insert(std::stoi(slice), matrix);
 	}
 
-	this->ui->spinBoxSlice->setMinimum(this->imageSlice.keys().last());
-	this->ui->spinBoxSlice->setMaximum(this->imageSlice.keys().first());
+	QList<int> allSlices = this->imageSlice.keys();
+	std::pair<QList<int>::const_iterator, QList<int>::const_iterator> sliceRange = std::minmax_element(allSlices.cbegin(), allSlices.cend());
+
+	this->ui->spinBoxSlice->setMinimum(*(sliceRange.first));
+	this->ui->spinBoxSlice->setMaximum(*(sliceRange.second));
 
 	this->ui->spinBoxSlice->setValue(1);
 	this->imageViewer->SetSliceOrientationToXZ();
