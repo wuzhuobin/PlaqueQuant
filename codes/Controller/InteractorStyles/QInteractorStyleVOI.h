@@ -25,6 +25,8 @@ public slots:
 	virtual void slotUpdateVOISpinBoxes(double* values);
 	virtual void ExtractVOI();
 	virtual void RestoreVOI();
+	virtual void SaveVOI();
+	virtual void LoadVOI();
 	virtual void ResetVOI();
 
 protected:
@@ -34,6 +36,9 @@ protected:
 
 	void uniqueInitialization();
 	void initialization();
+
+	void SetVOI(int voi[6]);
+
 	// initialization value is nullptr, if there is an instance of QInteractorStyleROI
 	// m_roi will be created
 	static vtkSmartPointer<vtkROIWidget> m_roi;

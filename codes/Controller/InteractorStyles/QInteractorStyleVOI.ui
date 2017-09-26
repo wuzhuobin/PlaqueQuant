@@ -337,6 +337,20 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButtonSaveVOI">
+          <property name="text">
+           <string>Save VOI</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonLoadVOI">
+          <property name="text">
+           <string>Load VOI</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButtonResetVOI">
           <property name="text">
            <string>Reset VOI</string>

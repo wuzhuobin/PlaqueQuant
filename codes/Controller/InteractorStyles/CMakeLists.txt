@@ -122,6 +122,7 @@ target_link_libraries(
 	ContourWidgetSeries
 	VesselWallHoughTransformCircles
 	MagneticContourLineInterpolator
+	qtcsv
 )
 
 target_include_directories(

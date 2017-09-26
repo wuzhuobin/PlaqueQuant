@@ -12,6 +12,13 @@
 
 #include <vtkImageCroppingRegionsWidget.h>
 
+#include <QFileDialog>
+
+#include "qtcsv/stringdata.h"
+#include "qtcsv/reader.h"
+#include "qtcsv/writer.h"
+
+
 vtkStandardNewMacro(QInteractorStyleVOI);
 QSETUP_UI_SRC(QInteractorStyleVOI);
 vtkSmartPointer<vtkROIWidget> QInteractorStyleVOI::m_roi = nullptr;
@@ -102,6 +109,47 @@ void QInteractorStyleVOI::RestoreVOI()
 	GetImageViewer()->Render();
 }
 
+void QInteractorStyleVOI::SaveVOI()
+{
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save VOI"), 
+		QString(), tr("VOI (*.csv)"));
+	if (fileName.isEmpty()) {
+		return;
+	}
+
+	QStringList strData;
+	for (int i = 0; i < 6; i++)
+	{
+		strData << QString::number(this->m_voi[i]);
+	}
+	
+	QFile file(fileName);
+
+	QtCSV::Writer::write(fileName, QtCSV::StringData() << strData);
+}
+
+void QInteractorStyleVOI::LoadVOI()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Load VOI"), 
+		QString(), tr("VOI (*.csv)"));
+
+	if (fileName.isEmpty()) {
+		return;
+	}
+
+	QList<QStringList> readData = QtCSV::Reader::readToList(fileName);
+	
+	int voi[6];
+	for (int i = 0; i < 6; i++)
+	{
+		voi[i] = readData.first()[i].toInt();
+
+	}
+	SAFE_DOWN_CAST_IMAGE_CONSTITERATOR(QInteractorStyleVOI, SetVOI(voi));
+
+
+}
+
 void QInteractorStyleVOI::ResetVOI()
 {
 	GetImageViewer()->ResetDisplayExtent();
@@ -147,7 +195,8 @@ void QInteractorStyleVOI::uniqueInitialization()
 		self->slotUpdateVOISpinBoxes(roiWidgetRep->GetBounds());
 	});
 	m_roi->AddObserver(vtkCommand::InteractionEvent, callback);
-	
+	connect(this->ui->pushButtonSaveVOI, SIGNAL(clicked()), this, SLOT(SaveVOI()));
+	connect(this->ui->pushButtonLoadVOI, SIGNAL(clicked()), this, SLOT(LoadVOI()));
 	//connect(m_roi, SIGNAL(signalROIBounds(double*)),
 	//	this, SLOT(slotUpdateVOISpinBoxes(double*)));
 }
@@ -162,4 +211,9 @@ void QInteractorStyleVOI::initialization()
 		this, SLOT(RestoreVOI()));
 	connect(ui->pushButtonExtractVOI, SIGNAL(clicked()),
 		this, SLOT(ExtractVOI()));
+}
+
+void QInteractorStyleVOI::SetVOI(int voi[6])
+{
+	std::copy_n(voi, 6, this->m_voi);
 }
