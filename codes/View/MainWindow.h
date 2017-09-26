@@ -21,6 +21,15 @@
 #include <QtWidgets/QMainWindow>
 
 
+#ifdef PLAQUEQUANT_VER
+#define MEASUREMENT_WIDGET MeasurementWidget
+
+#endif // PLAQUEQUANT_VER
+
+#ifdef IADE_VER
+#define MEASUREMENT_WIDGET IADEMeasurementWidget
+#endif // IADE_VER
+
 
 namespace Ui { class MainWindow; }
 class vtkRenderWindow;
@@ -29,7 +38,7 @@ class QSettings;
 class Switch2DWidget;
 class Switch3DWidget;
 class ViewerWidget;
-class MeasurementWidget;
+class MEASUREMENT_WIDGET;
 class LabelWidget;
 
 class MainWindow : public QMainWindow
@@ -58,7 +67,7 @@ public:
 	Switch2DWidget* getSwitch2DWidget();
 	Switch3DWidget* getSwitch3DWidget();
 	ViewerWidget* getViewerWidget(unsigned int num);
-	MeasurementWidget* getMeasurementWidget();
+	MEASUREMENT_WIDGET* getMeasurementWidget();
 	LabelWidget* getLabelWidget();
 	QMenu* getSelectImgMenu(unsigned int i);
 
@@ -110,7 +119,7 @@ private:
 
 	Switch3DWidget* switch3DWidget = nullptr;
 
-	MeasurementWidget* measurementWidget = nullptr;
+	MEASUREMENT_WIDGET* measurementWidget = nullptr;
 
 	LabelWidget* labelWidget = nullptr;
 

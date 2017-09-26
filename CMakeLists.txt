@@ -6,6 +6,8 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 project(PlaqueQuant)
 
+# add_definitions( -DPLAQUEQUANT_VER)
+add_definitions(-DIADE_VER)
 # MSUT find vtk first
 #VTK
 find_package(VTK REQUIRED)
