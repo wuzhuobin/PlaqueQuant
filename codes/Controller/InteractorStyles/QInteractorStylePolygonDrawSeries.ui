@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QInteractorStylePolygonDrawSeries</class>
+ <widget class="QWidget" name="QInteractorStylePolygonDrawSeries">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>277</width>
+    <height>215</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QInteractorStylePolygonDrawSeries</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_6">
+   <item>
+    <widget class="QLabel" name="label_21">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#0000a5;&quot;&gt;Current Stage&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Polygon draw series</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QRadioButton" name="smoothCurveRadioButton">
+        <property name="text">
+         <string>Smooth Curve</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButtonMagnetic">
+        <property name="text">
+         <string>Magnetic</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="polygonRadionButton">
+        <property name="text">
+         <string>Polygon</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPushButton" name="fillContourPushButton">
+          <property name="text">
+           <string>Fill</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cleanOnePushButton">
+          <property name="text">
+           <string>Clean One</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cleanAllPushButton">
+          <property name="text">
+           <string>Clean all</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_6">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(226, 226, 226)</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="activeLabelLabel_3">
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Active Label:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+            </font>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>13</width>
+             <height>13</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>No label</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/transparentbox.png</normaloff>:/icons/transparentbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Vessel Wall</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/bluebox.png</normaloff>:/icons/bluebox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Lumen</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/redbox.png</normaloff>:/icons/redbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Calcification</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/greenbox.png</normaloff>:/icons/greenbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Hemorrhage</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/yellowbox.png</normaloff>:/icons/yellowbox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LRNC</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/lightbluebox.png</normaloff>:/icons/lightbluebox.png</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LM</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../Main/resources/IADE_Analyzer.qrc">
+              <normaloff>:/icons/purplebox.png</normaloff>:/icons/purplebox.png</iconset>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+     <zorder>smoothCurveRadioButton</zorder>
+     <zorder>polygonRadionButton</zorder>
+     <zorder>radioButtonMagnetic</zorder>
+     <zorder>frame_6</zorder>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>206</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../Main/resources/IADE_Analyzer.qrc"/>
+ </resources>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
+</ui>
