@@ -8,6 +8,7 @@
 #include "Switch3DWidget.h"
 #include "ViewerWidget.h"
 #include "MeasurementWidget.h"
+#include "IADEMeasurementWidget.h"
 #include "LabelWidget.h"
 
 #include <qdebug.h>
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 	this->labelWidget = new LabelWidget(this);
 	this->switch2DWidget->getUi()->verticalLayoutModule->addWidget(this->labelWidget);
 
-	this->measurementWidget = new MeasurementWidget(this);
+	this->measurementWidget = new MEASUREMENT_WIDGET(this);
 	ui->dockWidgetMeasurement->setWidget(measurementWidget);
 
 	this->tabifyDockWidget(ui->dockWidgetMeasurement, ui->dockWidget3D);
@@ -407,7 +408,7 @@ ViewerWidget * MainWindow::getViewerWidget(unsigned int num)
 	return this->viewerWidgets[num];
 }
 
-MeasurementWidget * MainWindow::getMeasurementWidget()
+MEASUREMENT_WIDGET* MainWindow::getMeasurementWidget()
 {
 	return this->measurementWidget;
 }

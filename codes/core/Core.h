@@ -1,7 +1,7 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
-#define PLAQUEQUANT_VER
+//#define PLAQUEQUANT_VER
 
 #ifdef PLAQUEQUANT_VER
 #include "PlaqueQuantIOManager.h"
@@ -90,10 +90,6 @@ private slots:
 	void slotStenosis();
 	void slotVBDUboguMeasure();
 
-	////Diagnosis
-	//void slotSmokerStandard();
-	//void slotUboguStandard();
-	//void slotICDAStandard();
 
 	// Curved image update
 	bool slotInitializeCurvedImage();

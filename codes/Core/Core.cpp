@@ -10,6 +10,8 @@
 #include "Switch3DWidget.h"
 #include "ui_QAbstractNavigation.h"
 #include "MeasurementWidget.h"
+#include "IADEMeasurementWidget.h"
+#include "ui_IADEMeasurementWidget.h"
 #include "LabelWidget.h"
 
 
@@ -125,6 +127,50 @@ Core::Core(QObject * parent)
 	dataProcessor.surfaceInteractorStyle = surfaceInteractorStyle[0];
 	dataProcessor.imageManager = &imageManager;
 #endif // PLAQUEQUANT_VER
+
+#ifdef IADE_VER
+	// VBD-Ubogu
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedLengthOfBasilarArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxLengthBA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedLengthOfIntracranialSegmentOfLeftVertebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxLengthLVA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedLengthOfIntracranialSegmentOfRightVertebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxLengthRVA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedDistanceBetweenCenterlineAndTheLead(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxDeviationBA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedDistanceBetweenCenterlineAndConnectionLeadOf2TerminalsLeft(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxDeviationLVA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedDistanceBetweenCenterlineAndConnectionLeadOf2TerminalsRight(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxDeviationRVA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedMaximumDiameterOfBasilarArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxMaxDiameterBA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedMaximumDiameterOfLeftVertebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxMaxDiameterLVA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetUboguMeasure(), SIGNAL(valueChangedMaximumDiameterOfRightVertebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxMaxDiameterRVA, SLOT(setValue(double)));
+	//VBD-Smoker
+	connect(imageInteractorStyle[0]->GetVBDSmoker(), SIGNAL(elongationChanged(int)),
+		mainWindow.getMeasurementWidget()->getUi()->comboBoxElongationClass, SLOT(setCurrentIndex(int)));
+	connect(imageInteractorStyle[0]->GetVBDSmoker(), SIGNAL(detourChanged(int)),
+		mainWindow.getMeasurementWidget()->getUi()->comboBoxTortuosityClass, SLOT(setCurrentIndex(int)));
+	connect(surfaceInteractorStyle[0]->GetSmokerBADiameter(), SIGNAL(diameterChanged(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxSmokerMaxDiameterBA, SLOT(setValue(double)));
+	//ICDA
+	connect(surfaceInteractorStyle[0]->GetICDADiameter(), SIGNAL(diameterChangedLeftCavernousSegmentOfInternalCarotidArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxLICA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetICDADiameter(), SIGNAL(diameterChangedRightCavernousSegmentOfInternalCarotidArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxRICA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetICDADiameter(), SIGNAL(diameterChangedLeftMiddleCerebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxLMCA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetICDADiameter(), SIGNAL(diameterChangedRightMiddleCerebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxRMCA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetICDADiameter(), SIGNAL(diameterChangedLeftAnteriorCerebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxLACA, SLOT(setValue(double)));
+	connect(surfaceInteractorStyle[0]->GetICDADiameter(), SIGNAL(diameterChangedRightAnteriorCerebralArtery(double)),
+		mainWindow.getMeasurementWidget()->getUi()->doubleSpinBoxRACA, SLOT(setValue(double)));
+
+
+#endif // IADE_VER
 
 
 	// ImageViewer
@@ -416,6 +462,8 @@ void Core::slotOverlayToImageManager()
 
 void Core::slotSaveCurvedImage(QString fileName)
 {
+#ifdef PLAQUEQUANT_VER
+
 	ioManager.slotSaveCurvedOverlay(fileName, imageManager.getCurvedPlaqueQuantOverlay()->getData());
 
 	for (int i = 0; i < NUM_OF_IMAGES; ++i) {
@@ -426,6 +474,8 @@ void Core::slotSaveCurvedImage(QString fileName)
 
 		ioManager.slotSaveCurvedImages(_newFileName, imageManager.getCurvedImage(i));
 	}
+
+#endif // PLAQUEQUANT_VER
 }
 
 void Core::slotMIP(bool flag)
@@ -646,22 +696,6 @@ void Core::slotVBDBADiameter()
 	mainWindow.getSwitch3DWidget()->setWidget(surfaceInteractorStyle[0]->GetSmokerBADiameter());
 
 }
-
-//void Core::slotSmokerStandard()
-//{
-//	mainWindow.getUi()->actionVBD_Smoker_seed->trigger();
-//	mainWindow.getUi()->actionVBD_Smoker_BA_diameter->trigger();
-//}
-//
-//void Core::slotUboguStandard()
-//{
-//}
-//
-//void Core::slotICDAStandard()
-//{
-//	mainWindow.getUi()->actionICDA_standard->trigger();
-//	mainWindow.getUi()->actionNavigation->trigger();
-//}
 
 void Core::slotVBDSmokerSeed()
 {
