@@ -46,7 +46,7 @@ public slots:
 	virtual void SetCurrentSlice(int slice);
 signals:
 	void signalImagePos(int x, int y, int z, unsigned int i);
-	void signalImageCoord(double, double, double, unsigned int);
+	//void signalImageCoord(double, double, double, unsigned int);
 
 protected:
 	/**

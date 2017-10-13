@@ -5,6 +5,7 @@
 #include "ui_Switch2DWidget.h"
 #include "ui_Switch3DWidget.h"
 #include "ui_ViewerWidget.h"
+#include "ui_Yolk3DSeries.h"
 #include "ViewerWidget.h"
 #include "Switch2DWidget.h"
 #include "Switch3DWidget.h"
@@ -26,6 +27,9 @@
 #include <vtkLookupTable.h>
 #include <vtkMatrix4x4.h>
 #include "vtkROIWidget.h"
+#include <vtkPolyDataMapper.h>
+#include <vtkTransform.h>
+#include <vtkProperty.h>
 
 Core::Core(QObject * parent)
 	:
@@ -106,12 +110,33 @@ Core::Core(QObject * parent)
 	connect(imageInteractorStyle[DEFAULT_IMAGE]->GetNavigation()->QAbstractNavigation::getUi()->sliceSpinBoxZ, SIGNAL(valueChanged(int)),
 		&measurement, SLOT(updateMaximumWallThickness(int)));
 
-	connect(imageInteractorStyle[0]->GetNavigation(), SIGNAL(signalImageCoord(double, double, double, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
-	connect(imageInteractorStyle[1]->GetNavigation(), SIGNAL(signalImageCoord(double, double, double, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
-	connect(imageInteractorStyle[2]->GetNavigation(), SIGNAL(signalImageCoord(double, double, double, unsigned int)),
-		&this->mipViewer, SLOT(SetWorldCoordinate(double, double, double, unsigned int)));
+
+	// MIP
+
+	for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
+		connect(imageInteractorStyle[i]->GetNavigation(), SIGNAL(signalImagePos(int, int, int, unsigned int)),
+			&this->mipViewer, SLOT(setImageCoordinate(int, int, int, unsigned int)));
+		connect(this->mipViewer.getUi()->spinBoxSlice, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+			this, [=](int) {
+			this->imageViewers[i]->Render();
+			int orientation = this->imageViewers[i]->GetSliceOrientation();
+			this->mipPolyDataMapper[i]->SetInputConnection(this->mipViewer.getLineOutput(orientation));
+			
+		});
+		mipPolyDataMapper[i] =
+			vtkSmartPointer<vtkPolyDataMapper>::New();
+		this->mipPolyDataMapper[i]->SetInputConnection(this->mipViewer.getLineOutput(i));
+		vtkSmartPointer<vtkActor> actor =
+			vtkSmartPointer<vtkActor>::New();
+		actor->SetMapper(this->mipPolyDataMapper[i]);
+		actor->SetUserMatrix(this->mipViewer.getInverseImageDirection());
+		actor->GetProperty()->SetColor(1, 0, 0);
+		this->mipRenderer[i] = vtkRenderer::New();
+		this->mipRenderer[i]->AddActor(actor);
+		this->mipRenderer[i]->SetLayer(2);
+		this->mipRenderer[i]->SetActiveCamera(this->imageViewers[i]->GetRenderer()->GetActiveCamera());
+
+	}
 
 	connect(&measurement, SIGNAL(signalMeasurement2D(double*)),
 		mainWindow.getMeasurementWidget(), SLOT(slotUpdate2DMeasurements(double*)));
@@ -483,9 +508,17 @@ void Core::slotMIP(bool flag)
 
 	if (flag) {
 		this->mipViewer.show();
+		for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
+			this->imageViewers[i]->GetRenderWindow()->SetNumberOfLayers(3);
+			this->imageViewers[i]->GetRenderWindow()->AddRenderer(this->mipRenderer[i]);
+		}
 	}
 	else {
 		this->mipViewer.hide();
+		for (int i = 0; i < MainWindow::NUM_OF_2D_VIEWERS; ++i) {
+			//this->imageViewers[i]->GetRenderWindow()->SetNumberOfLayers(3);
+			this->imageViewers[i]->GetRenderWindow()->RemoveRenderer(this->mipRenderer[i]);
+		}
 	}
 
 }

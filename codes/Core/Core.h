@@ -123,6 +123,8 @@ private:
 	MEASUREMENT measurement;
 	DataProcessor dataProcessor;
 	Yolk3DSeries mipViewer;
+	vtkRenderer* mipRenderer[MainWindow::NUM_OF_2D_VIEWERS];
+	vtkSmartPointer<vtkPolyDataMapper> mipPolyDataMapper[MainWindow::NUM_OF_2D_VIEWERS];
 	
 
 	int currentImage[MainWindow::NUM_OF_2D_VIEWERS] = {DEFAULT_IMAGE};

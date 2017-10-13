@@ -32,7 +32,8 @@ void QInteractorStyleNavigation::SetCurrentSlice(int slice)
 	double imageCoord[3];
 	this->GetImageViewer()->GetFocalPointWithWorldCoordinate(imageCoord);
 	unsigned int orientation = this->GetImageViewer()->GetSliceOrientation();
-	emit signalImageCoord(imageCoord[0], imageCoord[1], imageCoord[2], orientation);
+	emit signalImagePos(imageCoord[0], imageCoord[1], imageCoord[2], orientation);
+	//emit signalImageCoord(imageCoord[0], imageCoord[1], imageCoord[2], orientation);
 }
 
 QInteractorStyleNavigation::QInteractorStyleNavigation(int uiType, QWidget * parent)

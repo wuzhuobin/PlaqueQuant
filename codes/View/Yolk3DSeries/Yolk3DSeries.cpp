@@ -62,6 +62,7 @@ using itk::MetaDataDictionary;
 //#include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageViewer2.h>
+#include <vtkCommand.h>
 #include <QVTKInteractor.h>
 
 
@@ -102,6 +103,33 @@ protected:
 
 };
 
+class Yolk3DSeriesCommand : public vtkCommand
+{
+public:
+	static Yolk3DSeriesCommand* New() { return new Yolk3DSeriesCommand; }
+	vtkTypeMacro(Yolk3DSeriesCommand, vtkCommand);
+	Yolk3DSeries* Self = nullptr;
+	virtual void Execute(vtkObject *caller, unsigned long eventId,
+		void *callData) VTK_OVERRIDE {
+		
+		this->AbortFlagOn();
+		int slice = this->Self->getUi()->spinBoxSlice->value();
+		switch (eventId)
+		{
+		case vtkCommand::MouseWheelBackwardEvent:
+			this->Self->getUi()->spinBoxSlice->setValue(--slice);
+			break;
+		case vtkCommand::MouseWheelForwardEvent:
+			this->Self->getUi()->spinBoxSlice->setValue(++slice);
+			break;
+		default:
+			break;
+		}
+	}
+
+
+};
+
 Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	:QWidget(parent)
 {
@@ -110,10 +138,17 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	/* Create UI */
 	this->setMinimumSize(800, 600);
 
+	Yolk3DSeriesCommand* command = Yolk3DSeriesCommand::New();
+	command->Self = this;
+
+
 	this->imageViewer = vtkSmartPointer<Yolk3DSeriesViewer>::New();
 	this->imageViewer->SetRenderWindow(this->ui->widgetViewer->GetRenderWindow());
 	this->imageViewer->SetupInteractor(this->ui->widgetViewer->GetInteractor());
-
+	this->ui->widgetViewer->GetInteractor()->AddObserver(vtkCommand::MouseWheelBackwardEvent, command, 1);
+	this->ui->widgetViewer->GetInteractor()->AddObserver(vtkCommand::MouseWheelForwardEvent, command, 1);
+	command->Delete();
+	
 	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = 
 	//	vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
 	//this->ui->widgetViewer->GetInteractor()->SetInteractorStyle(style);
@@ -124,14 +159,14 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->planeSource->SetCenter(0, 0, 0);
 	this->planeSource->SetNormal(0, 0, 1);
 
-	//vtkSmartPointer<vtkPolyDataMapper> planeMapper =
-	//	vtkSmartPointer<vtkPolyDataMapper>::New();
-	//planeMapper->SetInputConnection(this->planeSource->GetOutputPort());
-	//planeMapper->ScalarVisibilityOff();
+	vtkSmartPointer<vtkPolyDataMapper> planeMapper =
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	planeMapper->SetInputConnection(this->planeSource->GetOutputPort());
+	planeMapper->ScalarVisibilityOff();
 
 	//this->planeActor = vtkSmartPointer<vtkActor>::New();
 	//this->planeActor->SetMapper(planeMapper);
-	//this->planeActor->VisibilityOff();
+	////this->planeActor->VisibilityOff();
 	//this->planeActor->GetProperty()->SetColor(1, 1, 0);
 
 	//this->imageViewer->GetRenderer()->AddActor(planeActor);
@@ -141,8 +176,11 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	//this->planeSource2->SetPoint1(1000, 0, 0);
 	//this->planeSource2->SetPoint2(0, 1000, 0);
 
-	this->imageDirection = vtkSmartPointer<vtkMatrix4x4>::New();
+	this->imageDirection = vtkSmartPointer<vtkMatrix4x4>::New(); 
 	this->imageDirection->Identity();
+
+	this->inverseImageDirection = vtkSmartPointer<vtkMatrix4x4>::New();
+	this->inverseImageDirection->Identity();
 
 	//vtkSmartPointer<vtkTransform> transform2 =
 	//	vtkSmartPointer<vtkTransform>::New();
@@ -165,29 +203,31 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->imageViewer->GetRenderer()->AddActor(planeActor2)*/;
 
 
-	this->plane = vtkSmartPointer<vtkPlane>::New();
-	
-	this->cutter = vtkSmartPointer<vtkCutter>::New();
-	this->cutter->SetCutFunction(this->plane);
-	this->cutter->SetInputConnection(this->planeSource->GetOutputPort());
-	this->cutter->GenerateCutScalarsOff();
+	for (int i = 0; i < 3; i++)
+	{
+		this->plane[i] = vtkSmartPointer<vtkPlane>::New();
 
-	vtkSmartPointer<vtkPassArrays> passArrays =
-		vtkSmartPointer<vtkPassArrays>::New();
-	passArrays->SetInputConnection(this->cutter->GetOutputPort());
-	passArrays->UseFieldTypesOn();
-	passArrays->AddFieldType(vtkDataObject::POINT);
-	passArrays->AddFieldType(vtkDataObject::CELL);
-	passArrays->AddFieldType(vtkDataObject::FIELD);
-	passArrays->ClearArrays();
+		this->cutter[i] = vtkSmartPointer<vtkCutter>::New();
+		this->cutter[i]->SetCutFunction(this->plane[i]);
+		this->cutter[i]->SetInputConnection(this->planeSource->GetOutputPort());
+		this->cutter[i]->GenerateCutScalarsOff();
 
-	vtkSmartPointer<vtkPolyDataMapper> lineMapper =
-		vtkSmartPointer<vtkPolyDataMapper>::New();
-	lineMapper->SetInputConnection(passArrays->GetOutputPort());
-	lineMapper->ScalarVisibilityOff();
+		this->passArrays[i] =
+			vtkSmartPointer<vtkPassArrays>::New();
+		this->passArrays[i]->SetInputConnection(this->cutter[i]->GetOutputPort());
+		this->passArrays[i]->UseFieldTypesOn();
+		this->passArrays[i]->AddFieldType(vtkDataObject::POINT);
+		this->passArrays[i]->AddFieldType(vtkDataObject::CELL);
+		this->passArrays[i]->AddFieldType(vtkDataObject::FIELD);
+		this->passArrays[i]->ClearArrays();
+	}
+
+	this->lineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	this->lineMapper->SetInputConnection(passArrays[0]->GetOutputPort());
+	this->lineMapper->ScalarVisibilityOff();
 	
 	this->lineActor = vtkSmartPointer<vtkActor>::New();
-	this->lineActor->SetMapper(lineMapper);
+	this->lineActor->SetMapper(this->lineMapper);
 	this->lineActor->GetProperty()->SetColor(1, 0, 0);
 	this->lineActor->VisibilityOff();
 
@@ -207,17 +247,54 @@ Yolk3DSeries::~Yolk3DSeries()
 {
 	delete this->ui;
 }
-
 void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 {
 	this->imageDirection->DeepCopy(direction);
+	this->inverseImageDirection->DeepCopy(direction);
+	//this->inverseImageDirection->Invert();
+	vtkTransform* trans = vtkTransform::New();
+	cout << "imageDirection" << endl;
+	this->imageDirection->Print(cout);
+	cout << "beforce" << endl;
+	cout << "inverseImageDirection" << endl;
+	this->inverseImageDirection->Print(cout);
+	trans->SetMatrix(this->imageDirection);
+	trans->PostMultiply();
+	trans->Inverse();
+	trans->Translate(
+		this->imageDirection->GetElement(0, 3),
+		this->imageDirection->GetElement(1, 3),
+		this->imageDirection->GetElement(2, 3) );
+	trans->GetMatrix(this->inverseImageDirection);
+	cout << "after" << endl;
+	cout << "inverseImageDirection" << endl;
+	this->inverseImageDirection->Print(cout);
+	//this->inverseImageDirection->SetElement(0, 3, 0);
+	//this->inverseImageDirection->SetElement(1, 3, 0);
+	//this->inverseImageDirection->SetElement(2, 3, 0);
+
 }
+vtkMatrix4x4 * Yolk3DSeries::getImageDirection()
+{
+	return this->imageDirection; 
+}
+
+vtkMatrix4x4 * Yolk3DSeries::getInverseImageDirection()
+{
+	return this->inverseImageDirection;
+}
+
+//
+//void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
+//{
+//	this->imageDirection->DeepCopy(direction);
+//}
 
 
 
 void Yolk3DSeries::on_pushButtonLoad_clicked()
 {
-	RegistrationWizard rw(1);
+	RegistrationWizard rw("E:/work/IADE/T2propeller&MRA", 1);
 	QStringList fileNames;
 	rw.setImageModalityNames(0, "MIP Image");
 	if (rw.exec() == QWizard::Accepted) {
@@ -343,6 +420,7 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int slice)
 
 	vtkSmartPointer<vtkTransform> tranform = 
 		vtkSmartPointer<vtkTransform>::New();
+	tranform->PostMultiply();
 	tranform->SetMatrix(this->imageMatrixes[slice]);
 	tranform->Inverse();
 
@@ -417,33 +495,51 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int slice)
 	//this->imageViewer->GetImageActor()->SetPosition(position);
 	//this->imageViewer->GetImageActor()->SetOrientation(orientation);
 	this->imageViewer->Render();
+
 }
 
-void Yolk3DSeries::SetWorldCoordinate(double x, double y, double z, unsigned int i)
+vtkAlgorithmOutput * Yolk3DSeries::getLineOutput(int i)
 {
-	double origin[4] = {
-		x - this->imageDirection->GetElement(0, 3), 
-		y - this->imageDirection->GetElement(1, 3), 
-		z - this->imageDirection->GetElement(2, 3), 
+	return this->passArrays[i]->GetOutputPort();
+}
+
+//vtkPolyDataMapper * Yolk3DSeries::getLineMapper()
+//{
+//	return this->lineMapper;
+//}
+
+void Yolk3DSeries::setImageCoordinate(int x, int y, int z, unsigned int direction)
+{
+
+
+
+	for (int i = 0; i < 3; i++)
+	{
+		double normal[4] = { 0 ,0, 0, 0 };
+		double origin[4] = {
+		x - this->imageDirection->GetElement(0, 3),
+		y - this->imageDirection->GetElement(1, 3),
+		z - this->imageDirection->GetElement(2, 3),
 		1 };
+		normal[i] = 1;
 
+		this->imageDirection->MultiplyPoint(origin, origin);
+		this->imageDirection->MultiplyPoint(normal, normal);
 
-	double normal[4] = { 0 ,0, 0, 0 };
-	normal[i] = 1;
+		this->plane[i]->SetOrigin(origin);
+		this->plane[i]->SetNormal(normal);
+	}
 	
-
+	this->lineMapper->SetInputConnection(this->passArrays[direction]->GetOutputPort());
 	//cout << "Before" << endl;
 	//cout << "Normal: ";
 	//print_vector(cout, normal, 4);
 	//cout << "Origin: ";
 	//print_vector(cout, origin, 4);
-
-	this->imageDirection->MultiplyPoint(origin, origin);
-	this->imageDirection->MultiplyPoint(normal, normal);
 	//this->planeSource2->SetCenter(origin);
 	//this->planeSource2->SetNormal(normal);
-	this->plane->SetOrigin(origin);
-	this->plane->SetNormal(normal);
+	//this->plane->SetOrigin(origin);
+	//this->plane->SetNormal(normal);
 
 
 	//cout << "After" << endl;

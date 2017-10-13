@@ -23,6 +23,11 @@ class vtkPlane;
 class vtkActor;
 class vtkMatrix4x4;
 class vtkSphereSource;
+class vtkPolyData;
+class vtkPolyDataMapper;
+class vtkAlgorithmOutput;
+class vtkPassArrays;
+
 namespace Ui { class Yolk3DSeries; }
 
 class Yolk3DSeries : public QWidget
@@ -33,14 +38,19 @@ public:
 	~Yolk3DSeries();
 
 	void setImageDirection(vtkMatrix4x4* direction);
+	vtkMatrix4x4* getImageDirection();
+	vtkMatrix4x4* getInverseImageDirection();
+	Ui::Yolk3DSeries* getUi() { return this->ui; }
+
+	vtkAlgorithmOutput* getLineOutput(int i);
 
 public slots:
 
 
 	void on_pushButtonLoad_clicked();
-	void SetWorldCoordinate(double x, double y, double z, unsigned int i);
-	//void slotUpdate();
+	void setImageCoordinate(int x, int y, int z, unsigned int direction);
 	void on_spinBoxSlice_valueChanged(int value);
+
 
 protected:
 
@@ -57,13 +67,16 @@ protected:
 	//vtkSmartPointer<vtkActor> planeActor2;
 	//vtkSmartPointer<vtkTransformPolyDataFilter> planeTransform2;
 
-	vtkSmartPointer<vtkPlane> plane;
-	vtkSmartPointer<vtkCutter> cutter;
+	vtkSmartPointer<vtkPassArrays> passArrays[3];
+	vtkSmartPointer<vtkPlane> plane[3];
+	vtkSmartPointer<vtkCutter> cutter[3];
+	vtkSmartPointer<vtkPolyDataMapper> lineMapper;
 	vtkSmartPointer<vtkActor> lineActor;
 
 
 
 	vtkSmartPointer<vtkMatrix4x4> imageDirection;
+	vtkSmartPointer<vtkMatrix4x4> inverseImageDirection;
 
 	Ui::Yolk3DSeries* ui;
 
