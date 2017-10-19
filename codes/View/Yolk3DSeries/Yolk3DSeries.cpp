@@ -135,6 +135,7 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 {
 	this->ui = new Ui::Yolk3DSeries;
 	this->ui->setupUi(this);
+	this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	/* Create UI */
 	this->setMinimumSize(800, 600);
 

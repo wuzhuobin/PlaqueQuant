@@ -164,6 +164,47 @@ MainWindow::MainWindow(QWidget *parent)
 		this, SLOT(slotExportCSV()));
 	createRecentImageActions();
 
+
+	this->ui->menuImage->setEnabled(false);
+	this->ui->menuSurface->setEnabled(false);
+	this->ui->menuSegmentation->setEnabled(false);
+	this->ui->menuDiagnosis->menuAction()->setVisible(false);
+	this->ui->menuView->setEnabled(false);
+	this->ui->actionNew_segmentation->setEnabled(false);
+	this->ui->actionImport_segmentation->setEnabled(false);
+	this->ui->actionExport_curved_images->setEnabled(false);
+	this->ui->actionExport_segmentation->setEnabled(false);
+	this->ui->actionMulti_planar_view->setEnabled(false);
+	this->ui->actionAll_axial_view->setEnabled(false);
+
+	this->ui->actionNavigation->setEnabled(false);
+	this->ui->actionWindow_level->setEnabled(false);
+	this->ui->actionMaximum_wall_thickness->setEnabled(false);
+	this->ui->acitonVOI_selection->setEnabled(false);
+	this->ui->actionTubular_VOI->setEnabled(false);
+	this->ui->actionSeeds_placer->setEnabled(false);
+	this->ui->actionVessel_segmentation->setEnabled(false);
+	this->ui->actionCurved_view->setEnabled(false);
+	this->ui->actionMIP->setEnabled(false);
+
+
+
+	this->ui->actionTesting->setVisible(false);
+	this->ui->actionWindow_level->setVisible(false);
+	this->ui->actionPolygon_draw->setVisible(false);
+	this->ui->actionPolygon_draw_series->setVisible(false);
+	this->ui->actionDistance_measure->setVisible(false);
+	this->ui->actionVBD_Smoker_seed->setVisible(false);
+	this->ui->actionPerpendicular_measurement->setVisible(false);
+	this->ui->actionFind_maximum_radius->setVisible(false);
+
+	this->ui->actionTraceball_camera->setVisible(false);
+	this->ui->actionWay_point_centerline->setVisible(false);
+	this->ui->actionICDA_diameter->setVisible(false);
+	this->ui->actionVBD_Smoker_BA_diameter->setVisible(false);
+	this->ui->actionVBD_ubogu_measure->setVisible(false);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -357,6 +398,24 @@ void MainWindow::initialization()
 	ui->actionNavigation->trigger();
 
 	measurementWidget->slotUpdateInformation();
+
+	this->ui->menuImage->setEnabled(true);
+	this->ui->actionNavigation->setEnabled(true);
+	this->ui->actionWindow_level->setEnabled(true);
+	this->ui->actionMaximum_wall_thickness->setEnabled(true);
+	this->ui->acitonVOI_selection->setEnabled(true);
+	this->ui->actionTubular_VOI->setEnabled(true);
+	this->ui->actionSeeds_placer->setEnabled(true);
+	this->ui->actionVessel_segmentation->setEnabled(true);
+	this->ui->actionCurved_view->setEnabled(true);
+	this->ui->actionAll_axial_view->setEnabled(true);
+	this->ui->actionMulti_planar_view->setEnabled(true);
+	this->ui->actionMIP->setEnabled(true);
+	this->ui->menuView->setEnabled(true);
+	this->ui->actionNew_segmentation->setEnabled(true);
+	this->ui->actionImport_segmentation->setEnabled(true);
+	this->ui->actionExport_curved_images->setEnabled(true);
+	this->ui->actionExport_segmentation->setEnabled(true);
 }
 
 void MainWindow::enableInteractor(bool flag)

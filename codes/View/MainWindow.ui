@@ -279,6 +279,7 @@
    <addaction name="acitonVOI_selection"/>
    <addaction name="actionTubular_VOI"/>
    <addaction name="actionSeeds_placer"/>
+   <addaction name="actionVessel_segmentation"/>
    <addaction name="actionPolygon_draw"/>
    <addaction name="actionPaint_brush"/>
    <addaction name="separator"/>

@@ -1,23 +1,15 @@
+#include <QApplication>
+#include <qdebug.h>
 
 #include "EncryptionAuthentication.h"
-#include "Core.h"
-#include "MainWindow.h"
-#include <QtWidgets/QApplication>
 
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 
-
-int main(int argc, char *argv[])
-{
-	itk::Object::GlobalWarningDisplayOff();
-	vtkObject::GlobalWarningDisplayOff();
-
-
-
-		QApplication app(argc, argv);
+int main(int argc, char** argv) {
+	QApplication app(argc, argv);
 	// MainWindow mainWind;
 	EncryptionAuthentication ea(0, QString(), QString(),
-		QDateTime(QDate(2018, 12, 31),
+		QDateTime(QDate(2017, 01, 10),
 			QTime(24, 0, 0)), 
 		"68686868");
 
@@ -37,9 +29,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	else {
-		Core c;
 		// mainWnd.show(); 
 		return app.exec();
 	}
-
 }

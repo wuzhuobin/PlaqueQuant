@@ -13,13 +13,29 @@
 
 #include <math.h>
 
-class vtkvmtkCurvedMPRImageFilterNearestInterpolation : public vtkvmtkCurvedMPRImageFilter
+class vtkvmtkCurvedMPRImageFilter2 : public vtkvmtkCurvedMPRImageFilter
 {
 public:
-	static vtkvmtkCurvedMPRImageFilterNearestInterpolation* New() {
-		return new vtkvmtkCurvedMPRImageFilterNearestInterpolation();
+	static vtkvmtkCurvedMPRImageFilter2* New() {
+		return new vtkvmtkCurvedMPRImageFilter2();
 	}
-	vtkTypeMacro(vtkvmtkCurvedMPRImageFilterNearestInterpolation, vtkvmtkCurvedMPRImageFilter);
+	vtkTypeMacro(vtkvmtkCurvedMPRImageFilter2, vtkvmtkCurvedMPRImageFilter);
+
+
+	  //@{
+  /**
+   * Set interpolation mode (default: nearest neighbor).
+   */
+  vtkSetClampMacro(InterpolationMode, int,
+                   VTK_RESLICE_NEAREST, VTK_RESLICE_CUBIC);
+  vtkGetMacro(InterpolationMode, int);
+  void SetInterpolationModeToNearestNeighbor() {
+    this->SetInterpolationMode(VTK_RESLICE_NEAREST); };
+  void SetInterpolationModeToLinear() {
+    this->SetInterpolationMode(VTK_RESLICE_LINEAR); };
+  void SetInterpolationModeToCubic() {
+    this->SetInterpolationMode(VTK_RESLICE_CUBIC); };
+
 protected:
 	// Description:
 	// This method is called by the superclass and performs the actual computation of the MPR image
@@ -56,11 +72,20 @@ protected:
 				outputImage->SetWholeExtent(outputExtent);
 				outputImage->SetUpdateExtent(outputExtent);
 				outputImage->AllocateScalars();
-#else
+#elif (VTK_MAJOR_VERSION < 7)
 				this->UpdateInformation();
 				vtkStreamingDemandDrivenPipeline::SetUpdateExtent(outInfo, outputExtent);
 				this->Update();
 				outputImage->AllocateScalars(outInfo);
+#else
+				if (this->GetOutputInformation(0))
+				{
+					this->GetOutputInformation(0)->Set(
+						vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
+						this->GetOutputInformation(0)->Get(
+							vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()), 6);
+					outputImage->AllocateScalars(outInfo);
+				}
 #endif
 			}
 
@@ -117,7 +142,7 @@ protected:
 		{
 			vtkErrorMacro(<< "RequestData: Too few points in Centerline.");
 			return 1;
-		}
+	}
 
 		vtkPoints* linePoints = line->GetPoints();
 
@@ -133,11 +158,20 @@ protected:
 		outputImage->SetWholeExtent(outExtent);
 		outputImage->SetUpdateExtent(outExtent);
 		outputImage->AllocateScalars();
-#else
+#elif (VTK_MAJOR_VERSION < 7)
 		this->UpdateInformation();
 		vtkStreamingDemandDrivenPipeline::SetUpdateExtent(outInfo, outExtent);
 		this->Update();
 		outputImage->AllocateScalars(outInfo);
+#else
+		if (this->GetOutputInformation(0))
+		{
+			this->GetOutputInformation(0)->Set(
+				vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
+				this->GetOutputInformation(0)->Get(
+					vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()), 6);
+			outputImage->AllocateScalars(outInfo);
+		}
 #endif
 
 		vtkDataArray* frenetTangentArray = this->Centerline->GetPointData()->GetArray(this->FrenetTangentArrayName);
@@ -160,14 +194,14 @@ protected:
 		}
 
 		vtkImageReslice* reslice = vtkImageReslice::New();
+		reslice->SetInterpolationMode(this->InterpolationMode);
 		reslice->SetOutputDimensionality(2);
 #if (VTK_MAJOR_VERSION <= 5)
 		reslice->SetInput(inputImage);
 #else
 		reslice->SetInputData(inputImage);
 #endif
-		reslice->SetInterpolationModeToNearestNeighbor();
-		reslice->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+		reslice->SetInterpolationModeToCubic();
 		//turn off transformation of the input spacin, origin and extent, so we can define what we want
 		reslice->TransformInputSamplingOff();
 		//set the value of the voxels that are out of the input data
@@ -258,6 +292,9 @@ protected:
 		}
 	}
 
+
+	int InterpolationMode;
+
 };
 
 DataProcessor::DataProcessor(QObject * parent)
@@ -315,9 +352,10 @@ void DataProcessor::initializeCurved()
 		}
 
 
-		vtkSmartPointer<vtkvmtkCurvedMPRImageFilter> curvedMPRImageFilter =
-			vtkSmartPointer<vtkvmtkCurvedMPRImageFilter>::New();
+		vtkSmartPointer<vtkvmtkCurvedMPRImageFilter2> curvedMPRImageFilter =
+			vtkSmartPointer<vtkvmtkCurvedMPRImageFilter2>::New();
 		curvedMPRImageFilter->SetInputData(inputImage);
+		//curvedMPRImageFilter->SetInterpolationModeToCubic();
 		curvedMPRImageFilter->SetCenterline(centerlineAttributes->GetOutput());
 		curvedMPRImageFilter->SetParallelTransportNormalsArrayName("Normals");
 		curvedMPRImageFilter->SetFrenetTangentArrayName("FrenetTangent");
@@ -340,9 +378,10 @@ void DataProcessor::initializeCurved()
 
 	inputImage = imageManager->getOverlay()->getData();
 
-	vtkSmartPointer<vtkvmtkCurvedMPRImageFilterNearestInterpolation> curvedMPRImageFilter =
-		vtkSmartPointer<vtkvmtkCurvedMPRImageFilterNearestInterpolation>::New();
+	vtkSmartPointer<vtkvmtkCurvedMPRImageFilter2> curvedMPRImageFilter =
+		vtkSmartPointer<vtkvmtkCurvedMPRImageFilter2>::New();
 	curvedMPRImageFilter->SetInputData(inputImage);
+	curvedMPRImageFilter->SetInterpolationModeToNearestNeighbor();
 	curvedMPRImageFilter->SetCenterline(centerlineAttributes->GetOutput());
 	curvedMPRImageFilter->SetParallelTransportNormalsArrayName("Normals");
 	curvedMPRImageFilter->SetFrenetTangentArrayName("FrenetTangent");
