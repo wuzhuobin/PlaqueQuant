@@ -12,7 +12,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
+    <width>1067</width>
     <height>800</height>
    </rect>
   </property>
@@ -97,7 +97,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>835</width>
+           <width>905</width>
            <height>69</height>
           </rect>
          </property>
@@ -116,7 +116,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1067</width>
      <height>21</height>
     </rect>
    </property>
@@ -311,7 +311,7 @@
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>dockWidget2D</string>
+    <string>2D Tool Box</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -357,7 +357,7 @@
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>dockWidget3D</string>
+    <string>3D Tool Box</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
