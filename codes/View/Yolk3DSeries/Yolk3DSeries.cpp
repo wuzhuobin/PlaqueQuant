@@ -295,7 +295,7 @@ vtkMatrix4x4 * Yolk3DSeries::getInverseImageDirection()
 
 void Yolk3DSeries::on_pushButtonLoad_clicked()
 {
-	RegistrationWizard rw("E:/work/IADE/T2propeller&MRA", 1);
+	RegistrationWizard rw("", 1);
 	QStringList fileNames;
 	rw.setImageModalityNames(0, "MIP Image");
 	if (rw.exec() == QWizard::Accepted) {
