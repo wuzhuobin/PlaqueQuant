@@ -50,6 +50,7 @@ public slots:
 	void on_pushButtonLoad_clicked();
 	void setImageCoordinate(int x, int y, int z, unsigned int direction);
 	void on_spinBoxSlice_valueChanged(int value);
+	void slotClose();
 
 
 protected:

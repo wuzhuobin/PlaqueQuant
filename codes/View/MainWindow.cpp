@@ -25,7 +25,7 @@
 #include "RegistrationWizard.h"
 
 MainWindow::MainWindow(QWidget *parent)
-	:QMainWindow(parent) 
+	:QMainWindow(parent)
 {
 	ui = new Ui::MainWindow;
 	ui->setupUi(this);
@@ -150,13 +150,13 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui->actionImport, SIGNAL(triggered()),
 		this, SLOT(slotOpen()));
-	connect(ui->actionImport_images, SIGNAL(triggered()), 
+	connect(ui->actionImport_images, SIGNAL(triggered()),
 		this, SLOT(slotOpenNewImage()));
 	connect(ui->actionExport_curved_images, SIGNAL(triggered()),
 		this, SLOT(slotSaveCurvedImage()));
 	connect(ui->actionImport_segmentation, SIGNAL(triggered()),
 		this, SLOT(slotOpenOverlay()));
-	connect(ui->actionExport_segmentation, SIGNAL(triggered()), 
+	connect(ui->actionExport_segmentation, SIGNAL(triggered()),
 		this, SLOT(slotSaveOverlay()));
 	connect(ui->actionExport_Report, SIGNAL(triggered()),
 		this, SLOT(slotExportReport()));
@@ -245,7 +245,7 @@ void MainWindow::slotOpen(QString path)
 	}
 	else if (openMessageBox.clickedButton() == segmentationButton)
 	{
-		if (QFileInfo(path).completeSuffix() == "nii" || 
+		if (QFileInfo(path).completeSuffix() == "nii" ||
 			QFileInfo(path).completeSuffix() == "nii.gz")
 		{
 			slotOpenOverlay(path);
@@ -551,4 +551,11 @@ void MainWindow::updateRecentActionList()
 
 	for (int i = itEnd; i < MAX_RECENT_IMAGE; i++)
 		recentFileActionList.at(i)->setVisible(false);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	emit signalThisClosing();
+
+	QMainWindow::closeEvent(event);
 }

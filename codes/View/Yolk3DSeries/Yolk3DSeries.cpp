@@ -111,7 +111,7 @@ public:
 	Yolk3DSeries* Self = nullptr;
 	virtual void Execute(vtkObject *caller, unsigned long eventId,
 		void *callData) VTK_OVERRIDE {
-		
+
 		this->AbortFlagOn();
 		int slice = this->Self->getUi()->spinBoxSlice->value();
 		switch (eventId)
@@ -149,8 +149,8 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->ui->widgetViewer->GetInteractor()->AddObserver(vtkCommand::MouseWheelBackwardEvent, command, 1);
 	this->ui->widgetViewer->GetInteractor()->AddObserver(vtkCommand::MouseWheelForwardEvent, command, 1);
 	command->Delete();
-	
-	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = 
+
+	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =
 	//	vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
 	//this->ui->widgetViewer->GetInteractor()->SetInteractorStyle(style);
 	this->imageViewer->GetImageActor()->VisibilityOff();
@@ -177,7 +177,7 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	//this->planeSource2->SetPoint1(1000, 0, 0);
 	//this->planeSource2->SetPoint2(0, 1000, 0);
 
-	this->imageDirection = vtkSmartPointer<vtkMatrix4x4>::New(); 
+	this->imageDirection = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->imageDirection->Identity();
 
 	this->inverseImageDirection = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -226,7 +226,7 @@ Yolk3DSeries::Yolk3DSeries(QWidget* parent /*= nullptr*/)
 	this->lineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->lineMapper->SetInputConnection(passArrays[0]->GetOutputPort());
 	this->lineMapper->ScalarVisibilityOff();
-	
+
 	this->lineActor = vtkSmartPointer<vtkActor>::New();
 	this->lineActor->SetMapper(this->lineMapper);
 	this->lineActor->GetProperty()->SetColor(1, 0, 0);
@@ -277,7 +277,7 @@ void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 }
 vtkMatrix4x4 * Yolk3DSeries::getImageDirection()
 {
-	return this->imageDirection; 
+	return this->imageDirection;
 }
 
 vtkMatrix4x4 * Yolk3DSeries::getInverseImageDirection()
@@ -326,11 +326,11 @@ void Yolk3DSeries::on_pushButtonLoad_clicked()
 		}
 		catch (const itk::ExceptionObject& e)
 		{
-			qWarning() << e.what(); 
+			qWarning() << e.what();
 			continue;
 		}
 
-		
+
 		IVtkImageData::itkImageType::PointType zeroOrigin;
 		zeroOrigin.Fill(0);
 
@@ -419,7 +419,7 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int slice)
 		return;
 	}
 
-	vtkSmartPointer<vtkTransform> tranform = 
+	vtkSmartPointer<vtkTransform> tranform =
 		vtkSmartPointer<vtkTransform>::New();
 	tranform->PostMultiply();
 	tranform->SetMatrix(this->imageMatrixes[slice]);
@@ -499,6 +499,12 @@ void Yolk3DSeries::on_spinBoxSlice_valueChanged(int slice)
 
 }
 
+
+void Yolk3DSeries::slotClose()
+{
+	this->close();
+}
+
 vtkAlgorithmOutput * Yolk3DSeries::getLineOutput(int i)
 {
 	return this->passArrays[i]->GetOutputPort();
@@ -530,7 +536,7 @@ void Yolk3DSeries::setImageCoordinate(int x, int y, int z, unsigned int directio
 		this->plane[i]->SetOrigin(origin);
 		this->plane[i]->SetNormal(normal);
 	}
-	
+
 	this->lineMapper->SetInputConnection(this->passArrays[direction]->GetOutputPort());
 	//cout << "Before" << endl;
 	//cout << "Normal: ";

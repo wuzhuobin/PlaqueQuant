@@ -22,7 +22,7 @@
 #include "IADEOverlay.h"
 #include "IADEMeasurement.h"
 #define IO_MANAGER IADEIOManager
-#define IMAGE_MANAGER IADEImageManager 
+#define IMAGE_MANAGER IADEImageManager
 #define OVERLAY IADEOverlay
 #define MEASUREMENT IADEMeasurement
 #endif // IADE_VER
@@ -53,7 +53,7 @@ public:
 	~Core();
 
 private slots:
-	
+
 
 	void slotIOManagerToImageManager();
 	void slotOverlayToImageManager();
@@ -115,6 +115,8 @@ private slots:
 
 	void slotRenderALlViewers();
 
+	void slotMainWndCloseEvent();
+
 
 private:
 	MainWindow mainWindow;
@@ -125,7 +127,7 @@ private:
 	Yolk3DSeries mipViewer;
 	vtkRenderer* mipRenderer[MainWindow::NUM_OF_2D_VIEWERS];
 	vtkSmartPointer<vtkPolyDataMapper> mipPolyDataMapper[MainWindow::NUM_OF_2D_VIEWERS];
-	
+
 
 	int currentImage[MainWindow::NUM_OF_2D_VIEWERS] = {DEFAULT_IMAGE};
 	bool currentCurved[MainWindow::NUM_OF_2D_VIEWERS] = { false };

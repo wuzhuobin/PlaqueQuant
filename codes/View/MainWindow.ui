@@ -923,6 +923,9 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Main/resources/IADE_Analyzer.qrc">
      <normaloff>:/icons/aami10-90-512.png</normaloff>:/icons/aami10-90-512.png</iconset>
@@ -932,6 +935,9 @@
    </property>
    <property name="toolTip">
     <string>Tubular VOI</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionWay_point_centerline">

@@ -1,5 +1,5 @@
 /**
-* MainWindow of 
+* MainWindow of
 * API class for using the Vikey USB authentication system. The class is derived from
 * QWidget. And this API class can only be used under Windows OS.
 *
@@ -62,7 +62,7 @@ public:
 	void setSelectImgMenuVisible(unsigned int num, bool flag);
 	void clearModalityNames();
 
-	// get ui things for connection 
+	// get ui things for connection
 	Ui::MainWindow* getUi();
 	Switch2DWidget* getSwitch2DWidget();
 	Switch3DWidget* getSwitch3DWidget();
@@ -82,10 +82,11 @@ signals:
 	void signalOverlayImportLoad(QString);
 	void signalOverlayExportSave(QString);
 	void signalReportExport(QString);
+	void signalThisClosing();
 
 
 private slots:
-	
+
 	void slotOpenRecentImage();
 	void slotOpenNewImage(QString path = QString());
 	void slotOpen(QString path = QString());
@@ -112,7 +113,8 @@ private:
 	void createRecentImageActions();
 	void adjustForCurrentFile(const QString& filePath);
 	void updateRecentActionList();
-	
+	void closeEvent(QCloseEvent *event) override;
+
 	ViewerWidget* viewerWidgets[NUM_OF_VIEWERS] = { nullptr };
 
 	Switch2DWidget* switch2DWidget = nullptr;

@@ -123,7 +123,7 @@ Core::Core(QObject * parent)
 			this->imageViewers[i]->Render();
 			int orientation = this->imageViewers[i]->GetSliceOrientation();
 			this->mipPolyDataMapper[i]->SetInputConnection(this->mipViewer.getLineOutput(orientation));
-			
+
 		});
 		mipPolyDataMapper[i] =
 			vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -358,7 +358,8 @@ Core::Core(QObject * parent)
 		mainWindow.getUi()->actionTraceball_camera, SLOT(trigger()));
 	connect(mainWindow.getUi()->actionUpdate_curved_images, SIGNAL(triggered()),
 		this, SLOT(slotInitializeCurvedImage()));
-
+	connect(&mainWindow, SIGNAL(signalThisClosing()),
+		&mipViewer, SLOT(slotClose()));
 
 	mainWindow.show();
 }
@@ -907,5 +908,10 @@ void Core::slotRenderALlViewers()
 	imageViewers[1]->Render();
 	imageViewers[2]->Render();
 	surfaceViewer[0]->Render();
+}
+
+void Core::slotMainWndCloseEvent()
+{
+	mipViewer.close();
 }
 
