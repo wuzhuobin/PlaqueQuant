@@ -201,7 +201,8 @@ protected:
 #else
 		reslice->SetInputData(inputImage);
 #endif
-		reslice->SetInterpolationModeToCubic();
+		//reslice->SetInterpolationModeToCubic();
+		reslice->SetInterpolationMode(this->InterpolationMode);
 		//turn off transformation of the input spacin, origin and extent, so we can define what we want
 		reslice->TransformInputSamplingOff();
 		//set the value of the voxels that are out of the input data
@@ -355,7 +356,7 @@ void DataProcessor::initializeCurved()
 		vtkSmartPointer<vtkvmtkCurvedMPRImageFilter2> curvedMPRImageFilter =
 			vtkSmartPointer<vtkvmtkCurvedMPRImageFilter2>::New();
 		curvedMPRImageFilter->SetInputData(inputImage);
-		//curvedMPRImageFilter->SetInterpolationModeToCubic();
+		curvedMPRImageFilter->SetInterpolationModeToCubic();
 		curvedMPRImageFilter->SetCenterline(centerlineAttributes->GetOutput());
 		curvedMPRImageFilter->SetParallelTransportNormalsArrayName("Normals");
 		curvedMPRImageFilter->SetFrenetTangentArrayName("FrenetTangent");
