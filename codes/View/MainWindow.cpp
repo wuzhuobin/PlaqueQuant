@@ -205,7 +205,7 @@ MainWindow::MainWindow(QWidget *parent)
 	this->ui->actionVBD_Smoker_BA_diameter->setVisible(false);
 	this->ui->actionVBD_ubogu_measure->setVisible(false);
 
-
+	this->setWindowTitle("Plaque Quant - ver 9");
 }
 
 MainWindow::~MainWindow()
