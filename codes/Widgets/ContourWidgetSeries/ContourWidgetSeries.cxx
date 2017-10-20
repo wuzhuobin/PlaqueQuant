@@ -225,18 +225,24 @@ void ContourWidgetSeries::MoveAction(vtkAbstractWidget *w)
 	case START:
 		break;
 	case MANIPULATE:
-	//{
-	//	int X = self->Interactor->GetEventPosition()[0];
-	//	int Y = self->Interactor->GetEventPosition()[1];
-	//	int state = self->WidgetRep->ComputeInteractionState(X, Y);
-	//	if (state == ContourWidgetSeriesRepresentation::OUTSIDE) {
-	//		return;
-	//	}
-	//}
+		//{
+		//	int X = self->Interactor->GetEventPosition()[0];
+		//	int Y = self->Interactor->GetEventPosition()[1];
+		//	int state = self->WidgetRep->ComputeInteractionState(X, Y);
+		//	if (state == ContourWidgetSeriesRepresentation::OUTSIDE) {
+		//		return;
+		//	}
+		//}
 	case DEFINE:
 		// else conduct to contours
 		self->InvokeEvent(vtkCommand::InteractionEvent, NULL);
-		self->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);
+		// fixing a bug that the vtkCommand#MouseMoveEvent can invoke accessing the first 
+		// point of vtkOrientGlyphContourRepresentation#FocalPoint, it is a tricky bug and 
+		// I don't want to know why, just a temporary fixation. 
+		if (self->Contours->size() != 0 && 
+			self->Contours->back()->GetContourRepresentation()->GetNumberOfNodes() > 1) {
+			self->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);
+		}
 		self->EventCallbackCommand->SetAbortFlag(1);
 		self->Render();
 	default:

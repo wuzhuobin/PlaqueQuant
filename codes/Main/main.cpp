@@ -5,6 +5,7 @@
 #include <QtWidgets/QApplication>
 
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+//#pragma comment(linker, "/SUBSYSTEM:console /ENTRY:mainCRTStartup")
 
 
 int main(int argc, char *argv[])
