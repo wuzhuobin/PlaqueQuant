@@ -162,6 +162,7 @@ MainWindow::MainWindow(QWidget *parent)
 		this, SLOT(slotExportReport()));
 	connect(ui->actionExport_CSV, SIGNAL(triggered()),
 		this, SLOT(slotExportCSV()));
+	connect(ui->actionAbout, SIGNAL(triggered()), SLOT(slotAbout()));
 	createRecentImageActions();
 
 
@@ -358,6 +359,17 @@ void MainWindow::slotImage(bool flag)
 		this->viewerWidgets[3]->getUi()->pushButtonRestore->setChecked(true);
 	}
 	//m_core->RenderAllViewer();
+}
+
+
+void MainWindow::slotAbout()
+{
+	QMessageBox msgBox;
+	msgBox.setIconPixmap(QPixmap(":/icons/plaqueQuant.png"));
+	msgBox.setText(QString("<h2 align='center'>Plaque Quant - version REPLACE_ME</h2>").replace("REPLACE_ME", QString::number(9)) +
+		QString("<br>This software is a quantative software for measuring plaque related medical diagnosis cursor in head and neck."));
+	msgBox.setWindowTitle("About");
+	msgBox.exec();
 }
 
 void MainWindow::imageImport(QString path)

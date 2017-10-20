@@ -248,7 +248,6 @@ Core::Core(QObject * parent)
 		this, SLOT(slotVBDSmokerSeed()));
 
 
-
 	// change view mode
 	connect(mainWindow.getUi()->actionCurved_view, SIGNAL(toggled(bool)),
 		this, SLOT(slotCurvedView(bool)));
@@ -358,6 +357,8 @@ Core::Core(QObject * parent)
 		mainWindow.getUi()->actionTraceball_camera, SLOT(trigger()));
 	connect(mainWindow.getUi()->actionUpdate_curved_images, SIGNAL(triggered()),
 		this, SLOT(slotInitializeCurvedImage()));
+
+	// Close event handling
 	connect(&mainWindow, SIGNAL(signalThisClosing()),
 		&mipViewer, SLOT(slotClose()));
 

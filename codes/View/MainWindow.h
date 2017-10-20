@@ -100,7 +100,7 @@ private slots:
 	* four viewers and maximum
 	*/
 	void slotImage(bool flag);
-
+	void slotAbout();
 
 private:
 	Ui::MainWindow* ui;
