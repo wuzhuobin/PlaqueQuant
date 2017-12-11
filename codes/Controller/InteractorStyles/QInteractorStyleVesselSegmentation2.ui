@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>298</width>
-    <height>487</height>
+    <width>308</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -332,7 +332,7 @@ Deleting focusing focusing contours.</string>
          <layout class="QVBoxLayout" name="verticalLayout_7"/>
         </widget>
         <widget class="QWidget" name="pageVesselWallSegmentation">
-         <layout class="QVBoxLayout" name="verticalLayout_8">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
@@ -385,6 +385,13 @@ Deleting focusing focusing contours.</string>
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonInterpolate">
+            <property name="text">
+             <string>Interpolate</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QFrame" name="vesselFrame">
@@ -719,7 +726,7 @@ Deleting focusing focusing contours.</string>
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

@@ -43,6 +43,7 @@ public slots:
 	virtual void CleanAll() override;
 
 	virtual void FillContours() override;
+	virtual void Interpolate();
 	//virtual void FillSlices() override;
 
 

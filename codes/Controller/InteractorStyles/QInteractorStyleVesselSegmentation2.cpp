@@ -21,6 +21,8 @@
 #include <vtkCallbackCommand.h>
 #include <vtkRenderWindowInteractor.h>
 
+#include <QSharedPointer>
+
 #include "MagneticContourLineInterpolator.h"
 #include "ContourWidgetSeries.h"
 #include "ContourWidgetSeriesOrientedGlyphRepresentation.h"
@@ -28,6 +30,7 @@
 #include "ReorderPointIdOfContourFilter.h"
 #include "LumenSegmentationFilter2.h"
 #include "ImageViewer.h"
+#include "ContourInterpolateFilter.h"
 
 vtkStandardNewMacro(QInteractorStyleVesselSegmentation2);
 QSETUP_UI_SRC(QInteractorStyleVesselSegmentation2);
@@ -232,6 +235,8 @@ void QInteractorStyleVesselSegmentation2::initialization()
 		this, SLOT(AutoVesselWallSegmentation()));
 	connect(ui->spinBoxVesselWallThickness, SIGNAL(valueChanged(int)),
 		this, SLOT(setVesselWallSegmentationRadius(int)));
+	connect(ui->pushButtonInterpolate, SIGNAL(clicked()),
+		this, SLOT(Interpolate()));
 
 	// fill slices
 	connect(ui->spinBoxFillSlicesBegin, SIGNAL(valueChanged(int)),
@@ -506,6 +511,79 @@ void QInteractorStyleVesselSegmentation2::FillContours()
 	GetImageViewer()->GetOverlay()->Modified();
 	GetImageViewer()->GetOverlay()->InvokeEvent(vtkCommand::UpdateDataEvent);
 	SAFE_DOWN_CAST_IMAGE_CONSTITERATOR(InteractorStylePolygonDrawSeries, GetImageViewer()->Render());
+
+}
+
+void QInteractorStyleVesselSegmentation2::Interpolate()
+{
+
+	if (!m_lumenContours->GetEnabled() ||
+		GetSliceOrientation() != ImageViewer::SLICE_ORIENTATION_XY) {
+		return;
+	}
+
+	ContourInterpolateFilter contourInterpolateFilter;
+
+	int extent[6];
+	std::copy(this->GetImageViewer()->GetDisplayExtent(),
+		this->GetImageViewer()->GetDisplayExtent() + 6, extent);
+	int sliceMin = extent[5];
+	int sliceMax = extent[4];
+
+	for (ContourMap::const_iterator cit = m_normalXY.cbegin(); cit != m_normalXY.cend(); ++cit) {
+
+		if (cit.value()->size() < 1) {
+			continue;
+		}
+		vtkDataArray* colorArray = cit.value()->first()->GetCellData()->GetArray(COLOUR);
+		if (!colorArray)
+		{
+			continue;
+		}
+
+		double* colour = colorArray->GetTuple3(0);
+		if (colour[0] != 0 ||
+			colour[1] != 0 ||
+			colour[2] != 1) {
+			continue;
+		}
+		if (cit.key() < sliceMin) {
+			sliceMin = cit.key();
+		}
+
+		if (cit.key() > sliceMax) {
+			sliceMax = cit.key();
+		}
+
+		contourInterpolateFilter.AddSliceContour(cit.value()->first(), cit.key());
+	}
+
+	QList<unsigned int> slice;
+	for (int i = sliceMin; i <= sliceMax; i++) {
+		slice << i;
+	}
+
+	contourInterpolateFilter.SetInterpolateSlices(slice);
+	contourInterpolateFilter.Update();
+
+	// extract vessel wall contour polydata
+
+	while (!slice.isEmpty())
+	{
+		ContourMapElementPtr elementVesselWall = ContourMapElementPtr(new PolyDataList);
+		int index = static_cast<int>( slice.takeLast());
+
+		vtkSmartPointer<vtkPolyData> nodePolyData =
+			vtkSmartPointer<vtkPolyData>::New();
+		vtkPolyData* _nodePolyData = contourInterpolateFilter.GetSliceOutput(index);
+		if (!_nodePolyData) {
+			continue;
+		}
+		nodePolyData->ShallowCopy(_nodePolyData);
+		(*elementVesselWall) << nodePolyData;
+		m_vesselWall[index] = elementVesselWall;
+
+	}
 
 }
 

@@ -254,11 +254,11 @@ void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 	this->inverseImageDirection->DeepCopy(direction);
 	//this->inverseImageDirection->Invert();
 	vtkTransform* trans = vtkTransform::New();
-	cout << "imageDirection" << endl;
-	this->imageDirection->Print(cout);
-	cout << "beforce" << endl;
-	cout << "inverseImageDirection" << endl;
-	this->inverseImageDirection->Print(cout);
+	//cout << "imageDirection" << endl;
+	//this->imageDirection->Print(cout);
+	//cout << "beforce" << endl;
+	//cout << "inverseImageDirection" << endl;
+	//this->inverseImageDirection->Print(cout);
 	trans->SetMatrix(this->imageDirection);
 	trans->PostMultiply();
 	trans->Inverse();
@@ -267,9 +267,9 @@ void Yolk3DSeries::setImageDirection(vtkMatrix4x4 * direction)
 		this->imageDirection->GetElement(1, 3),
 		this->imageDirection->GetElement(2, 3) );
 	trans->GetMatrix(this->inverseImageDirection);
-	cout << "after" << endl;
-	cout << "inverseImageDirection" << endl;
-	this->inverseImageDirection->Print(cout);
+	//cout << "after" << endl;
+	//cout << "inverseImageDirection" << endl;
+	//this->inverseImageDirection->Print(cout);
 	//this->inverseImageDirection->SetElement(0, 3, 0);
 	//this->inverseImageDirection->SetElement(1, 3, 0);
 	//this->inverseImageDirection->SetElement(2, 3, 0);
